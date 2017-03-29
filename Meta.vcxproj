@@ -112,9 +112,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="char_list.hpp" />
-    <ClCompile Include="tests\apply_first_n_value_test.cpp" />
-    <ClCompile Include="tests\char_list_test.cpp" />
-    <ClCompile Include="tests\string_literal_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="apply_first_n_value.hpp" />
