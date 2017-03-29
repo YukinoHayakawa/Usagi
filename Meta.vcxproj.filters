@@ -18,9 +18,21 @@
     <ClCompile Include="tests\apply_first_n_value_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="char_list.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\char_list_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\string_literal_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="apply_first_n_value.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="string_literal.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
