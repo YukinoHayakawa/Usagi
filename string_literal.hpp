@@ -20,7 +20,7 @@ struct basic_string_literal
      */
     constexpr basic_string_literal(const T (&arr)[N]) : data {}
     {
-        for(auto i = 0; i < N; ++i)
+        for(size_t i = 0; i < N; ++i)
             data[i] = arr[i];
     }
 
@@ -30,7 +30,7 @@ struct basic_string_literal
     */
     constexpr basic_string_literal(const T(&arr)[N + 1]) : data { }
     {
-        for(auto i = 0; i < N; ++i)
+        for(size_t i = 0; i < N; ++i)
             data[i] = arr[i];
     }
 
@@ -41,7 +41,7 @@ struct basic_string_literal
      * \return 
      */
     template <size_t N2>
-    constexpr bool operator ==(const T (&rhs)[N2])
+    constexpr bool operator ==(const T (&rhs)[N2]) const
     {
         if(N2 <= N) return false;
         for(size_t i = 0; i < N; ++i)
@@ -52,7 +52,7 @@ struct basic_string_literal
     }
 
     template <size_t N2>
-    constexpr bool operator !=(const T(&rhs)[N2])
+    constexpr bool operator !=(const T(&rhs)[N2]) const
     {
         return !((*this) == rhs);
     }
