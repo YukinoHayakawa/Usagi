@@ -1,4 +1,4 @@
-#include "../Meta/string_literal.hpp"
+#include <Meta/string_literal.hpp>
 
 using namespace yuki;
 

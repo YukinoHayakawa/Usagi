@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="string_literal_test.cpp">
+    <ClCompile Include="Meta\apply_first_n_value_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="apply_first_n_value_test.cpp">
+    <ClCompile Include="Meta\char_list_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="char_list_test.cpp">
+    <ClCompile Include="Meta\string_literal_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

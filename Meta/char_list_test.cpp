@@ -1,13 +1,13 @@
 #include <type_traits>
 
-#include "../Meta/char_list.hpp"
+#include <Meta/char_list.hpp>
 
 using namespace yuki;
 
 typedef char_list<'h', 'e', 'l', 'l', 'o' > ref;
 typedef char_list<'h', 'e', 'l', 'l', 'o', 0, 0 > ref2;
 typedef YUKI_MAKE_CHAR_LIST("hello") from_string;
-typedef YUKI_MAKE_CHAR_LIST_STRINGIFY(hello) stringified;
+typedef YUKI_MAKE_CHAR_LIST_STRINGIZE(hello) stringified;
 
 static_assert(std::is_same<from_string, ref>::value, "YUKI_MAKE_CHAR_LIST");
 static_assert(std::is_same<stringified, ref>::value, "YUKI_MAKE_CHAR_LIST_STRINGIFY");

@@ -111,9 +111,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="apply_first_n_value_test.cpp" />
-    <ClCompile Include="char_list_test.cpp" />
-    <ClCompile Include="string_literal_test.cpp" />
+    <ClCompile Include="Meta\apply_first_n_value_test.cpp" />
+    <ClCompile Include="Meta\char_list_test.cpp" />
+    <ClCompile Include="Meta\string_literal_test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
