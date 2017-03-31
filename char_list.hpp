@@ -77,6 +77,6 @@ using char_list = basic_char_list<char, Ch...>;
     >::c_string_t \
 /**/
 
-#define YUKI_MAKE_CHAR_LIST_STRINGIFY(token) \
+#define YUKI_MAKE_CHAR_LIST_STRINGIZE(token) \
     YUKI_MAKE_CHAR_LIST(#token) \
 /**/
