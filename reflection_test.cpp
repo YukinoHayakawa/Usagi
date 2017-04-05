@@ -2,6 +2,8 @@
 
 #include "../Reflection/reflection.hpp"
 
+namespace foo { namespace bar {
+
 class A { };
 class B { };
 
@@ -19,18 +21,16 @@ public:
     enum F { };
 };
 
-YUKI_REFL_CLASS_BEGIN(C)
-YUKI_REFL_BASE_CLASSES(A, B)
-YUKI_REFL_NESTED_TYPES(
-    D, E, F
-)
-YUKI_REFL_MEMBERS(
-    foo, bar,
-    baz
-)
-YUKI_REFL_CLASS_END()
+}}
+
+YUKI_REFL_CLASS((foo, bar), C, (
+    YUKI_REFL_BASE_CLASSES(A, B)
+    YUKI_REFL_NESTED_TYPES(D, E, F)
+    YUKI_REFL_MEMBERS(foo, bar, baz)
+))
 
 using namespace yuki;
+using namespace foo::bar;
 
 // base class tests
 static_assert(class_traits<C>::base_classes::size == 2, "base class size");

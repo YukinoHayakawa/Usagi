@@ -15,8 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="reflection_test.cpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="reflection_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
