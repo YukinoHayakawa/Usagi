@@ -4,7 +4,12 @@
  * This file contains a set of macro for defining compile-time reflection information
  * for class and enum. The structure of definied information is conforming to std::class_traits
  * described in N4428 [1], with an extra field class_traits::identifier containing the
- * name of reflected class and nested in another namespace.
+ * name of reflected class and nested in another namespace. The contents of the structures,
+ * however, are not identical to that described in the proposal. The user of macro must
+ * decide what information should be exposed, not only for public base classes and members.
+ * 
+ * Other macros for fine-grained control over exposed information will be added in the future
+ * to support serialization, script binding, GUI widget rendering, etc.
  * 
  * To use the macros, follow the example below:
  *
@@ -125,9 +130,6 @@ struct refl_nested_type
  * \param _identifier The unqualified name of reflected class.
  * \param _elements Optional elements enclosed in a pair of (). Available elements include
  * YUKI_REFL_BASE_CLASSES, YUKI_REFL_NESTED_TYPES, and YUKI_REFL_MEMBERS.
- * In the expansion of this macro the elements are fully expanded into a large amount of
- * tokens, then they are sent to YUKI_TOKEN_REASSEMBLE to relink with commas with the extra
- * parentheses removed. This technique is from http://stackoverflow.com/a/35999754
  */
 #define YUKI_REFL_CLASS(_namespace, _identifier, _elements) \
 namespace yuki { namespace detail { namespace reflection_meta { YUKI_MAKE_NESTED_NAMESPACE(_namespace, (\
