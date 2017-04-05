@@ -24,5 +24,8 @@
     <ClCompile Include="Meta\string_literal_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Preprocessor\make_nested_namespace_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
