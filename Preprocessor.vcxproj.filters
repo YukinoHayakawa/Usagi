@@ -21,5 +21,8 @@
     <ClInclude Include="make_nested_namespace.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="infix_join.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

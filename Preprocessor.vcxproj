@@ -111,6 +111,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="infix_join.hpp" />
     <ClInclude Include="make_nested_namespace.hpp" />
     <ClInclude Include="unpack.hpp" />
   </ItemGroup>
