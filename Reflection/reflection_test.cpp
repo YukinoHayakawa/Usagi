@@ -1,6 +1,6 @@
 #include <type_traits>
 
-#include "../Reflection/reflection.hpp"
+#include <Reflection/reflection.hpp>
 
 namespace foo { namespace bar {
 
