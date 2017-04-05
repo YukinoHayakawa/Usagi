@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="make_nested_namespace.hpp">
+    <ClInclude Include="unpack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
