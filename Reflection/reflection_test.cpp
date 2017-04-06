@@ -55,3 +55,14 @@ static_assert(class_traits<C>::nested_types::get<0>::identifier == "D", "nested 
 
 static_assert(std::is_same<class_traits<C>::nested_types::get<2>::type, C::F>::value, "nested type 2 type");
 static_assert(class_traits<C>::nested_types::get<2>::identifier == "F", "nested type 2 identifier");
+
+// declaration in root namespace
+class Root
+{
+public:
+    class A { };
+};
+
+YUKI_REFL_CLASS((), Root, (
+    YUKI_REFL_NESTED_TYPES(A)
+))
