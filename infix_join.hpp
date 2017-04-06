@@ -3,6 +3,8 @@
 #include <boost/preprocessor/facilities/overload.hpp>
 #include <boost/preprocessor/facilities/empty.hpp>
 
+#define YUKI_INFIX_JOIN_1(_infix)
+#define YUKI_INFIX_JOIN_2(_infix, _1) _1
 #define YUKI_INFIX_JOIN_3(_infix, _1, _2) _1  _infix _2
 #define YUKI_INFIX_JOIN_4(_infix, _1, _2, _3) YUKI_INFIX_JOIN_3(_infix, _1, _2)  _infix _3
 #define YUKI_INFIX_JOIN_5(_infix, _1, _2, _3, _4) YUKI_INFIX_JOIN_4(_infix, _1, _2, _3)  _infix _4
@@ -30,4 +32,4 @@
 * \brief Link tokens with another token as infix. e.g.
 * YUKI_INFIX_JOIN(::, foo, bar, baz) becomes foo::bar::baz
 */
-#define YUKI_INFIX_JOIN(_token, ...) YUKI_INFIX_JOIN_VA(_token, __VA_ARGS__)
+#define YUKI_INFIX_JOIN(...) YUKI_INFIX_JOIN_VA(__VA_ARGS__)

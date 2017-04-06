@@ -5,6 +5,7 @@
 
 #include "unpack.hpp"
 
+#define YUKI_MAKE_NESTED_NAMESPACE_1(_code) YUKI_UNPACK _code
 #define YUKI_MAKE_NESTED_NAMESPACE_2(_code, _ns1) namespace _ns1 { YUKI_UNPACK _code }
 #define YUKI_MAKE_NESTED_NAMESPACE_3(_code, _ns1, _ns2) namespace _ns1 { namespace _ns2 { YUKI_UNPACK _code }}
 #define YUKI_MAKE_NESTED_NAMESPACE_4(_code, _ns1, _ns2, _ns3) namespace _ns1 { namespace _ns2 { namespace _ns3 { YUKI_UNPACK _code }}}
@@ -26,7 +27,8 @@
  * \brief Surround code with nested namespaces.
  * Directly expanding _ns with YUKI_UNPACK in the BOOST_PP_OVERLOAD macro generates error
  * so an intermediate macro is added.
+ * todo: replaced by N4230
  * \param _ns A list of namespaced enclosed by a pair of parentheses and seperated by comma.
  * \param _code The code to wrap in the inner most namespace enclosed by a pair of parentheses.
  */
-#define YUKI_MAKE_NESTED_NAMESPACE(_ns, _code) YUKI_MAKE_NESTED_NAMESPACE_VA(_code, YUKI_UNPACK _ns)
+#define YUKI_MAKE_NESTED_NAMESPACE(_ns, _code) YUKI_MAKE_NESTED_NAMESPACE_VA(_code YUKI_TAIL_UNPACK _ns)
