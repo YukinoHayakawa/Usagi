@@ -30,5 +30,8 @@
     <ClCompile Include="Preprocessor\infix_join_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Reflection\reflection_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
