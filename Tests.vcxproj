@@ -117,6 +117,7 @@
     <ClCompile Include="Preprocessor\infix_join_test.cpp" />
     <ClCompile Include="Preprocessor\make_nested_namespace_test.cpp" />
     <ClCompile Include="Reflection\reflection_test.cpp" />
+    <ClCompile Include="run_all_tests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
