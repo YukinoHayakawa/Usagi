@@ -24,10 +24,10 @@
     <ClCompile Include="Meta\string_literal_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Preprocessor\make_nested_namespace_test.cpp">
+    <ClCompile Include="Preprocessor\infix_join_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Preprocessor\infix_join_test.cpp">
+    <ClCompile Include="Preprocessor\make_nested_namespace_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Reflection\reflection_test.cpp">
