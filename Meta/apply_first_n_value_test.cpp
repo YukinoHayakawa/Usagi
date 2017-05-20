@@ -1,6 +1,6 @@
 #include <type_traits>
 
-#include <YukiToolset/Meta/apply_first_n_value.hpp>
+#include <Usagi/Meta/apply_first_n_value.hpp>
 
 using namespace yuki;
 

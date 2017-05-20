@@ -1,5 +1,5 @@
-#include <YukiToolset/Preprocessor/make_nested_namespace.hpp>
-#include <YukiToolset/Preprocessor/infix_join.hpp>
+#include <Usagi/Preprocessor/make_nested_namespace.hpp>
+#include <Usagi/Preprocessor/infix_join.hpp>
 
 YUKI_MAKE_NESTED_NAMESPACE((foo, bar, baz), (constexpr int hello = 5;))
 
