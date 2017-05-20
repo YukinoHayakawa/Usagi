@@ -62,9 +62,9 @@
 #include <boost/preprocessor/facilities/empty.hpp>
 #include <boost/preprocessor/control/if.hpp>
 
-#include <YukiToolset/Meta/char_list.hpp>
-#include <YukiToolset/Preprocessor/infix_join.hpp>
-#include <YukiToolset/Preprocessor/make_nested_namespace.hpp>
+#include <Usagi/Meta/char_list.hpp>
+#include <Usagi/Preprocessor/infix_join.hpp>
+#include <Usagi/Preprocessor/make_nested_namespace.hpp>
 
 namespace yuki
 {
