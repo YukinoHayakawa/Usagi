@@ -5,6 +5,7 @@
 #include <boost/mpl/at.hpp>
 #include <boost/type_traits/is_virtual_base_of.hpp>
 #include <boost/vmd/is_empty.hpp>
+#include <boost/preprocessor/comparison/less_equal.hpp>
 
 #include <Usagi/Meta/char_list.hpp>
 #include <Usagi/Preprocessor/infix_join.hpp>
@@ -21,9 +22,6 @@ namespace detail
 template <typename>
 struct simple_class_traits;
 
-template <typename T>
-struct refl_class_meta;
-
 // todo: (C++17) use auto for Ptr
 template <typename P, P Ptr, typename NameCharList>
 struct class_member
@@ -35,9 +33,16 @@ struct class_member
 template <typename T, typename IdentifierCharList>
 struct nested_type
 {
-    typedef IdentifierCharList NestedIdentifier;
+    typedef IdentifierCharList Identifier;
     typedef T nested_type_t;
 };
+//
+//template <typename T, typename IdentifierCharList>
+//struct nested_template
+//{
+//    typedef IdentifierCharList Identifier;
+//    template <typename... Args> using nested_template_t = T<Args...>;
+//};
 
 template <typename Reflected, typename BaseClasses>
 struct base_classes_base
@@ -67,7 +72,7 @@ struct nested_types_base
     template <size_t Index>
     struct get
     {
-        static constexpr auto identifier = boost::mpl::at<NestedTypes, boost::mpl::int_<Index>>::type::NestedIdentifier::to_string_literal();
+        static constexpr auto identifier = boost::mpl::at<NestedTypes, boost::mpl::int_<Index>>::type::Identifier::to_string_literal();
         typedef typename boost::mpl::at<NestedTypes, boost::mpl::int_<Index>>::type::nested_type_t type;
     };
     static constexpr size_t size = boost::mpl::size<NestedTypes>::type::value;
@@ -121,14 +126,16 @@ public: \
     template <> struct member_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _member_list_t; }; \
 /**/
 // arguments of member list
-#define YUKI_REFL_MEMBER(_member) \
+#define YUKI_REFL_MEMBER(next, total, _member) \
     ::yuki::reflection::detail::class_member<decltype(&_reflecting_t::_member), &_reflecting_t::_member, YUKI_MAKE_CHAR_LIST_STRINGIZE(_member)> \
+    BOOST_PP_COMMA_IF(BOOST_PP_LESS_EQUAL(next, total)) \
 /**/
 
 #define YUKI_REFL_NESTED_TYPE_LIST(...) \
     template <> struct nested_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _nested_type_list_t; }; \
 /**/
 // arguments of nested type list
-#define YUKI_REFL_NESTED_TYPE(_identifier) \
+#define YUKI_REFL_NESTED_TYPE(next, total, _identifier) \
     ::yuki::reflection::detail::nested_type<_reflecting_t::_identifier, YUKI_MAKE_CHAR_LIST_STRINGIZE(_identifier)> \
+    BOOST_PP_COMMA_IF(BOOST_PP_LESS_EQUAL(next, total)) \
 /**/
