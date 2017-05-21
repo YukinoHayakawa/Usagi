@@ -9,6 +9,7 @@
 #include <Usagi/Meta/char_list.hpp>
 #include <Usagi/Preprocessor/infix_join.hpp>
 #include <Usagi/Preprocessor/make_nested_namespace.hpp>
+#include <Usagi/Preprocessor/identifier.hpp>
 
 namespace yuki
 {
@@ -23,16 +24,16 @@ struct simple_class_traits;
 template <typename T>
 struct refl_class_meta;
 
-// todo: c++17 use auto for Ptr
+// todo: (C++17) use auto for Ptr
 template <typename P, P Ptr, typename NameCharList>
-struct refl_class_member
+struct class_member
 {
     typedef NameCharList MemberName;
     static constexpr P member_pointer = Ptr;
 };
 
 template <typename T, typename IdentifierCharList>
-struct refl_nested_type
+struct nested_type
 {
     typedef IdentifierCharList NestedIdentifier;
     typedef T nested_type_t;
@@ -74,34 +75,7 @@ struct nested_types_base
 
 }
 }
-
 }
-
-#define YUKI_REFL_BASE_CLASSES(...) \
-    template <> struct refl_base_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _base_list_t; }; \
-/**/
-
-#define YUKI_REFL_MEMBER(_member) \
-    ::yuki::reflection::detail::refl_class_member<decltype(&_reflecting_t::_member), &_reflecting_t::_member, YUKI_MAKE_CHAR_LIST_STRINGIZE(_member)> \
-/**/
-
-
-#define YUKI_REFL_MEMBER_LIST(...) \
-    template <> struct refl_member_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _member_list_t; }; \
-/**/
-
-#define YUKI_REFL_MEMBER(_member) \
-    ::yuki::reflection::detail::refl_class_member<decltype(&_reflecting_t::_member), &_reflecting_t::_member, YUKI_MAKE_CHAR_LIST_STRINGIZE(_member)> \
-/**/
-
-
-#define YUKI_REFL_NESTED_TYPE_LIST(...) \
-    template <> struct refl_nested_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _nested_type_list_t; }; \
-/**/
-
-#define YUKI_REFL_NESTED_TYPE(_identifier) \
-    ::yuki::reflection::detail::refl_nested_type<_reflecting_t::_identifier, YUKI_MAKE_CHAR_LIST_STRINGIZE(_identifier)> \
-/**/
 
 /**
 * \brief Main macro for defining class reflection information. Invoke this macro in the
@@ -112,22 +86,22 @@ struct nested_types_base
 * \param _elements Optional elements enclosed in a pair of (). Available elements include
 * YUKI_REFL_BASE_CLASSES, YUKI_REFL_NESTED_TYPES, and YUKI_REFL_MEMBERS.
 */
-#define YUKI_REFL_CLASS(_namespace, _identifier, _elements) \
-namespace yuki { namespace reflection { namespace detail { namespace meta { YUKI_MAKE_NESTED_NAMESPACE(_namespace, (\
-BOOST_PP_IF(BOOST_VMD_IS_EMPTY(YUKI_UNPACK _namespace), BOOST_PP_EMPTY(), YUKI_UNPACK(using namespace ::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespace);)) \
-typedef ::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespace, _identifier) _reflecting_t; \
-template <typename T> struct refl_base_list { typedef boost::mpl::vector<> _base_list_t; }; \
-template <typename T> struct refl_member_list { typedef boost::mpl::vector<> _member_list_t; }; \
-template <typename T> struct refl_nested_list { typedef boost::mpl::vector<> _nested_type_list_t; }; \
+#define YUKI_REFL_CLASS(_namespaces, _identifier, _elements) \
+namespace yuki { namespace reflection { namespace detail { namespace meta { YUKI_MAKE_NESTED_NAMESPACE(_namespaces, (\
+YUKI_USE_NAMESPACE(_namespaces); /* introduce identifiers from the namespace containing the class */ \
+typedef YUKI_CANONICAL_CLASS_ID(_namespaces, _identifier) _reflecting_t; \
+template <typename T> struct base_list { typedef boost::mpl::vector<> _base_list_t; }; \
+template <typename T> struct member_list { typedef boost::mpl::vector<> _member_list_t; }; \
+template <typename T> struct nested_list { typedef boost::mpl::vector<> _nested_type_list_t; }; \
 YUKI_UNPACK _elements /* template specializations, they use _reflecting_t */ \
 )) }}}} /* namespace yuki::reflection::detail::meta */ \
 namespace yuki { namespace reflection { namespace detail { \
-template <> struct simple_class_traits<::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespace, _identifier)> { \
+template <> struct simple_class_traits<YUKI_CANONICAL_CLASS_ID(_namespaces, _identifier)> { \
 private: \
-    typedef ::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespace, _identifier) _reflecting_t; \
-    typedef typename yuki::reflection::detail::meta::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespace, refl_base_list<_reflecting_t>::_base_list_t) _base_list_t; \
-    typedef typename yuki::reflection::detail::meta::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespace, refl_member_list<_reflecting_t>::_member_list_t) _member_list_t; \
-    typedef typename yuki::reflection::detail::meta::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespace, refl_nested_list<_reflecting_t>::_nested_type_list_t) _nested_type_list_t; \
+    typedef YUKI_CANONICAL_CLASS_ID(_namespaces, _identifier) _reflecting_t; \
+    typedef typename meta::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespaces, base_list<_reflecting_t>::_base_list_t) _base_list_t; \
+    typedef typename meta::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespaces, member_list<_reflecting_t>::_member_list_t) _member_list_t; \
+    typedef typename meta::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespaces, nested_list<_reflecting_t>::_nested_type_list_t) _nested_type_list_t; \
 public: \
     static constexpr auto identifier = make_string_literal(#_identifier); \
     struct base_classes : base_classes_base<_reflecting_t, _base_list_t> { }; \
@@ -135,4 +109,26 @@ public: \
     struct nested_types : nested_types_base<_nested_type_list_t> { }; \
 }; \
 }}} /* namespace yuki::reflection::detail */ \
+/**/
+
+// specialization of default traits
+
+#define YUKI_REFL_BASE_CLASSES(...) \
+    template <> struct base_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _base_list_t; }; \
+/**/
+
+#define YUKI_REFL_MEMBER_LIST(...) \
+    template <> struct member_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _member_list_t; }; \
+/**/
+// arguments of member list
+#define YUKI_REFL_MEMBER(_member) \
+    ::yuki::reflection::detail::class_member<decltype(&_reflecting_t::_member), &_reflecting_t::_member, YUKI_MAKE_CHAR_LIST_STRINGIZE(_member)> \
+/**/
+
+#define YUKI_REFL_NESTED_TYPE_LIST(...) \
+    template <> struct nested_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _nested_type_list_t; }; \
+/**/
+// arguments of nested type list
+#define YUKI_REFL_NESTED_TYPE(_identifier) \
+    ::yuki::reflection::detail::nested_type<_reflecting_t::_identifier, YUKI_MAKE_CHAR_LIST_STRINGIZE(_identifier)> \
 /**/
