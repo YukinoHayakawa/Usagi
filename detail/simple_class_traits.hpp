@@ -38,6 +38,40 @@ struct refl_nested_type
     typedef T nested_type_t;
 };
 
+template <typename Reflected, typename BaseClasses>
+struct base_classes_base
+{
+    template <size_t Index> struct get
+    {
+        typedef typename boost::mpl::at<BaseClasses, boost::mpl::int_<Index>>::type type;
+        static constexpr bool is_virtual = boost::is_virtual_base_of<type, Reflected>::value;
+    };
+    static constexpr size_t size = boost::mpl::size<BaseClasses>::type::value;
+};
+
+template <typename Members>
+struct class_members_base
+{
+    template <size_t Index> struct get
+    {
+        static constexpr auto name = boost::mpl::at<Members, boost::mpl::int_<Index>>::type::MemberName::to_string_literal();
+        static constexpr auto pointer = boost::mpl::at<Members, boost::mpl::int_<Index>>::type::member_pointer;
+    };
+    static constexpr size_t size = boost::mpl::size<Members>::type::value;
+};
+
+template <typename NestedTypes>
+struct nested_types_base
+{
+    template <size_t Index>
+    struct get
+    {
+        static constexpr auto identifier = boost::mpl::at<NestedTypes, boost::mpl::int_<Index>>::type::NestedIdentifier::to_string_literal();
+        typedef typename boost::mpl::at<NestedTypes, boost::mpl::int_<Index>>::type::nested_type_t type;
+    };
+    static constexpr size_t size = boost::mpl::size<NestedTypes>::type::value;
+};
+
 }
 }
 
@@ -96,27 +130,9 @@ private: \
     typedef typename yuki::reflection::detail::meta::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespace, refl_nested_list<_reflecting_t>::_nested_type_list_t) _nested_type_list_t; \
 public: \
     static constexpr auto identifier = make_string_literal(#_identifier); \
-    struct base_classes { \
-        template <size_t I> struct get { \
-            typedef typename boost::mpl::at<_base_list_t, boost::mpl::int_<I>>::type type; \
-            static constexpr bool is_virtual = boost::is_virtual_base_of<type, _reflecting_t>::value; \
-        }; \
-        static constexpr size_t size = boost::mpl::size<_base_list_t>::type::value; \
-    }; \
-    struct class_members { \
-        template <size_t I> struct get { \
-            static constexpr auto name = boost::mpl::at<_member_list_t, boost::mpl::int_<I>>::type::MemberName::to_string_literal(); \
-            static constexpr auto pointer = boost::mpl::at<_member_list_t, boost::mpl::int_<I>>::type::member_pointer; \
-        }; \
-        static constexpr size_t size = boost::mpl::size<_member_list_t>::type::value; \
-    }; \
-    struct nested_types { \
-        template <size_t I> struct get { \
-            static constexpr auto identifier = boost::mpl::at<_nested_type_list_t, boost::mpl::int_<I>>::type::NestedIdentifier::to_string_literal(); \
-            typedef typename boost::mpl::at<_nested_type_list_t, boost::mpl::int_<I>>::type::nested_type_t type; \
-        }; \
-        static constexpr size_t size = boost::mpl::size<_nested_type_list_t>::type::value; \
-    }; \
+    struct base_classes : base_classes_base<_reflecting_t, _base_list_t> { }; \
+    struct class_members : class_members_base<_member_list_t> { }; \
+    struct nested_types : nested_types_base<_nested_type_list_t> { }; \
 }; \
 }}} /* namespace yuki::reflection::detail */ \
 /**/
