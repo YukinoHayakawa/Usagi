@@ -91,7 +91,7 @@ struct nested_types_base
 * YUKI_REFL_BASE_CLASSES, YUKI_REFL_NESTED_TYPES, and YUKI_REFL_MEMBERS.
 */
 #define YUKI_REFL_CLASS(_namespaces, _identifier, _elements) \
-namespace yuki { namespace reflection { namespace detail { namespace meta { YUKI_MAKE_NESTED_NAMESPACE(_namespaces, (\
+namespace yuki { namespace reflection { namespace detail { namespace meta { YUKI_MAKE_NESTED_NAMESPACE((YUKI_HEAD_UNPACK _namespaces _identifier), (\
 YUKI_USE_NAMESPACE(_namespaces) /* introduce identifiers from the namespace containing the class */ \
 typedef YUKI_CANONICAL_CLASS_ID(_namespaces, _identifier) _reflecting_t; \
 template <typename T> struct base_list { typedef boost::mpl::vector<> _base_list_t; }; \
@@ -104,9 +104,9 @@ template <> struct simple_class_traits<YUKI_CANONICAL_CLASS_ID(_namespaces, _ide
 private: \
     typedef YUKI_CANONICAL_CLASS_ID(_namespaces, _identifier) _reflecting_t; \
     /* use YUKI_HEAD_UNPACK instaed of YUKI_TAIL_UNPACK, or MSVC will consider YUKI_OP_SCOPE YUKI_TAIL_UNPACK _namespaces as a single argument */ \
-    typedef typename meta::YUKI_INFIX_JOIN(YUKI_OP_SCOPE, YUKI_HEAD_UNPACK _namespaces base_list<_reflecting_t>::_base_list_t) _base_list_t; \
-    typedef typename meta::YUKI_INFIX_JOIN(YUKI_OP_SCOPE, YUKI_HEAD_UNPACK _namespaces member_list<_reflecting_t>::_member_list_t) _member_list_t; \
-    typedef typename meta::YUKI_INFIX_JOIN(YUKI_OP_SCOPE, YUKI_HEAD_UNPACK _namespaces nested_list<_reflecting_t>::_nested_type_list_t) _nested_type_list_t; \
+    typedef typename meta::YUKI_INFIX_JOIN(YUKI_OP_SCOPE, YUKI_HEAD_UNPACK _namespaces _identifier, base_list<_reflecting_t>::_base_list_t) _base_list_t; \
+    typedef typename meta::YUKI_INFIX_JOIN(YUKI_OP_SCOPE, YUKI_HEAD_UNPACK _namespaces _identifier, member_list<_reflecting_t>::_member_list_t) _member_list_t; \
+    typedef typename meta::YUKI_INFIX_JOIN(YUKI_OP_SCOPE, YUKI_HEAD_UNPACK _namespaces _identifier, nested_list<_reflecting_t>::_nested_type_list_t) _nested_type_list_t; \
 public: \
     static constexpr auto identifier = make_string_literal(#_identifier); \
     struct base_classes : base_classes_base<_reflecting_t, _base_list_t> { }; \
