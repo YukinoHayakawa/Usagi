@@ -27,5 +27,8 @@
     <ClInclude Include="identifier.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tuple.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

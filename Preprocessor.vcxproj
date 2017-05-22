@@ -116,6 +116,7 @@
     <ClInclude Include="identifier.hpp" />
     <ClInclude Include="infix_join.hpp" />
     <ClInclude Include="make_nested_namespace.hpp" />
+    <ClInclude Include="tuple.hpp" />
     <ClInclude Include="unpack.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
