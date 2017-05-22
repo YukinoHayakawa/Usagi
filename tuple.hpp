@@ -23,7 +23,7 @@
 #define YUKI_PAIR_FIRST_IMPL(x, y) x
 #define YUKI_PAIR_SECOND_IMPL(x, y) y
 
-#define YUKI_PAIR_FIRST(pair) YUKI_PAIR_FIRST_IMPL pair
-#define YUKI_PAIR_SECOND(pair) YUKI_PAIR_SECOND_IMPL pair
+#define YUKI_PAIR_FIRST(pair) BOOST_PP_CAT(YUKI_PAIR_FIRST_IMPL, pair)
+#define YUKI_PAIR_SECOND(pair) BOOST_PP_CAT(YUKI_PAIR_SECOND_IMPL, pair)
 
 #define YUKI_PAIR(x, y) (x, y)
