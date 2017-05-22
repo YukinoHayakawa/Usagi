@@ -1,12 +1,10 @@
 #pragma once
 
 #include <Usagi/Meta/char_list.hpp>
-#include <Usagi/Preprocessor/infix_join.hpp>
-#include <Usagi/Preprocessor/make_nested_namespace.hpp>
 #include <Usagi/Preprocessor/identifier.hpp>
-#include <Usagi/Preprocessor/op.hpp>
 
 #include "trait_elements.hpp"
+#include "class_traits_common.hpp"
 
 namespace yuki
 {
@@ -21,6 +19,13 @@ struct simple_class_traits { };
 }
 }
 }
+
+#define YUKI_REFL_IMPL_MAKE_TYPE(_namespaces, _identifier) \
+    typedef YUKI_CANONICAL_CLASS_ID(_namespaces, _identifier) _reflecting_t \
+/**/
+#define YUKI_REFL_IMPL_MAKE_CLASS_DECL(_namespaces, _identifier) \
+    template <> struct simple_class_traits<YUKI_CANONICAL_CLASS_ID(_namespaces, _identifier)> \
+/**/
 
 /**
  * \brief Main macro for defining class reflection information. Invoke this macro in the
@@ -62,29 +67,10 @@ struct simple_class_traits { };
  * YUKI_REFL_BASE_CLASSES, YUKI_REFL_NESTED_TYPES, and YUKI_REFL_MEMBERS.
  */
 #define YUKI_REFL_CLASS(_namespaces, _identifier, _elements) \
-namespace yuki { namespace reflection { namespace detail { namespace meta { YUKI_MAKE_NESTED_NAMESPACE((YUKI_HEAD_UNPACK _namespaces _identifier), (\
-YUKI_USE_NAMESPACE(_namespaces) /* introduce identifiers from the namespace containing the class */ \
-typedef YUKI_CANONICAL_CLASS_ID(_namespaces, _identifier) _reflecting_t; \
-template <typename T> struct base_list { typedef boost::mpl::vector<> _base_list_t; }; \
-template <typename T> struct member_list { typedef boost::mpl::vector<> _member_list_t; }; \
-template <typename T> struct nested_list { typedef boost::mpl::vector<> _nested_type_list_t; }; \
-YUKI_UNPACK _elements /* template specializations, they use _reflecting_t */ \
-)) }}}} /* namespace yuki::reflection::detail::meta */ \
-namespace yuki { namespace reflection { namespace detail { \
-template <> struct simple_class_traits<YUKI_CANONICAL_CLASS_ID(_namespaces, _identifier)> { \
-private: \
-    typedef YUKI_CANONICAL_CLASS_ID(_namespaces, _identifier) _reflecting_t; \
-    /* use YUKI_HEAD_UNPACK instaed of YUKI_TAIL_UNPACK, or MSVC will consider YUKI_OP_SCOPE YUKI_TAIL_UNPACK _namespaces as a single argument */ \
-    typedef typename meta::YUKI_INFIX_JOIN(YUKI_OP_SCOPE, YUKI_HEAD_UNPACK _namespaces _identifier, base_list<_reflecting_t>::_base_list_t) _base_list_t; \
-    typedef typename meta::YUKI_INFIX_JOIN(YUKI_OP_SCOPE, YUKI_HEAD_UNPACK _namespaces _identifier, member_list<_reflecting_t>::_member_list_t) _member_list_t; \
-    typedef typename meta::YUKI_INFIX_JOIN(YUKI_OP_SCOPE, YUKI_HEAD_UNPACK _namespaces _identifier, nested_list<_reflecting_t>::_nested_type_list_t) _nested_type_list_t; \
-public: \
-    static constexpr auto identifier = make_string_literal(#_identifier); \
-    struct base_classes : base_classes_base<_reflecting_t, _base_list_t> { }; \
-    struct class_members : class_members_base<_member_list_t> { }; \
-    struct nested_types : nested_types_base<_nested_type_list_t> { }; \
-}; \
-}}} /* namespace yuki::reflection::detail */ \
+    YUKI_REFL_BASE( \
+        _namespaces, _identifier, _elements, \
+        YUKI_REFL_IMPL_MAKE_TYPE, YUKI_REFL_IMPL_MAKE_CLASS_DECL, YUKI_REFL_IMPL_MAKE_TYPE \
+    ) \
 /**/
 
 // specialization of default traits
@@ -104,7 +90,7 @@ public: \
 /**/
 
 #define YUKI_REFL_NESTED_TYPE_LIST(...) \
-    template <> struct nested_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _nested_type_list_t; }; \
+    template <> struct nested_type_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _nested_type_list_t; }; \
 /**/
 #define YUKI_REFL_NESTED_TYPE(_identifier) \
     ::yuki::reflection::detail::nested_type<_reflecting_t::_identifier, YUKI_MAKE_CHAR_LIST_STRINGIZE(_identifier)> \
