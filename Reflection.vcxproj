@@ -115,6 +115,7 @@
   <ItemGroup>
     <ClInclude Include="detail\simple_class_traits.hpp" />
     <ClInclude Include="detail\template_class_traits.hpp" />
+    <ClInclude Include="detail\trait_elements.hpp" />
     <ClInclude Include="reflection.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

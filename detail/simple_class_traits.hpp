@@ -1,15 +1,12 @@
 #pragma once
 
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/size.hpp>
-#include <boost/mpl/at.hpp>
-#include <boost/type_traits/is_virtual_base_of.hpp>
-
 #include <Usagi/Meta/char_list.hpp>
 #include <Usagi/Preprocessor/infix_join.hpp>
 #include <Usagi/Preprocessor/make_nested_namespace.hpp>
 #include <Usagi/Preprocessor/identifier.hpp>
 #include <Usagi/Preprocessor/op.hpp>
+
+#include "trait_elements.hpp"
 
 namespace yuki
 {
@@ -21,75 +18,49 @@ namespace detail
 template <typename>
 struct simple_class_traits { };
 
-// todo: (C++17) use auto for Ptr
-template <typename P, P Ptr, typename NameCharList>
-struct class_member
-{
-    typedef NameCharList MemberName;
-    static constexpr P member_pointer = Ptr;
-};
-
-template <typename T, typename IdentifierCharList>
-struct nested_type
-{
-    typedef IdentifierCharList Identifier;
-    typedef T nested_type_t;
-};
-//
-//template <typename T, typename IdentifierCharList>
-//struct nested_template
-//{
-//    typedef IdentifierCharList Identifier;
-//    template <typename... Args> using nested_template_t = T<Args...>;
-//};
-
-template <typename Reflected, typename BaseClasses>
-struct base_classes_base
-{
-    template <size_t Index> struct get
-    {
-        typedef typename boost::mpl::at<BaseClasses, boost::mpl::int_<Index>>::type type;
-        static constexpr bool is_virtual = boost::is_virtual_base_of<type, Reflected>::value;
-    };
-    static constexpr size_t size = boost::mpl::size<BaseClasses>::type::value;
-};
-
-template <typename Members>
-struct class_members_base
-{
-    template <size_t Index> struct get
-    {
-        static constexpr auto name = boost::mpl::at<Members, boost::mpl::int_<Index>>::type::MemberName::to_string_literal();
-        static constexpr auto pointer = boost::mpl::at<Members, boost::mpl::int_<Index>>::type::member_pointer;
-    };
-    static constexpr size_t size = boost::mpl::size<Members>::type::value;
-};
-
-template <typename NestedTypes>
-struct nested_types_base
-{
-    template <size_t Index>
-    struct get
-    {
-        static constexpr auto identifier = boost::mpl::at<NestedTypes, boost::mpl::int_<Index>>::type::Identifier::to_string_literal();
-        typedef typename boost::mpl::at<NestedTypes, boost::mpl::int_<Index>>::type::nested_type_t type;
-    };
-    static constexpr size_t size = boost::mpl::size<NestedTypes>::type::value;
-};
-
 }
 }
 }
 
 /**
-* \brief Main macro for defining class reflection information. Invoke this macro in the
-* root namespace then access reflection info through yuki::class_traits<T>.
-* \param _namespace The namespace in which the class is declared, separated into unqualified
-* identifiers and surrounded by a pair of parentheses.
-* \param _identifier The unqualified name of reflected class.
-* \param _elements Optional elements enclosed in a pair of (). Available elements include
-* YUKI_REFL_BASE_CLASSES, YUKI_REFL_NESTED_TYPES, and YUKI_REFL_MEMBERS.
-*/
+ * \brief Main macro for defining class reflection information. Invoke this macro in the
+ * root namespace then access reflection info through yuki::class_traits<T>.
+ * 
+ * e.g.
+ * 
+ * namespace foo { namespace bar {
+ *
+ * class A { };
+ * class B { };
+ *
+ * class C : public A, public virtual B
+ * {
+ * public:
+ *     void foo() { }
+ *     void bar() { }
+ *
+ *     int baz;
+ *
+ *     class D { };
+ *     class E { };
+ *
+ *     enum F { };
+ * };
+ *
+ * }}
+ *
+ * YUKI_REFL_CLASS((foo, bar), C, (
+ *     YUKI_REFL_BASE_CLASSES(A, B)
+ *     YUKI_REFL_NESTED_TYPES(D, E, F)
+ *     YUKI_REFL_MEMBERS(foo, bar, baz)
+ * ))
+ * 
+ * \param _namespace The namespace in which the class is declared, separated into unqualified
+ * identifiers and surrounded by a pair of parentheses.
+ * \param _identifier The unqualified name of reflected class.
+ * \param _elements Optional elements enclosed in a pair of (). Available elements include
+ * YUKI_REFL_BASE_CLASSES, YUKI_REFL_NESTED_TYPES, and YUKI_REFL_MEMBERS.
+ */
 #define YUKI_REFL_CLASS(_namespaces, _identifier, _elements) \
 namespace yuki { namespace reflection { namespace detail { namespace meta { YUKI_MAKE_NESTED_NAMESPACE((YUKI_HEAD_UNPACK _namespaces _identifier), (\
 YUKI_USE_NAMESPACE(_namespaces) /* introduce identifiers from the namespace containing the class */ \

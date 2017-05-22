@@ -1,17 +1,13 @@
 #pragma once
 
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/size.hpp>
-#include <boost/mpl/at.hpp>
-#include <boost/type_traits/is_virtual_base_of.hpp>
-#include <boost/preprocessor/seq/to_tuple.hpp>
-
 #include <Usagi/Meta/char_list.hpp>
 #include <Usagi/Preprocessor/infix_join.hpp>
 #include <Usagi/Preprocessor/make_nested_namespace.hpp>
 #include <Usagi/Preprocessor/identifier.hpp>
 #include <Usagi/Preprocessor/op.hpp>
 #include <Usagi/Preprocessor/functional.hpp>
+
+#include "trait_elements.hpp"
 
 namespace yuki
 {
