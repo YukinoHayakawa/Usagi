@@ -19,7 +19,7 @@ namespace detail
 {
 
 template <typename>
-struct simple_class_traits;
+struct simple_class_traits { };
 
 // todo: (C++17) use auto for Ptr
 template <typename P, P Ptr, typename NameCharList>
