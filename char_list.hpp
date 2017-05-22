@@ -66,14 +66,24 @@ public:
 template <char...Ch>
 using char_list = basic_char_list<char, Ch...>;
 
+namespace detail
+{
+
+template <typename Char, size_t N>
+constexpr Char char_or_zero(Char(&Arr)[N], size_t i)
+{
+    return (i >= 0 && i < N ? Arr[i] : 0);
+}
+
+}
 }
 
 // a comma is prepended if N is not 0.
-#define YUKI_STRCHR(z, N, string) BOOST_PP_COMMA_IF(N) ((N >= 0 && N < sizeof(string)) ? string[N] : 0)
+#define YUKI_STRCHR(z, N, string) BOOST_PP_COMMA_IF(N) ::yuki::detail::char_or_zero(string, N)
 
 #define YUKI_MAKE_CHAR_LIST(string) \
     ::yuki::char_list< \
-        BOOST_PP_REPEAT(64, YUKI_STRCHR, string) \
+        BOOST_PP_REPEAT(16, YUKI_STRCHR, string) \
     >::c_string_t \
 /**/
 
