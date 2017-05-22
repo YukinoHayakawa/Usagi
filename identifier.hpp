@@ -15,5 +15,10 @@
 * \param _namespaces The namespace surrounded by a pair of parentheses and separated by commas.
 */
 #define YUKI_USE_NAMESPACE(_namespaces) \
-BOOST_PP_IF(BOOST_VMD_IS_EMPTY(YUKI_UNPACK _namespaces), BOOST_PP_EMPTY(), YUKI_UNPACK(using namespace ::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespaces))) \
+    /* directly use arguments inside the if macro since none of them has commas */ \
+    BOOST_PP_IF( \
+        BOOST_VMD_IS_EMPTY(YUKI_UNPACK _namespaces), \
+        BOOST_PP_EMPTY(), \
+        YUKI_UNPACK(using namespace ::YUKI_INFIX_JOIN(:: YUKI_TAIL_UNPACK _namespaces)) \
+    ) \
 /**/
