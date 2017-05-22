@@ -30,5 +30,11 @@
     <ClInclude Include="tuple.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="transform.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="op.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

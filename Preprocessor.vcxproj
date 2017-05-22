@@ -113,6 +113,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="op.hpp" />
+    <ClInclude Include="transform.hpp" />
     <ClInclude Include="identifier.hpp" />
     <ClInclude Include="infix_join.hpp" />
     <ClInclude Include="make_nested_namespace.hpp" />
