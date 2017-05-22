@@ -40,17 +40,6 @@
  *     YUKI_REFL_MEMBERS(foo, bar, baz)
  * ))
  * 
- * if the number of members exceeds the capacity of the overloaded macro,
- * use the manual macro with several sub-lists instead:
- * 
- * YUKI_REFL_MEMBER_LIST(
- *     YUKI_REFL_MEMBER_SUBLIST(foo, bar),
- *     YUKI_REFL_MEMBER_SUBLIST(baz)
- * )
- * YUKI_REFL_NESTED_TYPE_LIST(
- *     YUKI_REFL_NESTED_TYPE_SUBLIST(D, E, F)
- * )
- * 
  * todo: support template classes
  * todo: simplify declarations
  * todo: allow reflecting private/protected members
@@ -61,7 +50,6 @@
 
 #include "detail/simple_class_traits.hpp"
 #include "detail/template_class_traits.hpp"
-#include "detail/helper_macros.hpp"
 
 namespace yuki
 {

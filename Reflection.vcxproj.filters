@@ -24,8 +24,5 @@
     <ClInclude Include="detail\simple_class_traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="detail\helper_macros.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

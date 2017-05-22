@@ -113,7 +113,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="detail\helper_macros.hpp" />
     <ClInclude Include="detail\simple_class_traits.hpp" />
     <ClInclude Include="detail\template_class_traits.hpp" />
     <ClInclude Include="reflection.hpp" />
