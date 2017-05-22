@@ -21,12 +21,17 @@ public:
     enum F { };
 };
 
+class D { };
+
 }}
 
 YUKI_REFL_CLASS((foo, bar), C, (
     YUKI_REFL_BASE_CLASSES(A, B)
     YUKI_REFL_NESTED_TYPES(D, E, F)
     YUKI_REFL_MEMBERS(foo, bar, baz)
+))
+
+YUKI_REFL_CLASS((foo, bar), D, (
 ))
 
 using namespace yuki;
@@ -66,3 +71,36 @@ public:
 YUKI_REFL_CLASS((), Root, (
     YUKI_REFL_NESTED_TYPES(A)
 ))
+
+template <typename T, typename U>
+class TA { };
+class TB { };
+template <typename T>
+class T1 { };
+
+// template class tests
+template <typename T, typename U, template <typename> typename TT, int I>
+struct TC : TA<T, U>, virtual TB
+{
+    void foo() { }
+    void bar() { }
+
+    T baz;
+
+    class D { };
+    class E { };
+
+    enum F { };
+};
+
+#define YUKI_REFL_T_PARAMS() \
+((typename T, typename U, template <typename> typename TT, int I), (T, U, TT, I))
+YUKI_REFL_TEMPLATE((), TC, (
+    YUKI_REFL_T_BASE_CLASSES((TA<T,U>), (TB))
+    YUKI_REFL_T_NESTED_TYPES(D, E, F)
+    YUKI_REFL_T_MEMBERS(foo, bar, baz)
+))
+#undef YUKI_REFL_T_PARAMS
+
+static_assert(std::is_same<class_traits<TC<int, bool, T1, 0>>::base_classes::get<0>::type, TA<int, bool>>::value, "template base class 0 type");
+static_assert(class_traits<TC<int, bool, T1, 0>>::class_members::get<2>::pointer == &TC<int, bool, T1, 0>::baz, "template instance member pointer");
