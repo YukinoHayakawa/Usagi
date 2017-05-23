@@ -12,9 +12,14 @@
  * top of the class_traits<> instances,  to support serialization, script binding, GUI widget
  * rendering, etc.
  * 
+ * Note that, before reflecting nested template types is supported, it's not recommended
+ * to reflect nested types, since the interface is subject to changes caused by that
+ * function.
+ * 
  * todo: simplify declarations
  * todo: allow reflecting private/protected members
  * todo: dynamic reflection
+ * todo: nested template types
  * 
  * [1] http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4428.pdf
  */
