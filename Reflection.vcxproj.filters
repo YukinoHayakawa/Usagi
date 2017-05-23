@@ -18,5 +18,17 @@
     <ClInclude Include="reflection.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="detail\template_class_traits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\simple_class_traits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\trait_elements.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\class_traits_common.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
