@@ -42,5 +42,8 @@
     <ClCompile Include="Preprocessor\tuple_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Meta\premain_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

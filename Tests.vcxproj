@@ -117,6 +117,7 @@
   <ItemGroup>
     <ClCompile Include="Meta\apply_first_n_value_test.cpp" />
     <ClCompile Include="Meta\char_list_test.cpp" />
+    <ClCompile Include="Meta\premain_test.cpp" />
     <ClCompile Include="Meta\string_literal_test.cpp" />
     <ClCompile Include="Preprocessor\identifier_test.cpp" />
     <ClCompile Include="Preprocessor\infix_join_test.cpp" />
