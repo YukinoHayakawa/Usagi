@@ -24,5 +24,8 @@
     <ClInclude Include="string_literal.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="premain.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

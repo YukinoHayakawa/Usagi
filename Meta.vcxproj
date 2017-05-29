@@ -115,6 +115,7 @@
   <ItemGroup>
     <ClInclude Include="apply_first_n_value.hpp" />
     <ClInclude Include="char_list.hpp" />
+    <ClInclude Include="premain.hpp" />
     <ClInclude Include="string_literal.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
