@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Redirection", "Redirection\Redirection.vcxproj", "{DF56A7E9-8C1A-4A9B-BD87-DBFB645244CD}"
 EndProject
@@ -18,6 +18,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Reflection", "Reflection\Reflection.vcxproj", "{6DEFA12B-A5C5-4481-A200-3FFE04914B95}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{7654D3DE-FA34-4048-9EB2-3B23BDBB66A1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6DEFA12B-A5C5-4481-A200-3FFE04914B95} = {6DEFA12B-A5C5-4481-A200-3FFE04914B95}
+		{12798730-63A5-4D88-B24D-A2CFBFF421E4} = {12798730-63A5-4D88-B24D-A2CFBFF421E4}
+		{6A22B65F-BDBF-491D-988E-11019A427E5F} = {6A22B65F-BDBF-491D-988E-11019A427E5F}
+		{1709C9F1-31F0-4CDD-BA90-8623D630CE9B} = {1709C9F1-31F0-4CDD-BA90-8623D630CE9B}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
