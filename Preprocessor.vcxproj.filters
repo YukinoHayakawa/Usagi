@@ -36,5 +36,8 @@
     <ClInclude Include="op.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="export.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
