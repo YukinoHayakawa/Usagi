@@ -20,6 +20,7 @@
  * todo: allow reflecting private/protected members
  * todo: dynamic reflection
  * todo: nested template types
+ * todo: overloaded members
  * 
  * [1] http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4428.pdf
  */

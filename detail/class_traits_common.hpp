@@ -21,6 +21,7 @@
  * which defines _reflecting_t inside the information wrapper class when invoked.
  */
 #define YUKI_REFL_BASE(_namespaces, _identifier, _elements, _macro_make_type, _macro_make_class_decl, _macro_make_class_type) \
+/* the sole purpose of this nested namespace, is to provide a scope for declaring a _reflecting_t, so that it can be uniquely referred to. */ \
 namespace yuki { namespace reflection { namespace detail { namespace meta { YUKI_MAKE_NESTED_NAMESPACE((YUKI_HEAD_UNPACK _namespaces _identifier), (\
 YUKI_USE_NAMESPACE(_namespaces) /* introduce identifiers from the namespace containing the class */ \
 _macro_make_type(_namespaces, _identifier); \
