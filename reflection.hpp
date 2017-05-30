@@ -17,10 +17,20 @@
  * function.
  * 
  * todo: simplify declarations
- * todo: allow reflecting private/protected members
+ * todo: allow reflecting private/protected members - WIP
+ *      add an access_level_tag to each member
  * todo: dynamic reflection
  * todo: nested template types
  * todo: overloaded members
+ *      overloaded member functions may be distinguished by their signatures. however,
+ *      it imposes several extra difficulties on the implementation. the first is that,
+ *      private_member_access will fail to expose the pointers to members simply using
+ *      their identifiers, since this will cause overloading by returning type. a possible
+ *      solution would be identifying the members using sequential numbers of declaration.
+ * todo: only allow reflecting direct member of classes that aren't inherited
+ * todo: template members
+ * todo: use portable macros - current impl only works with MSVC
+ *      also, extract common patterns used in implementations of class & temlate reflections.
  * 
  * [1] http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4428.pdf
  */

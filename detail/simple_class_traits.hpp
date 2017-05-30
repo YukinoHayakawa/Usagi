@@ -82,19 +82,23 @@ struct simple_class_traits { };
 #define YUKI_REFL_MEMBER_LIST(...) \
     template <> struct member_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _member_list_t; }; \
 /**/
-#define YUKI_REFL_MEMBER(_member) \
-    ::yuki::reflection::detail::class_member<decltype(&_reflecting_t::_member), &_reflecting_t::_member, YUKI_MAKE_CHAR_LIST_STRINGIZE(_member)> \
+#define YUKI_REFL_MEMBER_ACCESS_DECL(r, _, _member_signature) \
+template struct member_access<decltype(&_reflecting_t::_member_signature), &_reflecting_t::_member_signature, member_access_tag<r>>; \
+/**/
+#define YUKI_REFL_MEMBER(r, _, _member) \
+    ::yuki::reflection::detail::class_member<decltype(member_ptr(member_access_tag<r>())), member_ptr(member_access_tag<r>()), YUKI_MAKE_CHAR_LIST_STRINGIZE(_member)> \
 /**/
 #define YUKI_REFL_MEMBERS(...) \
-    YUKI_REFL_MEMBER_LIST(YUKI_TRANSFORM_INFIX_JOIN(BOOST_PP_COMMA, YUKI_REFL_MEMBER, __VA_ARGS__)) \
+    BOOST_PP_SEQ_FOR_EACH(YUKI_REFL_MEMBER_ACCESS_DECL, BOOST_PP_EMPTY(), BOOST_PP_TUPLE_TO_SEQ((__VA_ARGS__))) \
+    YUKI_REFL_MEMBER_LIST(YUKI_TRANSFORM_INFIX_JOIN(BOOST_PP_COMMA, YUKI_REFL_MEMBER, BOOST_PP_EMPTY(), __VA_ARGS__)) \
 /**/
 
 #define YUKI_REFL_NESTED_TYPE_LIST(...) \
     template <> struct nested_type_list<_reflecting_t> { typedef boost::mpl::vector<__VA_ARGS__> _nested_type_list_t; }; \
 /**/
-#define YUKI_REFL_NESTED_TYPE(_identifier) \
+#define YUKI_REFL_NESTED_TYPE(r, data, _identifier) \
     ::yuki::reflection::detail::nested_type<_reflecting_t::_identifier, YUKI_MAKE_CHAR_LIST_STRINGIZE(_identifier)> \
 /**/
 #define YUKI_REFL_NESTED_TYPES(...) \
-    YUKI_REFL_NESTED_TYPE_LIST(YUKI_TRANSFORM_INFIX_JOIN(BOOST_PP_COMMA, YUKI_REFL_NESTED_TYPE, __VA_ARGS__)) \
+    YUKI_REFL_NESTED_TYPE_LIST(YUKI_TRANSFORM_INFIX_JOIN(BOOST_PP_COMMA, YUKI_REFL_NESTED_TYPE, BOOST_PP_EMPTY(), __VA_ARGS__)) \
 /**/

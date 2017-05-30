@@ -92,7 +92,7 @@ struct template_class_traits { };
  */
 #define YUKI_REFL_T_BASE_CLASSES(...) \
     template <YUKI_REFL_T_PARAM_LIST()> struct base_list<_reflecting_t<YUKI_REFL_T_PARAM_NAME_LIST()>> { \
-        typedef boost::mpl::vector<YUKI_TRANSFORM_INFIX_JOIN(BOOST_PP_COMMA, YUKI_TUPLE_TO_PARAM_LIST, __VA_ARGS__)> _base_list_t; \
+        typedef boost::mpl::vector<YUKI_TRANSFORM_INFIX_JOIN(BOOST_PP_COMMA, YUKI_TUPLE_TO_PARAM_LIST, BOOST_PP_EMPTY(), __VA_ARGS__)> _base_list_t; \
     }; \
 /**/
 
@@ -101,7 +101,7 @@ struct template_class_traits { };
         typedef boost::mpl::vector<__VA_ARGS__> _member_list_t; \
     }; \
 /**/
-#define YUKI_REFL_T_MEMBER(_member) \
+#define YUKI_REFL_T_MEMBER(r, data, _member) \
     ::yuki::reflection::detail::class_member< \
         decltype(&_reflecting_t<YUKI_REFL_T_PARAM_NAME_LIST()>::_member), \
         &_reflecting_t<YUKI_REFL_T_PARAM_NAME_LIST()>::_member, \
@@ -109,7 +109,7 @@ struct template_class_traits { };
     > \
 /**/
 #define YUKI_REFL_T_MEMBERS(...) \
-    YUKI_REFL_T_MEMBER_LIST(YUKI_TRANSFORM_INFIX_JOIN(BOOST_PP_COMMA, YUKI_REFL_T_MEMBER, __VA_ARGS__)) \
+    YUKI_REFL_T_MEMBER_LIST(YUKI_TRANSFORM_INFIX_JOIN(BOOST_PP_COMMA, YUKI_REFL_T_MEMBER, BOOST_PP_EMPTY(), __VA_ARGS__)) \
 /**/
 
 #define YUKI_REFL_T_NESTED_TYPE_LIST(...) \
@@ -117,12 +117,12 @@ struct template_class_traits { };
         typedef boost::mpl::vector<__VA_ARGS__> _nested_type_list_t; \
     }; \
 /**/
-#define YUKI_REFL_T_NESTED_TYPE(_identifier) \
+#define YUKI_REFL_T_NESTED_TYPE(r, data, _identifier) \
     ::yuki::reflection::detail::nested_type< \
         typename _reflecting_t<YUKI_REFL_T_PARAM_NAME_LIST()>::_identifier, \
         YUKI_MAKE_CHAR_LIST_STRINGIZE(_identifier) \
     > \
 /**/
 #define YUKI_REFL_T_NESTED_TYPES(...) \
-    YUKI_REFL_T_NESTED_TYPE_LIST(YUKI_TRANSFORM_INFIX_JOIN(BOOST_PP_COMMA, YUKI_REFL_T_NESTED_TYPE, __VA_ARGS__)) \
+    YUKI_REFL_T_NESTED_TYPE_LIST(YUKI_TRANSFORM_INFIX_JOIN(BOOST_PP_COMMA, YUKI_REFL_T_NESTED_TYPE, BOOST_PP_EMPTY(), __VA_ARGS__)) \
 /**/

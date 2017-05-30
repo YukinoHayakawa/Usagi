@@ -30,6 +30,8 @@ _macro_reflected_type_decl(_namespaces, _identifier); \
 template <typename T> struct base_list { typedef boost::mpl::vector<> _base_list_t; }; \
 template <typename T> struct member_list { typedef boost::mpl::vector<> _member_list_t; }; \
 template <typename T> struct nested_type_list { typedef boost::mpl::vector<> _nested_type_list_t; }; \
+template <typename MemberPtr, MemberPtr ptr, typename AccessTag> struct member_access { friend constexpr auto member_ptr(AccessTag) { return ptr; } }; \
+template <size_t I> struct member_access_tag { }; \
 /* template specializations, using _reflecting_t to refer to the class */ \
 /* each implementation may use different macros */ \
 YUKI_UNPACK _elements \
