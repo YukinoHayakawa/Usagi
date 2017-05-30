@@ -8,27 +8,28 @@
 #include "tuple.hpp"
 #include "transform.hpp"
 
-#define YUKI_INFIX_JOIN_OP(r, op_total_transform, token) \
-    BOOST_PP_TUPLE_ELEM(2, op_total_transform)(token) \
-    BOOST_PP_IF(BOOST_PP_LESS_EQUAL(r, BOOST_PP_TUPLE_ELEM(1, op_total_transform)), BOOST_PP_TUPLE_ELEM(0, op_total_transform), BOOST_PP_EMPTY)() \
+#define YUKI_INFIX_JOIN_OP(r, op_total_transform_data, token) \
+    BOOST_PP_TUPLE_ELEM(2, op_total_transform_data)(r, BOOST_PP_TUPLE_ELEM(3, op_total_transform_data), token) \
+    BOOST_PP_IF(BOOST_PP_LESS_EQUAL(r, BOOST_PP_TUPLE_ELEM(1, op_total_transform_data)), BOOST_PP_TUPLE_ELEM(0, op_total_transform_data), BOOST_PP_EMPTY)() \
 /**/
 
-#define YUKI_INFIX_JOIN_IMPL_EMPTY(op, token_tuple, transform) \
+#define YUKI_INFIX_JOIN_IMPL_EMPTY(op, token_tuple, transform, data) \
     BOOST_PP_EMPTY() \
 /**/
 
-#define YUKI_INFIX_JOIN_IMPL_NONEMPTY(op, token_tuple, transform) \
-    BOOST_PP_SEQ_FOR_EACH(YUKI_INFIX_JOIN_OP, (op, BOOST_PP_TUPLE_SIZE(token_tuple), transform), BOOST_PP_TUPLE_TO_SEQ(token_tuple)) \
+#define YUKI_INFIX_JOIN_IMPL_NONEMPTY(op, token_tuple, transform, data) \
+    BOOST_PP_SEQ_FOR_EACH(YUKI_INFIX_JOIN_OP, (op, BOOST_PP_TUPLE_SIZE(token_tuple), transform, data), BOOST_PP_TUPLE_TO_SEQ(token_tuple)) \
 /**/
 
 /**
  * \brief Transfrom each token using transform_macro, then link then with op_macro.
  * \param op_macro The name of macro generating the infix operator.
- * \param transform_macro A macro having the form of MACRO(token).
+ * \param transform_macro A macro having the form of MACRO(r, data, token).
+ * \param data The data passed to transform_macro.
  */
-#define YUKI_TRANSFORM_INFIX_JOIN(op_macro, transform_macro, ...) \
+#define YUKI_TRANSFORM_INFIX_JOIN(op_macro, transform_macro, data, ...) \
     BOOST_PP_IF(BOOST_VMD_IS_EMPTY(__VA_ARGS__), YUKI_INFIX_JOIN_IMPL_EMPTY, YUKI_INFIX_JOIN_IMPL_NONEMPTY) \
-        (op_macro, (__VA_ARGS__), transform_macro) \
+        (op_macro, (__VA_ARGS__), transform_macro, data) \
 /**/
 
  /**
@@ -38,5 +39,5 @@
  * YUKI_INFIX_JOIN(YUKI_OP_SCOPE) becomes an empty token.
  */
 #define YUKI_INFIX_JOIN(op_macro, ...) \
-    YUKI_TRANSFORM_INFIX_JOIN(op_macro, YUKI_ID, __VA_ARGS__) \
+    YUKI_TRANSFORM_INFIX_JOIN(op_macro, YUKI_ID, BOOST_PP_EMPTY(), __VA_ARGS__) \
  /**/
