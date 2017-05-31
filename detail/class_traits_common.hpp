@@ -21,7 +21,7 @@
  * which defines _reflecting_t inside the information wrapper class when invoked.
  */
 #define YUKI_REFL_BASE(_namespaces, _identifier, _elements, _macro_reflected_type_decl, _macro_trait_class_decl, _macro_reflected_type_nested_decl) \
-/* use a nested namespace to provide a scope for declaring a _reflecting_t for each class, \
+/* use a nested namespace to provide a scope for declaring a _reflecting_t for each class,
    avoiding passing the class name to each trait definition macro. */ \
 namespace yuki { namespace reflection { namespace detail { namespace meta { YUKI_MAKE_NESTED_NAMESPACE((YUKI_HEAD_UNPACK _namespaces _identifier), (\
 YUKI_USE_NAMESPACE(_namespaces) /* introduce identifiers from the namespace containing the class */ \
@@ -30,10 +30,19 @@ _macro_reflected_type_decl(_namespaces, _identifier); \
 template <typename T> struct base_list { typedef boost::mpl::vector<> _base_list_t; }; \
 template <typename T> struct member_list { typedef boost::mpl::vector<> _member_list_t; }; \
 template <typename T> struct nested_type_list { typedef boost::mpl::vector<> _nested_type_list_t; }; \
-template <typename MemberPtr, MemberPtr ptr, typename AccessTag> struct member_access { friend constexpr auto member_ptr(AccessTag) { return ptr; } }; \
+/* use explicit template instantiation with friend functions to expose pointers to members, 
+   including those to protected and private ones, then use tag classes to resolve the overload.
+   for templates, however, this trick does not work since explicit template instantitation
+   requires a complete argument list, which is not the case when declaring the member_list.
+   and because it can only be declared in namespace scopes, we cannot use it in the actual
+   trait class below, losing the last opportunity. therefore to reflect private members of
+   a template, a friend declaration must be used.
+   for the explicit instantiation trick, refer to:
+   http://bloglitb.blogspot.jp/2011/12/access-to-private-members-safer.html */ \
+template <typename MemberPtr, MemberPtr Ptr, typename AccessTag> struct member_access { friend constexpr auto member_ptr(AccessTag) { return Ptr; } }; \
 template <size_t I> struct member_access_tag { }; \
-/* template specializations, using _reflecting_t to refer to the class */ \
-/* each implementation may use different macros */ \
+/* template specializations, using _reflecting_t to refer to the class.
+   each implementation may use different macros */ \
 YUKI_UNPACK _elements \
 )) }}}} /* namespace yuki::reflection::detail::meta */ \
 namespace yuki { namespace reflection { namespace detail { \
