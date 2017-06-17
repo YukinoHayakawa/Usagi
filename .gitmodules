@@ -13,3 +13,6 @@
 [submodule "Meta"]
 	path = Meta
 	url = D:\\Development\\Usagi\\Meta
+[submodule "PropertySheet"]
+	path = PropertySheet
+	url = E:\\Projects\\Usagi\\PropertySheet
