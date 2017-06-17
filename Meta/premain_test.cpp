@@ -12,7 +12,7 @@ struct premain_test
     }
 };
 
-template yuki::premain_action<premain_test>;
+template struct yuki::premain_action<premain_test>;
 
 TEST(premain_test, code_is_executed)
 {
