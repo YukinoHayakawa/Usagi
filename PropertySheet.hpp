@@ -20,6 +20,9 @@ public:
     using std::runtime_error::runtime_error;
 };
 
+/**
+ * \brief A key-value mapping from string to any type.
+ */
 class PropertySheet
 {
 public:
@@ -33,16 +36,34 @@ public:
         return std::any_cast<ValueType>(_find_value(key));
     }
 
+    /**
+     * \brief Insert new key-value pair. If the key is already used, throws
+     * DuplicateKeyException.
+     * \param key 
+     * \param value 
+     */
     void insert(std::string key, std::any value)
     {
         _insert_value(std::move(key), std::move(value));
     }
 
+    /**
+     * \brief An overload of insert(), automatically converting a string literal
+     * to std::string.
+     * \param key 
+     * \param value 
+     */
     void insert(std::string key, const char *value)
     {
         _insert_value(std::move(key), std::make_any<std::string>(value));
     }
-
+    
+    /**
+     * \brief Remove a key associated with value from the sheet.
+     * \param key 
+     * \return If the key-value pair is removed, returns true; otherwise returns
+     * false.
+     */
     bool erase(const std::string &key)
     {
         return _erase_value(key);

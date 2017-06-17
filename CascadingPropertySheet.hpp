@@ -8,6 +8,10 @@ namespace yuki
 namespace property_sheet
 {
 
+/**
+ * \brief A hierarchical implementation of PropertySheet. A child sheet can
+ * inherit or override values from its parent.
+ */
 class CascadingPropertySheet : public PropertySheet
 {
 private:
