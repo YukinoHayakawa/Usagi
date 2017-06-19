@@ -25,7 +25,7 @@ public:
     }
 
 private:
-    std::any & _find_value(const std::string &key) override
+    const std::any & _find_value(const std::string &key) const override
     {
         auto iter = m_value_map.find(key);
         if(iter == m_value_map.end())

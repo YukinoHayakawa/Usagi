@@ -31,7 +31,7 @@ public:
     }
 
     template <typename ValueType>
-    ValueType find(const std::string &key)
+    ValueType find(const std::string &key) const
     {
         return std::any_cast<ValueType>(_find_value(key));
     }
@@ -80,7 +80,7 @@ public:
     }
 
 private:
-    virtual std::any & _find_value(const std::string &key) = 0;
+    virtual const std::any & _find_value(const std::string &key) const = 0;
     virtual bool _erase_value(const std::string &key) = 0;
     virtual void _insert_value(std::string key, std::any value) = 0;
     virtual void _set_value(const std::string &key, std::any value) = 0;
