@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include "Usagi/Match/Player.hpp"
+
+#include <Usagi/Match/Player.hpp>
 
 class PlayerTest : public ::testing::Test
 {
