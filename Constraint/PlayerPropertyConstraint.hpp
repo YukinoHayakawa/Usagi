@@ -1,9 +1,7 @@
 #pragma once
 
-#include <memory>
-
-#include <Usagi/PropertySheet/PropertySheet.hpp>
 #include "PlayerConstriant.hpp"
+#include "../Player.hpp"
 
 namespace yuki
 {
