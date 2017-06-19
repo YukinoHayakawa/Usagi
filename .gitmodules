@@ -16,3 +16,6 @@
 [submodule "PropertySheet"]
 	path = PropertySheet
 	url = E:\\Projects\\Usagi\\PropertySheet
+[submodule "Match"]
+	path = Match
+	url = E:\\Projects\\Usagi\\Match
