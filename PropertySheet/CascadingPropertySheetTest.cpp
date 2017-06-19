@@ -41,6 +41,13 @@ TEST_F(SingleLayerCascadingPropertySheetTest, can_erase)
     EXPECT_TRUE(sheet.erase("C"));
 }
 
+TEST_F(SingleLayerCascadingPropertySheetTest, set_wont_throw)
+{
+    sheet.set("A", 1);
+    EXPECT_NO_THROW(sheet.set("A", "hello"));
+    EXPECT_EQ(sheet.find<std::string>("A"), "hello");
+}
+
 class MultipleLayerCascadingPropertySheetTest : public ::testing::Test
 {
 protected:
