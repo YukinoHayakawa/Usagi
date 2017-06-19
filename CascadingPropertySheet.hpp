@@ -48,6 +48,11 @@ private:
     {
         return m_value_map.erase(key) != 0;
     }
+
+    void _set_value(const std::string &key, std::any value) override
+    {
+        m_value_map[key] = std::move(value);
+    }
 };
 
 }

@@ -69,10 +69,21 @@ public:
         return _erase_value(key);
     }
 
+    void set(const std::string &key, std::any value)
+    {
+        _set_value(std::move(key), std::move(value));
+    }
+    
+    void set(const std::string &key, const char *value)
+    {
+        _set_value(std::move(key), std::make_any<std::string>(value));
+    }
+
 private:
     virtual std::any & _find_value(const std::string &key) = 0;
     virtual bool _erase_value(const std::string &key) = 0;
     virtual void _insert_value(std::string key, std::any value) = 0;
+    virtual void _set_value(const std::string &key, std::any value) = 0;
 };
 
 }
