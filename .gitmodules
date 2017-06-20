@@ -19,3 +19,6 @@
 [submodule "Match"]
 	path = Match
 	url = E:\\Projects\\Usagi\\Match
+[submodule "Criteria"]
+	path = Criteria
+	url = E:\\Projects\\Usagi\\Criteria
