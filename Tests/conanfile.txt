@@ -1,0 +1,9 @@
+[requires]
+Boost/1.64.0@yukinoh/stable
+gtest/1.8.0@lasote/stable
+
+[generators]
+visual_studio
+
+[imports]
+bin, *.dll -> ./bin
