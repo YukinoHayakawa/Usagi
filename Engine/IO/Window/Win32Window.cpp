@@ -66,6 +66,11 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
     SetWindowLongPtr(mWindowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 }
 
+HDC yuki::Win32Window::getDeviceContext() const
+{
+    return GetDC(mWindowHandle);
+}
+
 void yuki::Win32Window::show()
 {
     ShowWindow(mWindowHandle, SW_SHOWNORMAL);

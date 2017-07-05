@@ -33,6 +33,8 @@ public:
      */
     Win32Window(const std::string &title, int width, int height);
 
+    HDC getDeviceContext() const;
+
     void show() override;
     void hide() override;
 
