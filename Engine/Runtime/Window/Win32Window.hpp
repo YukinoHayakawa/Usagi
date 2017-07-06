@@ -11,14 +11,14 @@
 namespace yuki
 {
 
-class Win32Window : Window
+class Win32Window : public Window
 {
 private:
     static const wchar_t mWindowClassName[];
     static HINSTANCE mProcessInstanceHandle;
 
     HWND mWindowHandle = nullptr;
-    
+
     /**
     * \brief Initialize the window subsystem.
     */

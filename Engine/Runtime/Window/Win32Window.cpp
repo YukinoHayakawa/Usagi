@@ -14,23 +14,18 @@ void yuki::Win32Window::_ensureWindowSubsystemInitialized()
     // to the same place.
     mProcessInstanceHandle = GetModuleHandle(nullptr);
 
-    WNDCLASSEX wcex;
+    WNDCLASSEX wcex = { 0 };
 
     wcex.cbSize = sizeof(WNDCLASSEX);
     // CS_OWNDC is required to create OpenGL context
     wcex.style = CS_OWNDC | CS_DBLCLKS;
     wcex.lpfnWndProc = &_windowMessageDispatcher;
-    wcex.cbClsExtra = 0;
-    wcex.cbWndExtra = 0;
     wcex.hInstance = mProcessInstanceHandle;
-    wcex.hIcon = nullptr;
     // hInstance must be null to use predefined cursors
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     // we print the background on our own
     wcex.hbrBackground = nullptr;
-    wcex.lpszMenuName = nullptr;
     wcex.lpszClassName = mWindowClassName;
-    wcex.hIconSm = nullptr;
 
     if(!RegisterClassEx(&wcex))
     {
@@ -48,7 +43,7 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
         WS_EX_ACCEPTFILES,
         mWindowClassName,
         &windowTitleWide[0],
-        WS_OVERLAPPEDWINDOW,
+        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT,
         width, height,
         nullptr,
@@ -84,7 +79,7 @@ void yuki::Win32Window::hide()
 void yuki::Win32Window::loop()
 {
     MSG msg;
-    while(GetMessage(&msg, NULL, 0, 0))
+    while(GetMessage(&msg, mWindowHandle, 0, 0))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
