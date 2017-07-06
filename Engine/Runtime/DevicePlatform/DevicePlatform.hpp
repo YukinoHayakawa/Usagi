@@ -3,12 +3,8 @@
 #include <memory>
 #include <string>
 
-#include <Usagi/Engine/Utility/Exception.hpp>
-
 namespace yuki
 {
-
-YUKI_DECL_RUNTIME_EXCEPTION(RenderingContextCreationFailure);
 
 class RenderWindow;
 

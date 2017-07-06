@@ -1,4 +1,5 @@
 ﻿#include <Usagi/Engine/Utility/String.hpp>
+#include <Usagi/Engine/Runtime/DevicePlatform/Win32Common.hpp>
 
 #include "Win32Window.hpp"
 
@@ -29,7 +30,7 @@ void yuki::Win32Window::_ensureWindowSubsystemInitialized()
 
     if(!RegisterClassEx(&wcex))
     {
-        throw WindowSubsystemInitializationFailureException("Call to RegisterClassEx failed!");
+        throw Win32APIException("RegisterClassEx() failed!");
     }
 }
 
@@ -54,7 +55,7 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
 
     if(!mWindowHandle)
     {
-        throw WindowCreationFailureException("Call to CreateWindow failed!");
+        throw Win32APIException("RegisterClassEx() failed");
     }
 
     // associate the class instance with the window so they can be identified in WindowProc

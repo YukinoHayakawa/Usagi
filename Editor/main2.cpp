@@ -1,6 +1,8 @@
+#include <GL/glew.h>
 #include <Usagi/Engine/Runtime/DevicePlatform/Win32DevicePlatform.hpp>
 #include <Usagi/Engine/Runtime/RenderWindow.hpp>
-#include <GL/glew.h>
+#include <Usagi/Engine/Runtime/GraphicsInterface/OpenGL/Shader/OpenGLShader.hpp>
+#include <Usagi/Engine/Runtime/GraphicsInterface/OpenGL/Shader/OpenGLProgram.hpp>
 
 int main(int argc, char *argv[])
 {
@@ -16,6 +18,39 @@ int main(int argc, char *argv[])
         auto rwnd = dev.createRenderWindow("UsagiEditor", 1280, 720);
         rwnd->show();
         rwnd->setCurrent();
+
+        OpenGLShader vtxshader(GL_VERTEX_SHADER, R"(
+            #version 330 core
+
+            // Input vertex data, different for all executions of this shader.
+            layout(location = 0) in vec3 vertexPosition_modelspace;
+
+            void main()
+            {
+                gl_Position.xyz = vertexPosition_modelspace;
+                gl_Position.w = 1.0;
+
+            }
+        )"), fragshader(GL_FRAGMENT_SHADER, R"(
+            #version 330 core
+
+            // Ouput data
+            out vec3 color;
+
+            void main()
+            {
+	            // Output color = red 
+	            color = vec3(1,0,0);
+            }
+        )");
+
+        OpenGLProgram prog;
+        prog.attachShader(vtxshader);
+        prog.attachShader(fragshader);
+        prog.link();
+
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         GLuint VertexArrayID;
         glGenVertexArrays(1, &VertexArrayID);
@@ -49,6 +84,8 @@ int main(int argc, char *argv[])
             (void*)0            // array buffer offset
         );
         // Draw the triangle !
+        glUseProgram(prog.getId());
+
         glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
         glDisableVertexAttribArray(0);
 

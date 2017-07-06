@@ -1,12 +1,7 @@
 ﻿#pragma once
 
-#include <Usagi/Engine/Utility/Exception.hpp>
-
 namespace yuki
 {
-
-YUKI_DECL_RUNTIME_EXCEPTION(WindowSubsystemInitializationFailure);
-YUKI_DECL_RUNTIME_EXCEPTION(WindowCreationFailure);
 
 /**
 * \brief Window is the interface between the player and the engine. It is mainly for
