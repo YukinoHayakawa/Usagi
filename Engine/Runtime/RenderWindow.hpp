@@ -22,6 +22,9 @@ public:
 
     void show() override;
     void hide() override;
+    void swapBuffer() override;
+    void setCurrent() override;
+    void processEvents() override;
 };
 
 }

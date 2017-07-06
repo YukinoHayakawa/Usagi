@@ -15,3 +15,18 @@ void yuki::RenderWindow::hide()
 {
     mWindow->hide();
 }
+
+void yuki::RenderWindow::swapBuffer()
+{
+    mGI->swapBuffer();
+}
+
+void yuki::RenderWindow::setCurrent()
+{
+    mGI->setCurrent();
+}
+
+void yuki::RenderWindow::processEvents()
+{
+    mWindow->processEvents();
+}

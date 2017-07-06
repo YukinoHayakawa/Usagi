@@ -76,7 +76,7 @@ void yuki::Win32Window::hide()
     ShowWindow(mWindowHandle, SW_HIDE);
 }
 
-void yuki::Win32Window::loop()
+void yuki::Win32Window::processEvents()
 {
     MSG msg;
     while(GetMessage(&msg, mWindowHandle, 0, 0))

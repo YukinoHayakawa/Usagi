@@ -37,10 +37,7 @@ public:
 
     void show() override;
     void hide() override;
-
-    //virtual void processEvents();
-
-    void loop();
+    void processEvents() override;
 
     static LRESULT CALLBACK _windowMessageDispatcher(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };

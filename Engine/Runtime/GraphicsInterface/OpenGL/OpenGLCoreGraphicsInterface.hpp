@@ -15,6 +15,9 @@ class OpenGLCoreGraphicsInterface : public GraphicsInterface
 
 public:
     OpenGLCoreGraphicsInterface(std::shared_ptr<OpenGLContext> opengl_context);
+    
+    void swapBuffer() override;
+    void setCurrent() override;
 };
 
 }
