@@ -1,4 +1,6 @@
-﻿#include "Context/OpenGLContext.hpp"
+﻿#include <GL/glew.h>
+
+#include "Context/OpenGLContext.hpp"
 
 #include "OpenGLCoreGraphicsInterface.hpp"
 
@@ -15,4 +17,9 @@ void yuki::OpenGLCoreGraphicsInterface::swapBuffer()
 void yuki::OpenGLCoreGraphicsInterface::setCurrent()
 {
     mOpenGLContext->setCurrent();
+}
+
+void yuki::OpenGLCoreGraphicsInterface::clear()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

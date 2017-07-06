@@ -10,6 +10,7 @@ public:
 
     virtual void swapBuffer() = 0;
     virtual void setCurrent() = 0;
+    virtual void clear() = 0;
 };
 
 }

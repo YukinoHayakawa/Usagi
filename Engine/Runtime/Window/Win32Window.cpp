@@ -44,7 +44,7 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
         WS_EX_ACCEPTFILES,
         mWindowClassName,
         &windowTitleWide[0],
-        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+        WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
         width, height,
         nullptr,

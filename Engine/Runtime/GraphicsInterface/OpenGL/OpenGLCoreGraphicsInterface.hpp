@@ -18,6 +18,7 @@ public:
     
     void swapBuffer() override;
     void setCurrent() override;
+    void clear() override;
 };
 
 }

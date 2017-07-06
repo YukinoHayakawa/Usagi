@@ -25,6 +25,7 @@ public:
     void swapBuffer() override;
     void setCurrent() override;
     void processEvents() override;
+    void clear() override;
 };
 
 }

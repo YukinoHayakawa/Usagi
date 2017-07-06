@@ -30,3 +30,8 @@ void yuki::RenderWindow::processEvents()
 {
     mWindow->processEvents();
 }
+
+void yuki::RenderWindow::clear()
+{
+    mGI->clear();
+}

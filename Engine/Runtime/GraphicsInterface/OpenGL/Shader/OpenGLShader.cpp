@@ -5,6 +5,11 @@
 
 yuki::OpenGLShader::OpenGLShader(GLenum shaderType, const std::string &source)
 {
+    _init(shaderType, source);
+}
+
+void yuki::OpenGLShader::_init(GLenum shaderType, const std::string &source)
+{
     YUKI_OPENGL_CHECKED_CALL(mShaderId = glCreateShader(shaderType));
     const char *src = source.c_str();
     glShaderSource(mShaderId, 1, &src, nullptr);
