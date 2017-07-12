@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <cassert>
 
 const char * getChunkTypeString(uint32_t type)
 {
@@ -454,6 +455,7 @@ private:
     void _parseBody(std::istream &in, RwSectionHeader &header, uint32_t version) override
     {
         std::getline(in, string, '\0');
+        // == -(string.size() + 1) % 4?
         size_t padding = (4 - (string.size() + 1) % 4) % 4;
         in.ignore(padding);
     }
@@ -528,10 +530,14 @@ private:
     {
         _skipHeader(in); // skip Struct header
         in.read(reinterpret_cast<char*>(&num_materials), sizeof(num_materials));
-        mat_indices = decltype(mat_indices) { num_materials, int32_t { 0 } };
-        in.read(reinterpret_cast<char*>(&mat_indices[0]), sizeof(int32_t) * num_materials);
+        // mat_indices = decltype(mat_indices) { num_materials, 0 }; -> will be recognized as an initializer list so does not work
+        mat_indices.clear();
+        mat_indices.insert(mat_indices.end(), num_materials, 0);
+        assert(mat_indices.size() == num_materials);
+        in.read(reinterpret_cast<char*>(&mat_indices[0]), sizeof(decltype(mat_indices)::value_type) * mat_indices.size());
 
         materials = decltype(materials) { num_materials, RpMaterial { } };
+        assert(materials.size() == num_materials);
         for(auto &&m : materials)
         {
             m.parse(in);
@@ -593,27 +599,33 @@ private:
             {
                 numTexSets = (format & 0x00FF0000) >> 16;
                 texCoords = decltype(texCoords) { numTexSets, decltype(texCoords)::value_type { } };
+                assert(texCoords.size() == numTexSets);
                 for(auto &&t : texCoords)
                 {
                     t = std::remove_reference_t<decltype(t)> { num_vertices, RwTexCoords { } };
+                    assert(t.size() == num_vertices);
                     in.read(reinterpret_cast<char*>(&t[0]), sizeof(RwTexCoords) * num_vertices);
                 }
             }
             triangles = decltype(triangles) { num_triangles, RpTriangle { } };
+            assert(triangles.size() == num_triangles);
             in.read(reinterpret_cast<char*>(&triangles[0]), sizeof(RpTriangle) * num_triangles);
         }
         morph_targets = decltype(morph_targets) { num_morph_targets, MorphTarget { } };
+        assert(morph_targets.size() == num_morph_targets);
         for(auto &&m : morph_targets)
         {
             in.read(reinterpret_cast<char*>(&m.bounding_sphere), sizeof(RwSphere) + 2 * sizeof(uint32_t));
             if(m.has_vertices)
             {
                 m.vertices = std::vector<RwV3d> { num_vertices, RwV3d { } };
+                assert(m.vertices.size() == num_vertices);
                 in.read(reinterpret_cast<char*>(&m.vertices[0]), num_vertices * sizeof(RwV3d));
             }
             if(m.has_normals)
             {
                 m.normals = std::vector<RwV3d> { num_vertices, RwV3d { } };
+                assert(m.normals.size() == num_vertices);
                 in.read(reinterpret_cast<char*>(&m.normals[0]), num_vertices * sizeof(RwV3d));
             }
         }
