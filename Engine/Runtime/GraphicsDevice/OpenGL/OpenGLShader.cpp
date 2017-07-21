@@ -101,6 +101,7 @@ yuki::OpenGLShader & yuki::OpenGLShader::linkInputs(yuki::VertexBuffer &vbo)
     glBindVertexArray(mVAO);
     BindingSentry vaobind { std::bind(glBindVertexArray, 0) };
     auto vbobind = vbo.bind();
+    YUKI_OPENGL_CHECK();
 
     // https://stackoverflow.com/questions/440144/in-opengl-is-there-a-way-to-get-a-list-of-all-uniforms-attribs-used-by-a-shade
     GLint count = 0;
@@ -139,19 +140,22 @@ yuki::OpenGLShader & yuki::OpenGLShader::linkInputs(yuki::VertexBuffer &vbo)
                 vbo.getElementSize(),
                 reinterpret_cast<const void *>(input->offset)
             );
+            YUKI_OPENGL_CHECK();
         }
         else
         {
             throw std::runtime_error("input variable not found in vertex buffer");
         }
     }
+    mLastLayoutSignature = sign;
+
     return *this;
 }
 
 yuki::BindingSentry yuki::OpenGLShader::bind()
 {
     glUseProgram(mProgramId);
-    glBindVertexArray(0);
+    glBindVertexArray(mVAO);
     YUKI_OPENGL_CHECK();
 
     return { []()
