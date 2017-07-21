@@ -1,5 +1,0 @@
-[requires]
-Boost/1.64.0@yukinoh/stable
-
-[generators]
-visual_studio
