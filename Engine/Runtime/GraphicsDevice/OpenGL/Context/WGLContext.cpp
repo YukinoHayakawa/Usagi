@@ -1,7 +1,7 @@
 ﻿#include <GL/glew.h>
 #include <GL/wglew.h>
+#include <stdexcept>
 
-#include <Usagi/Engine/Runtime/DevicePlatform/Win32Common.hpp>
 #include "../OpenGLCommon.hpp"
 
 #include "WGLContext.hpp"
@@ -24,7 +24,7 @@ void yuki::WGLContext::HGLRCWrapper::destroy()
 void yuki::WGLContext::HGLRCWrapper::setCurrent()
 {
     if(!wglMakeCurrent(dc, glrc))
-        throw Win32APIException("wglMakeCurrent() failed");
+        throw std::runtime_error("wglMakeCurrent() failed");
 }
 
 yuki::WGLContext::HGLRCWrapper::HGLRCWrapper()
@@ -75,18 +75,18 @@ yuki::WGLContext::WGLContext(HDC dc)
     // set the pixel format of DC to which we like
     int pfmt = ChoosePixelFormat(dc, &pfd);
     if(!pfmt)
-        throw Win32APIException("ChoosePixelFormat() failed");
+        throw std::runtime_error("ChoosePixelFormat() failed");
     if(!SetPixelFormat(dc, pfmt, &pfd))
-        throw Win32APIException("SetPixelFormat() failed");
+        throw std::runtime_error("SetPixelFormat() failed");
 
     // this creates an old OpenGL context (version <= 2.1), to use 3+ we have to
     // use WGL extension like below.
     mContext = HGLRCWrapper { dc, wglCreateContext(dc) };
-    if(!mContext.glrc) throw Win32APIException("wglCreateContext() failed");
+    if(!mContext.glrc) throw std::runtime_error("wglCreateContext() failed");
     mContext.setCurrent();
 
     GLenum err = glewInit();
-    if(GLEW_OK != err) throw OpenGLGeneralException("glewInit() failed");
+    if(GLEW_OK != err) throw std::runtime_error("glewInit() failed");
 
     if(wglewIsSupported("WGL_ARB_create_context") == 1)
     {
@@ -101,7 +101,7 @@ yuki::WGLContext::WGLContext(HDC dc)
     }
     else
     {
-        throw OpenGLGeneralException("WGL_ARB_create_context is not supported");
+        throw std::runtime_error("WGL_ARB_create_context is not supported");
     }
 }
 

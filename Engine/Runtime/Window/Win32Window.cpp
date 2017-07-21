@@ -1,5 +1,4 @@
 ﻿#include <Usagi/Engine/Utility/String.hpp>
-#include <Usagi/Engine/Runtime/DevicePlatform/Win32Common.hpp>
 
 #include "Win32Window.hpp"
 
@@ -30,7 +29,7 @@ void yuki::Win32Window::_ensureWindowSubsystemInitialized()
 
     if(!RegisterClassEx(&wcex))
     {
-        throw Win32APIException("RegisterClassEx() failed!");
+        throw std::runtime_error("RegisterClassEx() failed!");
     }
 }
 
@@ -55,7 +54,7 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
 
     if(!mWindowHandle)
     {
-        throw Win32APIException("RegisterClassEx() failed");
+        throw std::runtime_error("RegisterClassEx() failed");
     }
 
     // associate the class instance with the window so they can be identified in WindowProc
@@ -80,7 +79,8 @@ void yuki::Win32Window::hide()
 void yuki::Win32Window::processEvents()
 {
     MSG msg;
-    while(GetMessage(&msg, mWindowHandle, 0, 0))
+    // hwnd should be nullptr or the loop won't end when close the window
+    while(GetMessage(&msg, nullptr, 0, 0))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
