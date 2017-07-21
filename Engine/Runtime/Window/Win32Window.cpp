@@ -80,7 +80,7 @@ void yuki::Win32Window::processEvents()
 {
     MSG msg;
     // hwnd should be nullptr or the loop won't end when close the window
-    while(GetMessage(&msg, nullptr, 0, 0))
+    while(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
@@ -95,19 +95,6 @@ LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message, WPA
 
     switch(message)
     {
-        case WM_PAINT:
-            hdc = BeginPaint(hWnd, &ps);
-
-            // Here your application is laid out.  
-            // For this introduction, we just print out "Hello, World!"  
-            // in the top left corner.  
-            TextOut(hdc,
-                5, 5,
-                greeting, _tcslen(greeting));
-            // End application-specific layout section.  
-
-            EndPaint(hWnd, &ps);
-            break;
         case WM_DESTROY:
             PostQuitMessage(0);
             break;
