@@ -73,11 +73,6 @@ void yuki::OpenGLGraphicsDevice::drawTriangles(size_t first, size_t count)
 void yuki::OpenGLGraphicsDevice::_draw(GLenum mode, size_t first, size_t count)
 {
     glDrawArrays(mode, first, count);
-
-    glUseProgram(0);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     YUKI_OPENGL_CHECK();
 }
 
