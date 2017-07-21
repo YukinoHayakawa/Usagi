@@ -1,4 +1,6 @@
-﻿#include <Usagi/Engine/Utility/String.hpp>
+﻿#include <ShellScalingAPI.h>
+
+#include <Usagi/Engine/Utility/String.hpp>
 
 #include "Win32Window.hpp"
 
@@ -59,6 +61,7 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
 
     // associate the class instance with the window so they can be identified in WindowProc
     SetWindowLongPtr(mWindowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 }
 
 HDC yuki::Win32Window::getDeviceContext() const
@@ -89,10 +92,6 @@ void yuki::Win32Window::processEvents()
 
 LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    PAINTSTRUCT ps;
-    HDC hdc;
-    TCHAR greeting[] = _T("Hello, World!");
-
     switch(message)
     {
         case WM_DESTROY:
