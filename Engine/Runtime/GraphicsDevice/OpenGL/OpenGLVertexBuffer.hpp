@@ -10,6 +10,9 @@ namespace yuki
 class OpenGLVertexBuffer : public VertexBuffer
 {
 public:
+    OpenGLVertexBuffer();
+    ~OpenGLVertexBuffer() override;
+
     void streamUpdate(const void *data, size_t length) override;
     MemoryMappingSentry mapStorage() override;
     void reallocate() override;
