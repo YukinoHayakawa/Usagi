@@ -44,9 +44,24 @@ void yuki::OpenGLShader::_deleteVAO()
     mVAO = 0;
 }
 
+void yuki::OpenGLShader::_deleteShaders()
+{
+    if(mVertShader)
+    {
+        glDeleteShader(mVertShader);
+        mVertShader = 0;
+    }
+    if(mFragShader)
+    {
+        glDeleteShader(mFragShader);
+        mFragShader = 0;
+    }
+}
+
 yuki::OpenGLShader::~OpenGLShader()
 {
     if(mProgramId) glDeleteProgram(mProgramId);
+    _deleteShaders();
     _deleteVAO();
 }
 
@@ -72,6 +87,9 @@ yuki::OpenGLShader & yuki::OpenGLShader::compile()
     glAttachShader(mProgramId, mVertShader);
     glAttachShader(mProgramId, mFragShader);
     glLinkProgram(mProgramId);
+    glDetachShader(mProgramId, mVertShader);
+    glDetachShader(mProgramId, mFragShader);
+    _deleteShaders();
 
     GLint result;
     int info_log_length;

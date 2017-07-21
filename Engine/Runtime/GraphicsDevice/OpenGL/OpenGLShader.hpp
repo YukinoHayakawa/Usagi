@@ -14,6 +14,7 @@ class OpenGLShader : public Shader
 
     void _compileShader(GLenum shaderType, const std::string &source);
     void _deleteVAO();
+    void _deleteShaders();
 
 public:
     OpenGLShader();
