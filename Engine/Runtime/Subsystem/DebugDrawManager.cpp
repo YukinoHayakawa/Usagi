@@ -9,7 +9,9 @@
 #include <Usagi/Engine/Runtime/GraphicsDevice/Shader.hpp>
 
 #include "DebugDrawManager.hpp"
+//todo remove
 #include <GL/glew.h>
+#include "Usagi/Engine/Runtime/GraphicsDevice/OpenGL/OpenGLCommon.hpp"
 
 namespace
 {
@@ -155,7 +157,7 @@ struct Camera
         right = Vector3(1.0f, 0.0f, 0.0f);
         up = Vector3(0.0f, 1.0f, 0.0f);
         forward = Vector3(0.0f, 0.0f, 1.0f);
-        eye = Vector3(0.0f, 0.0f, 0.0f);
+        eye = Vector3(10, 10, 10);
         viewMatrix = Matrix4::identity();
         vpMatrix = Matrix4::identity();
 
@@ -257,7 +259,7 @@ struct Camera
 
     void updateMatrices()
     {
-        viewMatrix = Matrix4::lookAt(Point3(eye), getTarget(), up);
+        viewMatrix = Matrix4::lookAt(Point3(eye), Point3(0, 0, 0), up);
         vpMatrix = projMatrix * viewMatrix; // Vectormath lib uses column-major OGL style, so multiply P*V*M
     }
 
@@ -305,8 +307,8 @@ static void drawLabel(ddVec3Param pos, const char * name)
     // that go out of view might still show up in the corners. A frustum
     // check before adding them would fix the issue.
     const ddVec3 textColor = { 0.8f, 0.8f, 1.0f };
-    dd::projectedText(name, pos, textColor, toFloatPtr(camera.vpMatrix),
-        0, 0, 1280, 720, 0.5f);
+//     dd::projectedText(name, pos, textColor, toFloatPtr(camera.vpMatrix),
+//         0, 0, 1280, 720, 0.5f);
 }
 
 static void drawMiscObjects()
@@ -440,15 +442,14 @@ static void drawText()
 yuki::DebugDrawManager::DebugDrawManager(GraphicsDevice &gd)
     : mGraphicsDevice { &gd }
 {
-    (*(mBlendState = gd.createBlendState()).get())
-        .enableBlend(false)
-        ;
-
     (*(mRasterizerState = gd.createRasterizerState()).get())
         .enableDepthTest(true)
         .setFaceCulling(RasterizerState::FaceCullingType::FRONT)
         ;
 
+    (*(mLinePointBlendState = gd.createBlendState()).get())
+        .enableBlend(false)
+        ;
     (*(mLinePointVBO = gd.createVertexBuffer()).get())
         .setLayout(DEBUG_DRAW_VERTEX_BUFFER_SIZE * sizeof(dd::DrawVertex), sizeof(dd::DrawVertex), {
             { "in_Position", BufferElementType::FLOAT, 3, false, 0 },
@@ -461,11 +462,17 @@ yuki::DebugDrawManager::DebugDrawManager(GraphicsDevice &gd)
         .compile()
         ;
 
+    (*(mTextBlendState = gd.createBlendState()).get())
+        .enableBlend(true)
+        .setOp(BlendState::Operation::ADD)
+        .setSrcFactor(BlendState::Factor::SOURCE_ALPHA)
+        .setDestFactor(BlendState::Factor::INV_SOURCE_ALPHA)
+        ;
     (*(mTextVBO = gd.createVertexBuffer()).get())
         .setLayout(DEBUG_DRAW_VERTEX_BUFFER_SIZE * sizeof(dd::DrawVertex), sizeof(dd::DrawVertex), {
             { "in_Position", BufferElementType::FLOAT, 2, false, 0 },
             { "in_TexCoords", BufferElementType::FLOAT, 2, false, 2 * sizeof(float) },
-            { "in_Color", BufferElementType::FLOAT, 4, false, 4 * sizeof(float) },
+            { "in_Color", BufferElementType::FLOAT, 3, false, 4 * sizeof(float) },
         })
         ;
     (*(mTextShader = gd.createShader()).get())
@@ -486,6 +493,7 @@ void yuki::DebugDrawManager::render(GraphicsDevice &gd, const Clock &render_cloc
 {
     assert(&gd == mGraphicsDevice);
 
+    camera.updateMatrices();
     // todo remove
     drawGrid();
     drawMiscObjects();
@@ -497,9 +505,12 @@ void yuki::DebugDrawManager::render(GraphicsDevice &gd, const Clock &render_cloc
 
 dd::GlyphTextureHandle yuki::DebugDrawManager::createGlyphTexture(int width, int height, const void *pixels)
 {
+    assert(width > 0 && height > 0);
+    assert(pixels != nullptr);
+
     auto tex = mGraphicsDevice->createTexture();
 
-    tex->setFormat(width, height, 1, BufferElementType::BYTE);
+    tex->setFormat(width, height, 1, BufferElementType::UNSIGNED_BYTE);
     tex->upload(pixels);
 
     mTextures.push_back(tex);
@@ -516,6 +527,9 @@ void yuki::DebugDrawManager::destroyGlyphTexture(dd::GlyphTextureHandle glyphTex
 
 void yuki::DebugDrawManager::drawPointList(const dd::DrawVertex *points, int count, bool depthEnabled)
 {
+    assert(points != nullptr);
+    assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
+
     // update data
     mLinePointVBO->streamUpdate(points, count * sizeof(dd::DrawVertex));
     mRasterizerState->enableDepthTest(depthEnabled);
@@ -523,13 +537,13 @@ void yuki::DebugDrawManager::drawPointList(const dd::DrawVertex *points, int cou
     // setup pipeline
     mLinePointShader->linkInputs(*mLinePointVBO.get()); // setup input layout
     mRasterizerState->use();
-    mBlendState->use();
+    mLinePointBlendState->use();
 
     auto ss = mLinePointShader->bind();
     auto vs = mLinePointVBO->bind();
 
 
-    //todo remove
+    //todo impl constant buffer
     GLuint p;
     glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&p));
     auto linePointProgram_MvpMatrixLocation = glGetUniformLocation(p, "u_MvpMatrix");
@@ -546,12 +560,15 @@ void yuki::DebugDrawManager::drawPointList(const dd::DrawVertex *points, int cou
 
 void yuki::DebugDrawManager::drawLineList(const dd::DrawVertex *lines, int count, bool depthEnabled)
 {
+    assert(lines != nullptr);
+    assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
+
     mLinePointVBO->streamUpdate(lines, count * sizeof(dd::DrawVertex));
     mRasterizerState->enableDepthTest(depthEnabled);
 
     mLinePointShader->linkInputs(*mLinePointVBO.get());
     mRasterizerState->use();
-    mBlendState->use();
+    mLinePointBlendState->use();
 
     auto ss = mLinePointShader->bind();
     auto vs = mLinePointVBO->bind();
@@ -571,17 +588,34 @@ void yuki::DebugDrawManager::drawLineList(const dd::DrawVertex *lines, int count
     mGraphicsDevice->drawLines(0, count);
 }
 
+// todo: impl texture usage
 void yuki::DebugDrawManager::drawGlyphList(const dd::DrawVertex *glyphs, int count, dd::GlyphTextureHandle glyphTex)
 {
+    assert(glyphs != nullptr);
+    assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
+
     mTextVBO->streamUpdate(glyphs, count * sizeof(dd::DrawVertex));
-    mRasterizerState->enableDepthTest(true);
+    mRasterizerState->enableDepthTest(false);
 
     mTextShader->linkInputs(*mTextVBO.get());
     mRasterizerState->use();
-    mBlendState->use();
+    mTextBlendState->use();
 
     auto ss = mTextShader->bind();
     auto vs = mTextVBO->bind();
+    auto ts = reinterpret_cast<GDTexture*>(glyphTex)->bind(0);
+
+    GLuint p;
+    glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&p));
+    auto textProgram_GlyphTextureLocation = glGetUniformLocation(p, "u_glyphTexture");
+    auto textProgram_ScreenDimensions = glGetUniformLocation(p, "u_screenDimensions");
+
+    glUniform1i(textProgram_GlyphTextureLocation, 0);
+    glUniform2f(textProgram_ScreenDimensions,
+        static_cast<GLfloat>(windowWidth),
+        static_cast<GLfloat>(windowHeight));
+
+	YUKI_OPENGL_CHECK();
 
     mGraphicsDevice->drawTriangles(0, count);
 }

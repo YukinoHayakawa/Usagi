@@ -17,7 +17,7 @@ class DebugDrawManager : public Renderable, public dd::RenderInterface
     GraphicsDevice *mGraphicsDevice;
     std::vector<std::shared_ptr<GDTexture>> mTextures;
     std::shared_ptr<RasterizerState> mRasterizerState;
-    std::shared_ptr<BlendState> mBlendState;
+    std::shared_ptr<BlendState> mLinePointBlendState, mTextBlendState;
     std::shared_ptr<Shader> mLinePointShader;
     std::shared_ptr<VertexBuffer> mLinePointVBO;
     std::shared_ptr<Shader> mTextShader;
