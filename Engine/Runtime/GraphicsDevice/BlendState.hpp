@@ -22,6 +22,27 @@ public:
         ADD
     };
 
+    BlendState & setOp(Operation op)
+    {
+        setColorOp(op);
+        setAlphaOp(op);
+        return *this;
+    }
+
+    BlendState & setSrcFactor(Factor factor)
+    {
+        setColorSrcFactor(factor);
+        setAlphaSrcFactor(factor);
+        return *this;
+    }
+
+    BlendState & setDestFactor(Factor factor)
+    {
+        setColorDestFactor(factor);
+        setAlphaDestFactor(factor);
+        return *this;
+    }
+
     virtual BlendState & setColorOp(Operation op) = 0;
     virtual BlendState & setAlphaOp(Operation op) = 0;
     virtual BlendState & setColorSrcFactor(Factor factor) = 0;

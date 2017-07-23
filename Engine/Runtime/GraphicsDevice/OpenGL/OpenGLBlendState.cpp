@@ -68,7 +68,15 @@ yuki::OpenGLBlendState & yuki::OpenGLBlendState::setAlphaDestFactor(Factor facto
 
 void yuki::OpenGLBlendState::use()
 {
-    glBlendEquationSeparate(mColorOp, mAlphaOp);
-    glBlendFuncSeparate(mSrcRgb, mDestRgb, mSrcAlpha, mDestAlpha);
+	if(mEnable)
+	{
+		glEnable(GL_BLEND);
+		glBlendEquationSeparate(mColorOp, mAlphaOp);
+		glBlendFuncSeparate(mSrcRgb, mDestRgb, mSrcAlpha, mDestAlpha);
+	}
+	else
+	{
+		glDisable(GL_BLEND);
+	}
     YUKI_OPENGL_CHECK();
 }
