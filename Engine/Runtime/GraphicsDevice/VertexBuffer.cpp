@@ -1,6 +1,6 @@
 ﻿#include <algorithm>
 #include <functional>
-#include <string_view>
+#include <string>
 
 #include "VertexBuffer.hpp"
 
@@ -14,7 +14,8 @@ yuki::VertexBuffer & yuki::VertexBuffer::setLayout(size_t count, size_t element_
     mSize = count * element_size;
     mLayout = layout;
     mElementSize = element_size;
-    mSignature = std::hash<std::string_view>()(std::string_view(
+	// todo: use string_view
+    mSignature = std::hash<std::string>()(std::string(
         reinterpret_cast<const char *>(&mLayout[0]),
         sizeof(BufferLayout) * mLayout.size()
     ));
