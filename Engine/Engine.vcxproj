@@ -20,9 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{6A22B65F-BDBF-491D-988E-11019A427E5F}</ProjectGuid>
-    <RootNamespace>Preprocessor</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <ProjectGuid>{19097A41-38D5-4564-92E0-702887CF5259}</ProjectGuid>
+    <RootNamespace>Engine</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -41,13 +40,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -64,11 +63,9 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="build\debug\conanbuildinfo.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="build\release\conanbuildinfo.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -77,6 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -106,6 +104,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -113,14 +112,62 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="export.hpp" />
-    <ClInclude Include="op.hpp" />
-    <ClInclude Include="transform.hpp" />
-    <ClInclude Include="identifier.hpp" />
-    <ClInclude Include="infix_join.hpp" />
-    <ClInclude Include="make_nested_namespace.hpp" />
-    <ClInclude Include="tuple.hpp" />
-    <ClInclude Include="unpack.hpp" />
+    <ClInclude Include="Core\Types.hpp" />
+    <ClInclude Include="Core\Spectrum\CommonRGBColor.hpp" />
+    <ClInclude Include="Core\Spectrum\RGBSpectrum.hpp" />
+    <ClInclude Include="Core\Spectrum\Spectrum.hpp" />
+    <ClInclude Include="Filesystem\Filesystem.hpp" />
+    <ClInclude Include="Extension\GTA\GTA3IMGv2Filesystem.hpp" />
+    <ClInclude Include="Renderer\Renderer.hpp" />
+    <ClInclude Include="Runtime\Clock.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\BlendState.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\BufferElementType.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\GDTexture.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\GraphicsDevice.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\Context\OpenGLContext.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\Context\WGLContext.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLBlendState.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLCommon.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLGraphicsDevice.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLRasterizerState.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLTexture.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLShader.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLVertexBuffer.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\RasterizerState.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\Shader.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\VertexBuffer.hpp" />
+    <ClInclude Include="Runtime\Renderable.hpp" />
+    <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
+    <ClInclude Include="Runtime\Subsystem\DebugDrawManager.hpp" />
+    <ClInclude Include="Runtime\Window\Win32Window.hpp" />
+    <ClInclude Include="Runtime\Window\Window.hpp" />
+    <ClInclude Include="Utility\BindingSentry.hpp" />
+    <ClInclude Include="Utility\Exception.hpp" />
+    <ClInclude Include="Utility\File.hpp" />
+    <ClInclude Include="Utility\String.hpp" />
+    <ClInclude Include="World\Geometry\Geometry.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Filesystem\Filesystem.cpp" />
+    <ClCompile Include="Extension\GTA\GTA3IMGv2Filesystem.cpp" />
+    <ClCompile Include="Renderer\Renderer.cpp" />
+    <ClCompile Include="Runtime\Clock.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\Context\WGLContext.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLBlendState.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLCommon.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLGraphicsDevice.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLRasterizerState.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLTexture.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLShader.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLVertexBuffer.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\VertexBuffer.cpp" />
+    <ClCompile Include="Runtime\Renderable.cpp" />
+    <ClCompile Include="Runtime\Subsystem\DebugDrawImpl.cpp" />
+    <ClCompile Include="Runtime\Subsystem\DebugDrawManager.cpp" />
+    <ClCompile Include="Runtime\Window\Win32Window.cpp" />
+    <ClCompile Include="Runtime\Window\Window.cpp" />
+    <ClCompile Include="Utility\File.cpp" />
+    <ClCompile Include="World\Geometry\Geometry.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
