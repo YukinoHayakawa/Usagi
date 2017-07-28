@@ -139,6 +139,52 @@ public:
 	 */
 	virtual void fsEnableDepthTest(bool enable) = 0;
 
+    /*
+     * Color Blending
+     */
+
+    /**
+     * \brief Color blending. Disabled by default.
+     * \param enable 
+     */
+    virtual void bldEnableBlend(bool enable) = 0;
+
+    enum class BlendingFactor
+    {
+        ZERO, ONE,
+        SOURCE_ALPHA, INV_SOURCE_ALPHA,
+    };
+
+    enum class BlendingOperation
+    {
+        ADD
+    };
+
+    void bldSetOp(BlendingOperation op)
+    {
+        bldSetColorOp(op);
+        bldSetAlphaOp(op);
+    }
+
+    void bldSetSrcFactor(BlendingFactor factor)
+    {
+        bldSetColorSrcFactor(factor);
+        bldSetAlphaSrcFactor(factor);
+    }
+
+    void bldSetDestFactor(BlendingFactor factor)
+    {
+        bldSetColorDestFactor(factor);
+        bldSetAlphaDestFactor(factor);
+    }
+
+    virtual void bldSetColorOp(BlendingOperation op) = 0;
+    virtual void bldSetAlphaOp(BlendingOperation op) = 0;
+    virtual void bldSetColorSrcFactor(BlendingFactor factor) = 0;
+    virtual void bldSetAlphaSrcFactor(BlendingFactor factor) = 0;
+    virtual void bldSetColorDestFactor(BlendingFactor factor) = 0;
+    virtual void bldSetAlphaDestFactor(BlendingFactor factor) = 0;
+
 	/**
 	 * \brief Apply the states to the device context creating this pipeline.
 	 */
