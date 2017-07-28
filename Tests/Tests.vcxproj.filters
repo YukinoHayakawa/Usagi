@@ -15,22 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Meta\apply_first_n_value_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Meta\char_list_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Meta\string_literal_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Preprocessor\infix_join_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Preprocessor\make_nested_namespace_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Reflection\reflection_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="run_all_tests.cpp">
@@ -43,6 +31,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Meta\premain_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Meta\make_delegate_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

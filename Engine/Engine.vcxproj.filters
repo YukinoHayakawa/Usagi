@@ -72,40 +72,16 @@
     <ClInclude Include="Runtime\GraphicsDevice\VertexBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\GraphicsDevice\GDTexture.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\GraphicsDevice\BufferElementType.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Subsystem\DebugDrawManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Clock.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLTexture.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\GraphicsDevice\BlendState.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\GraphicsDevice\RasterizerState.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLRasterizerState.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLBlendState.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLGraphicsDevice.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utility\File.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLShader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utility\BindingSentry.hpp">
@@ -115,6 +91,33 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\GDBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\GDPipeline.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\ShaderDataType.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\NativeDataType.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLPipeline.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Noncopyable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\detail\OpenGLShader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLVertexShader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLFragmentShader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -143,40 +146,40 @@
     <ClCompile Include="Runtime\Renderable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\GraphicsDevice\VertexBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\Subsystem\DebugDrawManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Clock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLCommon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLRasterizerState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLBlendState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLGraphicsDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLShader.cpp">
+    <ClCompile Include="Utility\File.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\File.cpp">
+    <ClCompile Include="Runtime\Subsystem\DebugDrawImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\GraphicsDevice\GDBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\detail\OpenGLShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLVertexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Subsystem\DebugDrawImpl.cpp">
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLVertexShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLFragmentShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

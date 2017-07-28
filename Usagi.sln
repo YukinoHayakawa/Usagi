@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Meta", "Meta\Meta.vcxitems", "{2E1F36EC-AA7F-4008-B485-2ABC067DFAF2}"
 EndProject
@@ -11,17 +11,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Preprocessor", "Preprocesso
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Reflection", "Reflection\Reflection.vcxitems", "{51E840F2-E886-44AE-874D-95D748C231A6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Multiplayer", "Multiplayer\Multiplayer.vcxitems", "{683CF4ED-FDF8-4E22-B8BA-6CE8C7A4DC00}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Game", "Game", "{2A9134A8-0B09-4FB1-B1DD-AB756E79AEC1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PropertySheet", "PropertySheet\PropertySheet.vcxitems", "{4604C2A4-68FB-4ED7-8FA0-F363CA232E07}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utility", "Utility", "{72123BE8-4B07-430E-A0F4-0FD126CBE4EA}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{7654D3DE-FA34-4048-9EB2-3B23BDBB66A1}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Criteria", "Criteria\Criteria.vcxitems", "{F55FA973-581B-40D9-A01F-39C784DC5908}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Serialization", "Serialization\Serialization.vcxitems", "{BF921786-7EDA-4227-93D9-B786B6D0120A}"
 EndProject
@@ -34,19 +26,13 @@ EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Meta\Meta.vcxitems*{2e1f36ec-aa7f-4008-b485-2abc067dfaf2}*SharedItemsImports = 9
-		PropertySheet\PropertySheet.vcxitems*{4604c2a4-68fb-4ed7-8fa0-f363ca232e07}*SharedItemsImports = 9
 		Reflection\Reflection.vcxitems*{51e840f2-e886-44ae-874d-95d748c231a6}*SharedItemsImports = 9
-		Multiplayer\Multiplayer.vcxitems*{683cf4ed-fdf8-4e22-b8ba-6ce8c7a4dc00}*SharedItemsImports = 9
-		Criteria\Criteria.vcxitems*{7654d3de-fa34-4048-9eb2-3b23bdbb66a1}*SharedItemsImports = 4
 		Meta\Meta.vcxitems*{7654d3de-fa34-4048-9eb2-3b23bdbb66a1}*SharedItemsImports = 4
-		Multiplayer\Multiplayer.vcxitems*{7654d3de-fa34-4048-9eb2-3b23bdbb66a1}*SharedItemsImports = 4
 		Preprocessor\Preprocessor.vcxitems*{7654d3de-fa34-4048-9eb2-3b23bdbb66a1}*SharedItemsImports = 4
-		PropertySheet\PropertySheet.vcxitems*{7654d3de-fa34-4048-9eb2-3b23bdbb66a1}*SharedItemsImports = 4
 		Reflection\Reflection.vcxitems*{7654d3de-fa34-4048-9eb2-3b23bdbb66a1}*SharedItemsImports = 4
 		Serialization\Serialization.vcxitems*{7654d3de-fa34-4048-9eb2-3b23bdbb66a1}*SharedItemsImports = 4
 		Serialization\Serialization.vcxitems*{bf921786-7eda-4227-93d9-b786b6d0120a}*SharedItemsImports = 9
 		Preprocessor\Preprocessor.vcxitems*{db9b76ca-a88d-427f-be22-23b7ef533de2}*SharedItemsImports = 9
-		Criteria\Criteria.vcxitems*{f55fa973-581b-40d9-a01f-39c784dc5908}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -95,9 +81,6 @@ Global
 		{2E1F36EC-AA7F-4008-B485-2ABC067DFAF2} = {55C1D6F0-D81A-4414-B3DF-0EA0D5B5DA57}
 		{DB9B76CA-A88D-427F-BE22-23B7EF533DE2} = {55C1D6F0-D81A-4414-B3DF-0EA0D5B5DA57}
 		{51E840F2-E886-44AE-874D-95D748C231A6} = {55C1D6F0-D81A-4414-B3DF-0EA0D5B5DA57}
-		{683CF4ED-FDF8-4E22-B8BA-6CE8C7A4DC00} = {2A9134A8-0B09-4FB1-B1DD-AB756E79AEC1}
-		{4604C2A4-68FB-4ED7-8FA0-F363CA232E07} = {72123BE8-4B07-430E-A0F4-0FD126CBE4EA}
-		{F55FA973-581B-40D9-A01F-39C784DC5908} = {72123BE8-4B07-430E-A0F4-0FD126CBE4EA}
 		{BF921786-7EDA-4227-93D9-B786B6D0120A} = {55C1D6F0-D81A-4414-B3DF-0EA0D5B5DA57}
 		{8AACE3BA-7E7E-4609-B42A-CE8F12527D7B} = {2A9134A8-0B09-4FB1-B1DD-AB756E79AEC1}
 		{19097A41-38D5-4564-92E0-702887CF5259} = {2A9134A8-0B09-4FB1-B1DD-AB756E79AEC1}
