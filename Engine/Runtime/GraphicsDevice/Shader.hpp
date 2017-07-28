@@ -18,12 +18,12 @@ public:
     virtual void compile() = 0;
 };
 
-class VertexShader: public Shader
+class VertexShader: public virtual Shader
 {
 public:
 };
 
-class FragmentShader : public Shader
+class FragmentShader : public virtual Shader
 {
 public:
 };

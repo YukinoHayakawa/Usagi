@@ -28,12 +28,12 @@ yuki::detail::OpenGLShader::~OpenGLShader()
     if(mShader) glDeleteShader(mShader);
 }
 
-void yuki::detail::OpenGLShader::_useSourceString(std::string source_code)
+void yuki::detail::OpenGLShader::useSourceString(std::string source_code)
 {
     mSource = source_code;
 }
 
-void yuki::detail::OpenGLShader::_readFromSourceFile(const std::string &file_path)
+void yuki::detail::OpenGLShader::readFromSourceFile(const std::string &file_path)
 {
     mSource = readFileContent(file_path);
 }

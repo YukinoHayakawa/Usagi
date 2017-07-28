@@ -3,14 +3,14 @@
 #include <string>
 #include <GL/glew.h>
 
-#include <Usagi/Engine/Utility/Noncopyable.hpp>
+#include <Usagi/Engine/Runtime/GraphicsDevice/Shader.hpp>
 
 namespace yuki
 {
 namespace detail
 {
 
-class OpenGLShader : public Noncopyable
+class OpenGLShader : public virtual Shader
 {
     GLuint mShader = 0;
     std::string mSource;
@@ -18,14 +18,14 @@ class OpenGLShader : public Noncopyable
 protected:
     void _attachToProgram(GLuint program);
     void _detachFromProgram(GLuint program);
+    void _compile(GLenum shaderType);
 
 public:
     OpenGLShader();
     ~OpenGLShader();
 
-    void _useSourceString(std::string source_code);
-    void _readFromSourceFile(const std::string &file_path);
-    void _compile(GLenum shaderType);
+    void useSourceString(std::string source_code) override;
+    void readFromSourceFile(const std::string &file_path) override;
 };
 
 }
