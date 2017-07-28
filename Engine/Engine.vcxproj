@@ -120,6 +120,7 @@
     <ClInclude Include="Extension\GTA\GTA3IMGv2Filesystem.hpp" />
     <ClInclude Include="Renderer\Renderer.hpp" />
     <ClInclude Include="Runtime\Clock.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\Debug\DebugTriangle.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\NativeDataType.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\OpenGL\detail\OpenGLShader.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLFragmentShader.hpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="Extension\GTA\GTA3IMGv2Filesystem.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Runtime\Clock.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\Debug\DebugTriangle.cpp" />
     <ClCompile Include="Runtime\GraphicsDevice\GDBuffer.cpp" />
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\detail\OpenGLShader.cpp" />
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\Context\WGLContext.cpp" />

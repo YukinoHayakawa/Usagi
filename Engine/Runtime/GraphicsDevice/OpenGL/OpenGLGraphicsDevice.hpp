@@ -14,7 +14,7 @@ class OpenGLGraphicsDevice : public GraphicsDevice
 {
     std::shared_ptr<OpenGLContext> mOpenGLContext;
 
-    void _draw(GLenum mode, size_t first, size_t count);
+    void _draw(GLenum mode, size_t first, size_t num_indices);
 
 public:
     OpenGLGraphicsDevice(std::shared_ptr<OpenGLContext> opengl_context);
@@ -31,9 +31,9 @@ public:
 
     void setScissorRect(int x, int y, int width, int height) override;
 
-    void drawPoints(size_t first, size_t count) override;
-    void drawLines(size_t first, size_t count) override;
-    void drawTriangles(size_t first, size_t count) override;
+    void drawPoints(size_t first, size_t num_indices) override;
+    void drawLines(size_t first, size_t num_indices) override;
+    void drawTriangles(size_t first, size_t num_indices) override;
     
 };
 

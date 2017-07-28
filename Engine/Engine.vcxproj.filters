@@ -120,6 +120,9 @@
     <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLFragmentShader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\Debug\DebugTriangle.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\Window\Win32Window.cpp">
@@ -180,6 +183,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLFragmentShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\GraphicsDevice\Debug\DebugTriangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

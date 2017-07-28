@@ -79,9 +79,9 @@ public:
 	// enabling scissoring test using RasterizerState.
     virtual void setScissorRect(int x, int y, int width, int height) = 0;
 
-    virtual void drawPoints(size_t first, size_t count) = 0;
-    virtual void drawLines(size_t first, size_t count) = 0;
-    virtual void drawTriangles(size_t first, size_t count) = 0;
+    virtual void drawPoints(size_t first, size_t num_indices) = 0;
+    virtual void drawLines(size_t first, size_t num_indices) = 0;
+    virtual void drawTriangles(size_t first, size_t num_indices) = 0;
 };
 
 }

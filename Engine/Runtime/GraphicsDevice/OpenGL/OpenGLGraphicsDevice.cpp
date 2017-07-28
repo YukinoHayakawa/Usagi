@@ -54,23 +54,23 @@ void yuki::OpenGLGraphicsDevice::setScissorRect(int x, int y, int width, int hei
     // todo: scissor
 }
 
-void yuki::OpenGLGraphicsDevice::drawLines(size_t first, size_t count)
+void yuki::OpenGLGraphicsDevice::drawLines(size_t first, size_t num_indices)
 {
-    _draw(GL_LINES, first, count);
+    _draw(GL_LINES, first, num_indices);
 }
 
-void yuki::OpenGLGraphicsDevice::drawTriangles(size_t first, size_t count)
+void yuki::OpenGLGraphicsDevice::drawTriangles(size_t first, size_t num_indices)
 {
-    _draw(GL_TRIANGLES, first, count);
+    _draw(GL_TRIANGLES, first, num_indices);
 }
 
-void yuki::OpenGLGraphicsDevice::_draw(GLenum mode, size_t first, size_t count)
+void yuki::OpenGLGraphicsDevice::_draw(GLenum mode, size_t first, size_t num_indices)
 {
-    glDrawArrays(mode, first, count);
+    glDrawArrays(mode, first, num_indices);
     YUKI_OPENGL_CHECK();
 }
 
-void yuki::OpenGLGraphicsDevice::drawPoints(size_t first, size_t count)
+void yuki::OpenGLGraphicsDevice::drawPoints(size_t first, size_t num_indices)
 {
-    _draw(GL_POINTS, first, count);
+    _draw(GL_POINTS, first, num_indices);
 }
