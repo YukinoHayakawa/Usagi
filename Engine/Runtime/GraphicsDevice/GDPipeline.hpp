@@ -18,8 +18,14 @@ class FragmentShader;
 /**
  * \brief Captures all states required to set up the functional
  * stages of the graphics pipeline.
+ * 
+ * This implementation assumes the following prerequisites:
+ * - An OpenGL 4.5+ context is used.
+ * - The inputs in shaders use explicit location assignment in a
+ *   continuous manner starting from 0.
+ * - Uniforms are wrapped within interface blocks with std140 layout.
+ * 
  * todo: optimization: no-op if last assembled pipeline is the same.
- * todo: blending
  */
 class GDPipeline : public Noncopyable
 {

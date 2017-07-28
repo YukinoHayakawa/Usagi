@@ -58,20 +58,28 @@ protected:
 		void *const storage;
 
 		MemoryMappingSentry(void *storage)
-			: BindingSentry{ []() {} }
-			, storage{ storage }
+			: BindingSentry { []() {} }
+			, storage { storage }
 		{
 		}
 
 		MemoryMappingSentry(std::function<void()> unmap_func, void *storage)
-			: BindingSentry{ std::move(unmap_func) }
-			, storage{ storage }
+			: BindingSentry { std::move(unmap_func) }
+			, storage { storage }
 		{
 		}
 	};
 
+    /**
+     * \brief Implementation is responsible for setting this variable.
+     */
+    size_t mSize = 0;
+
 public:
 	virtual ~GDBuffer() = default;
+
+protected:
+    void _updateSizeInfo(size_t size) { mSize = size; }
 
 	/**
 	 * \brief Reallocate the buffer storage with the same format and size, then copy

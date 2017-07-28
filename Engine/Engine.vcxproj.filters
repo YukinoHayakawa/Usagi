@@ -120,7 +120,16 @@
     <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLFragmentShader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\GraphicsDevice\Debug\DebugTriangle.hpp">
+    <ClInclude Include="Runtime\GraphicsDevice\Debugging\DebugTriangle.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\ConstantBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLConstantBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\detail\OpenGLBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -185,7 +194,16 @@
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLFragmentShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\GraphicsDevice\Debug\DebugTriangle.cpp">
+    <ClCompile Include="Runtime\GraphicsDevice\Debugging\DebugTriangle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\GraphicsDevice\ConstantBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLConstantBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\detail\OpenGLBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
