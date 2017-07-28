@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "BufferElementType.hpp"
+#include "ShaderDataType.hpp"
 #include <Usagi/Engine/Utility/BindingSentry.hpp>
 
 namespace yuki
@@ -26,7 +26,7 @@ public:
      * \param num_channels 
      * \param channel_data_type 
      */
-    virtual void setFormat(int width, int height, uint8_t num_channels, BufferElementType channel_data_type) = 0;
+    virtual void setFormat(int width, int height, uint8_t num_channels, ShaderDataType channel_data_type) = 0;
 
     /**
      * \brief Copy data to the texture buffer. Must be called after setFormat(), then the

@@ -20,20 +20,21 @@ public:
     OpenGLGraphicsDevice(std::shared_ptr<OpenGLContext> opengl_context);
     
     void setContextCurrent() override;
-    std::shared_ptr<GDTexture> createTexture() override;
-    std::shared_ptr<Shader> createShader() override;
 
     std::shared_ptr<VertexBuffer> createVertexBuffer() override;
+    std::shared_ptr<VertexShader> createVertexShader() override;
+    std::shared_ptr<FragmentShader> createFragmentShader() override;
+    std::shared_ptr<GDPipeline> createPipeline() override;
+
     void swapFrameBuffers() override;
     void clearCurrentFrameBuffer() override;
 
-    std::shared_ptr<RasterizerState> createRasterizerState() override;
-    std::shared_ptr<BlendState> createBlendState() override;
     void setScissorRect(int x, int y, int width, int height) override;
 
     void drawPoints(size_t first, size_t count) override;
     void drawLines(size_t first, size_t count) override;
     void drawTriangles(size_t first, size_t count) override;
+    
 };
 
 }

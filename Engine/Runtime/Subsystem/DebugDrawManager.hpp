@@ -4,8 +4,6 @@
 #include <vector>
 
 #include <Usagi/Engine/Runtime/Renderable.hpp>
-#include <Usagi/Engine/Runtime/GraphicsDevice/RasterizerState.hpp>
-#include "Usagi/Engine/Runtime/GraphicsDevice/BlendState.hpp"
 
 namespace yuki
 {
@@ -15,13 +13,9 @@ class VertexBuffer;
 class DebugDrawManager : public Renderable, public dd::RenderInterface
 {
     GraphicsDevice *mGraphicsDevice;
-    std::vector<std::shared_ptr<GDTexture>> mTextures;
-    std::shared_ptr<RasterizerState> mRasterizerState;
-    std::shared_ptr<BlendState> mLinePointBlendState, mTextBlendState;
-    std::shared_ptr<Shader> mLinePointShader;
-    std::shared_ptr<VertexBuffer> mLinePointVBO;
-    std::shared_ptr<Shader> mTextShader;
-    std::shared_ptr<VertexBuffer> mTextVBO;
+    // std::vector<std::shared_ptr<GDTexture>> mTextures;
+    std::shared_ptr<class GDPipeline> mLinePointPipeline, mTextPipeline;
+    std::shared_ptr<class VertexBuffer> mLinePointVertexBuffer, mTextVertexBuffer;
 
 public:
     DebugDrawManager(GraphicsDevice &gd);

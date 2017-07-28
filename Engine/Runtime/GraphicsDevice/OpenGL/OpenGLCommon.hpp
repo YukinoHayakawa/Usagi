@@ -2,13 +2,13 @@
 
 #include <GL/glew.h>
 
-#include <Usagi/Engine/Runtime/GraphicsDevice/BufferElementType.hpp>
+#include <Usagi/Engine/Runtime/GraphicsDevice/NativeDataType.hpp>
 
 namespace yuki
 {
 
 void OpenGLCheckError(const char *file, int line);
-GLenum getOpenGLElementType(BufferElementType mChannelDataType);
+GLenum OpenGLTranslateNativeDataType(NativeDataType type);
 
 }
 

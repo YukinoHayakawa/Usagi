@@ -13,7 +13,7 @@ yuki::OpenGLTexture::~OpenGLTexture()
     glDeleteTextures(1, &mTextureName);
 }
 
-void yuki::OpenGLTexture::setFormat(int width, int height, uint8_t num_channels, BufferElementType channel_data_type)
+void yuki::OpenGLTexture::setFormat(int width, int height, uint8_t num_channels, ShaderDataType channel_data_type)
 {
     mWidth = width;
     mHeight = height;
@@ -28,7 +28,7 @@ void yuki::OpenGLTexture::upload(const void *data)
 
     // declare the source pixels as tightly packed
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    GLenum type = getOpenGLElementType(mChannelDataType);
+    GLenum type = OpenGLTranslateNativeDataType(mChannelDataType);
 
     GLint internalFormat;
     switch(mNumChannels)

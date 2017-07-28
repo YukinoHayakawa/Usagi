@@ -4,56 +4,40 @@
 
 yuki::OpenGLVertexBuffer::OpenGLVertexBuffer()
 {
-    glGenBuffers(1, &mBufferName);
+    glCreateBuffers(1, &mBufferName);
 }
 
 yuki::OpenGLVertexBuffer::~OpenGLVertexBuffer()
 {
     if(mBufferName) glDeleteBuffers(1, &mBufferName);
-    mBufferName = 0;
 }
 
-void yuki::OpenGLVertexBuffer::streamUpdate(const void *data, size_t length)
+void yuki::OpenGLVertexBuffer::_reallocate()
 {
-    auto sentry = bind();
-    glBufferData(GL_ARRAY_BUFFER, mSize, nullptr, GL_STREAM_DRAW); // orphan the old buffer
-    glBufferSubData(GL_ARRAY_BUFFER, 0, length, data);
+    glNamedBufferData(mBufferName, mSize, nullptr, GL_STREAM_DRAW);
+}
+
+void yuki::OpenGLVertexBuffer::streamFromHostBuffer(const void *data, size_t length)
+{
+    _reallocate();
+    glNamedBufferSubData(mBufferName, 0, length, data);
     YUKI_OPENGL_CHECK();
 }
 
-yuki::VertexBuffer::MemoryMappingSentry yuki::OpenGLVertexBuffer::mapStorage()
+yuki::GDBuffer::MemoryMappingSentry yuki::OpenGLVertexBuffer::mapWrite(bool orphan_old)
 {
-    glBindBuffer(GL_ARRAY_BUFFER, mBufferName);
-    auto mem = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    if(orphan_old) _reallocate();
+
+    auto mem = glMapNamedBuffer(mBufferName, GL_WRITE_ONLY);
     YUKI_OPENGL_CHECK();
 
-    return { [this]()
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, mBufferName);
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return { [this]() {
+        glUnmapNamedBuffer(mBufferName);
     }, mem };
 }
 
-void yuki::OpenGLVertexBuffer::reallocate()
+void yuki::OpenGLVertexBuffer::initStorage(size_t count, size_t element_size)
 {
-    auto sentry = bind();
-    glBufferData(GL_ARRAY_BUFFER, mSize, nullptr, GL_STREAM_DRAW);
-    YUKI_OPENGL_CHECK();
-}
-
-yuki::BindingSentry yuki::OpenGLVertexBuffer::bind()
-{
-    glBindBuffer(GL_ARRAY_BUFFER, mBufferName);
-    YUKI_OPENGL_CHECK();
-
-    return { []()
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    } };
-}
-
-void yuki::OpenGLVertexBuffer::_updateLayout()
-{
+    _updateFormat(count, element_size);
+    _reallocate();
 }

@@ -3,15 +3,15 @@
 
 #include <Usagi/Engine/Runtime/Clock.hpp>
 #include <Usagi/Engine/Runtime/GraphicsDevice/GraphicsDevice.hpp>
-#include <Usagi/Engine/Runtime/GraphicsDevice/BufferElementType.hpp>
 #include <Usagi/Engine/Runtime/GraphicsDevice/GDTexture.hpp>
 #include <Usagi/Engine/Runtime/GraphicsDevice/VertexBuffer.hpp>
-#include <Usagi/Engine/Runtime/GraphicsDevice/Shader.hpp>
+#include <Usagi/Engine/Runtime/GraphicsDevice/GDPipeline.hpp>
 
 #include "DebugDrawManager.hpp"
-//todo remove
+
+// todo remove
 #include <GL/glew.h>
-#include "Usagi/Engine/Runtime/GraphicsDevice/OpenGL/OpenGLCommon.hpp"
+#include <Usagi/Engine/Runtime/GraphicsDevice/Shader.hpp>
 
 namespace
 {
@@ -19,8 +19,8 @@ namespace
 const char *lpvs = R"(
 #version 450
 
-in vec3 in_Position;
-in vec4 in_ColorPointSize;
+layout(location = 0) in vec3 in_Position;
+layout(location = 1) in vec4 in_ColorPointSize;
 
 out vec4 v_Color;
 uniform mat4 u_MvpMatrix;
@@ -48,9 +48,9 @@ void main()
 const char *tvs = R"(
 #version 450
 
-in vec2 in_Position;
-in vec2 in_TexCoords;
-in vec3 in_Color;
+layout(location = 0) in vec2 in_Position;
+layout(location = 1) in vec2 in_TexCoords;
+layout(location = 2) in vec3 in_Color;
 
 uniform vec2 u_screenDimensions;
 
@@ -442,44 +442,64 @@ static void drawText()
 yuki::DebugDrawManager::DebugDrawManager(GraphicsDevice &gd)
     : mGraphicsDevice { &gd }
 {
-    (*(mRasterizerState = gd.createRasterizerState()).get())
-        .enableDepthTest(true)
-        .setFaceCulling(RasterizerState::FaceCullingType::FRONT)
-        ;
+    /*
+     * Line and point rendering
+     */
 
-    (*(mLinePointBlendState = gd.createBlendState()).get())
-        .enableBlend(false)
-        ;
-    (*(mLinePointVBO = gd.createVertexBuffer()).get())
-        .setLayout(DEBUG_DRAW_VERTEX_BUFFER_SIZE * sizeof(dd::DrawVertex), sizeof(dd::DrawVertex), {
-            { "in_Position", BufferElementType::FLOAT, 3, false, 0 },
-            { "in_ColorPointSize", BufferElementType::FLOAT, 4, false, 3 * sizeof(float) },
-        })
-        ;
-    (*(mLinePointShader = gd.createShader()).get())
-        .setVertexShaderSource(lpvs)
-        .setFragmentShaderSource(lpfs)
-        .compile()
-        ;
+    mLinePointVertexBuffer = gd.createVertexBuffer();
+    mLinePointVertexBuffer->initStorage(DEBUG_DRAW_VERTEX_BUFFER_SIZE, sizeof(dd::DrawVertex));
 
-    (*(mTextBlendState = gd.createBlendState()).get())
-        .enableBlend(true)
-        .setOp(BlendState::Operation::ADD)
-        .setSrcFactor(BlendState::Factor::SOURCE_ALPHA)
-        .setDestFactor(BlendState::Factor::INV_SOURCE_ALPHA)
-        ;
-    (*(mTextVBO = gd.createVertexBuffer()).get())
-        .setLayout(DEBUG_DRAW_VERTEX_BUFFER_SIZE * sizeof(dd::DrawVertex), sizeof(dd::DrawVertex), {
-            { "in_Position", BufferElementType::FLOAT, 2, false, 0 },
-            { "in_TexCoords", BufferElementType::FLOAT, 2, false, 2 * sizeof(float) },
-            { "in_Color", BufferElementType::FLOAT, 3, false, 4 * sizeof(float) },
-        })
-        ;
-    (*(mTextShader = gd.createShader()).get())
-        .setVertexShaderSource(tvs)
-        .setFragmentShaderSource(tfs)
-        .compile()
-        ;
+    mLinePointPipeline = gd.createPipeline();
+    mLinePointPipeline->vpSetVertexInputFormat({
+        { 0, 0, 0, NativeDataType::FLOAT, 3, false }, // in_Position
+        { 1, 0, 3 * sizeof(float), NativeDataType::FLOAT, 4, false }, // in_ColorPointSize
+    });
+    mLinePointPipeline->vpBindVertexBuffer(0, mLinePointVertexBuffer);
+    {
+        auto vs = gd.createVertexShader();
+        vs->useSourceString(lpvs);
+        vs->compile();
+        mLinePointPipeline->vsUseVertexShader(std::move(vs));
+    }
+    mLinePointPipeline->rsSetFaceCulling(GDPipeline::FaceCullingType::FRONT);
+    {
+        auto fs = gd.createFragmentShader();
+        fs->useSourceString(lpfs);
+        fs->compile();
+        mLinePointPipeline->fsUseFragmentShader(std::move(fs));
+    }
+
+    /*
+     * Text rendering
+     */
+
+    mTextVertexBuffer = gd.createVertexBuffer();
+    mTextVertexBuffer->initStorage(DEBUG_DRAW_VERTEX_BUFFER_SIZE, sizeof(dd::DrawVertex));
+
+    mTextPipeline = gd.createPipeline();
+    mTextPipeline->vpSetVertexInputFormat({
+        { 0, 0, 0, NativeDataType::FLOAT, 2, false }, // in_Position
+        { 1, 0, 2 * sizeof(float), NativeDataType::FLOAT, 2, false }, // in_TexCoords
+        { 2, 0, 4 * sizeof(float), NativeDataType::FLOAT, 3, false }, // in_Color
+    });
+    mTextPipeline->vpBindVertexBuffer(0, mTextVertexBuffer);
+    {
+        auto vs = gd.createVertexShader();
+        vs->useSourceString(lpvs);
+        vs->compile();
+        mTextPipeline->vsUseVertexShader(std::move(vs));
+    }
+    {
+        auto fs = gd.createFragmentShader();
+        fs->useSourceString(lpfs);
+        fs->compile();
+        mTextPipeline->fsUseFragmentShader(std::move(fs));
+    }
+    mTextPipeline->bldEnableBlend(true);
+    mTextPipeline->bldSetOp(GDPipeline::BlendingOperation::ADD);
+    mTextPipeline->bldSetSrcFactor(GDPipeline::BlendingFactor::SOURCE_ALPHA);
+    mTextPipeline->bldSetDestFactor(GDPipeline::BlendingFactor::INV_SOURCE_ALPHA);
+
     
     dd::initialize(this);
 }
@@ -503,19 +523,21 @@ void yuki::DebugDrawManager::render(GraphicsDevice &gd, const Clock &render_cloc
     dd::flush(render_clock.getTime() * 1000);
 }
 
+// todo
 dd::GlyphTextureHandle yuki::DebugDrawManager::createGlyphTexture(int width, int height, const void *pixels)
 {
     assert(width > 0 && height > 0);
     assert(pixels != nullptr);
 
-    auto tex = mGraphicsDevice->createTexture();
-
-    tex->setFormat(width, height, 1, BufferElementType::UNSIGNED_BYTE);
-    tex->upload(pixels);
-
-    mTextures.push_back(tex);
-
-    return reinterpret_cast<dd::GlyphTextureHandle>(tex.get());
+//     auto tex = mGraphicsDevice->createTexture();
+// 
+//     tex->setFormat(width, height, 1, ShaderDataType::UNSIGNED_BYTE);
+//     tex->upload(pixels);
+// 
+//     mTextures.push_back(tex);
+// 
+//     return reinterpret_cast<dd::GlyphTextureHandle>(tex.get());
+    return nullptr;
 }
 
 void yuki::DebugDrawManager::destroyGlyphTexture(dd::GlyphTextureHandle glyphTex)
@@ -530,18 +552,10 @@ void yuki::DebugDrawManager::drawPointList(const dd::DrawVertex *points, int cou
     assert(points != nullptr);
     assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
 
-    // update data
-    mLinePointVBO->streamUpdate(points, count * sizeof(dd::DrawVertex));
-    mRasterizerState->enableDepthTest(depthEnabled);
+    mLinePointVertexBuffer->streamFromHostBuffer(points, count * sizeof(dd::DrawVertex));
+    mLinePointPipeline->fsEnableDepthTest(depthEnabled);
 
-    // setup pipeline
-    mLinePointShader->linkInputs(*mLinePointVBO.get()); // setup input layout
-    mRasterizerState->use();
-    mLinePointBlendState->use();
-
-    auto ss = mLinePointShader->bind();
-    auto vs = mLinePointVBO->bind();
-
+    mLinePointPipeline->assemble();
 
     //todo impl constant buffer
     GLuint p;
@@ -563,15 +577,10 @@ void yuki::DebugDrawManager::drawLineList(const dd::DrawVertex *lines, int count
     assert(lines != nullptr);
     assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
 
-    mLinePointVBO->streamUpdate(lines, count * sizeof(dd::DrawVertex));
-    mRasterizerState->enableDepthTest(depthEnabled);
+    mLinePointVertexBuffer->streamFromHostBuffer(lines, count * sizeof(dd::DrawVertex));
+    mLinePointPipeline->fsEnableDepthTest(depthEnabled);
 
-    mLinePointShader->linkInputs(*mLinePointVBO.get());
-    mRasterizerState->use();
-    mLinePointBlendState->use();
-
-    auto ss = mLinePointShader->bind();
-    auto vs = mLinePointVBO->bind();
+    mLinePointPipeline->assemble();
 
 
     //todo remove
@@ -594,28 +603,10 @@ void yuki::DebugDrawManager::drawGlyphList(const dd::DrawVertex *glyphs, int cou
     assert(glyphs != nullptr);
     assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
 
-    mTextVBO->streamUpdate(glyphs, count * sizeof(dd::DrawVertex));
-    mRasterizerState->enableDepthTest(false);
+    mTextVertexBuffer->streamFromHostBuffer(glyphs, count * sizeof(dd::DrawVertex));
+    mTextPipeline->assemble();
 
-    mTextShader->linkInputs(*mTextVBO.get());
-    mRasterizerState->use();
-    mTextBlendState->use();
-
-    auto ss = mTextShader->bind();
-    auto vs = mTextVBO->bind();
-    auto ts = reinterpret_cast<GDTexture*>(glyphTex)->bind(0);
-
-    GLuint p;
-    glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&p));
-    auto textProgram_GlyphTextureLocation = glGetUniformLocation(p, "u_glyphTexture");
-    auto textProgram_ScreenDimensions = glGetUniformLocation(p, "u_screenDimensions");
-
-    glUniform1i(textProgram_GlyphTextureLocation, 0);
-    glUniform2f(textProgram_ScreenDimensions,
-        static_cast<GLfloat>(windowWidth),
-        static_cast<GLfloat>(windowHeight));
-
-	YUKI_OPENGL_CHECK();
+    // auto ts = reinterpret_cast<GDTexture*>(glyphTex)->bind(0);
 
     mGraphicsDevice->drawTriangles(0, count);
 }

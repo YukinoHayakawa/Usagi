@@ -2,15 +2,10 @@
 
 #include <memory>
 
+#include <Usagi/Engine/Utility/Noncopyable.hpp>
+
 namespace yuki
 {
-
-class GDTexture;
-class Shader;
-class RasterizerState;
-class BlendState;
-class VertexBuffer;
-class VertexIndexList;
 
 /**
  * \brief Provide unified access to graphics device and manage hardware
@@ -33,8 +28,10 @@ class VertexIndexList;
  * Manage GPU resources such as textures and shaders.
  * Issue drawing commands.
  * Maintain a swap chain.
+ * 
+ * todo: PipelineStateObject?
  */
-class GraphicsDevice
+class GraphicsDevice : public Noncopyable
 {
 public:
     virtual ~GraphicsDevice() = default;
@@ -55,9 +52,10 @@ public:
      * the GraphicsDevice.
      */
 
-    virtual std::shared_ptr<GDTexture> createTexture() = 0;
-    virtual std::shared_ptr<Shader> createShader() = 0;
-    virtual std::shared_ptr<VertexBuffer> createVertexBuffer() = 0;
+    //virtual std::shared_ptr<GDTexture> createTexture() = 0;
+    virtual std::shared_ptr<class VertexShader> createVertexShader() = 0;
+    virtual std::shared_ptr<class VertexBuffer> createVertexBuffer() = 0;
+    virtual std::shared_ptr<class FragmentShader> createFragmentShader() = 0;
 
     /*
      * Swap Chain
@@ -70,15 +68,16 @@ public:
      * Pipeline
      */
 
-    virtual std::shared_ptr<RasterizerState> createRasterizerState() = 0;
-    virtual std::shared_ptr<BlendState> createBlendState() = 0;
-    // coordinates start from the upper-left corner, only available after
-    // enabling scissoring test using RasterizerState.
-    virtual void setScissorRect(int x, int y, int width, int height) = 0;
+    virtual std::shared_ptr<class GDPipeline> createPipeline() = 0;
 
-    /*
-     * Primitive Drawing
-     */
+
+	/*
+	 * Commands
+	 */
+
+	// coordinates start from the upper-left corner, only available after
+	// enabling scissoring test using RasterizerState.
+    virtual void setScissorRect(int x, int y, int width, int height) = 0;
 
     virtual void drawPoints(size_t first, size_t count) = 0;
     virtual void drawLines(size_t first, size_t count) = 0;

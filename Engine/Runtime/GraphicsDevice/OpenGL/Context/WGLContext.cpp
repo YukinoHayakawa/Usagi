@@ -85,6 +85,7 @@ yuki::WGLContext::WGLContext(HDC dc)
     if(!mContext.glrc) throw std::runtime_error("wglCreateContext() failed");
     mContext.setCurrent();
 
+    // todo: should get OpenGL function pointers from the new context
     GLenum err = glewInit();
     if(GLEW_OK != err) throw std::runtime_error("glewInit() failed");
 

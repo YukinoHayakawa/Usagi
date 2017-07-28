@@ -22,19 +22,18 @@ void yuki::OpenGLCheckError(const char *file, int line)
     }
 }
 
-GLenum yuki::getOpenGLElementType(BufferElementType mChannelDataType)
+GLenum yuki::OpenGLTranslateNativeDataType(NativeDataType type)
 {
-    GLenum type;
-    switch(mChannelDataType)
+    switch(type)
     {
-        case BufferElementType::BYTE: type = GL_BYTE; break;
-        case BufferElementType::UNSIGNED_BYTE: type = GL_UNSIGNED_BYTE; break;
-        case BufferElementType::SHORT: type = GL_SHORT; break;
-        case BufferElementType::UNSIGNED_SHORT: type = GL_UNSIGNED_SHORT; break;
-        case BufferElementType::INTEGER: type = GL_INT; break;
-        case BufferElementType::UNSIGNED_INTEGER: type = GL_UNSIGNED_INT; break;
-        case BufferElementType::FLOAT: type = GL_FLOAT; break;
-        default: throw std::invalid_argument("invalid BufferElementType value");
+        case NativeDataType::BYTE: return GL_BYTE;
+        case NativeDataType::UNSIGNED_BYTE: return GL_UNSIGNED_BYTE;
+        case NativeDataType::SHORT: return GL_SHORT;
+        case NativeDataType::UNSIGNED_SHORT: return GL_UNSIGNED_SHORT;
+        case NativeDataType::INTEGER: return GL_INT;
+        case NativeDataType::UNSIGNED_INTEGER: return GL_UNSIGNED_INT;
+        case NativeDataType::FLOAT: return GL_FLOAT;
+        case NativeDataType::BOOL: return GL_BOOL;
+        default: throw std::invalid_argument("invalid NativeDataType value");
     }
-    return type;
 }

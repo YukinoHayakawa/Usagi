@@ -4,6 +4,7 @@
 #include <initializer_list>
 
 #include "NativeDataType.hpp"
+#include <Usagi/Engine/Utility/Noncopyable.hpp>
 
 namespace yuki
 {
@@ -20,7 +21,7 @@ class FragmentShader;
  * todo: optimization: no-op if last assembled pipeline is the same.
  * todo: blending
  */
-class GDPipeline
+class GDPipeline : public Noncopyable
 {
 public:
 	virtual ~GDPipeline() = default;
@@ -157,7 +158,7 @@ public:
 
     enum class BlendingOperation
     {
-        ADD
+        ADD, SUBTRACT, REVERSE_SUBTRACT, MIN, MAX,
     };
 
     void bldSetOp(BlendingOperation op)
