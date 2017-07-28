@@ -1,12 +1,13 @@
 ﻿#include <stdexcept>
+#include <cassert>
+#include <vector>
+#include <iostream>
 
 #include "OpenGLVertexBuffer.hpp"
 #include "OpenGLVertexShader.hpp"
 #include "OpenGLFragmentShader.hpp"
 #include "OpenGLPipeline.hpp"
 #include "OpenGLCommon.hpp"
-#include <cassert>
-#include <vector>
 
 yuki::OpenGLPipeline::OpenGLPipeline()
 {
@@ -29,6 +30,7 @@ void yuki::OpenGLPipeline::vpSetVertexInputFormat(std::initializer_list<VertexAt
 {
     for(auto i : sources)
     {
+        glEnableVertexArrayAttrib(mVertexArray, i.index);
         glVertexArrayAttribFormat(
             mVertexArray,
             i.index,
@@ -203,12 +205,14 @@ void yuki::OpenGLPipeline::_setupCulling()
         }
         default: throw std::logic_error("invalid face culling type");
     }
+    YUKI_OPENGL_CHECK();
 }
 
 void yuki::OpenGLPipeline::_setupPerFragmentOperations()
 {
     mScissorTest ? glEnable(GL_SCISSOR_TEST) : glDisable(GL_SCISSOR_TEST);
     mDepthTest ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+    YUKI_OPENGL_CHECK();
 }
 
 void yuki::OpenGLPipeline::_setupFragmentPreparation()
@@ -241,6 +245,7 @@ void yuki::OpenGLPipeline::_setupShaderProgram()
         _deleteProgram();
         mProgram = glCreateProgram();
         
+        std::cout << "Linking program" << std::endl;
         mVertexShader->_attachToProgram(mProgram);
         mFragmentShader->_attachToProgram(mProgram);
         glLinkProgram(mProgram);
@@ -271,16 +276,22 @@ void yuki::OpenGLPipeline::_setupShaderProgram()
     }
     assert(mProgram);
     glUseProgram(mProgram);
+    YUKI_OPENGL_CHECK();
 }
 
 void yuki::OpenGLPipeline::_setupShaderBuffers()
 {
     glBindVertexArray(mVertexArray);
+    
     // todo bind uniform buffers
+
+    YUKI_OPENGL_CHECK();
 }
 
 void yuki::OpenGLPipeline::assemble()
 {
+    // perform error checking in each method!
+
     _setupShaderProgram();
     _setupShaderBuffers();
 
@@ -293,8 +304,6 @@ void yuki::OpenGLPipeline::assemble()
     _setupPerFragmentOperations();
 
     _setupColorBlending();
-
-    YUKI_OPENGL_CHECK();
 
     // todo: unbind program & VAO
 }

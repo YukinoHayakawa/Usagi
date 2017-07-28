@@ -499,7 +499,6 @@ yuki::DebugDrawManager::DebugDrawManager(GraphicsDevice &gd)
     mTextPipeline->bldSetOp(GDPipeline::BlendingOperation::ADD);
     mTextPipeline->bldSetSrcFactor(GDPipeline::BlendingFactor::SOURCE_ALPHA);
     mTextPipeline->bldSetDestFactor(GDPipeline::BlendingFactor::INV_SOURCE_ALPHA);
-
     
     dd::initialize(this);
 }

@@ -17,7 +17,7 @@ class OpenGLFragmentShader;
  */
 class OpenGLPipeline : public GDPipeline
 {
-    std::map<size_t, std::shared_ptr<OpenGLVertexBuffer>> mVertexBuffers;
+    std::map<int, std::shared_ptr<OpenGLVertexBuffer>> mVertexBuffers;
     std::shared_ptr<OpenGLVertexShader> mVertexShader;
     std::shared_ptr<OpenGLFragmentShader> mFragmentShader;
 
