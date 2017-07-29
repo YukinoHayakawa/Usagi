@@ -8,6 +8,7 @@
 #include "OpenGLVertexShader.hpp"
 #include "OpenGLFragmentShader.hpp"
 #include "OpenGLPipeline.hpp"
+#include "OpenGLConstantBuffer.hpp"
 
 yuki::OpenGLGraphicsDevice::OpenGLGraphicsDevice(std::shared_ptr<OpenGLContext> opengl_context)
     : mOpenGLContext { std::move(opengl_context) }
@@ -17,6 +18,11 @@ yuki::OpenGLGraphicsDevice::OpenGLGraphicsDevice(std::shared_ptr<OpenGLContext> 
 void yuki::OpenGLGraphicsDevice::setContextCurrent()
 {
     mOpenGLContext->setCurrent();
+}
+
+std::shared_ptr<yuki::ConstantBuffer> yuki::OpenGLGraphicsDevice::createConstantBuffer()
+{
+    return std::make_shared<OpenGLConstantBuffer>();
 }
 
 std::shared_ptr<yuki::VertexBuffer> yuki::OpenGLGraphicsDevice::createVertexBuffer()

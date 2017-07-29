@@ -157,9 +157,7 @@
     <ClCompile Include="Extension\GTA\GTA3IMGv2Filesystem.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Runtime\Clock.cpp" />
-    <ClCompile Include="Runtime\GraphicsDevice\ConstantBuffer.cpp" />
     <ClCompile Include="Runtime\GraphicsDevice\Debugging\DebugTriangle.cpp" />
-    <ClCompile Include="Runtime\GraphicsDevice\GDBuffer.cpp" />
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\detail\OpenGLBuffer.cpp" />
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\detail\OpenGLShader.cpp" />
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\Context\WGLContext.cpp" />

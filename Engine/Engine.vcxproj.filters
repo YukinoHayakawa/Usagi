@@ -176,9 +176,6 @@
     <ClCompile Include="Runtime\Subsystem\DebugDrawImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\GraphicsDevice\GDBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -195,9 +192,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\GraphicsDevice\Debugging\DebugTriangle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\GraphicsDevice\ConstantBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLConstantBuffer.cpp">

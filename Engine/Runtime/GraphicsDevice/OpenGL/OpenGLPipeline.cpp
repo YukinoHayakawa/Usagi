@@ -8,6 +8,7 @@
 #include "OpenGLFragmentShader.hpp"
 #include "OpenGLPipeline.hpp"
 #include "OpenGLCommon.hpp"
+#include "OpenGLConstantBuffer.hpp"
 
 yuki::OpenGLPipeline::OpenGLPipeline()
 {
@@ -56,6 +57,7 @@ void yuki::OpenGLPipeline::vpUseIndexBuffer(std::shared_ptr<IndexBuffer> buffer)
 void yuki::OpenGLPipeline::vpBindVertexBuffer(size_t slot, std::shared_ptr<VertexBuffer> buffer)
 {
     auto real_buffer = std::dynamic_pointer_cast<OpenGLVertexBuffer>(buffer);
+    if(!real_buffer) throw std::bad_cast();
 
     glVertexArrayVertexBuffer(
         mVertexArray,
@@ -69,8 +71,18 @@ void yuki::OpenGLPipeline::vpBindVertexBuffer(size_t slot, std::shared_ptr<Verte
     mVertexBuffers[slot] = std::move(real_buffer);
 }
 
+void yuki::OpenGLPipeline::_bindConstantBuffer(size_t binding_index, std::shared_ptr<yuki::ConstantBuffer> buffer)
+{
+    auto real_buffer = std::dynamic_pointer_cast<OpenGLConstantBuffer>(buffer);
+    if(!real_buffer) throw std::bad_cast();
+
+    mConstantBuffers[binding_index] = std::move(real_buffer);
+}
+
 void yuki::OpenGLPipeline::vsBindConstantBuffer(size_t slot, std::shared_ptr<ConstantBuffer> buffer)
 {
+    assert(slot < UBO_LIMIT);
+    _bindConstantBuffer(slot + VERTEX_SHADER_UBO_OFFSET, buffer);
 }
 
 void yuki::OpenGLPipeline::vsUseVertexShader(std::shared_ptr<VertexShader> shader)
@@ -92,6 +104,8 @@ void yuki::OpenGLPipeline::rsSetFaceCulling(FaceCullingType type)
 
 void yuki::OpenGLPipeline::fsBindConstantBuffer(size_t slot, std::shared_ptr<ConstantBuffer> buffer)
 {
+    assert(slot < UBO_LIMIT);
+    _bindConstantBuffer(slot + FRAGMENT_SHADER_UBO_OFFSET, buffer);
 }
 
 void yuki::OpenGLPipeline::fsUseFragmentShader(std::shared_ptr<FragmentShader> shader)
@@ -283,6 +297,10 @@ void yuki::OpenGLPipeline::_setupShaderBuffers()
 {
     glBindVertexArray(mVertexArray);
     
+    for(auto &&i : mConstantBuffers)
+    {
+        glBindBufferBase(GL_UNIFORM_BUFFER, i.first, i.second->_getBufferName());
+    }
     // todo bind uniform buffers
 
     YUKI_OPENGL_CHECK();

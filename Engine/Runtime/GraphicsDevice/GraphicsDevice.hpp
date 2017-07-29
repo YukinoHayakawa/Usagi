@@ -53,8 +53,10 @@ public:
      */
 
     //virtual std::shared_ptr<GDTexture> createTexture() = 0;
-    virtual std::shared_ptr<class VertexShader> createVertexShader() = 0;
+    virtual std::shared_ptr<class ConstantBuffer> createConstantBuffer() = 0;
     virtual std::shared_ptr<class VertexBuffer> createVertexBuffer() = 0;
+
+    virtual std::shared_ptr<class VertexShader> createVertexShader() = 0;
     virtual std::shared_ptr<class FragmentShader> createFragmentShader() = 0;
 
     /*

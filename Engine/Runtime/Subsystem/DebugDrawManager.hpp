@@ -16,6 +16,7 @@ class DebugDrawManager : public Renderable, public dd::RenderInterface
     // std::vector<std::shared_ptr<GDTexture>> mTextures;
     std::shared_ptr<class GDPipeline> mLinePointPipeline, mTextPipeline;
     std::shared_ptr<class VertexBuffer> mLinePointVertexBuffer, mTextVertexBuffer;
+    std::shared_ptr<class ConstantBuffer> mLinePointConstantBuffer;
 
 public:
     DebugDrawManager(GraphicsDevice &gd);

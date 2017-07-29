@@ -12,6 +12,7 @@
 // todo remove
 #include <GL/glew.h>
 #include <Usagi/Engine/Runtime/GraphicsDevice/Shader.hpp>
+#include <Usagi/Engine/Runtime/GraphicsDevice/ConstantBuffer.hpp>
 
 namespace
 {
@@ -23,7 +24,11 @@ layout(location = 0) in vec3 in_Position;
 layout(location = 1) in vec4 in_ColorPointSize;
 
 out vec4 v_Color;
-uniform mat4 u_MvpMatrix;
+
+layout(std140, binding = 0) uniform View
+{
+    mat4 u_MvpMatrix;
+};
 
 void main()
 {
@@ -469,6 +474,12 @@ yuki::DebugDrawManager::DebugDrawManager(GraphicsDevice &gd)
         mLinePointPipeline->fsUseFragmentShader(std::move(fs));
     }
 
+    mLinePointConstantBuffer = gd.createConstantBuffer();
+    mLinePointConstantBuffer->setAttributeFormat({
+        { ShaderDataType::MATRIX4, 1 }, // u_MvpMatrix
+    });
+    mLinePointPipeline->vsBindConstantBuffer(0, mLinePointConstantBuffer);
+
     /*
      * Text rendering
      */
@@ -519,6 +530,8 @@ void yuki::DebugDrawManager::render(GraphicsDevice &gd, const Clock &render_cloc
     drawFrustum();
     drawText();
 
+    mLinePointConstantBuffer->setAttributeData(0, toFloatPtr(camera.vpMatrix));
+
     dd::flush(render_clock.getTime() * 1000);
 }
 
@@ -556,19 +569,7 @@ void yuki::DebugDrawManager::drawPointList(const dd::DrawVertex *points, int cou
 
     mLinePointPipeline->assemble();
 
-    //todo impl constant buffer
-    GLuint p;
-    glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&p));
-    auto linePointProgram_MvpMatrixLocation = glGetUniformLocation(p, "u_MvpMatrix");
-
-    glUniformMatrix4fv(linePointProgram_MvpMatrixLocation,
-        1, GL_FALSE, toFloatPtr(camera.vpMatrix));
-
-
-
     mGraphicsDevice->drawPoints(0, count);
-
-    // automatically unbind shader, VAO, VBO here
 }
 
 void yuki::DebugDrawManager::drawLineList(const dd::DrawVertex *lines, int count, bool depthEnabled)
@@ -580,18 +581,6 @@ void yuki::DebugDrawManager::drawLineList(const dd::DrawVertex *lines, int count
     mLinePointPipeline->fsEnableDepthTest(depthEnabled);
 
     mLinePointPipeline->assemble();
-
-
-    //todo remove
-    GLuint p;
-    glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&p));
-    auto linePointProgram_MvpMatrixLocation = glGetUniformLocation(p, "u_MvpMatrix");
-
-    glUniformMatrix4fv(linePointProgram_MvpMatrixLocation,
-        1, GL_FALSE, toFloatPtr(camera.vpMatrix));
-
-
-
 
     mGraphicsDevice->drawLines(0, count);
 }

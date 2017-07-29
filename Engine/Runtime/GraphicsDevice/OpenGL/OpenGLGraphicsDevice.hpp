@@ -21,9 +21,12 @@ public:
     
     void setContextCurrent() override;
 
+    std::shared_ptr<ConstantBuffer> createConstantBuffer() override;
     std::shared_ptr<VertexBuffer> createVertexBuffer() override;
+
     std::shared_ptr<VertexShader> createVertexShader() override;
     std::shared_ptr<FragmentShader> createFragmentShader() override;
+    
     std::shared_ptr<GDPipeline> createPipeline() override;
 
     void swapFrameBuffers() override;
@@ -34,7 +37,6 @@ public:
     void drawPoints(size_t first, size_t num_indices) override;
     void drawLines(size_t first, size_t num_indices) override;
     void drawTriangles(size_t first, size_t num_indices) override;
-    
 };
 
 }

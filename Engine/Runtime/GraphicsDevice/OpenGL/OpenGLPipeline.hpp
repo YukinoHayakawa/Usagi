@@ -8,18 +8,29 @@
 namespace yuki
 {
 
-class OpenGLVertexBuffer;
-class OpenGLVertexShader;
-class OpenGLFragmentShader;
-
 /**
  * \brief 
+ * GL_MAX_stage_COMPUTE_UNIFORM_BLOCKS is at least 14 for each shader stage, and
+ * HLSL shaders do not have separate binding slots for each stage. In order to
+ * uniquely identity binding slots for each shader stage, the following convention
+ * is used:
+ * - Each shader can use at most 14 uniform blocks
+ * - Use monotonically increasing buffer binding indices
+ * - Binding slots are assigned as such:
+ *      Vertex shaders: 0-13
+ *      Fragment shaders: 14-27
+ * - The pipeline still index the slots for each stage starting from 0
  */
 class OpenGLPipeline : public GDPipeline
 {
-    std::map<int, std::shared_ptr<OpenGLVertexBuffer>> mVertexBuffers;
-    std::shared_ptr<OpenGLVertexShader> mVertexShader;
-    std::shared_ptr<OpenGLFragmentShader> mFragmentShader;
+    std::map<int, std::shared_ptr<class OpenGLVertexBuffer>> mVertexBuffers;
+    std::map<int, std::shared_ptr<class OpenGLConstantBuffer>> mConstantBuffers;
+    std::shared_ptr<class OpenGLVertexShader> mVertexShader;
+    std::shared_ptr<class OpenGLFragmentShader> mFragmentShader;
+
+    static constexpr size_t UBO_LIMIT = 14;
+    static constexpr size_t VERTEX_SHADER_UBO_OFFSET = 0 * UBO_LIMIT;
+    static constexpr size_t FRAGMENT_SHADER_UBO_OFFSET = 1 * UBO_LIMIT;
 
     GLuint mVertexArray = 0;
     /**
@@ -49,6 +60,8 @@ class OpenGLPipeline : public GDPipeline
     void _setupColorBlending();
     void _setupShaderProgram();
     void _setupShaderBuffers();
+
+    void _bindConstantBuffer(size_t slot, std::shared_ptr<yuki::ConstantBuffer> buffer);
 
 public:
     OpenGLPipeline();
