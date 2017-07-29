@@ -85,25 +85,24 @@ yuki::WGLContext::WGLContext(HDC dc)
     if(!mContext.glrc) throw std::runtime_error("wglCreateContext() failed");
     mContext.setCurrent();
 
-    // todo: should get OpenGL function pointers from the new context
+    auto create_context = reinterpret_cast<PFNWGLCREATECONTEXTATTRIBSARBPROC>(
+        wglGetProcAddress("wglCreateContextAttribsARB")
+    );
+    // http://developer.download.nvidia.com/opengl/specs/WGL_ARB_create_context.txt
+    int attribs[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 5,
+        // WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+        // creates core profile
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+        0
+    };
+    mContext = HGLRCWrapper { dc, create_context(dc, nullptr, attribs) };
+    mContext.setCurrent();
+
     GLenum err = glewInit();
     if(GLEW_OK != err) throw std::runtime_error("glewInit() failed");
-
-    if(wglewIsSupported("WGL_ARB_create_context") == 1)
-    {
-        int attribs[] =
-        {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 5,
-            WGL_CONTEXT_FLAGS_ARB, 0,
-            0
-        };
-        mContext = HGLRCWrapper { dc, wglCreateContextAttribsARB(dc, nullptr, attribs) };
-    }
-    else
-    {
-        throw std::runtime_error("WGL_ARB_create_context is not supported");
-    }
 }
 
 void yuki::WGLContext::setCurrent()
