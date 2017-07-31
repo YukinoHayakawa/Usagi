@@ -1,45 +1,41 @@
 ﻿#pragma once
 
-#include <functional>
-
-#include "ShaderDataType.hpp"
-#include <Usagi/Engine/Utility/BindingSentry.hpp>
+#include "NativeDataType.hpp"
 
 namespace yuki
 {
 
 /**
  * \brief
- * todo: alignment
  */
 class GDTexture
 {
 public:
     virtual ~GDTexture() = default;
 
+    enum class ChannelEnum
+    {
+        R, RG, RGB, RGBA
+    };
+
     /**
-     * \brief Specify the pixel format of the texture. Invocation to this function does not
-     * imply any calling to the graphics API, and only after uploadData() is called with a
-     * success the buffer may be bound with a shader input slot.
+     * \brief Specify the format of device side texture storage.
      * \param width 
      * \param height 
-     * \param num_channels 
-     * \param channel_data_type 
+     * \param format Number of channels and order. An RGBA order is always used.
      */
-    virtual void setFormat(int width, int height, uint8_t num_channels, ShaderDataType channel_data_type) = 0;
+    virtual void setFormat(int width, int height, ChannelEnum format) = 0;
 
     /**
-     * \brief Copy data to the texture buffer. Must be called after setFormat(), then the
-     * texture may be used by shaders if the operation succeeds.
-     * The source pixel components must be ordered in RGBA, and are tightly packed without any
-     * padding after any pixel or row.
-     * todo: deal with alignment
-     * \param data A pointer to the beginning of the texture data, whose size must be at least
-     * width * height * sizeof([pixel]).
+     * \brief 
+     * \param src_channel_type The data type of each color component of source data.
+     * \param src_format Number of channels of the source data. If this is more than that of the target storage,
+     * only the required number of channels will be read from each pixel starting from the red channel.
+     * \param src_alignment Used to derive the pitch of row of the source data.
+     * Must be 1, 2, 4, or 8. If data is tightly packed, use 1.
+     * \param data The source data of texture content.
      */
-    virtual void upload(const void *data) = 0;
-
-    virtual BindingSentry bind(size_t slot_id) = 0;
+    virtual void upload(NativeDataType src_channel_type, ChannelEnum src_format, uint8_t src_alignment, const void *data) = 0;
 };
 
 }

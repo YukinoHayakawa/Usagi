@@ -12,7 +12,7 @@ protected:
 
     void _updateFormat(size_t count, size_t element_size)
     {
-        mSize = count * element_size;
+        _updateSizeInfo(count * element_size);
         mElementSize = element_size;
     }
 
@@ -22,6 +22,7 @@ public:
     virtual void initStorage(size_t count, size_t element_size) = 0;
     size_t getElementSize() const { return mElementSize; }
 
+    // expose as public methods
     using GDBuffer::streamFromHostBuffer;
     using GDBuffer::mapWrite;
 };

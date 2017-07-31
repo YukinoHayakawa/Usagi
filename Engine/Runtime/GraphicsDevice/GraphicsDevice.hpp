@@ -52,7 +52,9 @@ public:
      * the GraphicsDevice.
      */
 
-    //virtual std::shared_ptr<GDTexture> createTexture() = 0;
+    virtual std::shared_ptr<class GDTexture> createTexture() = 0;
+    virtual std::shared_ptr<class GDSampler> createSampler() = 0;
+
     virtual std::shared_ptr<class ConstantBuffer> createConstantBuffer() = 0;
     virtual std::shared_ptr<class VertexBuffer> createVertexBuffer() = 0;
 

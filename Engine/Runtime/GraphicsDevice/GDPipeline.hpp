@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <memory>
-#include <initializer_list>
+#include <vector>
 
 #include "NativeDataType.hpp"
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
@@ -14,6 +14,8 @@ class ConstantBuffer;
 class IndexBuffer;
 class VertexShader;
 class FragmentShader;
+class GDTexture;
+class GDSampler;
 
 /**
  * \brief Captures all states required to set up the functional
@@ -50,6 +52,7 @@ public:
 		 * For HLSL, the semantic names are queried by their indices
 		 * using shader reflection.
 		 * https://www.khronos.org/opengl/wiki/Vertex_Shader#Inputs
+		 * todo: is this field redundant to vector index?
 		 */
 		int					index;
 		/**
@@ -75,9 +78,9 @@ public:
 		bool				normalize;
 	};
 
-	virtual void vpSetVertexInputFormat(std::initializer_list<VertexAttributeSource> sources) = 0;
-	virtual void vpUseIndexBuffer(std::shared_ptr<IndexBuffer> buffer) = 0;
-	virtual void vpBindVertexBuffer(size_t slot, std::shared_ptr<VertexBuffer> buffer) = 0;
+	virtual void vpSetVertexInputFormat(const std::vector<VertexAttributeSource> &sources) = 0;
+	virtual void vpUseIndexBuffer(const std::shared_ptr<IndexBuffer> &buffer) = 0;
+	virtual void vpBindVertexBuffer(size_t slot, const std::shared_ptr<VertexBuffer> &buffer) = 0;
 
 	/*
 	 * Vertex Shading
@@ -85,8 +88,22 @@ public:
 	 * Process vertex data in the scope of vertex shader.
 	 */
 
-	virtual void vsBindConstantBuffer(size_t slot, std::shared_ptr<ConstantBuffer> buffer) = 0;
-	virtual void vsUseVertexShader(std::shared_ptr<VertexShader> shader) = 0;
+	virtual void vsBindConstantBuffer(size_t slot, const std::shared_ptr<ConstantBuffer> &buffer) = 0;
+	virtual void vsUseVertexShader(const std::shared_ptr<VertexShader> &shader) = 0;
+    virtual void vsBindTexture(size_t slot, const std::shared_ptr<GDTexture> &texture) = 0;
+    virtual void vsBindSampler(size_t slot, const std::shared_ptr<GDSampler> &sampler) = 0;
+
+    struct SamplerUsage
+    {
+        size_t tex_slot;
+        size_t sampler_slot;
+    };
+    /**
+     * \brief Provide the possible combinations of textures and samplers. This information
+     * may be ignored by the some implementation, but required for others.
+     * \param usages 
+     */
+    virtual void vsSamplerUsageHint(const std::vector<SamplerUsage> &usages) = 0;
 
 	/*
 	 * Primitive Assembly & Rasterization
@@ -123,11 +140,15 @@ public:
 	 * Use interpolated data from the vertex shader to output samples to the screen.
 	 */
 
-	virtual void fsBindConstantBuffer(size_t slot, std::shared_ptr<ConstantBuffer> buffer) = 0;
-	virtual void fsUseFragmentShader(std::shared_ptr<FragmentShader> shader) = 0;
+	virtual void fsBindConstantBuffer(size_t slot, const std::shared_ptr<ConstantBuffer> &buffer) = 0;
+	virtual void fsUseFragmentShader(const std::shared_ptr<FragmentShader> &shader) = 0;
+
+    virtual void fsBindTexture(size_t slot, const std::shared_ptr<GDTexture> &texture) = 0;
+    virtual void fsBindSampler(size_t slot, const std::shared_ptr<GDSampler> &sampler) = 0;
+    virtual void fsSamplerUsageHint(const std::vector<SamplerUsage> &usages) = 0;
 
 	/*
-	 * Fragment Screening
+	 * Fragment Discarding
 	 * 
 	 * Filter out the fragments fail the tests.
 	 */
@@ -138,13 +159,13 @@ public:
 	 * \param enable 
 	 * \return 
 	 */
-	virtual void fsEnableScissor(bool enable) = 0;
+	virtual void fdEnableScissor(bool enable) = 0;
 	/**
 	 * \brief Depth test. Enabled by default.
 	 * \param enable 
 	 * \return 
 	 */
-	virtual void fsEnableDepthTest(bool enable) = 0;
+	virtual void fdEnableDepthTest(bool enable) = 0;
 
     /*
      * Color Blending

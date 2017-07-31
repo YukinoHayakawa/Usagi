@@ -122,12 +122,15 @@
     <ClInclude Include="Runtime\Clock.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\ConstantBuffer.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\Debugging\DebugTriangle.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\GDTexture.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\NativeDataType.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\OpenGL\detail\OpenGLBuffer.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\OpenGL\detail\OpenGLShader.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLConstantBuffer.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLFragmentShader.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLPipeline.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLSampler.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\OpenGL\OpenGLTexture.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\ShaderDataType.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\GDBuffer.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\GDPipeline.hpp" />
@@ -142,6 +145,7 @@
     <ClInclude Include="Runtime\GraphicsDevice\VertexBuffer.hpp" />
     <ClInclude Include="Runtime\Renderable.hpp" />
     <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
+    <ClInclude Include="Runtime\GraphicsDevice\GDSampler.hpp" />
     <ClInclude Include="Runtime\Subsystem\DebugDrawManager.hpp" />
     <ClInclude Include="Runtime\Window\Win32Window.hpp" />
     <ClInclude Include="Runtime\Window\Window.hpp" />
@@ -150,6 +154,7 @@
     <ClInclude Include="Utility\File.hpp" />
     <ClInclude Include="Utility\Noncopyable.hpp" />
     <ClInclude Include="Utility\String.hpp" />
+    <ClInclude Include="Utility\TypeCast.hpp" />
     <ClInclude Include="World\Geometry\Geometry.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -166,6 +171,8 @@
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLFragmentShader.cpp" />
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLGraphicsDevice.cpp" />
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLPipeline.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLSampler.cpp" />
+    <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLTexture.cpp" />
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLVertexBuffer.cpp" />
     <ClCompile Include="Runtime\GraphicsDevice\OpenGL\OpenGLVertexShader.cpp" />
     <ClCompile Include="Runtime\Renderable.cpp" />

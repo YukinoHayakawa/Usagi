@@ -54,7 +54,7 @@ class OpenGLConstantBuffer : public ConstantBuffer, detail::OpenGLBuffer
     static AttributeAlignment _getStd140BaseAlignment(ShaderDataType type);
 
 public:
-    void setAttributeFormat(std::initializer_list<AttributeFormat> format) override;
+    void setAttributeFormat(const std::vector<AttributeFormat> &format) override;
     size_t setAttributeData(size_t index, const void *data) override;
 };
 

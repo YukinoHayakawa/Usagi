@@ -23,7 +23,7 @@ yuki::OpenGLConstantBuffer::AttributeAlignment yuki::OpenGLConstantBuffer::_getS
     }
 }
 
-void yuki::OpenGLConstantBuffer::setAttributeFormat(std::initializer_list<AttributeFormat> format)
+void yuki::OpenGLConstantBuffer::setAttributeFormat(const std::vector<yuki::ConstantBuffer::AttributeFormat> &format)
 {
     // todo: test the implementation correctness
     mAttributes.clear();

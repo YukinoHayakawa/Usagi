@@ -1,14 +1,39 @@
-﻿#include <stdexcept>
-#include <cassert>
+﻿#include <cassert>
 #include <vector>
 #include <iostream>
 
+#include <Usagi/Engine/Utility/TypeCast.hpp>
 #include "OpenGLVertexBuffer.hpp"
 #include "OpenGLVertexShader.hpp"
 #include "OpenGLFragmentShader.hpp"
 #include "OpenGLPipeline.hpp"
 #include "OpenGLCommon.hpp"
 #include "OpenGLConstantBuffer.hpp"
+#include "OpenGLSampler.hpp"
+#include "OpenGLTexture.hpp"
+
+namespace
+{
+
+/**
+ * \brief Resolve the target pointer type from the map definition,
+ * then cast the source pointer to the target type and store it in
+ * the map by the slot number.
+ * \tparam Map 
+ * \tparam Source 
+ * \param dest 
+ * \param slot 
+ * \param ptr 
+ */
+template <typename Map, typename Source>
+void cast_and_store(Map &dest, int slot, const std::shared_ptr<Source> &ptr)
+{
+    typedef typename Map::value_type::second_type::element_type Target;
+    auto real = yuki::dynamic_pointer_cast_throw<Target>(ptr);
+    dest[slot] = std::move(real);
+}
+
+}
 
 yuki::OpenGLPipeline::OpenGLPipeline()
 {
@@ -27,7 +52,7 @@ yuki::OpenGLPipeline::~OpenGLPipeline()
     _deleteProgram();
 }
 
-void yuki::OpenGLPipeline::vpSetVertexInputFormat(std::initializer_list<VertexAttributeSource> sources)
+void yuki::OpenGLPipeline::vpSetVertexInputFormat(const std::vector<yuki::GDPipeline::VertexAttributeSource> &sources)
 {
     for(auto i : sources)
     {
@@ -49,15 +74,14 @@ void yuki::OpenGLPipeline::vpSetVertexInputFormat(std::initializer_list<VertexAt
     }
 }
 
-void yuki::OpenGLPipeline::vpUseIndexBuffer(std::shared_ptr<IndexBuffer> buffer)
+void yuki::OpenGLPipeline::vpUseIndexBuffer(const std::shared_ptr<yuki::IndexBuffer> &buffer)
 {
     // todo
 }
 
-void yuki::OpenGLPipeline::vpBindVertexBuffer(size_t slot, std::shared_ptr<VertexBuffer> buffer)
+void yuki::OpenGLPipeline::vpBindVertexBuffer(size_t slot, const std::shared_ptr<yuki::VertexBuffer> &buffer)
 {
-    auto real_buffer = std::dynamic_pointer_cast<OpenGLVertexBuffer>(buffer);
-    if(!real_buffer) throw std::bad_cast();
+    auto real_buffer = dynamic_pointer_cast_throw<OpenGLVertexBuffer>(buffer);
 
     glVertexArrayVertexBuffer(
         mVertexArray,
@@ -73,23 +97,34 @@ void yuki::OpenGLPipeline::vpBindVertexBuffer(size_t slot, std::shared_ptr<Verte
 
 void yuki::OpenGLPipeline::_bindConstantBuffer(size_t binding_index, std::shared_ptr<yuki::ConstantBuffer> buffer)
 {
-    auto real_buffer = std::dynamic_pointer_cast<OpenGLConstantBuffer>(buffer);
-    if(!real_buffer) throw std::bad_cast();
-
-    mConstantBuffers[binding_index] = std::move(real_buffer);
+    cast_and_store(mConstantBuffers, binding_index, buffer);
 }
 
-void yuki::OpenGLPipeline::vsBindConstantBuffer(size_t slot, std::shared_ptr<ConstantBuffer> buffer)
+void yuki::OpenGLPipeline::vsBindConstantBuffer(size_t slot, const std::shared_ptr<yuki::ConstantBuffer> &buffer)
 {
     assert(slot < UBO_LIMIT);
     _bindConstantBuffer(slot + VERTEX_SHADER_UBO_OFFSET, buffer);
 }
 
-void yuki::OpenGLPipeline::vsUseVertexShader(std::shared_ptr<VertexShader> shader)
+void yuki::OpenGLPipeline::vsUseVertexShader(const std::shared_ptr<yuki::VertexShader> &shader)
 {
-    mVertexShader = std::dynamic_pointer_cast<OpenGLVertexShader>(shader);
-    if(!mVertexShader) throw std::bad_cast();
+    mVertexShader = dynamic_pointer_cast_throw<OpenGLVertexShader>(shader);
     mProgramNeedCompilation = true;
+}
+
+void yuki::OpenGLPipeline::vsBindTexture(size_t slot, const std::shared_ptr<yuki::GDTexture> &texture)
+{
+    mVertexTextureUnitManager.bindTexture(slot, texture);
+}
+
+void yuki::OpenGLPipeline::vsBindSampler(size_t slot, const std::shared_ptr<yuki::GDSampler> &sampler)
+{
+    mVertexTextureUnitManager.bindSampler(slot, sampler);
+}
+
+void yuki::OpenGLPipeline::vsSamplerUsageHint(const std::vector<yuki::GDPipeline::SamplerUsage> &usages)
+{
+    mVertexTextureUnitManager.samplerUsageHint(usages);
 }
 
 void yuki::OpenGLPipeline::rsSetVertexOrder(VertexOrder order)
@@ -102,25 +137,39 @@ void yuki::OpenGLPipeline::rsSetFaceCulling(FaceCullingType type)
     mFaceCulling = type;
 }
 
-void yuki::OpenGLPipeline::fsBindConstantBuffer(size_t slot, std::shared_ptr<ConstantBuffer> buffer)
+void yuki::OpenGLPipeline::fsBindConstantBuffer(size_t slot, const std::shared_ptr<yuki::ConstantBuffer> &buffer)
 {
     assert(slot < UBO_LIMIT);
     _bindConstantBuffer(slot + FRAGMENT_SHADER_UBO_OFFSET, buffer);
 }
 
-void yuki::OpenGLPipeline::fsUseFragmentShader(std::shared_ptr<FragmentShader> shader)
+void yuki::OpenGLPipeline::fsUseFragmentShader(const std::shared_ptr<yuki::FragmentShader> &shader)
 {
-    mFragmentShader = std::dynamic_pointer_cast<OpenGLFragmentShader>(shader);
-    if(!mFragmentShader) throw std::bad_cast();
+    mFragmentShader = dynamic_pointer_cast_throw<OpenGLFragmentShader>(shader);
     mProgramNeedCompilation = true;
 }
 
-void yuki::OpenGLPipeline::fsEnableScissor(bool enable)
+void yuki::OpenGLPipeline::fsBindTexture(size_t slot, const std::shared_ptr<yuki::GDTexture> &texture)
+{
+    mFragmentTextureUnitManager.bindTexture(slot, texture);
+}
+
+void yuki::OpenGLPipeline::fsBindSampler(size_t slot, const std::shared_ptr<yuki::GDSampler> &sampler)
+{
+    mFragmentTextureUnitManager.bindSampler(slot, sampler);
+}
+
+void yuki::OpenGLPipeline::fsSamplerUsageHint(const std::vector<SamplerUsage> &usages)
+{
+    mFragmentTextureUnitManager.samplerUsageHint(usages);
+}
+
+void yuki::OpenGLPipeline::fdEnableScissor(bool enable)
 {
     mScissorTest = enable;
 }
 
-void yuki::OpenGLPipeline::fsEnableDepthTest(bool enable)
+void yuki::OpenGLPipeline::fdEnableDepthTest(bool enable)
 {
     mDepthTest = enable;
 }
@@ -158,6 +207,31 @@ void yuki::OpenGLPipeline::bldSetColorDestFactor(BlendingFactor factor)
 void yuki::OpenGLPipeline::bldSetAlphaDestFactor(BlendingFactor factor)
 {
     mBlendingDestAlpha = _translateBlendingFactor(factor);
+}
+
+void yuki::OpenGLPipeline::TextureUnitManager::bindTexture(size_t slot, const std::shared_ptr<GDTexture> &texture)
+{
+    cast_and_store(mTextures, slot, texture);
+}
+
+void yuki::OpenGLPipeline::TextureUnitManager::bindSampler(size_t slot, const std::shared_ptr<GDSampler> &sampler)
+{
+    cast_and_store(mSamplers, slot, sampler);
+}
+
+void yuki::OpenGLPipeline::TextureUnitManager::samplerUsageHint(const std::vector<SamplerUsage> &usages)
+{
+    mTextureUnitUsages = usages;
+}
+
+void yuki::OpenGLPipeline::TextureUnitManager::bindToTextureUnits()
+{
+    for(auto i = 0; i < mTextureUnitUsages.size(); ++i)
+    {
+        auto &u = mTextureUnitUsages[i];
+        mSamplers[u.sampler_slot]->_bindToTextureUnit(i + mOffset);
+        mTextures[u.tex_slot]->_bindToTextureUnit(i + mOffset);
+    }
 }
 
 GLenum yuki::OpenGLPipeline::_translateBlendingFactor(BlendingFactor factor)
@@ -258,7 +332,7 @@ void yuki::OpenGLPipeline::_setupShaderProgram()
 
         _deleteProgram();
         mProgram = glCreateProgram();
-        
+
         std::cout << "Linking program" << std::endl;
         mVertexShader->_attachToProgram(mProgram);
         mFragmentShader->_attachToProgram(mProgram);
@@ -296,7 +370,7 @@ void yuki::OpenGLPipeline::_setupShaderProgram()
 void yuki::OpenGLPipeline::_setupShaderBuffers()
 {
     glBindVertexArray(mVertexArray);
-    
+
     for(auto &&i : mConstantBuffers)
     {
         glBindBufferBase(GL_UNIFORM_BUFFER, i.first, i.second->_getBufferName());
@@ -306,12 +380,19 @@ void yuki::OpenGLPipeline::_setupShaderBuffers()
     YUKI_OPENGL_CHECK();
 }
 
+void yuki::OpenGLPipeline::_setupTextureUnits()
+{
+    mVertexTextureUnitManager.bindToTextureUnits();
+    mFragmentTextureUnitManager.bindToTextureUnits();
+}
+
 void yuki::OpenGLPipeline::assemble()
 {
     // perform error checking in each method!
 
     _setupShaderProgram();
     _setupShaderBuffers();
+    _setupTextureUnits();
 
     // todo bind resources (textures, samplers)
 

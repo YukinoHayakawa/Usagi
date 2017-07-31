@@ -13,10 +13,11 @@ class VertexBuffer;
 class DebugDrawManager : public Renderable, public dd::RenderInterface
 {
     GraphicsDevice *mGraphicsDevice;
-    // std::vector<std::shared_ptr<GDTexture>> mTextures;
+    std::vector<std::shared_ptr<GDTexture>> mTextures;
     std::shared_ptr<class GDPipeline> mLinePointPipeline, mTextPipeline;
     std::shared_ptr<class VertexBuffer> mLinePointVertexBuffer, mTextVertexBuffer;
-    std::shared_ptr<class ConstantBuffer> mLinePointConstantBuffer;
+    std::shared_ptr<class ConstantBuffer> mLinePointConstantBuffer, mTextConstantBuffer;
+    std::shared_ptr<class GDSampler> mDefaultSampler;
 
 public:
     DebugDrawManager(GraphicsDevice &gd);

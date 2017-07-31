@@ -24,7 +24,7 @@ public:
      * This information is then used to calculate the actual layout with paddings.
      * \param format 
      */
-    virtual void setAttributeFormat(std::initializer_list<AttributeFormat> format) = 0;
+    virtual void setAttributeFormat(const std::vector<AttributeFormat> &format) = 0;
     /**
      * \brief 
      * \param index 

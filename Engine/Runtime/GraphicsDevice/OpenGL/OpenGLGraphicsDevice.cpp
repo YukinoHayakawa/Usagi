@@ -1,7 +1,6 @@
 ﻿#include <GL/glew.h>
 
 #include "Context/OpenGLContext.hpp"
-
 #include "OpenGLGraphicsDevice.hpp"
 #include "OpenGLCommon.hpp"
 #include "OpenGLVertexBuffer.hpp"
@@ -9,6 +8,8 @@
 #include "OpenGLFragmentShader.hpp"
 #include "OpenGLPipeline.hpp"
 #include "OpenGLConstantBuffer.hpp"
+#include "OpenGLTexture.hpp"
+#include "OpenGLSampler.hpp"
 
 yuki::OpenGLGraphicsDevice::OpenGLGraphicsDevice(std::shared_ptr<OpenGLContext> opengl_context)
     : mOpenGLContext { std::move(opengl_context) }
@@ -18,6 +19,16 @@ yuki::OpenGLGraphicsDevice::OpenGLGraphicsDevice(std::shared_ptr<OpenGLContext> 
 void yuki::OpenGLGraphicsDevice::setContextCurrent()
 {
     mOpenGLContext->setCurrent();
+}
+
+std::shared_ptr<yuki::GDTexture> yuki::OpenGLGraphicsDevice::createTexture()
+{
+    return std::make_shared<OpenGLTexture>();
+}
+
+std::shared_ptr<yuki::GDSampler> yuki::OpenGLGraphicsDevice::createSampler()
+{
+    return std::make_shared<OpenGLSampler>();
 }
 
 std::shared_ptr<yuki::ConstantBuffer> yuki::OpenGLGraphicsDevice::createConstantBuffer()

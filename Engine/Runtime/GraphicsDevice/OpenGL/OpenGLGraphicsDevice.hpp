@@ -21,6 +21,9 @@ public:
     
     void setContextCurrent() override;
 
+    std::shared_ptr<GDTexture> createTexture() override;
+    std::shared_ptr<GDSampler> createSampler() override;
+
     std::shared_ptr<ConstantBuffer> createConstantBuffer() override;
     std::shared_ptr<VertexBuffer> createVertexBuffer() override;
 

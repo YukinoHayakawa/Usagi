@@ -6,17 +6,15 @@
 #include <Usagi/Engine/Runtime/GraphicsDevice/GDTexture.hpp>
 #include <Usagi/Engine/Runtime/GraphicsDevice/VertexBuffer.hpp>
 #include <Usagi/Engine/Runtime/GraphicsDevice/GDPipeline.hpp>
+#include <Usagi/Engine/Runtime/GraphicsDevice/Shader.hpp>
+#include <Usagi/Engine/Runtime/GraphicsDevice/ConstantBuffer.hpp>
+#include <Usagi/Engine/Runtime/GraphicsDevice/GDSampler.hpp>
 
 #include "DebugDrawManager.hpp"
 
-// todo remove
-#include <GL/glew.h>
-#include <Usagi/Engine/Runtime/GraphicsDevice/Shader.hpp>
-#include <Usagi/Engine/Runtime/GraphicsDevice/ConstantBuffer.hpp>
-
 namespace
 {
-
+// todo: platform independent shader
 const char *lpvs = R"(
 #version 450
 
@@ -57,7 +55,10 @@ layout(location = 0) in vec2 in_Position;
 layout(location = 1) in vec2 in_TexCoords;
 layout(location = 2) in vec3 in_Color;
 
-uniform vec2 u_screenDimensions;
+layout(std140, binding = 0) uniform Screen
+{
+    vec2 u_screenDimensions;
+};
 
 out vec2 v_TexCoords;
 out vec4 v_Color;
@@ -80,7 +81,8 @@ const char *tfs = R"(
 in vec2 v_TexCoords;
 in vec4 v_Color;
 
-uniform sampler2D u_glyphTexture;
+layout(binding = 16) uniform sampler2D u_glyphTexture;
+
 out vec4 out_FragColor;
 
 void main()
@@ -496,13 +498,13 @@ yuki::DebugDrawManager::DebugDrawManager(GraphicsDevice &gd)
     mTextPipeline->vpBindVertexBuffer(0, mTextVertexBuffer);
     {
         auto vs = gd.createVertexShader();
-        vs->useSourceString(lpvs);
+        vs->useSourceString(tvs);
         vs->compile();
         mTextPipeline->vsUseVertexShader(std::move(vs));
     }
     {
         auto fs = gd.createFragmentShader();
-        fs->useSourceString(lpfs);
+        fs->useSourceString(tfs);
         fs->compile();
         mTextPipeline->fsUseFragmentShader(std::move(fs));
     }
@@ -510,12 +512,26 @@ yuki::DebugDrawManager::DebugDrawManager(GraphicsDevice &gd)
     mTextPipeline->bldSetOp(GDPipeline::BlendingOperation::ADD);
     mTextPipeline->bldSetSrcFactor(GDPipeline::BlendingFactor::SOURCE_ALPHA);
     mTextPipeline->bldSetDestFactor(GDPipeline::BlendingFactor::INV_SOURCE_ALPHA);
-    
+
+    mTextConstantBuffer = gd.createConstantBuffer();
+    mTextConstantBuffer->setAttributeFormat({
+        { ShaderDataType::VECTOR2, 1 }, // u_screenDimensions
+    });
+    mTextPipeline->vsBindConstantBuffer(0, mTextConstantBuffer);
+
+    mDefaultSampler = gd.createSampler();
+    mDefaultSampler->setFilter(GDSampler::FilterType::LINEAR, GDSampler::FilterType::NEAREST);
+    mDefaultSampler->setTextureWrapping(GDSampler::TextureWrapping::CLAMP_TO_EDGE, GDSampler::TextureWrapping::CLAMP_TO_EDGE);
+    mTextPipeline->fsBindSampler(0, mDefaultSampler);
+    mTextPipeline->fsSamplerUsageHint({
+        { 0, 0 },
+    });
+
     dd::initialize(this);
 }
 
 yuki::DebugDrawManager::~DebugDrawManager()
-{     
+{
     dd::shutdown();
 }
 
@@ -531,25 +547,27 @@ void yuki::DebugDrawManager::render(GraphicsDevice &gd, const Clock &render_cloc
     drawText();
 
     mLinePointConstantBuffer->setAttributeData(0, toFloatPtr(camera.vpMatrix));
+    // todo update from window upon resize events
+    float scrdim[2] { windowWidth, windowHeight };
+    mTextConstantBuffer->setAttributeData(0, scrdim);
 
     dd::flush(render_clock.getTime() * 1000);
 }
 
-// todo
 dd::GlyphTextureHandle yuki::DebugDrawManager::createGlyphTexture(int width, int height, const void *pixels)
 {
     assert(width > 0 && height > 0);
     assert(pixels != nullptr);
 
-//     auto tex = mGraphicsDevice->createTexture();
-// 
-//     tex->setFormat(width, height, 1, ShaderDataType::UNSIGNED_BYTE);
-//     tex->upload(pixels);
-// 
-//     mTextures.push_back(tex);
-// 
-//     return reinterpret_cast<dd::GlyphTextureHandle>(tex.get());
-    return nullptr;
+    auto tex = mGraphicsDevice->createTexture();
+
+    tex->setFormat(width, height, GDTexture::ChannelEnum::R);
+    tex->upload(NativeDataType::UNSIGNED_BYTE, GDTexture::ChannelEnum::R, 1, pixels);
+
+    mTextures.push_back(tex);
+
+    // avoid id 0 so DD acknowledges that we return a valid handle
+    return reinterpret_cast<dd::GlyphTextureHandle>(mTextures.size());
 }
 
 void yuki::DebugDrawManager::destroyGlyphTexture(dd::GlyphTextureHandle glyphTex)
@@ -565,7 +583,7 @@ void yuki::DebugDrawManager::drawPointList(const dd::DrawVertex *points, int cou
     assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
 
     mLinePointVertexBuffer->streamFromHostBuffer(points, count * sizeof(dd::DrawVertex));
-    mLinePointPipeline->fsEnableDepthTest(depthEnabled);
+    mLinePointPipeline->fdEnableDepthTest(depthEnabled);
 
     mLinePointPipeline->assemble();
 
@@ -578,23 +596,22 @@ void yuki::DebugDrawManager::drawLineList(const dd::DrawVertex *lines, int count
     assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
 
     mLinePointVertexBuffer->streamFromHostBuffer(lines, count * sizeof(dd::DrawVertex));
-    mLinePointPipeline->fsEnableDepthTest(depthEnabled);
+    mLinePointPipeline->fdEnableDepthTest(depthEnabled);
 
     mLinePointPipeline->assemble();
 
     mGraphicsDevice->drawLines(0, count);
 }
 
-// todo: impl texture usage
 void yuki::DebugDrawManager::drawGlyphList(const dd::DrawVertex *glyphs, int count, dd::GlyphTextureHandle glyphTex)
 {
     assert(glyphs != nullptr);
     assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
 
     mTextVertexBuffer->streamFromHostBuffer(glyphs, count * sizeof(dd::DrawVertex));
-    mTextPipeline->assemble();
+    mTextPipeline->fsBindTexture(0, mTextures[reinterpret_cast<size_t>(glyphTex) - 1]);
 
-    // auto ts = reinterpret_cast<GDTexture*>(glyphTex)->bind(0);
+    mTextPipeline->assemble();
 
     mGraphicsDevice->drawTriangles(0, count);
 }
