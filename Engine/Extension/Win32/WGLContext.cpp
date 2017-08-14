@@ -2,8 +2,6 @@
 #include <GL/wglew.h>
 #include <stdexcept>
 
-#include "../detail/OpenGLCommon.hpp"
-
 #include "WGLContext.hpp"
 
 void yuki::WGLContext::HGLRCWrapper::clear()

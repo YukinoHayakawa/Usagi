@@ -119,6 +119,7 @@
     <ClInclude Include="Component\InteractiveComponent.hpp" />
     <ClInclude Include="Component\TimeVariantComponent.hpp" />
     <ClInclude Include="Extension\Extension.hpp" />
+    <ClInclude Include="Extension\Win32\WindowsHeader.hpp" />
     <ClInclude Include="Geometry\Bound.hpp" />
     <ClInclude Include="Component\DynamicComponent.hpp" />
     <ClInclude Include="Geometry\Direction.hpp" />
@@ -134,7 +135,7 @@
     <ClInclude Include="Scene\Entity.hpp" />
     <ClInclude Include="Time\Clock.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\ConstantBuffer.hpp" />
-    <ClInclude Include="Runtime\GraphicsDevice\Debugging\DebugTriangle.hpp" />
+    <ClInclude Include="Debugging\DebugFullscreenTriangle.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\GDTexture.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\NativeDataType.hpp" />
     <ClInclude Include="Extension\OpenGL\detail\OpenGLBuffer.hpp" />
@@ -148,8 +149,8 @@
     <ClInclude Include="Runtime\GraphicsDevice\GDBuffer.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\GDPipeline.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\GraphicsDevice.hpp" />
-    <ClInclude Include="Extension\OpenGL\Context\OpenGLContext.hpp" />
-    <ClInclude Include="Extension\OpenGL\Context\WGLContext.hpp" />
+    <ClInclude Include="Extension\OpenGL\OpenGLContext.hpp" />
+    <ClInclude Include="Extension\Win32\WGLContext.hpp" />
     <ClInclude Include="Extension\OpenGL\detail\OpenGLCommon.hpp" />
     <ClInclude Include="Extension\OpenGL\OpenGLGraphicsDevice.hpp" />
     <ClInclude Include="Extension\OpenGL\OpenGLVertexShader.hpp" />
@@ -187,12 +188,14 @@
     <ClCompile Include="Extension\GTA\GTA3IMGv2Filesystem.cpp" />
     <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
+    <ClCompile Include="Runtime\HID\Keyboard\KeyCode.cpp" />
+    <ClCompile Include="Runtime\HID\Mouse\MouseButtonCode.cpp" />
     <ClCompile Include="Scene\Entity.cpp" />
     <ClCompile Include="Time\Clock.cpp" />
-    <ClCompile Include="Runtime\GraphicsDevice\Debugging\DebugTriangle.cpp" />
+    <ClCompile Include="Debugging\DebugFullscreenTriangle.cpp" />
     <ClCompile Include="Extension\OpenGL\detail\OpenGLBuffer.cpp" />
     <ClCompile Include="Extension\OpenGL\detail\OpenGLShader.cpp" />
-    <ClCompile Include="Extension\OpenGL\Context\WGLContext.cpp" />
+    <ClCompile Include="Extension\Win32\WGLContext.cpp" />
     <ClCompile Include="Extension\OpenGL\detail\OpenGLCommon.cpp" />
     <ClCompile Include="Extension\OpenGL\OpenGLConstantBuffer.cpp" />
     <ClCompile Include="Extension\OpenGL\OpenGLFragmentShader.cpp" />

@@ -3,7 +3,6 @@
 namespace yuki
 {
 
-
 /**
  * \brief Create platform-specific OpenGL context.
  */

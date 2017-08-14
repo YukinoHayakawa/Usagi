@@ -1,14 +1,12 @@
 ﻿#include <Usagi/Engine/Utility/String.hpp>
 #include <Usagi/Engine/Runtime/HID/Mouse/MouseEventListener.hpp>
 #include <Usagi/Engine/Runtime/HID/Keyboard/KeyCode.hpp>
+#include <Usagi/Engine/Runtime/HID/Keyboard/KeyEventListener.hpp>
 
 // include dirty windows headers at last
 #include "Win32Window.hpp"
 #include <ShellScalingAPI.h>
 #include <Windowsx.h>
-#include <Usagi/Engine/Runtime/HID/Keyboard/KeyEventListener.hpp>
-// undefine conflicting macros
-#undef DELETE
 
 const wchar_t yuki::Win32Window::mWindowClassName[] = L"UsagiNativeWindowWrapper";
 HINSTANCE yuki::Win32Window::mProcessInstanceHandle = nullptr;
@@ -62,7 +60,7 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
 
     if(!mWindowHandle)
     {
-        throw std::runtime_error("RegisterClassEx() failed");
+        throw std::runtime_error("mWindowHandle() failed");
     }
 
     // associate the class instance with the window so they can be identified in WindowProc
@@ -101,7 +99,11 @@ void yuki::Win32Window::processEvents()
 LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     auto window = reinterpret_cast<Win32Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-    assert(window);
+    // during window creation some misc messages are sent, we just pass them to the system procedure.
+    if(!window)
+    {
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
     return window->_handleWindowMessage(hWnd, message, wParam, lParam);
 }
 
@@ -181,6 +183,8 @@ yuki::KeyCode yuki::Win32Window::_translateKeyCodeFromMessage(WPARAM vkey, LPARA
         case 'X': return KeyCode::X;
         case 'Y': return KeyCode::Y;
         case 'Z': return KeyCode::Z;
+        case VK_LWIN: return KeyCode::LEFT_OS;
+        case VK_RWIN: return KeyCode::RIGHT_OS;
         case VK_APPS: return KeyCode::CONTEXT_MENU;
         case VK_NUMPAD0: return KeyCode::NUM_0;
         case VK_NUMPAD1: return KeyCode::NUM_1;
@@ -431,6 +435,7 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
             break;
         }
         // key strokes
+        // todo: print screen receive no press event
         case WM_SYSKEYDOWN:
         case WM_KEYDOWN:
         {

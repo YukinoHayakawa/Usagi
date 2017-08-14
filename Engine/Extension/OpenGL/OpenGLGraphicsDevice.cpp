@@ -1,8 +1,8 @@
 ﻿#include <GL/glew.h>
 
-#include "Context/OpenGLContext.hpp"
-#include "OpenGLGraphicsDevice.hpp"
 #include "detail/OpenGLCommon.hpp"
+#include "OpenGLContext.hpp"
+#include "OpenGLGraphicsDevice.hpp"
 #include "OpenGLVertexBuffer.hpp"
 #include "OpenGLVertexShader.hpp"
 #include "OpenGLFragmentShader.hpp"

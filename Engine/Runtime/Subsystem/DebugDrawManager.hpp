@@ -2,18 +2,17 @@
 
 #include <debug-draw/debug_draw.hpp>
 #include <vector>
+#include <memory>
 
 #include <Usagi/Engine/Runtime/Renderable.hpp>
 
 namespace yuki
 {
 
-class VertexBuffer;
-
 class DebugDrawManager : public Renderable, public dd::RenderInterface
 {
     GraphicsDevice *mGraphicsDevice;
-    std::vector<std::shared_ptr<GDTexture>> mTextures;
+    std::vector<std::shared_ptr<class GDTexture>> mTextures;
     std::shared_ptr<class GDPipeline> mLinePointPipeline, mTextPipeline;
     std::shared_ptr<class VertexBuffer> mLinePointVertexBuffer, mTextVertexBuffer;
     std::shared_ptr<class ConstantBuffer> mLinePointConstantBuffer, mTextConstantBuffer;

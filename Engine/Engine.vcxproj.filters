@@ -75,9 +75,6 @@
     <ClInclude Include="Utility\Noncopyable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\GraphicsDevice\Debugging\DebugTriangle.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\GraphicsDevice\ConstantBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -162,12 +159,6 @@
     <ClInclude Include="Extension\Win32\Win32Window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\OpenGL\Context\OpenGLContext.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\OpenGL\Context\WGLContext.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Extension\OpenGL\detail\OpenGLBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -204,6 +195,18 @@
     <ClInclude Include="Extension\OpenGL\detail\OpenGLCommon.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Debugging\DebugFullscreenTriangle.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Win32\WindowsHeader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Win32\WGLContext.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\OpenGL\OpenGLContext.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Filesystem\Filesystem.cpp">
@@ -228,9 +231,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Subsystem\DebugDrawImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\GraphicsDevice\Debugging\DebugTriangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\HID\Keyboard\Keyboard.cpp">
@@ -269,9 +269,6 @@
     <ClCompile Include="Extension\Win32\Win32Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\OpenGL\Context\WGLContext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Extension\OpenGL\detail\OpenGLBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -303,6 +300,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\OpenGL\detail\OpenGLCommon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\DebugFullscreenTriangle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\HID\Mouse\MouseButtonCode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\HID\Keyboard\KeyCode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Win32\WGLContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

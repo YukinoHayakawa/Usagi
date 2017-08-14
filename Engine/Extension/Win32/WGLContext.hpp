@@ -1,9 +1,7 @@
 ﻿#pragma once
 
-// todo: remove windows header
-#include <windows.h>
-
-#include "OpenGLContext.hpp"
+#include <Usagi/Engine/Extension/Win32/WindowsHeader.hpp>
+#include <Usagi/Engine/Extension/OpenGL/OpenGLContext.hpp>
 
 namespace yuki
 {

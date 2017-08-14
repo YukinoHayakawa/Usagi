@@ -7,12 +7,12 @@
 namespace yuki
 {
 
-class DebugTriangle : public Renderable
+class DebugFullscreenTriangle : public Renderable
 {
     std::shared_ptr<class GDPipeline> mPipeline;
 
 public:
-    DebugTriangle(GraphicsDevice &gd);
+    DebugFullscreenTriangle(GraphicsDevice &gd);
     void render(GraphicsDevice &gd, const Clock &render_clock) override;
 };
 

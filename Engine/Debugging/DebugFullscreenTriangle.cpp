@@ -2,7 +2,7 @@
 #include <Usagi/Engine/Runtime/GraphicsDevice/GDPipeline.hpp>
 #include <Usagi/Engine/Runtime/GraphicsDevice/VertexBuffer.hpp>
 
-#include "DebugTriangle.hpp"
+#include "DebugFullscreenTriangle.hpp"
 #include <Usagi/Engine/Runtime/GraphicsDevice/Shader.hpp>
 
 namespace
@@ -27,7 +27,7 @@ void main(){
 
 }
 
-yuki::DebugTriangle::DebugTriangle(GraphicsDevice &gd)
+yuki::DebugFullscreenTriangle::DebugFullscreenTriangle(GraphicsDevice &gd)
 {
     mPipeline = gd.createPipeline();
     mPipeline->vpSetVertexInputFormat({
@@ -58,7 +58,7 @@ yuki::DebugTriangle::DebugTriangle(GraphicsDevice &gd)
     }
 }
 
-void yuki::DebugTriangle::render(GraphicsDevice &gd, const Clock &render_clock)
+void yuki::DebugFullscreenTriangle::render(GraphicsDevice &gd, const Clock &render_clock)
 {
     mPipeline->assemble();
     gd.drawTriangles(0, 3);

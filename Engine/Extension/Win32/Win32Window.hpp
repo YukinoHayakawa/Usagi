@@ -3,9 +3,7 @@
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Runtime/HID/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include <Usagi/Engine/Extension/Win32/WindowsHeader.hpp>
 
 namespace yuki
 {

@@ -135,4 +135,6 @@ enum class KeyCode
     UNKNOWN,
 };
 
+const char *getKeyName(KeyCode key);
+
 }

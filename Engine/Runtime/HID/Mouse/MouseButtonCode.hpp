@@ -9,4 +9,6 @@ enum class MouseButtonCode
     UNKNOWN
 };
 
+const char *getMouseButtonName(MouseButtonCode key);
+
 }
