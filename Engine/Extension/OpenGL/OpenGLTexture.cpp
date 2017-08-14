@@ -1,7 +1,7 @@
 ﻿#include <stdexcept>
 
 #include "OpenGLTexture.hpp"
-#include "OpenGLCommon.hpp"
+#include "detail/OpenGLCommon.hpp"
 
 void yuki::OpenGLTexture::_bindToTextureUnit(GLuint unit) const
 {

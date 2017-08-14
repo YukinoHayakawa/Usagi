@@ -3,7 +3,7 @@
 
 #include "OpenGLShader.hpp"
 
-#include <Usagi/Engine/Runtime/GraphicsDevice/OpenGL/OpenGLCommon.hpp>
+#include "../detail/OpenGLCommon.hpp"
 #include <Usagi/Engine/Utility/File.hpp>
 
 void yuki::detail::OpenGLShader::_attachToProgram(GLuint program)

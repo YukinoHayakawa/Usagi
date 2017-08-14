@@ -7,6 +7,8 @@ namespace yuki
 
 /**
  * \brief Provide a simple measurement of time.
+ * 
+ * todo: the precision of double changes over time, use a data type with invariant precesion instead.
  */
 class Clock
 {

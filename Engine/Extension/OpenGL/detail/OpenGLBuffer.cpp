@@ -1,7 +1,6 @@
 ﻿#include <cassert>
 
-#include <Usagi/Engine/Runtime/GraphicsDevice/OpenGL/OpenGLCommon.hpp>
-
+#include "../detail/OpenGLCommon.hpp"
 #include "OpenGLBuffer.hpp"
 
 void yuki::detail::OpenGLBuffer::_reallocate()

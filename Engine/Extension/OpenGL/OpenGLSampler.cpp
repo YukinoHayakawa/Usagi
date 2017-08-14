@@ -1,7 +1,7 @@
 ﻿#include <stdexcept>
 
 #include "OpenGLSampler.hpp"
-#include "OpenGLCommon.hpp"
+#include "detail/OpenGLCommon.hpp"
 
 void yuki::OpenGLSampler::_bindToTextureUnit(GLuint unit)
 {

@@ -2,7 +2,7 @@
 
 #include "Context/OpenGLContext.hpp"
 #include "OpenGLGraphicsDevice.hpp"
-#include "OpenGLCommon.hpp"
+#include "detail/OpenGLCommon.hpp"
 #include "OpenGLVertexBuffer.hpp"
 #include "OpenGLVertexShader.hpp"
 #include "OpenGLFragmentShader.hpp"

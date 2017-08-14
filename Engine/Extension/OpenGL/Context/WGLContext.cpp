@@ -2,7 +2,7 @@
 #include <GL/wglew.h>
 #include <stdexcept>
 
-#include "../OpenGLCommon.hpp"
+#include "../detail/OpenGLCommon.hpp"
 
 #include "WGLContext.hpp"
 

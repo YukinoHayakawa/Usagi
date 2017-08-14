@@ -1,7 +1,7 @@
 ﻿#include <cassert>
 #include <vectormath.h>
 
-#include <Usagi/Engine/Runtime/Clock.hpp>
+#include <Usagi/Engine/Time/Clock.hpp>
 #include <Usagi/Engine/Runtime/GraphicsDevice/GraphicsDevice.hpp>
 #include <Usagi/Engine/Runtime/GraphicsDevice/GDTexture.hpp>
 #include <Usagi/Engine/Runtime/GraphicsDevice/VertexBuffer.hpp>

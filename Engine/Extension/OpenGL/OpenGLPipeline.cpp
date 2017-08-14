@@ -7,7 +7,7 @@
 #include "OpenGLVertexShader.hpp"
 #include "OpenGLFragmentShader.hpp"
 #include "OpenGLPipeline.hpp"
-#include "OpenGLCommon.hpp"
+#include "detail/OpenGLCommon.hpp"
 #include "OpenGLConstantBuffer.hpp"
 #include "OpenGLSampler.hpp"
 #include "OpenGLTexture.hpp"

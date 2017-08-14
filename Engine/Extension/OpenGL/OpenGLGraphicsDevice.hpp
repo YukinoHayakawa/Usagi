@@ -3,7 +3,7 @@
 #include <memory>
 #include <GL/glew.h>
 
-#include "../GraphicsDevice.hpp"
+#include <Usagi/Engine/Runtime/GraphicsDevice/GraphicsDevice.hpp>
 
 namespace yuki
 {

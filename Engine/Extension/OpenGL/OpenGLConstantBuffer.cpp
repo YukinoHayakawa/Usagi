@@ -1,6 +1,6 @@
 ﻿#include "OpenGLConstantBuffer.hpp"
+#include "detail/OpenGLCommon.hpp"
 #include <cassert>
-#include "OpenGLCommon.hpp"
 
 // https://www.khronos.org/opengl/wiki/Data_Type_(GLSL)
 // Uniform block layout section in:
