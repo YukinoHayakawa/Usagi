@@ -18,8 +18,8 @@ namespace yuki
  * S - move backward
  * A - move left
  * D - move right
- * E - move upward
- * Q - move downward
+ * SPACE - move upward
+ * LEFT_SHIFT - move downward
  * 
  * where the coordinate system is defined by the following rules:
  * Y axis is aligned with the world coordinate system with the same
@@ -41,7 +41,7 @@ class NoClipEntityController
 {
 protected:
     bool mMovement[static_cast<size_t>(Direction::ENUM_COUNT)] = { false };
-    float mMoveSpeed = 0.5f; // m/s
+    float mMoveSpeed = 0.4f; // m/s
     float mRotationSpeed = 0.1f; // deg/pixel
     float mYaw; // rotation around world Y axis
     float mPitch; // rotation around local X axis

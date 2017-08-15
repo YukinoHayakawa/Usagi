@@ -22,16 +22,16 @@ Eigen::Affine3f gDdVpMatrix;
 class SimpleCamera : public yuki::DynamicComponent, public yuki::TimeVariantComponent
 {
 public:
-    Eigen::Projective3f mProjectionMatrix;
+    Eigen::Projective3f mLocalToNdcProjectionMatrix;
 
     void lookAt(const Eigen::Vector3f& position, const Eigen::Vector3f& target, const Eigen::Vector3f& up)
     {
-        Eigen::Matrix3f worldToLocal;
-        worldToLocal.col(2) = (position - target).normalized();
-        worldToLocal.col(0) = up.cross(worldToLocal.col(2)).normalized();
-        worldToLocal.col(1) = worldToLocal.col(2).cross(worldToLocal.col(0));
-        setOrientation(worldToLocal.transpose());
-        setPosition(-worldToLocal.transpose() * position);
+        Eigen::Matrix3f localToWorld;
+        localToWorld.col(2) = (position - target).normalized(); // z
+        localToWorld.col(0) = up.cross(localToWorld.col(2)).normalized(); // x
+        localToWorld.col(1) = localToWorld.col(2).cross(localToWorld.col(0)); // y
+        setOrientation(localToWorld);
+        setPosition(position);
     }
 
     void setPerspective(float fovY, float aspect, float near, float far)
@@ -40,17 +40,17 @@ public:
         float range = far - near;
         float invtan = 1. / tan(theta);
 
-        mProjectionMatrix(0, 0) = invtan / aspect;
-        mProjectionMatrix(1, 1) = invtan;
-        mProjectionMatrix(2, 2) = -(near + far) / range;
-        mProjectionMatrix(3, 2) = -1;
-        mProjectionMatrix(2, 3) = -2 * near * far / range;
-        mProjectionMatrix(3, 3) = 0;
+        mLocalToNdcProjectionMatrix(0, 0) = invtan / aspect;
+        mLocalToNdcProjectionMatrix(1, 1) = invtan;
+        mLocalToNdcProjectionMatrix(2, 2) = -(near + far) / range;
+        mLocalToNdcProjectionMatrix(3, 2) = -1;
+        mLocalToNdcProjectionMatrix(2, 3) = -2 * near * far / range;
+        mLocalToNdcProjectionMatrix(3, 3) = 0;
     }
 
     void tickUpdate(const yuki::Clock &clock) override
     {
-        gDdVpMatrix = mProjectionMatrix * getLocalToWorldTransform().matrix();
+        gDdVpMatrix = mLocalToNdcProjectionMatrix * getLocalToWorldTransform().matrix().inverse();
     }
 };
 

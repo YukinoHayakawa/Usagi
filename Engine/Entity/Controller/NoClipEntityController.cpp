@@ -22,19 +22,36 @@ void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
     {
         static const Eigen::Vector3f DIR_VEC[]
         {
-            { 0, 0, -1 }, { 0, 0, 1 },
-            { -1, 0, 0 }, { 1, 0, 0 },
-            { 0, 1, 0 }, { 0, -1, 0 },
+            { 0, 0, -1 }, // forward
+            { 0, 0, 1 }, // backward
+            { -1, 0, 0 }, // left
+            { 1, 0, 0 }, // right
+            { 0, 1, 0 }, // up
+            { 0, -1, 0 }, // down
         };
         Eigen::Vector3f movement = Eigen::Vector3f::Zero();
 
-        for(size_t i = 0; i < static_cast<size_t>(Direction::ENUM_COUNT); ++i)
+        // pan along local axes but locked in world x-z plane
+        for(size_t i = 0; i < static_cast<size_t>(Direction::UPWARD); ++i)
             if(mMovement[i]) movement += DIR_VEC[i];
+        if(!movement.isZero())
+        {
+            // todo make a method of DynamicComponent::moveInPlane()?
+            movement = mEntity->getLocalToWorldTransform().linear() * movement;
+            movement.y() = 0; // lock in x-z plane
+            movement.normalize();
+            mEntity->move(movement * mMoveSpeed * clock.getElapsedTime());
+            movement.setZero();
+        }
 
+        // rise and drop in world coordinates
+        for(size_t i = static_cast<size_t>(Direction::UPWARD); i < static_cast<size_t>(Direction::ENUM_COUNT); ++i)
+            if(mMovement[i]) movement += DIR_VEC[i];
         if(!movement.isZero())
         {
             movement.normalize();
-            mEntity->addPosition(movement * mMoveSpeed * clock.getElapsedTime());
+            mEntity->move(movement * mMoveSpeed * clock.getElapsedTime());
+            movement.setZero();
         }
     }
 
@@ -43,8 +60,8 @@ void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
         auto l2w = mEntity->getLocalToWorldTransform();
         Eigen::Vector3f right = l2w.linear().col(0);
 
-        mEntity->rotate(Eigen::AngleAxisf(mPitch * mRotationSpeed, right));
-        mEntity->rotate(Eigen::AngleAxisf(mYaw * mRotationSpeed, Eigen::Vector3f::UnitY()));        
+       // mEntity->rotate(Eigen::AngleAxisf(mPitch * mRotationSpeed, right));
+     //   mEntity->rotate(Eigen::AngleAxisf(mYaw * mRotationSpeed, Eigen::Vector3f::UnitY()));        
 
         _resetRotation();
     }
@@ -65,8 +82,8 @@ void yuki::NoClipEntityController::onKeyStateChange(const KeyEvent &e)
         NCEC_KEY_BIND(S, BACKWARD);
         NCEC_KEY_BIND(A, LEFT);
         NCEC_KEY_BIND(D, RIGHT);
-        NCEC_KEY_BIND(E, UPWARD);
-        NCEC_KEY_BIND(Q, DOWNWARD);
+        NCEC_KEY_BIND(SPACE, UPWARD);
+        NCEC_KEY_BIND(LEFT_SHIFT, DOWNWARD);
 #undef NCEC_KEY_BIND
         default: break;
     }

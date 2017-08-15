@@ -43,12 +43,18 @@ public:
         _polluteMatrix();
     }
 
-    void addPosition(const Eigen::Vector3f &delta_pos)
+    void move(const Eigen::Vector3f &delta_pos)
     {
         mPosition += delta_pos;
         _polluteMatrix();
     }
 
+    void moveLocally(const Eigen::Vector3f &delta_pos)
+    {
+        mPosition += getLocalToWorldTransform().linear() * delta_pos;
+        _polluteMatrix();
+    }
+    
     // orientation
     template <typename Rotation>
     void setOrientation(const Rotation &orientation)
