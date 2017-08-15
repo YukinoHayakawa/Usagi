@@ -41,8 +41,8 @@ class NoClipEntityController
 {
 protected:
     bool mMovement[static_cast<size_t>(Direction::ENUM_COUNT)] = { false };
-    float mMoveSpeed = 0.4f; // m/s
-    float mRotationSpeed = 0.1f; // deg/pixel
+    float mMoveSpeed = 0.25f; // m/s
+    float mRotationSpeed = 0.005f; // deg/pixel
     float mYaw; // rotation around world Y axis
     float mPitch; // rotation around local X axis
 

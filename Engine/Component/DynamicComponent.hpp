@@ -54,7 +54,7 @@ public:
         mPosition += getLocalToWorldTransform().linear() * delta_pos;
         _polluteMatrix();
     }
-    
+
     // orientation
     template <typename Rotation>
     void setOrientation(const Rotation &orientation)
@@ -66,7 +66,7 @@ public:
     template <typename Rotation>
     void rotate(const Rotation& delta_ori)
     {
-        mOrientation *= Eigen::Quaternionf(delta_ori);
+        mOrientation = Eigen::Quaternionf(delta_ori) * mOrientation;
         _polluteMatrix();
     }
 

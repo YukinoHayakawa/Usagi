@@ -22,10 +22,11 @@ Eigen::Affine3f gDdVpMatrix;
 class SimpleCamera : public yuki::DynamicComponent, public yuki::TimeVariantComponent
 {
 public:
-    Eigen::Projective3f mLocalToNdcProjectionMatrix;
+    Eigen::Projective3f mLocalToNdc;
 
     void lookAt(const Eigen::Vector3f& position, const Eigen::Vector3f& target, const Eigen::Vector3f& up)
     {
+        // todo: geometry::makeCoordinateSystem method
         Eigen::Matrix3f localToWorld;
         localToWorld.col(2) = (position - target).normalized(); // z
         localToWorld.col(0) = up.cross(localToWorld.col(2)).normalized(); // x
@@ -40,17 +41,17 @@ public:
         float range = far - near;
         float invtan = 1. / tan(theta);
 
-        mLocalToNdcProjectionMatrix(0, 0) = invtan / aspect;
-        mLocalToNdcProjectionMatrix(1, 1) = invtan;
-        mLocalToNdcProjectionMatrix(2, 2) = -(near + far) / range;
-        mLocalToNdcProjectionMatrix(3, 2) = -1;
-        mLocalToNdcProjectionMatrix(2, 3) = -2 * near * far / range;
-        mLocalToNdcProjectionMatrix(3, 3) = 0;
+        mLocalToNdc(0, 0) = invtan / aspect;
+        mLocalToNdc(1, 1) = invtan;
+        mLocalToNdc(2, 2) = -(near + far) / range;
+        mLocalToNdc(3, 2) = -1;
+        mLocalToNdc(2, 3) = -2 * near * far / range;
+        mLocalToNdc(3, 3) = 0;
     }
 
     void tickUpdate(const yuki::Clock &clock) override
     {
-        gDdVpMatrix = mLocalToNdcProjectionMatrix * getLocalToWorldTransform().matrix().inverse();
+        gDdVpMatrix = mLocalToNdc * getLocalToWorldTransform().matrix().inverse();
     }
 };
 

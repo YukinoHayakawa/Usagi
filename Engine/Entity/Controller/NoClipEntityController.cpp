@@ -50,7 +50,7 @@ void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
         if(!movement.isZero())
         {
             movement.normalize();
-            mEntity->move(movement * mMoveSpeed * clock.getElapsedTime());
+            mEntity->move(movement * mMoveSpeed * 0.25f * clock.getElapsedTime());
             movement.setZero();
         }
     }
@@ -60,8 +60,9 @@ void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
         auto l2w = mEntity->getLocalToWorldTransform();
         Eigen::Vector3f right = l2w.linear().col(0);
 
-       // mEntity->rotate(Eigen::AngleAxisf(mPitch * mRotationSpeed, right));
-     //   mEntity->rotate(Eigen::AngleAxisf(mYaw * mRotationSpeed, Eigen::Vector3f::UnitY()));        
+        // todo: lock view angle
+        mEntity->rotate(Eigen::AngleAxisf(mPitch * mRotationSpeed, right));
+        mEntity->rotate(Eigen::AngleAxisf(mYaw * mRotationSpeed, Eigen::Vector3f::UnitY()));        
 
         _resetRotation();
     }
@@ -89,6 +90,7 @@ void yuki::NoClipEntityController::onKeyStateChange(const KeyEvent &e)
     }
 }
 
+// todo: geometry::makeCoordinateSystem method
 void yuki::NoClipEntityController::_postAttachTo()
 {
     // enforce the constraints of this entity controller,
@@ -111,5 +113,5 @@ void yuki::NoClipEntityController::_postAttachTo()
     // update the orientation of the entity
     Eigen::Matrix3f orientation;
     orientation << right, up, back;
-    mEntity->setOrientation(Eigen::Quaternionf(orientation));
+    mEntity->setOrientation(orientation);
 }
