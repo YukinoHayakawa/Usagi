@@ -113,6 +113,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Component\Component.hpp" />
+    <ClInclude Include="Debugging\DebugKeyMouseEventListener.hpp" />
     <ClInclude Include="Entity\Controller\EntityController.hpp" />
     <ClInclude Include="Entity\Controller\NoClipEntityController.hpp" />
     <ClInclude Include="Entity\Controller\Attachment\PermissiveAttachmentEntityController.hpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="World\Geometry\Geometry.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Debugging\DebugKeyMouseEventListener.cpp" />
     <ClCompile Include="Entity\Controller\NoClipEntityController.cpp" />
     <ClCompile Include="Entity\Controller\Attachment\PermissiveAttachmentEntityController.cpp" />
     <ClCompile Include="Component\InteractiveComponent.cpp" />

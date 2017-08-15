@@ -26,13 +26,16 @@ void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
             { -1, 0, 0 }, { 1, 0, 0 },
             { 0, 1, 0 }, { 0, -1, 0 },
         };
-        Eigen::Vector3f movement;
-        
+        Eigen::Vector3f movement = Eigen::Vector3f::Zero();
+
         for(size_t i = 0; i < static_cast<size_t>(Direction::ENUM_COUNT); ++i)
             if(mMovement[i]) movement += DIR_VEC[i];
-        movement.normalize();
 
-        mEntity->addPosition(movement * mMoveSpeed * clock.getElapsedTime());
+        if(!movement.isZero())
+        {
+            movement.normalize();
+            mEntity->addPosition(movement * mMoveSpeed * clock.getElapsedTime());
+        }
     }
 
     // calculate orientation

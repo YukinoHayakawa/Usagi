@@ -13,8 +13,8 @@ class DynamicComponent
 {
     mutable Eigen::Affine3f mLocalToWorld;
     // todo: assert normalized quaternion
-    Eigen::Quaternionf mOrientation;
-    Eigen::Vector3f mPosition;
+    mutable Eigen::Quaternionf mOrientation = Eigen::Quaternionf::Identity();
+    Eigen::Vector3f mPosition = Eigen::Vector3f::Zero();
     mutable bool mDirtyMatrix = true;
 
     void _polluteMatrix()
@@ -72,6 +72,7 @@ public:
     {
         if(_isMatrixDirty())
         {
+            mOrientation.normalize();
             mLocalToWorld = Eigen::Translation3f(mPosition) * mOrientation.toRotationMatrix();
             _cleanMatrix();
         }

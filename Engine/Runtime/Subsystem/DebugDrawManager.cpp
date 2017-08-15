@@ -1,4 +1,5 @@
 ﻿#include <cassert>
+#include <eigen3/Eigen/Dense>
 #include <vectormath.h>
 
 #include <Usagi/Engine/Time/Clock.hpp>
@@ -11,6 +12,10 @@
 #include <Usagi/Engine/Runtime/GraphicsDevice/GDSampler.hpp>
 
 #include "DebugDrawManager.hpp"
+
+// todo remove
+extern Eigen::Affine3f gDdVpMatrix;
+
 
 namespace
 {
@@ -92,214 +97,15 @@ void main()
 }
 )";
 
+static const int windowWidth = 1280;
+static const int windowHeight = 720;
+
 // Angle in degrees to angle in radians for sin/cos/etc.
 static inline float degToRad(const float ang)
 {
     return ang * 3.1415926535897931f / 180.0f;
 }
 
-struct Keys
-{
-    // For the first-person camera controls.
-    bool wDown;
-    bool sDown;
-    bool aDown;
-    bool dDown;
-    // Flags:
-    bool showLabels; // True if object labels are drawn. Toggle with the space bar.
-    bool showGrid;   // True if the ground grid is drawn. Toggle with the return key.
-} keys;
-
-struct Mouse
-{
-    enum { MaxDelta = 100 };
-    int  deltaX;
-    int  deltaY;
-    int  lastPosX;
-    int  lastPosY;
-    bool leftButtonDown;
-    bool rightButtonDown;
-} mouse;
-
-struct Time
-{
-    float seconds;
-    long long milliseconds;
-} deltaTime;
-
-static const int windowWidth = 1280;
-static const int windowHeight = 720;
-
-struct Camera
-{
-    //
-    // Camera Axes:
-    //
-    //    (up)
-    //    +Y   +Z (forward)
-    //    |   /
-    //    |  /
-    //    | /
-    //    + ------ +X (right)
-    //  (eye)
-    //
-    Vector3 right;
-    Vector3 up;
-    Vector3 forward;
-    Vector3 eye;
-    Matrix4 viewMatrix;
-    Matrix4 projMatrix;
-    Matrix4 vpMatrix;
-
-    enum MoveDir
-    {
-        Forward, // Move forward relative to the camera's space
-        Back,    // Move backward relative to the camera's space
-        Left,    // Move left relative to the camera's space
-        Right    // Move right relative to the camera's space
-    };
-
-    Camera()
-    {
-        right = Vector3(1.0f, 0.0f, 0.0f);
-        up = Vector3(0.0f, 1.0f, 0.0f);
-        forward = Vector3(0.0f, 0.0f, 1.0f);
-        eye = Vector3(10, 10, 10);
-        viewMatrix = Matrix4::identity();
-        vpMatrix = Matrix4::identity();
-
-        const float fovY = degToRad(60.0f);
-        const float aspect = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
-        projMatrix = Matrix4::perspective(fovY, aspect, 0.1f, 1000.0f);
-    }
-
-    void pitch(const float angle)
-    {
-        // Pitches camera by 'angle' radians.
-        forward = rotateAroundAxis(forward, right, angle); // Calculate new forward.
-        up = cross(forward, right);                   // Calculate new camera up vector.
-    }
-
-    void rotate(const float angle)
-    {
-        // Rotates around world Y-axis by the given angle (in radians).
-        const float sinAng = std::sin(angle);
-        const float cosAng = std::cos(angle);
-        float xxx, zzz;
-
-        // Rotate forward vector:
-        xxx = forward[0];
-        zzz = forward[2];
-        forward[0] = xxx *  cosAng + zzz * sinAng;
-        forward[2] = xxx * -sinAng + zzz * cosAng;
-
-        // Rotate up vector:
-        xxx = up[0];
-        zzz = up[2];
-        up[0] = xxx *  cosAng + zzz * sinAng;
-        up[2] = xxx * -sinAng + zzz * cosAng;
-
-        // Rotate right vector:
-        xxx = right[0];
-        zzz = right[2];
-        right[0] = xxx *  cosAng + zzz * sinAng;
-        right[2] = xxx * -sinAng + zzz * cosAng;
-    }
-
-    void move(const MoveDir dir, const float amount)
-    {
-        switch(dir)
-        {
-            case Camera::Forward: eye += forward * amount; break;
-            case Camera::Back: eye -= forward * amount; break;
-            case Camera::Left: eye += right   * amount; break;
-            case Camera::Right: eye -= right   * amount; break;
-        }
-    }
-
-    void checkKeyboardMovement()
-    {
-        const float moveSpeed = 3.0f * deltaTime.seconds;
-        if(keys.aDown) { move(Camera::Left, moveSpeed); }
-        if(keys.dDown) { move(Camera::Right, moveSpeed); }
-        if(keys.wDown) { move(Camera::Forward, moveSpeed); }
-        if(keys.sDown) { move(Camera::Back, moveSpeed); }
-    }
-
-    void checkMouseRotation()
-    {
-        static const float maxAngle = 89.5f; // Max degrees of rotation
-        static float pitchAmt;
-
-        if(!mouse.leftButtonDown)
-        {
-            return;
-        }
-
-        const float rotateSpeed = 6.0f * deltaTime.seconds;
-
-        // Rotate left/right:
-        float amt = static_cast<float>(mouse.deltaX) * rotateSpeed;
-        rotate(degToRad(-amt));
-
-        // Calculate amount to rotate up/down:
-        amt = static_cast<float>(mouse.deltaY) * rotateSpeed;
-
-        // Clamp pitch amount:
-        if((pitchAmt + amt) <= -maxAngle)
-        {
-            amt = -maxAngle - pitchAmt;
-            pitchAmt = -maxAngle;
-        }
-        else if((pitchAmt + amt) >= maxAngle)
-        {
-            amt = maxAngle - pitchAmt;
-            pitchAmt = maxAngle;
-        }
-        else
-        {
-            pitchAmt += amt;
-        }
-
-        pitch(degToRad(-amt));
-    }
-
-    void updateMatrices()
-    {
-        viewMatrix = Matrix4::lookAt(Point3(eye), Point3(0, 0, 0), up);
-        vpMatrix = projMatrix * viewMatrix; // Vectormath lib uses column-major OGL style, so multiply P*V*M
-    }
-
-    Point3 getTarget() const
-    {
-        return Point3(eye[0] + forward[0], eye[1] + forward[1], eye[2] + forward[2]);
-    }
-
-    static Vector3 rotateAroundAxis(const Vector3 & vec, const Vector3 & axis, const float angle)
-    {
-        const float sinAng = std::sin(angle);
-        const float cosAng = std::cos(angle);
-        const float oneMinusCosAng = (1.0f - cosAng);
-
-        const float aX = axis[0];
-        const float aY = axis[1];
-        const float aZ = axis[2];
-
-        float x = (aX * aX * oneMinusCosAng + cosAng)      * vec[0] +
-            (aX * aY * oneMinusCosAng + aZ * sinAng) * vec[1] +
-            (aX * aZ * oneMinusCosAng - aY * sinAng) * vec[2];
-
-        float y = (aX * aY * oneMinusCosAng - aZ * sinAng) * vec[0] +
-            (aY * aY * oneMinusCosAng + cosAng)      * vec[1] +
-            (aY * aZ * oneMinusCosAng + aX * sinAng) * vec[2];
-
-        float z = (aX * aZ * oneMinusCosAng + aY * sinAng) * vec[0] +
-            (aY * aZ * oneMinusCosAng - aX * sinAng) * vec[1] +
-            (aZ * aZ * oneMinusCosAng + cosAng)      * vec[2];
-
-        return Vector3(x, y, z);
-    }
-} camera;
 
 static void drawGrid()
 {
@@ -539,14 +345,13 @@ void yuki::DebugDrawManager::render(GraphicsDevice &gd, const Clock &render_cloc
 {
     assert(&gd == mGraphicsDevice);
 
-    camera.updateMatrices();
     // todo remove
     drawGrid();
     drawMiscObjects();
     drawFrustum();
     drawText();
 
-    mLinePointConstantBuffer->setAttributeData(0, toFloatPtr(camera.vpMatrix));
+    mLinePointConstantBuffer->setAttributeData(0, gDdVpMatrix.data());
     // todo update from window upon resize events
     float scrdim[2] { windowWidth, windowHeight };
     mTextConstantBuffer->setAttributeData(0, scrdim);

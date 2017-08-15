@@ -33,7 +33,7 @@ namespace yuki
  * during binding. During its usage, only translational and rotational
  * components of the transformation of the entity will be preserved.
  * 
- * todo: this is an extremly simple impl of camera controller. improve the algorithm using books or other resources.
+ * todo: this is an extremely simple impl of camera controller. improve the algorithm using books or other resources.
  */
 class NoClipEntityController
     : public PermissiveAttachmentEntityController
@@ -41,7 +41,7 @@ class NoClipEntityController
 {
 protected:
     bool mMovement[static_cast<size_t>(Direction::ENUM_COUNT)] = { false };
-    float mMoveSpeed = 5.f; // m/s
+    float mMoveSpeed = 0.5f; // m/s
     float mRotationSpeed = 0.1f; // deg/pixel
     float mYaw; // rotation around world Y axis
     float mPitch; // rotation around local X axis

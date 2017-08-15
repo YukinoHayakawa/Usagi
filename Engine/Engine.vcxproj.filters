@@ -207,6 +207,9 @@
     <ClInclude Include="Extension\OpenGL\OpenGLContext.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Debugging\DebugKeyMouseEventListener.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Filesystem\Filesystem.cpp">
@@ -312,6 +315,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Win32\WGLContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\DebugKeyMouseEventListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
