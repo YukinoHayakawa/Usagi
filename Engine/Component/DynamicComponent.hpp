@@ -12,7 +12,6 @@ namespace yuki
 class DynamicComponent
 {
     mutable Eigen::Affine3f mLocalToWorld;
-    // todo: assert normalized quaternion
     mutable Eigen::Quaternionf mOrientation = Eigen::Quaternionf::Identity();
     Eigen::Vector3f mPosition = Eigen::Vector3f::Zero();
     mutable bool mDirtyMatrix = true;
@@ -56,6 +55,7 @@ public:
     }
 
     // orientation
+
     template <typename Rotation>
     void setOrientation(const Rotation &orientation)
     {
@@ -72,18 +72,13 @@ public:
 
     // scaling is not supported yet
 
+    // helpers
+
+    void lookAt(const Eigen::Vector3f &position, const Eigen::Vector3f &target, const Eigen::Vector3f &up);
+
     // affine matrix
 
-    Eigen::Affine3f getLocalToWorldTransform() const
-    {
-        if(_isMatrixDirty())
-        {
-            mOrientation.normalize();
-            mLocalToWorld = Eigen::Translation3f(mPosition) * mOrientation.toRotationMatrix();
-            _cleanMatrix();
-        }
-        return mLocalToWorld;
-    }
+    Eigen::Affine3f getLocalToWorldTransform() const;
 };
 
 }

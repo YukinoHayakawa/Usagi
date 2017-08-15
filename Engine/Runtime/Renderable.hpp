@@ -1,10 +1,9 @@
 ﻿#pragma once
 
+#include <memory>
+
 namespace yuki
 {
-
-class Clock;
-class GraphicsDevice;
 
 /**
  * \brief Issue drawing commands to a GraphicsDevice.
@@ -16,14 +15,17 @@ class GraphicsDevice;
  */
 class Renderable
 {
+protected:
+    std::shared_ptr<class GraphicsDevice> mGraphicsDevice;
+
 public:
+    Renderable(std::shared_ptr<GraphicsDevice> graphics_device);
     virtual ~Renderable() = default;
 
     /**
      * \brief Setup rendering pipeline and issue rendering commands.
-     * \param gd GraphicsDevice instance.
      */
-    virtual void render(GraphicsDevice &gd, const Clock &render_clock) = 0;
+    virtual void render(const class Clock &render_clock) = 0;
 };
 
 }

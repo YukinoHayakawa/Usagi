@@ -27,14 +27,15 @@ void main(){
 
 }
 
-yuki::DebugFullscreenTriangle::DebugFullscreenTriangle(GraphicsDevice &gd)
+yuki::DebugFullscreenTriangle::DebugFullscreenTriangle(std::shared_ptr<GraphicsDevice> graphics_device)
+    : Renderable { std::move(graphics_device) }
 {
-    mPipeline = gd.createPipeline();
+    mPipeline = mGraphicsDevice->createPipeline();
     mPipeline->vpSetVertexInputFormat({
         { 0, 0, 0, NativeDataType::FLOAT, 3, false }, // vertexPosition_modelspace
     });
     {
-        auto vb = gd.createVertexBuffer();
+        auto vb = mGraphicsDevice->createVertexBuffer();
         vb->initStorage(3, sizeof(float) * 3);
         static const float vertex_buffer_data[] = {
             -1.0f, -1.0f, 0.0f,
@@ -45,21 +46,21 @@ yuki::DebugFullscreenTriangle::DebugFullscreenTriangle(GraphicsDevice &gd)
         mPipeline->vpBindVertexBuffer(0, std::move(vb));
     }
     {
-        auto vs = gd.createVertexShader();
+        auto vs = mGraphicsDevice->createVertexShader();
         vs->useSourceString(triangle_vs);
         vs->compile();
         mPipeline->vsUseVertexShader(std::move(vs));
     }
     {
-        auto fs = gd.createFragmentShader();
+        auto fs = mGraphicsDevice->createFragmentShader();
         fs->useSourceString(triangle_fs);
         fs->compile();
         mPipeline->fsUseFragmentShader(std::move(fs));
     }
 }
 
-void yuki::DebugFullscreenTriangle::render(GraphicsDevice &gd, const Clock &render_clock)
+void yuki::DebugFullscreenTriangle::render(const Clock &render_clock)
 {
     mPipeline->assemble();
-    gd.drawTriangles(0, 3);
+    mGraphicsDevice->drawTriangles(0, 3);
 }

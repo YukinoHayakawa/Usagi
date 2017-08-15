@@ -112,6 +112,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera\PerspectiveCamera.hpp" />
     <ClInclude Include="Component\Component.hpp" />
     <ClInclude Include="Debugging\DebugKeyMouseEventListener.hpp" />
     <ClInclude Include="Entity\Controller\EntityController.hpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="Component\TimeVariantComponent.hpp" />
     <ClInclude Include="Extension\Extension.hpp" />
     <ClInclude Include="Extension\Win32\WindowsHeader.hpp" />
+    <ClInclude Include="Geometry\Angle.hpp" />
     <ClInclude Include="Geometry\Bound.hpp" />
     <ClInclude Include="Component\DynamicComponent.hpp" />
     <ClInclude Include="Geometry\Direction.hpp" />
@@ -132,6 +134,7 @@
     <ClInclude Include="Filesystem\Filesystem.hpp" />
     <ClInclude Include="Extension\GTA\GTA3IMGv2Filesystem.hpp" />
     <ClInclude Include="Camera\Camera.hpp" />
+    <ClInclude Include="Geometry\Transform.hpp" />
     <ClInclude Include="Renderer\Renderer.hpp" />
     <ClInclude Include="Scene\Entity.hpp" />
     <ClInclude Include="Time\Clock.hpp" />
@@ -179,10 +182,13 @@
     <ClInclude Include="World\Geometry\Geometry.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera\PerspectiveCamera.cpp" />
+    <ClCompile Include="Component\DynamicComponent.cpp" />
     <ClCompile Include="Debugging\DebugKeyMouseEventListener.cpp" />
     <ClCompile Include="Entity\Controller\NoClipEntityController.cpp" />
     <ClCompile Include="Entity\Controller\Attachment\PermissiveAttachmentEntityController.cpp" />
     <ClCompile Include="Component\InteractiveComponent.cpp" />
+    <ClCompile Include="Geometry\Angle.cpp" />
     <ClCompile Include="Geometry\Bound.cpp" />
     <ClCompile Include="Geometry\Intersection.cpp" />
     <ClCompile Include="Geometry\Ray.cpp" />

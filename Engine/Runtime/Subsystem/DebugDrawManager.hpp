@@ -2,7 +2,6 @@
 
 #include <debug-draw/debug_draw.hpp>
 #include <vector>
-#include <memory>
 
 #include <Usagi/Engine/Runtime/Renderable.hpp>
 
@@ -11,7 +10,7 @@ namespace yuki
 
 class DebugDrawManager : public Renderable, public dd::RenderInterface
 {
-    GraphicsDevice *mGraphicsDevice;
+    std::shared_ptr<class Camera> mCamera;
     std::vector<std::shared_ptr<class GDTexture>> mTextures;
     std::shared_ptr<class GDPipeline> mLinePointPipeline, mTextPipeline;
     std::shared_ptr<class VertexBuffer> mLinePointVertexBuffer, mTextVertexBuffer;
@@ -19,10 +18,10 @@ class DebugDrawManager : public Renderable, public dd::RenderInterface
     std::shared_ptr<class GDSampler> mDefaultSampler;
 
 public:
-    DebugDrawManager(GraphicsDevice &gd);
+    DebugDrawManager(std::shared_ptr<GraphicsDevice> graphics_device, std::shared_ptr<Camera> camera);
     ~DebugDrawManager() override;
 
-    void render(GraphicsDevice &gd, const Clock &render_clock) override;
+    void render(const Clock &render_clock) override;
 
     dd::GlyphTextureHandle createGlyphTexture(int width, int height, const void *pixels) override;
     void destroyGlyphTexture(dd::GlyphTextureHandle glyphTex) override;

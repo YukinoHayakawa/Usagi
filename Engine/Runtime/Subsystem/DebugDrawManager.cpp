@@ -1,5 +1,4 @@
 ﻿#include <cassert>
-#include <eigen3/Eigen/Dense>
 #include <vectormath.h>
 
 #include <Usagi/Engine/Time/Clock.hpp>
@@ -10,12 +9,10 @@
 #include <Usagi/Engine/Runtime/GraphicsDevice/Shader.hpp>
 #include <Usagi/Engine/Runtime/GraphicsDevice/ConstantBuffer.hpp>
 #include <Usagi/Engine/Runtime/GraphicsDevice/GDSampler.hpp>
+#include <Usagi/Engine/Geometry/Angle.hpp>
+#include <Usagi/Engine/Camera/Camera.hpp>
 
 #include "DebugDrawManager.hpp"
-
-// todo remove
-extern Eigen::Affine3f gDdVpMatrix;
-
 
 namespace
 {
@@ -97,15 +94,9 @@ void main()
 }
 )";
 
+// todo get from window
 static const int windowWidth = 1280;
 static const int windowHeight = 720;
-
-// Angle in degrees to angle in radians for sin/cos/etc.
-static inline float degToRad(const float ang)
-{
-    return ang * 3.1415926535897931f / 180.0f;
-}
-
 
 static void drawGrid()
 {
@@ -225,7 +216,7 @@ static void drawFrustum()
     drawLabel(origin, "frustum + axes");
 
     // The frustum will depict a fake camera:
-    const Matrix4 proj = Matrix4::perspective(degToRad(45.0f), 800.0f / 600.0f, 0.5f, 4.0f);
+    const Matrix4 proj = Matrix4::perspective(yuki::Degrees(45.0f).toRadians(), 800.0f / 600.0f, 0.5f, 4.0f);
     const Matrix4 view = Matrix4::lookAt(Point3(-8.0f, 0.5f, 14.0f), Point3(-8.0f, 0.5f, -14.0f), Vector3::yAxis());
     const Matrix4 clip = inverse(proj * view);
     dd::frustum(toFloatPtr(clip), color);
@@ -235,7 +226,7 @@ static void drawFrustum()
     dd::point(origin, white, 15.0f);
 
     // A set of arrows at the camera's origin/eye:
-    const Matrix4 transform = Matrix4::translation(Vector3(-8.0f, 0.5f, 14.0f)) * Matrix4::rotationZ(degToRad(60.0f));
+    const Matrix4 transform = Matrix4::translation(Vector3(-8.0f, 0.5f, 14.0f)) * Matrix4::rotationZ(yuki::Degrees(60.f).toRadians());
     dd::axisTriad(toFloatPtr(transform), 0.3f, 2.0f);
 }
 
@@ -252,37 +243,38 @@ static void drawText()
 
 }
 
-yuki::DebugDrawManager::DebugDrawManager(GraphicsDevice &gd)
-    : mGraphicsDevice { &gd }
+yuki::DebugDrawManager::DebugDrawManager(std::shared_ptr<GraphicsDevice> graphics_device, std::shared_ptr<Camera> camera)
+    : Renderable { std::move(graphics_device) }
+    , mCamera { std::move(camera) }
 {
     /*
      * Line and point rendering
      */
 
-    mLinePointVertexBuffer = gd.createVertexBuffer();
+    mLinePointVertexBuffer = mGraphicsDevice->createVertexBuffer();
     mLinePointVertexBuffer->initStorage(DEBUG_DRAW_VERTEX_BUFFER_SIZE, sizeof(dd::DrawVertex));
 
-    mLinePointPipeline = gd.createPipeline();
+    mLinePointPipeline = mGraphicsDevice->createPipeline();
     mLinePointPipeline->vpSetVertexInputFormat({
         { 0, 0, 0, NativeDataType::FLOAT, 3, false }, // in_Position
         { 1, 0, 3 * sizeof(float), NativeDataType::FLOAT, 4, false }, // in_ColorPointSize
     });
     mLinePointPipeline->vpBindVertexBuffer(0, mLinePointVertexBuffer);
     {
-        auto vs = gd.createVertexShader();
+        auto vs = mGraphicsDevice->createVertexShader();
         vs->useSourceString(lpvs);
         vs->compile();
         mLinePointPipeline->vsUseVertexShader(std::move(vs));
     }
     mLinePointPipeline->rsSetFaceCulling(GDPipeline::FaceCullingType::FRONT);
     {
-        auto fs = gd.createFragmentShader();
+        auto fs = mGraphicsDevice->createFragmentShader();
         fs->useSourceString(lpfs);
         fs->compile();
         mLinePointPipeline->fsUseFragmentShader(std::move(fs));
     }
 
-    mLinePointConstantBuffer = gd.createConstantBuffer();
+    mLinePointConstantBuffer = mGraphicsDevice->createConstantBuffer();
     mLinePointConstantBuffer->setAttributeFormat({
         { ShaderDataType::MATRIX4, 1 }, // u_MvpMatrix
     });
@@ -292,10 +284,10 @@ yuki::DebugDrawManager::DebugDrawManager(GraphicsDevice &gd)
      * Text rendering
      */
 
-    mTextVertexBuffer = gd.createVertexBuffer();
+    mTextVertexBuffer = mGraphicsDevice->createVertexBuffer();
     mTextVertexBuffer->initStorage(DEBUG_DRAW_VERTEX_BUFFER_SIZE, sizeof(dd::DrawVertex));
 
-    mTextPipeline = gd.createPipeline();
+    mTextPipeline = mGraphicsDevice->createPipeline();
     mTextPipeline->vpSetVertexInputFormat({
         { 0, 0, 0, NativeDataType::FLOAT, 2, false }, // in_Position
         { 1, 0, 2 * sizeof(float), NativeDataType::FLOAT, 2, false }, // in_TexCoords
@@ -303,13 +295,13 @@ yuki::DebugDrawManager::DebugDrawManager(GraphicsDevice &gd)
     });
     mTextPipeline->vpBindVertexBuffer(0, mTextVertexBuffer);
     {
-        auto vs = gd.createVertexShader();
+        auto vs = mGraphicsDevice->createVertexShader();
         vs->useSourceString(tvs);
         vs->compile();
         mTextPipeline->vsUseVertexShader(std::move(vs));
     }
     {
-        auto fs = gd.createFragmentShader();
+        auto fs = mGraphicsDevice->createFragmentShader();
         fs->useSourceString(tfs);
         fs->compile();
         mTextPipeline->fsUseFragmentShader(std::move(fs));
@@ -319,13 +311,13 @@ yuki::DebugDrawManager::DebugDrawManager(GraphicsDevice &gd)
     mTextPipeline->bldSetSrcFactor(GDPipeline::BlendingFactor::SOURCE_ALPHA);
     mTextPipeline->bldSetDestFactor(GDPipeline::BlendingFactor::INV_SOURCE_ALPHA);
 
-    mTextConstantBuffer = gd.createConstantBuffer();
+    mTextConstantBuffer = mGraphicsDevice->createConstantBuffer();
     mTextConstantBuffer->setAttributeFormat({
         { ShaderDataType::VECTOR2, 1 }, // u_screenDimensions
     });
     mTextPipeline->vsBindConstantBuffer(0, mTextConstantBuffer);
 
-    mDefaultSampler = gd.createSampler();
+    mDefaultSampler = mGraphicsDevice->createSampler();
     mDefaultSampler->setFilter(GDSampler::FilterType::LINEAR, GDSampler::FilterType::NEAREST);
     mDefaultSampler->setTextureWrapping(GDSampler::TextureWrapping::CLAMP_TO_EDGE, GDSampler::TextureWrapping::CLAMP_TO_EDGE);
     mTextPipeline->fsBindSampler(0, mDefaultSampler);
@@ -341,17 +333,17 @@ yuki::DebugDrawManager::~DebugDrawManager()
     dd::shutdown();
 }
 
-void yuki::DebugDrawManager::render(GraphicsDevice &gd, const Clock &render_clock)
+void yuki::DebugDrawManager::render(const Clock &render_clock)
 {
-    assert(&gd == mGraphicsDevice);
-
     // todo remove
     drawGrid();
     drawMiscObjects();
     drawFrustum();
     drawText();
 
-    mLinePointConstantBuffer->setAttributeData(0, gDdVpMatrix.data());
+    auto pvMat = mCamera->getProjectionMatrix() * mCamera->getLocalToWorldTransform().inverse().matrix();
+
+    mLinePointConstantBuffer->setAttributeData(0, pvMat.data());
     // todo update from window upon resize events
     float scrdim[2] { windowWidth, windowHeight };
     mTextConstantBuffer->setAttributeData(0, scrdim);
