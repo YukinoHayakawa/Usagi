@@ -67,6 +67,12 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
     SetWindowLongPtr(mWindowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
     SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 
+    RECT window_rect;
+    GetClientRect(mWindowHandle, &window_rect);
+    SetCursorPos(
+        (window_rect.left + window_rect.right) / 2,
+        (window_rect.top + window_rect.bottom) / 2
+    );
     mMouseCursorLastPos = Win32Window::getMouseCursorWindowPos();
 }
 
