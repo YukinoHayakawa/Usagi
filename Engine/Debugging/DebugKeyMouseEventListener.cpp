@@ -11,7 +11,7 @@ void yuki::DebugKeyMouseEventListener::onKeyStateChange(const KeyEvent &e)
 
 void yuki::DebugKeyMouseEventListener::onMouseMove(const yuki::MousePositionEvent &e)
 {
-    std::cout << "mouse pos " << e.cursorWindowPos.transpose() << " delta " << e.cursorPosDelta.transpose() << std::endl;
+    std::cout << "mouse pos delta " << e.cursorPosDelta.transpose() << std::endl;
 }
 
 void yuki::DebugKeyMouseEventListener::onMouseButtonStateChange(const yuki::MouseButtonEvent &e)

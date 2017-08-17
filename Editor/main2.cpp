@@ -6,6 +6,7 @@
 #include <Usagi/Engine/Camera/PerspectiveCamera.hpp>
 // dirty one last
 #include <Usagi/Engine/Extension/Win32/Win32Window.hpp>
+#include <Usagi/Engine/Debugging/DebugKeyMouseEventListener.hpp>
 
 static const int windowWidth = 1280;
 static const int windowHeight = 720;
@@ -31,9 +32,13 @@ int main(int argc, char *argv[])
         window->addMouseEventListener(camman);
         window->addKeyEventListener(camman);
 
+        auto mousedebug = std::make_shared<DebugKeyMouseEventListener>();
+        window->addMouseEventListener(mousedebug);
+
+
         DebugDrawManager debug_draw_manager(device, camera);
 
-        window->show();
+        window->showWindow(true);
         device->setContextCurrent();
 
         Clock master_clock;

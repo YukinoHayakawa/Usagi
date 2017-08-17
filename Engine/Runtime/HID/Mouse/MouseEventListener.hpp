@@ -9,13 +9,12 @@ namespace yuki
 
 struct MouseEvent
 {
-    // the origin is the upper-left corner of the window's drawing area
-    Eigen::Vector2f cursorWindowPos;
+    class Mouse *mouse = nullptr;
 };
 
 struct MousePositionEvent : MouseEvent
 {
-    Eigen::Vector2f cursorPosDelta;
+    Eigen::Vector2f cursorPosDelta = Eigen::Vector2f::Zero();
 };
 
 struct MouseButtonEvent : MouseEvent

@@ -3,7 +3,7 @@
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Runtime/HID/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
-#include <Usagi/Engine/Extension/Win32/WindowsHeader.hpp>
+#include "WindowsHeader.hpp"
 
 namespace yuki
 {
@@ -18,22 +18,39 @@ class Win32Window
     static const wchar_t mWindowClassName[];
     static HINSTANCE mProcessInstanceHandle;
 
+    // window
+
     HWND mWindowHandle = nullptr;
+    bool mWindowActive = false;
+    Eigen::Vector2i mWindowSize;
 
-    Eigen::Vector2f mMouseCursorLastPos;
-
-    /**
-    * \brief Initialize the window subsystem.
-    */
     static void _ensureWindowSubsystemInitialized();
+    RECT _getClientScreenRect() const;
+
+    void _createWindowHandle(const std::string &title, int width, int height);
+    void _registerRawInputDevices() const;
 
     static LRESULT CALLBACK _windowMessageDispatcher(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     LRESULT _handleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-    static Eigen::Vector2f _parseMousePos(LPARAM lParam);
-    void _sendButtonEvent(MouseButtonCode button, bool pressed, LPARAM lParam);
+
+    // raw input
+
+    std::unique_ptr<BYTE[]> _getRawInputBuffer(LPARAM lParam) const;
+
+    // mouse
+    
+    bool mMouseCursorCaptured = false;
+
+    static Eigen::Vector2i _parseMousePos(LPARAM lParam);
+    void _sendButtonEvent(MouseButtonCode button, bool pressed);
+
+    // keyboard
+
     static KeyCode _translateKeyCodeFromMessage(WPARAM vkey, LPARAM lParam);
     static int _translateKeyCodeToNative(KeyCode key);
     void _sendKeyEvent(WPARAM wParam, LPARAM lParam, bool pressed, bool repeated);
+    void _confineCursorInClientArea() const;
+    void _processMouseInput(const RAWINPUT *raw);
 
     // GetKeyState does not distinguish between them, so we manually record their states
     bool mEnterPressed = false, mNumEnterPressed = false;
@@ -47,14 +64,25 @@ public:
      */
     Win32Window(const std::string &title, int width, int height);
 
+    // window
+
     HDC getDeviceContext() const;
 
-    void show() override;
-    void hide() override;
+    void showWindow(bool show) override;
     void processEvents() override;
 
-    bool isKeyPressed(KeyCode key) override;
+    // mouse
+
     Eigen::Vector2f getMouseCursorWindowPos() override;
+    void captureCursor() override;
+    void releaseCursor() override;
+    bool isCursorCaptured() override;
+    void centerCursor() override;
+    void showCursor(bool show) override;
+
+    // keyboard
+
+    bool isKeyPressed(KeyCode key) override;
 };
 
 }

@@ -7,6 +7,7 @@
 #include "Win32Window.hpp"
 #include <ShellScalingAPI.h>
 #include <Windowsx.h>
+#include <Strsafe.h>
 
 const wchar_t yuki::Win32Window::mWindowClassName[] = L"UsagiNativeWindowWrapper";
 HINSTANCE yuki::Win32Window::mProcessInstanceHandle = nullptr;
@@ -39,19 +40,47 @@ void yuki::Win32Window::_ensureWindowSubsystemInitialized()
     }
 }
 
-yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
+RECT yuki::Win32Window::_getClientScreenRect() const
 {
-    _ensureWindowSubsystemInitialized();
+    // Get the window client area.
+    RECT rc;
+    GetClientRect(mWindowHandle, &rc);
 
+    POINT pt = { rc.left, rc.top };
+    POINT pt2 = { rc.right, rc.bottom };
+    ClientToScreen(mWindowHandle, &pt);
+    ClientToScreen(mWindowHandle, &pt2);
+
+    rc.left = pt.x;
+    rc.top = pt.y;
+    rc.right = pt2.x;
+    rc.bottom = pt2.y;
+
+    return rc;
+}
+
+void yuki::Win32Window::_createWindowHandle(const std::string &title, int width, int height)
+{
     auto windowTitleWide = string::toWideVector(title);
+    // todo update after resizing
+    mWindowSize = { width, height };
+
+    static constexpr DWORD window_style = WS_OVERLAPPEDWINDOW;
+    static constexpr DWORD window_style_ex = WS_EX_ACCEPTFILES;
+
+    RECT window_rect = { 0 };
+    window_rect.bottom = height;
+    window_rect.right = width;
+    AdjustWindowRectEx(&window_rect, window_style, FALSE, window_style_ex);
 
     mWindowHandle = CreateWindowEx(
-        WS_EX_ACCEPTFILES,
+        window_style_ex,
         mWindowClassName,
         &windowTitleWide[0],
-        WS_OVERLAPPEDWINDOW,
+        window_style,
         CW_USEDEFAULT, CW_USEDEFAULT,
-        width, height,
+        window_rect.right - window_rect.left, // width
+        window_rect.bottom - window_rect.top, // height
         nullptr,
         nullptr,
         mProcessInstanceHandle,
@@ -66,14 +95,37 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
     // associate the class instance with the window so they can be identified in WindowProc
     SetWindowLongPtr(mWindowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
     SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+}
 
-    RECT window_rect;
-    GetClientRect(mWindowHandle, &window_rect);
-    SetCursorPos(
-        (window_rect.left + window_rect.right) / 2,
-        (window_rect.top + window_rect.bottom) / 2
-    );
-    mMouseCursorLastPos = Win32Window::getMouseCursorWindowPos();
+void yuki::Win32Window::_registerRawInputDevices() const
+{
+    RAWINPUTDEVICE Rid[2];
+
+    Rid[0].usUsagePage = 0x01;
+    Rid[0].usUsage = 0x02;
+    Rid[0].dwFlags = 0; // RIDEV_NOLEGACY;   // adds HID mouse and also ignores legacy mouse messages
+    Rid[0].hwndTarget = 0;
+
+    Rid[1].usUsagePage = 0x01;
+    Rid[1].usUsage = 0x06;
+    Rid[1].dwFlags = 0; // RIDEV_NOLEGACY;   // adds HID keyboard and also ignores legacy keyboard messages
+    Rid[1].hwndTarget = mWindowHandle;
+
+    if(RegisterRawInputDevices(Rid, 2, sizeof(Rid[0])) == FALSE)
+    {
+        //registration failed. Call GetLastError for the cause of the error
+        throw std::runtime_error("RegisterRawInputDevices() failed");
+    }
+}
+
+yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
+{
+    _ensureWindowSubsystemInitialized();
+    _createWindowHandle(title, width, height);
+
+    Win32Window::centerCursor();
+
+    _registerRawInputDevices();
 }
 
 HDC yuki::Win32Window::getDeviceContext() const
@@ -81,14 +133,9 @@ HDC yuki::Win32Window::getDeviceContext() const
     return GetDC(mWindowHandle);
 }
 
-void yuki::Win32Window::show()
+void yuki::Win32Window::showWindow(bool show)
 {
-    ShowWindow(mWindowHandle, SW_SHOWNORMAL);
-}
-
-void yuki::Win32Window::hide()
-{
-    ShowWindow(mWindowHandle, SW_HIDE);
+    ShowWindow(mWindowHandle, show ? SW_SHOWNORMAL : SW_HIDE);
 }
 
 void yuki::Win32Window::processEvents()
@@ -113,17 +160,17 @@ LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message, WPA
     return window->_handleWindowMessage(hWnd, message, wParam, lParam);
 }
 
-Eigen::Vector2f yuki::Win32Window::_parseMousePos(LPARAM lParam)
+Eigen::Vector2i yuki::Win32Window::_parseMousePos(LPARAM lParam)
 {
     auto xPos = GET_X_LPARAM(lParam);
     auto yPos = GET_Y_LPARAM(lParam);
     return { xPos, yPos };
 }
 
-void yuki::Win32Window::_sendButtonEvent(yuki::MouseButtonCode button, bool pressed, LPARAM lParam)
+void yuki::Win32Window::_sendButtonEvent(yuki::MouseButtonCode button, bool pressed)
 {
     MouseButtonEvent e;
-    e.cursorWindowPos = _parseMousePos(lParam);
+    e.mouse = this;
     e.button = button;
     e.pressed = pressed;
     for(auto &&h : mMouseEventListeners)
@@ -380,63 +427,131 @@ void yuki::Win32Window::_sendKeyEvent(WPARAM wParam, LPARAM lParam, bool pressed
     }
 }
 
+void yuki::Win32Window::_confineCursorInClientArea() const
+{
+    RECT client_rect = _getClientScreenRect();
+    ClipCursor(&client_rect);
+}
+
+void yuki::Win32Window::_processMouseInput(const RAWINPUT *raw)
+{
+    TCHAR szTempOutput[1024];
+
+    auto &mouse = raw->data.mouse;
+    StringCchPrintf(szTempOutput, 1024, TEXT("Mouse: usFlags=%04x ulButtons=%04x usButtonFlags=%04x usButtonData=%04x ulRawButtons=%04x lLastX=%04x lLastY=%04x ulExtraInformation=%04x\r\n"),
+        raw->data.mouse.usFlags,
+        raw->data.mouse.ulButtons,
+        raw->data.mouse.usButtonFlags,
+        raw->data.mouse.usButtonData,
+        raw->data.mouse.ulRawButtons,
+        raw->data.mouse.lLastX,
+        raw->data.mouse.lLastY,
+        raw->data.mouse.ulExtraInformation);
+    OutputDebugString(szTempOutput);
+
+    // only receive relative movement. note that the mouse driver typically won't generate
+    // mouse input data based on absolute data.
+    // see https://stackoverflow.com/questions/14113303/raw-input-device-rawmouse-usage
+    if(mouse.usFlags != MOUSE_MOVE_RELATIVE) return;
+
+    // process mouse movement
+    if(mouse.lLastX || mouse.lLastY)
+    {
+        MousePositionEvent e;
+        e.mouse = this;
+        e.cursorPosDelta = { mouse.lLastX, mouse.lLastY };
+        for(auto &&h : mMouseEventListeners)
+        {
+            h->onMouseMove(e);
+        }
+    }
+    // proces mouse buttons & scrolling
+    if(mouse.usButtonFlags)
+    {
+#define _MOUSE_BTN_EVENT(button) \
+    if(mouse.usButtonFlags & RI_MOUSE_##button##_BUTTON_DOWN) \
+        _sendButtonEvent(MouseButtonCode::button, true); \
+    else if(mouse.usButtonFlags & RI_MOUSE_##button##_BUTTON_UP) \
+        _sendButtonEvent(MouseButtonCode::button, false) \
+/**/
+        // todo send mouse button up events when the window is deactivated
+        _MOUSE_BTN_EVENT(LEFT);
+        _MOUSE_BTN_EVENT(MIDDLE);
+        _MOUSE_BTN_EVENT(RIGHT);
+        // ignore other buttons
+#undef _MOUSE_BTN_EVENT
+
+        // process scrolling
+        if(mouse.usButtonFlags & RI_MOUSE_WHEEL)
+        {
+            MouseWheelEvent e;
+            e.mouse = this;
+            e.distance = static_cast<short>(mouse.usButtonData);
+            for(auto &&h : mMouseEventListeners)
+            {
+                h->onMouseWheelScroll(e);
+            }
+        }
+    }
+}
+
+std::unique_ptr<BYTE[]> yuki::Win32Window::_getRawInputBuffer(LPARAM lParam) const
+{
+    UINT dwSize;
+
+    // fetch raw input data
+    GetRawInputData(
+        reinterpret_cast<HRAWINPUT>(lParam),
+        RID_INPUT,
+        nullptr,
+        &dwSize,
+        sizeof(RAWINPUTHEADER)
+    );
+    std::unique_ptr<BYTE[]> lpb(new BYTE[dwSize]);
+    if(GetRawInputData(
+        reinterpret_cast<HRAWINPUT>(lParam),
+        RID_INPUT,
+        lpb.get(),
+        &dwSize,
+        sizeof(RAWINPUTHEADER)
+    ) != dwSize)
+        throw std::runtime_error("GetRawInputData does not return correct size!");
+
+    return std::move(lpb);
+}
+
 LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch(message)
     {
-        // mouse buttons
-        case WM_LBUTTONDOWN:
+        // unbuffered raw input data
+        case WM_INPUT:
         {
-            _sendButtonEvent(MouseButtonCode::LEFT, true, lParam);
-            break;
-        }
-        case WM_LBUTTONUP:
-        {
-            _sendButtonEvent(MouseButtonCode::LEFT, false, lParam);
-            break;
-        }
-        case WM_MBUTTONDOWN:
-        {
-            _sendButtonEvent(MouseButtonCode::MIDDLE, true, lParam);
-            break;
-        }
-        case WM_MBUTTONUP:
-        {
-            _sendButtonEvent(MouseButtonCode::MIDDLE, false, lParam);
-            break;
-        }
-        case WM_RBUTTONDOWN:
-        {
-            _sendButtonEvent(MouseButtonCode::RIGHT, true, lParam);
-            break;
-        }
-        case WM_RBUTTONUP:
-        {
-            _sendButtonEvent(MouseButtonCode::RIGHT, false, lParam);
-            break;
-        }
-        // mouse movement
-        case WM_MOUSEMOVE:
-        {
-            MousePositionEvent e;
-            e.cursorWindowPos = _parseMousePos(lParam);
-            e.cursorPosDelta = e.cursorWindowPos - mMouseCursorLastPos;
-            mMouseCursorLastPos = e.cursorWindowPos;
-            for(auto &&h : mMouseEventListeners)
+            TCHAR szTempOutput[1024];
+
+            std::unique_ptr<BYTE[]> lpb = _getRawInputBuffer(lParam);
+            RAWINPUT *raw = reinterpret_cast<RAWINPUT*>(lpb.get());
+
+            switch(raw->header.dwType)
             {
-                h->onMouseMove(e);
-            }
-            break;
-        }
-        // mouse wheel
-        case WM_MOUSEWHEEL:
-        {
-            MouseWheelEvent e;
-            e.cursorWindowPos = _parseMousePos(lParam);
-            e.distance = GET_WHEEL_DELTA_WPARAM(wParam);
-            for(auto &&h : mMouseEventListeners)
-            {
-                h->onMouseWheelScroll(e);
+                case RIM_TYPEKEYBOARD:
+                {
+                    StringCchPrintf(szTempOutput, 1024, TEXT(" Kbd: make=%04x Flags:%04x Reserved:%04x ExtraInformation:%08x, msg=%04x VK=%04x \n"),
+                        raw->data.keyboard.MakeCode,
+                        raw->data.keyboard.Flags,
+                        raw->data.keyboard.Reserved,
+                        raw->data.keyboard.ExtraInformation,
+                        raw->data.keyboard.Message,
+                        raw->data.keyboard.VKey);
+                    OutputDebugString(szTempOutput);
+                    break;
+                }
+                case RIM_TYPEMOUSE:
+                {
+                    _processMouseInput(raw);
+                    break;
+                }
+                default: break;
             }
             break;
         }
@@ -455,6 +570,19 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
             break;
         }
         // window management
+        case WM_ACTIVATEAPP:
+        {
+            mWindowActive = wParam == TRUE;
+            if(mMouseCursorCaptured) captureCursor();
+            break;
+        }
+        // todo: sent resize/move events
+        case WM_SIZE:
+        case WM_MOVE:
+        {
+            _confineCursorInClientArea();
+            break;
+        }
         case WM_DESTROY:
         {
             // todo: fix the message loop does not exit after closing the window
@@ -480,4 +608,38 @@ Eigen::Vector2f yuki::Win32Window::getMouseCursorWindowPos()
     GetCursorPos(&pt);
     ScreenToClient(mWindowHandle, &pt);
     return { pt.x, pt.y };
+}
+
+void yuki::Win32Window::captureCursor()
+{
+    _confineCursorInClientArea();
+
+    mMouseCursorCaptured = true;
+}
+
+void yuki::Win32Window::releaseCursor()
+{
+    // remove cursor restriction
+    ClipCursor(nullptr);
+    mMouseCursorCaptured = false;
+}
+
+bool yuki::Win32Window::isCursorCaptured()
+{
+    return mMouseCursorCaptured;
+}
+
+void yuki::Win32Window::centerCursor()
+{
+    auto rect = _getClientScreenRect();
+    Eigen::Vector2i cursor {
+        (rect.left + rect.right) / 2,
+        (rect.top + rect.bottom) / 2
+    };
+    SetCursorPos(cursor.x(), cursor.y());
+}
+
+void yuki::Win32Window::showCursor(bool show)
+{
+    ShowCursor(show);
 }
