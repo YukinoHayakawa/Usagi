@@ -6,7 +6,6 @@
 // include dirty windows headers at last
 #include "Win32Window.hpp"
 #include <ShellScalingAPI.h>
-#include <Strsafe.h>
 
 const wchar_t yuki::Win32Window::mWindowClassName[] = L"UsagiNativeWindowWrapper";
 HINSTANCE yuki::Win32Window::mProcessInstanceHandle = nullptr;
@@ -100,15 +99,21 @@ void yuki::Win32Window::_registerRawInputDevices() const
 {
     RAWINPUTDEVICE Rid[2];
 
+    // adds HID mouse, RIDEV_NOLEGACY is not used because we need the system to process non-client area.
     Rid[0].usUsagePage = 0x01;
     Rid[0].usUsage = 0x02;
-    Rid[0].dwFlags = 0; // RIDEV_NOLEGACY;   // adds HID mouse and also ignores legacy mouse messages
+    Rid[0].dwFlags = 0;
     Rid[0].hwndTarget = 0;
 
+    // adds HID keyboard, RIDEV_NOLEGACY is not used to allow the system process hotkeys like
+    // print screen. note that alt+f4 is not handled if related key messages not passed to
+    // DefWindowProc().
     Rid[1].usUsagePage = 0x01;
     Rid[1].usUsage = 0x06;
-    Rid[1].dwFlags = 0; // RIDEV_NOLEGACY;   // adds HID keyboard and also ignores legacy keyboard messages
-    Rid[1].hwndTarget = mWindowHandle;
+    // interestingly, RIDEV_NOHOTKEYS will prevent the explorer from using the fancy window-choosing
+    // popup, and we still receive key events when switching window, so it is not used here.
+    Rid[1].dwFlags = 0;
+    Rid[1].hwndTarget = 0;
 
     if(RegisterRawInputDevices(Rid, 2, sizeof(Rid[0])) == FALSE)
     {
@@ -180,9 +185,9 @@ void yuki::Win32Window::_sendButtonEvent(yuki::MouseButtonCode button, bool pres
     }
 }
 
-yuki::KeyCode yuki::Win32Window::_translateKeyCodeFromMessage(WPARAM vkey, LPARAM lParam)
+yuki::KeyCode yuki::Win32Window::_translateKeyCodeFromRawInput(const RAWKEYBOARD *keyboard)
 {
-    switch(vkey)
+    switch(keyboard->VKey)
     {
         case VK_BACK: return KeyCode::BACKSPACE;
         case VK_TAB: return KeyCode::TAB;
@@ -280,148 +285,29 @@ yuki::KeyCode yuki::Win32Window::_translateKeyCodeFromMessage(WPARAM vkey, LPARA
         case VK_OEM_5: return KeyCode::BACKSLASH;
         case VK_OEM_6: return KeyCode::RIGHT_BRACKET;
         case VK_OEM_7: return KeyCode::QUOTE;
-        case VK_SHIFT: case VK_CONTROL: case VK_MENU: case VK_RETURN: break;
-        default: return KeyCode::UNKNOWN;
+        default: break;
     }
-    int extended = (lParam & 0x01000000) != 0;
-    switch(vkey)
+    int e0_prefixed = (keyboard->Flags & RI_KEY_E0) != 0;
+    switch(keyboard->VKey)
     {
         case VK_SHIFT:
         {
-            UINT scancode = (lParam & 0x00ff0000) >> 16;
-            return MapVirtualKey(scancode, MAPVK_VSC_TO_VK_EX) == VK_LSHIFT ? KeyCode::LEFT_SHIFT : KeyCode::RIGHT_SHIFT;
+            return MapVirtualKey(keyboard->MakeCode, MAPVK_VSC_TO_VK_EX) == VK_LSHIFT ? KeyCode::LEFT_SHIFT : KeyCode::RIGHT_SHIFT;
         }
-        case VK_CONTROL: return extended ? KeyCode::RIGHT_CONTROL : KeyCode::LEFT_CONTROL;
-        case VK_MENU: return extended ? KeyCode::RIGHT_ALT : KeyCode::LEFT_ALT;
-        case VK_RETURN: return extended ? KeyCode::NUM_ENTER : KeyCode::ENTER;
+        case VK_CONTROL: return e0_prefixed ? KeyCode::RIGHT_CONTROL : KeyCode::LEFT_CONTROL;
+        case VK_MENU: return e0_prefixed ? KeyCode::RIGHT_ALT : KeyCode::LEFT_ALT;
+        case VK_RETURN: return e0_prefixed ? KeyCode::NUM_ENTER : KeyCode::ENTER;
         default: return KeyCode::UNKNOWN;
     }
 }
 
-int yuki::Win32Window::_translateKeyCodeToNative(KeyCode key)
+void yuki::Win32Window::_sendKeyEvent(yuki::KeyCode key, bool pressed, bool repeated)
 {
-    // note that the two enter keys are not included
-    switch(key)
-    {
-        case KeyCode::BACKSPACE: return VK_BACK;
-        case KeyCode::TAB: return VK_TAB;
-        case KeyCode::PAUSE: return VK_PAUSE;
-        case KeyCode::CAPSLOCK: return VK_CAPITAL;
-        case KeyCode::ESCAPE: return VK_ESCAPE;
-        case KeyCode::SPACE: return VK_SPACE;
-        case KeyCode::PAGE_UP: return VK_PRIOR;
-        case KeyCode::PAGE_DOWN: return VK_NEXT;
-        case KeyCode::END: return VK_END;
-        case KeyCode::HOME: return VK_HOME;
-        case KeyCode::LEFT: return VK_LEFT;
-        case KeyCode::UP: return VK_UP;
-        case KeyCode::RIGHT: return VK_RIGHT;
-        case KeyCode::DOWN: return VK_DOWN;
-        case KeyCode::PRINT_SCREEN: return VK_SNAPSHOT;
-        case KeyCode::INSERT: return VK_INSERT;
-        case KeyCode::DELETE: return VK_DELETE;
-        case KeyCode::DIGIT_0: return '0';
-        case KeyCode::DIGIT_1: return '1';
-        case KeyCode::DIGIT_2: return '2';
-        case KeyCode::DIGIT_3: return '3';
-        case KeyCode::DIGIT_4: return '4';
-        case KeyCode::DIGIT_5: return '5';
-        case KeyCode::DIGIT_6: return '6';
-        case KeyCode::DIGIT_7: return '7';
-        case KeyCode::DIGIT_8: return '8';
-        case KeyCode::DIGIT_9: return '9';
-        case KeyCode::A: return 'A';
-        case KeyCode::B: return 'B';
-        case KeyCode::C: return 'C';
-        case KeyCode::D: return 'D';
-        case KeyCode::E: return 'E';
-        case KeyCode::F: return 'F';
-        case KeyCode::G: return 'G';
-        case KeyCode::H: return 'H';
-        case KeyCode::I: return 'I';
-        case KeyCode::J: return 'J';
-        case KeyCode::K: return 'K';
-        case KeyCode::L: return 'L';
-        case KeyCode::M: return 'M';
-        case KeyCode::N: return 'N';
-        case KeyCode::O: return 'O';
-        case KeyCode::P: return 'P';
-        case KeyCode::Q: return 'Q';
-        case KeyCode::R: return 'R';
-        case KeyCode::S: return 'S';
-        case KeyCode::T: return 'T';
-        case KeyCode::U: return 'U';
-        case KeyCode::V: return 'V';
-        case KeyCode::W: return 'W';
-        case KeyCode::X: return 'X';
-        case KeyCode::Y: return 'Y';
-        case KeyCode::Z: return 'Z';
-        case KeyCode::CONTEXT_MENU: return VK_APPS;
-        case KeyCode::NUM_0: return VK_NUMPAD0;
-        case KeyCode::NUM_1: return VK_NUMPAD1;
-        case KeyCode::NUM_2: return VK_NUMPAD2;
-        case KeyCode::NUM_3: return VK_NUMPAD3;
-        case KeyCode::NUM_4: return VK_NUMPAD4;
-        case KeyCode::NUM_5: return VK_NUMPAD5;
-        case KeyCode::NUM_6: return VK_NUMPAD6;
-        case KeyCode::NUM_7: return VK_NUMPAD7;
-        case KeyCode::NUM_8: return VK_NUMPAD8;
-        case KeyCode::NUM_9: return VK_NUMPAD9;
-        case KeyCode::NUM_MULTIPLY: return VK_MULTIPLY;
-        case KeyCode::NUM_ADD: return VK_ADD;
-        case KeyCode::NUM_SUBTRACT: return VK_SUBTRACT;
-        case KeyCode::NUM_DECIMAL: return VK_DECIMAL;
-        case KeyCode::NUM_DIVIDE: return VK_DIVIDE;
-        case KeyCode::F1: return VK_F1;
-        case KeyCode::F2: return VK_F2;
-        case KeyCode::F3: return VK_F3;
-        case KeyCode::F4: return VK_F4;
-        case KeyCode::F5: return VK_F5;
-        case KeyCode::F6: return VK_F6;
-        case KeyCode::F7: return VK_F7;
-        case KeyCode::F8: return VK_F8;
-        case KeyCode::F9: return VK_F9;
-        case KeyCode::F10: return VK_F10;
-        case KeyCode::F11: return VK_F11;
-        case KeyCode::F12: return VK_F12;
-        case KeyCode::NUM_LOCK: return VK_NUMLOCK;
-        case KeyCode::SCROLL_LOCK: return VK_SCROLL;
-        case KeyCode::SEMICOLON: return VK_OEM_1;
-        case KeyCode::EQUAL: return VK_OEM_PLUS;
-        case KeyCode::COMMA: return VK_OEM_COMMA;
-        case KeyCode::MINUS: return VK_OEM_MINUS;
-        case KeyCode::PERIOD: return VK_OEM_PERIOD;
-        case KeyCode::SLASH: return VK_OEM_2;
-        case KeyCode::BACKQUOTE: return VK_OEM_3;
-        case KeyCode::LEFT_BRACKET: return VK_OEM_4;
-        case KeyCode::BACKSLASH: return VK_OEM_5;
-        case KeyCode::RIGHT_BRACKET: return VK_OEM_6;
-        case KeyCode::QUOTE: return VK_OEM_7;
-        case KeyCode::LEFT_SHIFT: return VK_LSHIFT;
-        case KeyCode::RIGHT_SHIFT: return VK_RSHIFT;
-        case KeyCode::LEFT_CONTROL: return VK_LCONTROL;
-        case KeyCode::RIGHT_CONTROL: return VK_RCONTROL;
-        case KeyCode::LEFT_ALT: return VK_LMENU;
-        case KeyCode::RIGHT_ALT: return VK_RMENU;
-        case KeyCode::LEFT_OS: return VK_LWIN;
-        case KeyCode::RIGHT_OS: return VK_RWIN;
-        default: return 0;
-    }
-}
-
-void yuki::Win32Window::_sendKeyEvent(WPARAM wParam, LPARAM lParam, bool pressed, bool repeated)
-{
-    KeyEventListener::KeyEvent e;
-    e.keyCode = _translateKeyCodeFromMessage(wParam, lParam);
+    KeyEvent e;
+    e.keyboard = this;
+    e.keyCode = key;
     e.pressed = pressed;
     e.repeated = repeated;
-    // store key state for later queries
-    switch(e.keyCode)
-    {
-        case KeyCode::ENTER: mEnterPressed = pressed; break;
-        case KeyCode::NUM_ENTER: mNumEnterPressed = pressed; break;
-        default: break;
-    }
     for(auto &&h : mKeyEventListeners)
     {
         h->onKeyStateChange(e);
@@ -430,6 +316,8 @@ void yuki::Win32Window::_sendKeyEvent(WPARAM wParam, LPARAM lParam, bool pressed
 
 void yuki::Win32Window::_confineCursorInClientArea() const
 {
+    if(!mWindowActive) return;
+
     RECT client_rect = _getClientScreenRect();
     ClipCursor(&client_rect);
 }
@@ -522,6 +410,46 @@ std::unique_ptr<BYTE[]> yuki::Win32Window::_getRawInputBuffer(LPARAM lParam) con
     return std::move(lpb);
 }
 
+void yuki::Win32Window::_recaptureCursor()
+{
+    if(mMouseCursorCaptured) _captureCursor();
+}
+
+void yuki::Win32Window::_processKeyboardInput(RAWINPUT *raw)
+{
+    auto &kb = raw->data.keyboard;
+
+    auto key = _translateKeyCodeFromRawInput(&kb);
+    // ignore keys other than those on 101 keyboard
+    if(key == KeyCode::UNKNOWN) return;
+
+    bool pressed = (kb.Flags & RI_KEY_BREAK) == 0;
+    bool repeated = false;
+
+    if(pressed)
+    {
+        if(mKeyPressed.count(key) != 0)
+            repeated = true;
+        else
+            mKeyPressed.insert(key);
+    }
+    else
+    {
+        mKeyPressed.erase(key);
+    }
+
+    _sendKeyEvent(key, pressed, repeated);
+}
+
+void yuki::Win32Window::_clearKeyPressedStates()
+{
+    for(auto iter = mKeyPressed.begin(); iter != mKeyPressed.end();)
+    {
+        _sendKeyEvent(*iter, false, false);
+        iter = mKeyPressed.erase(iter);
+    }
+}
+
 LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch(message)
@@ -529,8 +457,6 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
         // unbuffered raw input data
         case WM_INPUT:
         {
-            TCHAR szTempOutput[1024];
-
             std::unique_ptr<BYTE[]> lpb = _getRawInputBuffer(lParam);
             RAWINPUT *raw = reinterpret_cast<RAWINPUT*>(lpb.get());
 
@@ -538,14 +464,7 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
             {
                 case RIM_TYPEKEYBOARD:
                 {
-                    StringCchPrintf(szTempOutput, 1024, TEXT(" Kbd: make=%04x Flags:%04x Reserved:%04x ExtraInformation:%08x, msg=%04x VK=%04x \n"),
-                        raw->data.keyboard.MakeCode,
-                        raw->data.keyboard.Flags,
-                        raw->data.keyboard.Reserved,
-                        raw->data.keyboard.ExtraInformation,
-                        raw->data.keyboard.Message,
-                        raw->data.keyboard.VKey);
-                    OutputDebugString(szTempOutput);
+                    _processKeyboardInput(raw);
                     break;
                 }
                 case RIM_TYPEMOUSE:
@@ -557,31 +476,19 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
             }
             break;
         }
-        // key strokes
-        // todo: print screen receive no press event
-        case WM_SYSKEYDOWN:
-        case WM_KEYDOWN:
-        {
-            _sendKeyEvent(wParam, lParam, true, (lParam & (1 << 30)) != 0);
-            break;
-        }
-        case WM_SYSKEYUP:
-        case WM_KEYUP:
-        {
-            _sendKeyEvent(wParam, lParam, false, false);
-            break;
-        }
         // window management
         case WM_ACTIVATEAPP:
         {
             // window being activated
-            if((mWindowActive = wParam == TRUE))
+            if((mWindowActive = (wParam == TRUE)))
             {
-                if(mMouseCursorCaptured) _captureCursor();
+                _recaptureCursor();
             }
             // window being deactivated
             else
             {
+                _clearKeyPressedStates();
+                break;
             }
             break;
         }
@@ -589,7 +496,19 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
         case WM_SIZE:
         case WM_MOVE:
         {
-            if(mMouseCursorCaptured) _captureCursor();
+            _recaptureCursor();
+            break;
+        }
+        // ignore any key events
+        case WM_SYSKEYDOWN:
+        case WM_SYSKEYUP:
+        case WM_KEYDOWN:
+        case WM_KEYUP:
+        {
+            break;
+        }
+        case WM_CHAR:
+        {
             break;
         }
         case WM_DESTROY:
@@ -608,7 +527,7 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
 
 bool yuki::Win32Window::isKeyPressed(KeyCode key)
 {
-    return false;
+    return mKeyPressed.count(key) != 0;
 }
 
 Eigen::Vector2f yuki::Win32Window::getMouseCursorWindowPos()

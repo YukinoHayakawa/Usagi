@@ -5,17 +5,18 @@ namespace yuki
 
 enum class KeyCode;
 
+struct KeyEvent
+{
+    class Keyboard *keyboard = nullptr;
+    KeyCode keyCode;
+    bool pressed = false;
+    bool repeated = false;
+};
+
 class KeyEventListener
 {
 public:
     virtual ~KeyEventListener() = default;
-
-    struct KeyEvent
-    {
-        KeyCode keyCode;
-        bool pressed;
-        bool repeated;
-    };
 
     virtual void onKeyStateChange(const KeyEvent &e) { }
 };

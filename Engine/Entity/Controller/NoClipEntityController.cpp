@@ -11,11 +11,16 @@ void yuki::NoClipEntityController::_resetRotation()
     mPitch = 0;
 }
 
+void yuki::NoClipEntityController::_resetAccumulation()
+{
+    _resetRotation();
+}
+
 yuki::NoClipEntityController::NoClipEntityController(std::shared_ptr<Mouse> mouse, std::shared_ptr<Keyboard> keyboard)
     // todo remove unused members
     : InteractiveComponent { std::move(mouse), std::move(keyboard) }
 {
-    _resetRotation();
+    _resetAccumulation();
     mMouse->setImmersiveMode(true);
 }
 
@@ -56,7 +61,6 @@ void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
         {
             movement.normalize();
             mEntity->move(movement * mMoveSpeed * 0.25f * clock.getElapsedTime());
-            movement.setZero();
         }
     }
 
@@ -67,10 +71,10 @@ void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
 
         // todo: lock view angle
         mEntity->rotate(Eigen::AngleAxisf(mPitch * mRotationSpeed, right));
-        mEntity->rotate(Eigen::AngleAxisf(mYaw * mRotationSpeed, Eigen::Vector3f::UnitY()));        
-
-        _resetRotation();
+        mEntity->rotate(Eigen::AngleAxisf(mYaw * mRotationSpeed, Eigen::Vector3f::UnitY()));
     }
+
+    _resetAccumulation();
 }
 
 void yuki::NoClipEntityController::onMouseMove(const MousePositionEvent &e)
@@ -95,7 +99,14 @@ void yuki::NoClipEntityController::onKeyStateChange(const KeyEvent &e)
 #undef NCEC_KEY_BIND
         case KeyCode::LEFT_CONTROL:
         {
-            if(!e.repeated) mMouse->setImmersiveMode(!e.pressed);
+            if(!e.repeated)
+            {
+                bool enable = !e.pressed;
+                mMouse->setImmersiveMode(enable);
+                // clear accumulation when disabling immersive mode to prevent expired
+                // input from affecting next enabling.
+                if(enable) _resetAccumulation();
+            }
             break;
         }
         default: break;

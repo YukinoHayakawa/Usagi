@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <set>
+
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Runtime/HID/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
@@ -21,8 +23,8 @@ class Win32Window
     // window
 
     HWND mWindowHandle = nullptr;
-    bool mWindowActive = false;
     Eigen::Vector2i mWindowSize;
+    bool mWindowActive;
 
     static void _ensureWindowSubsystemInitialized();
     RECT _getClientScreenRect() const;
@@ -38,7 +40,7 @@ class Win32Window
     std::unique_ptr<BYTE[]> _getRawInputBuffer(LPARAM lParam) const;
 
     // mouse
-    
+
     bool mMouseCursorCaptured = false;
     /**
      * \brief Mouse cursor use a counter to determine whether it should be displayed.
@@ -53,17 +55,19 @@ class Win32Window
     void _releaseCursor() override;
     bool _isCursorCaptured() override;
     void _showCursor(bool show) override;
-
-    // keyboard
-
-    static KeyCode _translateKeyCodeFromMessage(WPARAM vkey, LPARAM lParam);
-    static int _translateKeyCodeToNative(KeyCode key);
-    void _sendKeyEvent(WPARAM wParam, LPARAM lParam, bool pressed, bool repeated);
+    void _recaptureCursor();
     void _confineCursorInClientArea() const;
     void _processMouseInput(const RAWINPUT *raw);
 
-    // GetKeyState does not distinguish between them, so we manually record their states
-    bool mEnterPressed = false, mNumEnterPressed = false;
+    // keyboard
+
+    std::set<KeyCode> mKeyPressed;
+
+    static KeyCode _translateKeyCodeFromRawInput(const RAWKEYBOARD *keyboard);
+    void _sendKeyEvent(KeyCode key, bool pressed, bool repeated);
+
+    void _processKeyboardInput(RAWINPUT *raw);
+    void _clearKeyPressedStates();
 
 public:
     /**

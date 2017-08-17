@@ -32,8 +32,9 @@ int main(int argc, char *argv[])
         window->addMouseEventListener(camman);
         window->addKeyEventListener(camman);
 
-        auto mousedebug = std::make_shared<DebugKeyMouseEventListener>();
-        window->addMouseEventListener(mousedebug);
+        auto inputdebug = std::make_shared<DebugKeyMouseEventListener>();
+        window->addKeyEventListener(inputdebug);
+        //window->addMouseEventListener(inputdebug);
 
 
         DebugDrawManager debug_draw_manager(device, camera);

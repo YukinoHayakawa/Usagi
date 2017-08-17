@@ -8,6 +8,8 @@ namespace yuki
  */
 enum class KeyCode
 {
+    UNKNOWN,
+
     // FUNCTION KEYS
 
     ESCAPE,
@@ -130,9 +132,7 @@ enum class KeyCode
     NUM_DECIMAL,
     NUM_ENTER,
 
-    // ANYTHING ELSE
-
-    UNKNOWN,
+    ENUM_COUNT
 };
 
 const char *getKeyName(KeyCode key);

@@ -50,6 +50,7 @@ protected:
 
 private:
     void _resetRotation();
+    void _resetAccumulation();
 
 public:
     NoClipEntityController(std::shared_ptr<Mouse> mouse, std::shared_ptr<Keyboard> keyboard);

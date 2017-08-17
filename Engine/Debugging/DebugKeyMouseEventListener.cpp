@@ -6,7 +6,7 @@
 
 void yuki::DebugKeyMouseEventListener::onKeyStateChange(const KeyEvent &e)
 {
-    std::cout << getKeyName(e.keyCode) << (e.pressed ? " pressed" : " released") << std::endl;
+    std::cout << getKeyName(e.keyCode) << (e.pressed ? " pressed" : " released") << (e.repeated ? " (repeated)" : "") << std::endl;
 }
 
 void yuki::DebugKeyMouseEventListener::onMouseMove(const yuki::MousePositionEvent &e)
