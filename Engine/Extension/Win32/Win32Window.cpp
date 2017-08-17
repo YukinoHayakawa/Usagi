@@ -122,10 +122,8 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
 {
     _ensureWindowSubsystemInitialized();
     _createWindowHandle(title, width, height);
-
-    Win32Window::centerCursor();
-
     _registerRawInputDevices();
+    Win32Window::centerCursor();
 }
 
 HDC yuki::Win32Window::getDeviceContext() const
@@ -436,8 +434,6 @@ void yuki::Win32Window::_confineCursorInClientArea() const
 void yuki::Win32Window::_processMouseInput(const RAWINPUT *raw)
 {
     TCHAR szTempOutput[1024];
-
-    auto &mouse = raw->data.mouse;
     StringCchPrintf(szTempOutput, 1024, TEXT("Mouse: usFlags=%04x ulButtons=%04x usButtonFlags=%04x usButtonData=%04x ulRawButtons=%04x lLastX=%04x lLastY=%04x ulExtraInformation=%04x\r\n"),
         raw->data.mouse.usFlags,
         raw->data.mouse.ulButtons,
@@ -448,6 +444,8 @@ void yuki::Win32Window::_processMouseInput(const RAWINPUT *raw)
         raw->data.mouse.lLastY,
         raw->data.mouse.ulExtraInformation);
     OutputDebugString(szTempOutput);
+
+    auto &mouse = raw->data.mouse;
 
     // only receive relative movement. note that the mouse driver typically won't generate
     // mouse input data based on absolute data.
@@ -580,7 +578,7 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
         case WM_SIZE:
         case WM_MOVE:
         {
-            _confineCursorInClientArea();
+            if(mMouseCursorCaptured) captureCursor();
             break;
         }
         case WM_DESTROY:
@@ -641,5 +639,8 @@ void yuki::Win32Window::centerCursor()
 
 void yuki::Win32Window::showCursor(bool show)
 {
+    if(mShowMouseCursor == show) return;
+
     ShowCursor(show);
+    mShowMouseCursor = show;
 }
