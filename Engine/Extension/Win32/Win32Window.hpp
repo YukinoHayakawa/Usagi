@@ -40,9 +40,19 @@ class Win32Window
     // mouse
     
     bool mMouseCursorCaptured = false;
+    /**
+     * \brief Mouse cursor use a counter to determine whether it should be displayed.
+     * see https://msdn.microsoft.com/en-us/library/windows/desktop/ms648396(v=vs.85).aspx
+     */
+    bool mShowMouseCursor = true;
+    bool mMouseButtonDown[static_cast<size_t>(MouseButtonCode::ENUM_COUNT)] = { false };
 
-    static Eigen::Vector2i _parseMousePos(LPARAM lParam);
     void _sendButtonEvent(MouseButtonCode button, bool pressed);
+
+    void _captureCursor() override;
+    void _releaseCursor() override;
+    bool _isCursorCaptured() override;
+    void _showCursor(bool show) override;
 
     // keyboard
 
@@ -74,11 +84,7 @@ public:
     // mouse
 
     Eigen::Vector2f getMouseCursorWindowPos() override;
-    void captureCursor() override;
-    void releaseCursor() override;
-    bool isCursorCaptured() override;
     void centerCursor() override;
-    void showCursor(bool show) override;
 
     // keyboard
 

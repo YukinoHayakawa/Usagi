@@ -6,7 +6,7 @@ namespace yuki
 enum class MouseButtonCode
 {
     LEFT, RIGHT, MIDDLE,
-    UNKNOWN
+    ENUM_COUNT
 };
 
 const char *getMouseButtonName(MouseButtonCode key);

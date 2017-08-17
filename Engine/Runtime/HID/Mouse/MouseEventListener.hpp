@@ -19,7 +19,7 @@ struct MousePositionEvent : MouseEvent
 
 struct MouseButtonEvent : MouseEvent
 {
-    MouseButtonCode button = MouseButtonCode::UNKNOWN;
+    MouseButtonCode button;
     bool pressed = false;
 };
 

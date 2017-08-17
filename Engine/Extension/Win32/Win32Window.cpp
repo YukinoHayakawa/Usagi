@@ -6,7 +6,6 @@
 // include dirty windows headers at last
 #include "Win32Window.hpp"
 #include <ShellScalingAPI.h>
-#include <Windowsx.h>
 #include <Strsafe.h>
 
 const wchar_t yuki::Win32Window::mWindowClassName[] = L"UsagiNativeWindowWrapper";
@@ -158,15 +157,19 @@ LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message, WPA
     return window->_handleWindowMessage(hWnd, message, wParam, lParam);
 }
 
-Eigen::Vector2i yuki::Win32Window::_parseMousePos(LPARAM lParam)
-{
-    auto xPos = GET_X_LPARAM(lParam);
-    auto yPos = GET_Y_LPARAM(lParam);
-    return { xPos, yPos };
-}
-
 void yuki::Win32Window::_sendButtonEvent(yuki::MouseButtonCode button, bool pressed)
 {
+    auto &prev_pressed = mMouseButtonDown[static_cast<size_t>(button)];
+
+    // if we receive an release event without a prior press event, it means that
+    // the user activated our window by clicking. this is only meaningful if we
+    // are in normal mode when using GUI. if immersive mode is enabled, such
+    // event may cause undesired behavior, such as firing the weapon.
+    if(!pressed && !prev_pressed && isImmersiveMode())
+        return;
+
+    prev_pressed = pressed;
+
     MouseButtonEvent e;
     e.mouse = this;
     e.button = button;
@@ -433,24 +436,21 @@ void yuki::Win32Window::_confineCursorInClientArea() const
 
 void yuki::Win32Window::_processMouseInput(const RAWINPUT *raw)
 {
-    TCHAR szTempOutput[1024];
-    StringCchPrintf(szTempOutput, 1024, TEXT("Mouse: usFlags=%04x ulButtons=%04x usButtonFlags=%04x usButtonData=%04x ulRawButtons=%04x lLastX=%04x lLastY=%04x ulExtraInformation=%04x\r\n"),
-        raw->data.mouse.usFlags,
-        raw->data.mouse.ulButtons,
-        raw->data.mouse.usButtonFlags,
-        raw->data.mouse.usButtonData,
-        raw->data.mouse.ulRawButtons,
-        raw->data.mouse.lLastX,
-        raw->data.mouse.lLastY,
-        raw->data.mouse.ulExtraInformation);
-    OutputDebugString(szTempOutput);
-
     auto &mouse = raw->data.mouse;
 
     // only receive relative movement. note that the mouse driver typically won't generate
     // mouse input data based on absolute data.
     // see https://stackoverflow.com/questions/14113303/raw-input-device-rawmouse-usage
     if(mouse.usFlags != MOUSE_MOVE_RELATIVE) return;
+
+    // when in GUI mode, only receive events inside the window rect
+    // todo since we use raw input, we receive the mouse messages even if the part of window is covered, in which case the user might perform undesired actions.
+    if(!isImmersiveMode())
+    {
+        auto cursor = getMouseCursorWindowPos();
+        if(cursor.x() < 0 || cursor.y() < 0 || cursor.x() >= mWindowSize.x() || cursor.y() >= mWindowSize.y())
+            return;
+    }
 
     // process mouse movement
     if(mouse.lLastX || mouse.lLastY)
@@ -466,13 +466,17 @@ void yuki::Win32Window::_processMouseInput(const RAWINPUT *raw)
     // proces mouse buttons & scrolling
     if(mouse.usButtonFlags)
     {
+        // process mouse buttons
+        // note that it is impossible to activate another window while holding a mouse
+        // button pressed within the active window, so it is unnecessary to clear
+        // button press states when deactive the window. however this does not hold
+        // for the keyboard.
 #define _MOUSE_BTN_EVENT(button) \
     if(mouse.usButtonFlags & RI_MOUSE_##button##_BUTTON_DOWN) \
         _sendButtonEvent(MouseButtonCode::button, true); \
     else if(mouse.usButtonFlags & RI_MOUSE_##button##_BUTTON_UP) \
         _sendButtonEvent(MouseButtonCode::button, false) \
 /**/
-        // todo send mouse button up events when the window is deactivated
         _MOUSE_BTN_EVENT(LEFT);
         _MOUSE_BTN_EVENT(MIDDLE);
         _MOUSE_BTN_EVENT(RIGHT);
@@ -570,15 +574,22 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
         // window management
         case WM_ACTIVATEAPP:
         {
-            mWindowActive = wParam == TRUE;
-            if(mMouseCursorCaptured) captureCursor();
+            // window being activated
+            if((mWindowActive = wParam == TRUE))
+            {
+                if(mMouseCursorCaptured) _captureCursor();
+            }
+            // window being deactivated
+            else
+            {
+            }
             break;
         }
         // todo: sent resize/move events
         case WM_SIZE:
         case WM_MOVE:
         {
-            if(mMouseCursorCaptured) captureCursor();
+            if(mMouseCursorCaptured) _captureCursor();
             break;
         }
         case WM_DESTROY:
@@ -608,21 +619,21 @@ Eigen::Vector2f yuki::Win32Window::getMouseCursorWindowPos()
     return { pt.x, pt.y };
 }
 
-void yuki::Win32Window::captureCursor()
+void yuki::Win32Window::_captureCursor()
 {
     _confineCursorInClientArea();
 
     mMouseCursorCaptured = true;
 }
 
-void yuki::Win32Window::releaseCursor()
+void yuki::Win32Window::_releaseCursor()
 {
     // remove cursor restriction
     ClipCursor(nullptr);
     mMouseCursorCaptured = false;
 }
 
-bool yuki::Win32Window::isCursorCaptured()
+bool yuki::Win32Window::_isCursorCaptured()
 {
     return mMouseCursorCaptured;
 }
@@ -637,7 +648,7 @@ void yuki::Win32Window::centerCursor()
     SetCursorPos(cursor.x(), cursor.y());
 }
 
-void yuki::Win32Window::showCursor(bool show)
+void yuki::Win32Window::_showCursor(bool show)
 {
     if(mShowMouseCursor == show) return;
 

@@ -1,7 +1,9 @@
-﻿#include "NoClipEntityController.hpp"
-#include <Usagi/Engine/Runtime/HID/Keyboard/KeyCode.hpp>
+﻿#include <Usagi/Engine/Runtime/HID/Keyboard/KeyCode.hpp>
 #include <Usagi/Engine/Component/DynamicComponent.hpp>
 #include <Usagi/Engine/Time/Clock.hpp>
+#include <Usagi/Engine/Runtime/HID/Mouse/Mouse.hpp>
+
+#include "NoClipEntityController.hpp"
 
 void yuki::NoClipEntityController::_resetRotation()
 {
@@ -14,10 +16,13 @@ yuki::NoClipEntityController::NoClipEntityController(std::shared_ptr<Mouse> mous
     : InteractiveComponent { std::move(mouse), std::move(keyboard) }
 {
     _resetRotation();
+    mMouse->setImmersiveMode(true);
 }
 
 void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
 {
+    if(!mMouse->isImmersiveMode()) return;
+
     // calculate position
     {
         static const Eigen::Vector3f DIR_VEC[]
@@ -70,6 +75,8 @@ void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
 
 void yuki::NoClipEntityController::onMouseMove(const MousePositionEvent &e)
 {
+    if(!mMouse->isImmersiveMode()) return;
+
     mYaw -= e.cursorPosDelta.x();
     mPitch -= e.cursorPosDelta.y();
 }
@@ -86,11 +93,17 @@ void yuki::NoClipEntityController::onKeyStateChange(const KeyEvent &e)
         NCEC_KEY_BIND(SPACE, UPWARD);
         NCEC_KEY_BIND(LEFT_SHIFT, DOWNWARD);
 #undef NCEC_KEY_BIND
+        case KeyCode::LEFT_CONTROL:
+        {
+            if(!e.repeated) mMouse->setImmersiveMode(!e.pressed);
+            break;
+        }
         default: break;
     }
 }
 
 // todo: geometry::makeCoordinateSystem method
+// todo: not working correctly after several frames
 void yuki::NoClipEntityController::_postAttachTo()
 {
     // enforce the constraints of this entity controller,
