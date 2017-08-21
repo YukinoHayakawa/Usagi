@@ -60,7 +60,7 @@ void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
         if(!movement.isZero())
         {
             movement.normalize();
-            mEntity->move(movement * mMoveSpeed * 0.25f * clock.getElapsedTime());
+            mEntity->move(movement * mMoveSpeed * clock.getElapsedTime());
         }
     }
 
@@ -97,7 +97,7 @@ void yuki::NoClipEntityController::onKeyStateChange(const KeyEvent &e)
         NCEC_KEY_BIND(SPACE, UPWARD);
         NCEC_KEY_BIND(LEFT_SHIFT, DOWNWARD);
 #undef NCEC_KEY_BIND
-        case KeyCode::LEFT_CONTROL:
+        case KeyCode::LEFT_ALT:
         {
             if(!e.repeated)
             {

@@ -107,7 +107,8 @@ void yuki::Win32Window::_registerRawInputDevices() const
 
     // adds HID keyboard, RIDEV_NOLEGACY is not used to allow the system process hotkeys like
     // print screen. note that alt+f4 is not handled if related key messages not passed to
-    // DefWindowProc().
+    // DefWindowProc(). generally, RIDEV_NOLEGACY should only be used when having a single fullscreen
+    // window.
     Rid[1].usUsagePage = 0x01;
     Rid[1].usUsage = 0x06;
     // interestingly, RIDEV_NOHOTKEYS will prevent the explorer from using the fancy window-choosing
@@ -115,6 +116,7 @@ void yuki::Win32Window::_registerRawInputDevices() const
     Rid[1].dwFlags = 0;
     Rid[1].hwndTarget = 0;
 
+    // note that this registration affects the entire application
     if(RegisterRawInputDevices(Rid, 2, sizeof(Rid[0])) == FALSE)
     {
         //registration failed. Call GetLastError for the cause of the error
@@ -504,6 +506,20 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
         case WM_SYSKEYUP:
         case WM_KEYDOWN:
         case WM_KEYUP:
+        // ignore mouse events
+        case WM_MOUSEMOVE:
+        case WM_LBUTTONDBLCLK:
+        case WM_LBUTTONDOWN:
+        case WM_LBUTTONUP:
+        case WM_MBUTTONDBLCLK:
+        case WM_MBUTTONDOWN:
+        case WM_MBUTTONUP:
+        case WM_RBUTTONDBLCLK:
+        case WM_RBUTTONDOWN:
+        case WM_RBUTTONUP:
+        case WM_XBUTTONDBLCLK:
+        case WM_XBUTTONDOWN:
+        case WM_XBUTTONUP:
         {
             break;
         }

@@ -33,7 +33,7 @@ namespace yuki
  * during binding. During its usage, only translational and rotational
  * components of the transformation of the entity will be preserved.
  * 
- * The mouse cursor is captured by default. To release it, hold LEFT_CONTROL.
+ * The mouse cursor is captured by default. To release it, hold LEFT_ALT.
  * 
  * todo: this is an extremely simple impl of camera controller. improve the algorithm using books or other resources.
  */
@@ -43,7 +43,7 @@ class NoClipEntityController
 {
 protected:
     bool mMovement[static_cast<size_t>(Direction::ENUM_COUNT)] = { false };
-    float mMoveSpeed = 0.25f; // m/s
+    float mMoveSpeed = 0.05f; // m/s
     float mRotationSpeed = 0.005f; // deg/pixel
     float mYaw; // rotation around world Y axis
     float mPitch; // rotation around local X axis
