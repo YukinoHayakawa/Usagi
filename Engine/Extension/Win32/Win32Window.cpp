@@ -142,6 +142,11 @@ void yuki::Win32Window::showWindow(bool show)
     ShowWindow(mWindowHandle, show ? SW_SHOWNORMAL : SW_HIDE);
 }
 
+bool yuki::Win32Window::isWindowActive() const
+{
+    return mWindowActive;
+}
+
 void yuki::Win32Window::processEvents()
 {
     MSG msg;
@@ -151,6 +156,11 @@ void yuki::Win32Window::processEvents()
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+}
+
+Eigen::Vector2f yuki::Win32Window::getWindowSize() const
+{
+    return mWindowSize.cast<float>();
 }
 
 LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -583,10 +593,27 @@ void yuki::Win32Window::centerCursor()
     SetCursorPos(cursor.x(), cursor.y());
 }
 
-void yuki::Win32Window::_showCursor(bool show)
+void yuki::Win32Window::showCursor(bool show)
 {
     if(mShowMouseCursor == show) return;
 
     ShowCursor(show);
     mShowMouseCursor = show;
+}
+
+bool yuki::Win32Window::isMouseButtonPressed(MouseButtonCode button) const
+{
+    auto idx = static_cast<size_t>(button);
+    if(idx > sizeof(mMouseButtonDown) / sizeof(bool)) return false;
+    return mMouseButtonDown[idx];
+}
+
+HWND yuki::Win32Window::getNativeWindowHandle() const
+{
+    return mWindowHandle;
+}
+
+HINSTANCE yuki::Win32Window::getProcessInstanceHandle()
+{
+    return mProcessInstanceHandle;
 }

@@ -54,7 +54,7 @@ class Win32Window
     void _captureCursor() override;
     void _releaseCursor() override;
     bool _isCursorCaptured() override;
-    void _showCursor(bool show) override;
+    void showCursor(bool show) override;
     void _recaptureCursor();
     void _confineCursorInClientArea() const;
     void _processMouseInput(const RAWINPUT *raw);
@@ -81,14 +81,20 @@ public:
     // window
 
     HDC getDeviceContext() const;
+    HWND getNativeWindowHandle() const;
+    static HINSTANCE getProcessInstanceHandle();
 
     void showWindow(bool show) override;
+    bool isWindowActive() const override;
+    Eigen::Vector2f getWindowSize() const override;
+
     void processEvents() override;
 
     // mouse
 
     Eigen::Vector2f getMouseCursorWindowPos() override;
     void centerCursor() override;
+    bool isMouseButtonPressed(MouseButtonCode button) const override;
 
     // keyboard
 
