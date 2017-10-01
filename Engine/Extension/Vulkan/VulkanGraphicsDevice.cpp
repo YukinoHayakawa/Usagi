@@ -161,9 +161,6 @@ yuki::VulkanGraphicsDevice::VulkanGraphicsDevice()
 {
     _createInstance();
     _createDebugReport();
-
-    //mPhysicalDevice.getSurfaceSupportKHR()
-
     _selectPhysicalDevice();
     _createGraphicsQueue();
 }

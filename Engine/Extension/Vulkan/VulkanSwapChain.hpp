@@ -16,11 +16,15 @@ namespace yuki
  */
 class VulkanSwapChain : public SwapChain
 {
-    std::shared_ptr<class VulkanGraphicsDevice> mDevice;
+    std::shared_ptr<class VulkanGraphicsDevice> mVulkanGD;
 
-    vk::Semaphore mPresentationSemaphore;
-    vk::SurfaceKHR mSurface;
-    vk::SwapchainKHR mSwapChain;
+    vk::UniqueSemaphore mImageAvailableSemaphore, mRenderingFinishedSemaphore;
+    vk::UniqueSurfaceKHR mSurface;
+    vk::UniqueSwapchainKHR mSwapChain;
+    std::vector<vk::Image> mSwapChainImages;
+    vk::UniqueCommandPool mPresentCommandPool;
+    std::vector<vk::UniqueCommandBuffer> mPresentCommandBuffers;
+
     uint32_t mPresentationQueueFamilyIndex = 0;
 
     static vk::SurfaceFormatKHR _selectSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surface_formats);
@@ -28,9 +32,18 @@ class VulkanSwapChain : public SwapChain
     static vk::PresentModeKHR _selectPresentMode(const std::vector<vk::PresentModeKHR> &present_modes);
     uint32_t _selectPresentationQueueFamily() const;
 
+    /**
+     * \brief Initialize the swap chain, or create a new swap chain after the window changes its size.
+     */
+    void _createSwapChain();
+    void _createCommandBuffers();
+    void _recordCommands();
+
 public:
     VulkanSwapChain(std::shared_ptr<VulkanGraphicsDevice> device, HINSTANCE hInstance, HWND hWnd);
     ~VulkanSwapChain() override;
+
+    void present() override;
 };
 
 }
