@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vulkan/vulkan.hpp>
+#include <Usagi/Engine/Runtime/Graphics/GraphicsPipeline.hpp>
 
 namespace yuki
 {
@@ -9,6 +10,7 @@ namespace yuki
 class VulkanGraphicsDevice : public std::enable_shared_from_this<VulkanGraphicsDevice>
 {
     friend class VulkanSwapChain;
+    friend class VulkanGraphicsPipeline;
 
     vk::Instance mInstance;
     vk::DebugReportCallbackEXT mDebugReportCallback;
@@ -36,7 +38,9 @@ public:
     VulkanGraphicsDevice();
     virtual ~VulkanGraphicsDevice();
 
+    // todo: remove param
     virtual std::shared_ptr<class SwapChain> createSwapChain(std::shared_ptr<class Window> window);
+    virtual std::shared_ptr<GraphicsPipeline> createGraphicsPipeline();
 };
 
 }

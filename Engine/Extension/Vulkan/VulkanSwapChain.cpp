@@ -1,4 +1,5 @@
 ﻿#include <Usagi/Engine/Utility/Math.hpp>
+#include <Usagi/Engine/Runtime/Exception.hpp>
 
 #include "VulkanSwapChain.hpp"
 #include "VulkanGraphicsDevice.hpp"
@@ -58,9 +59,10 @@ uint32_t yuki::VulkanSwapChain::_selectPresentationQueueFamily() const
         if(mVulkanGD->mPhysicalDevice.getSurfaceSupportKHR(queue_index, mSurface.get()))
             return queue_index;
     }
-    throw VulkanRuntimeException("no queue family supporting WSI was found");
+    throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo("no queue family supporting WSI was found");
 }
 
+// todo recreate after resizing the window
 void yuki::VulkanSwapChain::_createSwapChain()
 {
     mPresentationQueueFamilyIndex = _selectPresentationQueueFamily();
@@ -73,16 +75,15 @@ void yuki::VulkanSwapChain::_createSwapChain()
 
     swapchain_create_info_khr.setSurface(mSurface.get());
     const auto format = _selectSurfaceFormat(surface_formats);
+    mSurfaceFormat = format.format;
     swapchain_create_info_khr.setImageFormat(format.format);
     swapchain_create_info_khr.setImageColorSpace(format.colorSpace);
     swapchain_create_info_khr.setImageExtent(_selectSurfaceExtent(surface_capabilities));
 
     // set up triple buffering
     const uint32_t image_count = 3;
-    checkThrow<VulkanRuntimeException>(
-        withinOpenInterval(image_count, { surface_capabilities.minImageCount, surface_capabilities.maxImageCount }),
-        "the device does not support triple buffering"
-    );
+    if(!withinOpenInterval(image_count, { surface_capabilities.minImageCount, surface_capabilities.maxImageCount }))
+        throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo("the device does not support triple buffering");
     swapchain_create_info_khr.setMinImageCount(image_count);
     swapchain_create_info_khr.setPresentMode(_selectPresentMode(surface_present_modes));
 
@@ -131,7 +132,7 @@ void yuki::VulkanSwapChain::_recordCommands()
     for(uint32_t i = 0; i < image_count; ++i)
     {
         vk::ImageMemoryBarrier barrier_from_present_to_clear;
-        barrier_from_present_to_clear.setSrcAccessMask(vk::AccessFlagBits::eMemoryRead);
+        barrier_from_present_to_clear.setSrcAccessMask({ });
         barrier_from_present_to_clear.setDstAccessMask(vk::AccessFlagBits::eTransferWrite);
         barrier_from_present_to_clear.setOldLayout(vk::ImageLayout::eUndefined); // discard old content
         barrier_from_present_to_clear.setNewLayout(vk::ImageLayout::eTransferDstOptimal);
@@ -151,8 +152,9 @@ void yuki::VulkanSwapChain::_recordCommands()
         barrier_from_clear_to_present.setSubresourceRange(image_subresource_range); 
 
         mPresentCommandBuffers[i]->begin(cmd_buffer_begin_info);
-        // ?
+        // todo: understand the semantic
         mPresentCommandBuffers[i]->pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eTransfer, { }, nullptr, nullptr, { barrier_from_present_to_clear });
+        // todo: the operation should be posted to graphics command queue
         mPresentCommandBuffers[i]->clearColorImage(mSwapChainImages[i], vk::ImageLayout::eTransferDstOptimal, clear_color, { image_subresource_range });
         mPresentCommandBuffers[i]->pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eBottomOfPipe, { }, nullptr, nullptr, { barrier_from_clear_to_present });
         mPresentCommandBuffers[i]->end();
@@ -217,4 +219,9 @@ void yuki::VulkanSwapChain::present()
     present_info.setPSwapchains(&*mSwapChain);
     present_info.setPImageIndices(&result.value);
     mVulkanGD->mGraphicsQueue.presentKHR(present_info);
+}
+
+uint64_t yuki::VulkanSwapChain::getSurfaceFormat()
+{
+    return static_cast<uint64_t>(mSurfaceFormat);
 }

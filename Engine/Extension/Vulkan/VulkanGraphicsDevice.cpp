@@ -1,9 +1,11 @@
 ﻿#include <iostream>
 
 #include <Usagi/Engine/Extension/Win32/Win32Window.hpp>
+#include <Usagi/Engine/Runtime/Exception.hpp>
 
 #include "VulkanGraphicsDevice.hpp"
 #include "VulkanSwapChain.hpp"
+#include "VulkanGraphicsPipeline.hpp"
 
 VkBool32 yuki::VulkanGraphicsDevice::_debugLayerCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char *layerPrefix, const char *msg, void *userData)
 {
@@ -110,7 +112,7 @@ void yuki::VulkanGraphicsDevice::_selectPhysicalDevice()
             mPhysicalDevice = dev;
     }
     if(!mPhysicalDevice)
-        throw std::runtime_error("no suitable Vulkan device was found!");
+        throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo("no suitable Vulkan device was found!");
     std::cout << "Using device: " << mPhysicalDevice.getProperties().deviceName << std::endl;
 }
 
@@ -128,7 +130,7 @@ void yuki::VulkanGraphicsDevice::_createGraphicsQueue()
 
     }
     if(graphics_queue_index == queue_family.end())
-        throw std::runtime_error("no queue family supporting graphics operations was found");
+        throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo("no queue family supporting graphics operations was found");
 
     vk::DeviceCreateInfo device_create_info;
 
@@ -178,5 +180,10 @@ std::shared_ptr<yuki::SwapChain> yuki::VulkanGraphicsDevice::createSwapChain(std
     {
         return std::make_shared<VulkanSwapChain>(shared_from_this(), native_window->getProcessInstanceHandle(), native_window->getNativeWindowHandle());
     }
-    throw std::runtime_error("unsupported window system");
+    throw OSAPIUnsupportedPlatformException() << PlatformDescriptionInfo("The windowing system on Win32 is not native.");
+}
+
+std::shared_ptr<yuki::GraphicsPipeline> yuki::VulkanGraphicsDevice::createGraphicsPipeline()
+{
+    return std::make_shared<VulkanGraphicsPipeline>(shared_from_this());
 }

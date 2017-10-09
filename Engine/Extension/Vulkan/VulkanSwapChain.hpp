@@ -4,9 +4,6 @@
 #include <vulkan/vulkan.hpp>
 
 #include <Usagi/Engine/Runtime/Graphics/SwapChain.hpp>
-#include <Usagi/Engine/Utility/Exception.hpp>
-
-YUKI_DECL_RUNTIME_EXCEPTION(VulkanRuntime);
 
 namespace yuki
 {
@@ -20,6 +17,7 @@ class VulkanSwapChain : public SwapChain
 
     vk::UniqueSemaphore mImageAvailableSemaphore, mRenderingFinishedSemaphore;
     vk::UniqueSurfaceKHR mSurface;
+    vk::Format mSurfaceFormat;
     vk::UniqueSwapchainKHR mSwapChain;
     std::vector<vk::Image> mSwapChainImages;
     vk::UniqueCommandPool mPresentCommandPool;
@@ -44,6 +42,8 @@ public:
     ~VulkanSwapChain() override;
 
     void present() override;
+
+    uint64_t getSurfaceFormat() override;
 };
 
 }
