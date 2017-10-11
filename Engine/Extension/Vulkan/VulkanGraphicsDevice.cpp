@@ -2,14 +2,17 @@
 
 #include <Usagi/Engine/Extension/Win32/Win32Window.hpp>
 #include <Usagi/Engine/Runtime/Exception.hpp>
+#include <Usagi/Engine/Runtime/Graphics/GraphicsSemaphore.hpp>
 
 #include "VulkanGraphicsDevice.hpp"
 #include "VulkanSwapChain.hpp"
 #include "VulkanGraphicsPipeline.hpp"
+#include "VulkanGraphicsCommandPool.hpp"
+#include "VulkanGraphicsCommandList.hpp"
 
 VkBool32 yuki::VulkanGraphicsDevice::_debugLayerCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char *layerPrefix, const char *msg, void *userData)
 {
-    vk::DebugReportFlagsEXT level(static_cast<vk::DebugReportFlagBitsEXT>(flags));
+    const vk::DebugReportFlagsEXT level(static_cast<vk::DebugReportFlagBitsEXT>(flags));
     if(level & vk::DebugReportFlagBitsEXT::eInformation)
         std::cout << "[INFO] ";
     if(level & vk::DebugReportFlagBitsEXT::eWarning)
@@ -72,7 +75,7 @@ void yuki::VulkanGraphicsDevice::_createInstance()
     instance_create_info.setEnabledLayerCount(validationLayers.size());
     instance_create_info.setPpEnabledLayerNames(validationLayers.data());
 
-    mInstance = vk::createInstance(instance_create_info);
+    mInstance = vk::createInstanceUnique(instance_create_info);
 }
 
 void yuki::VulkanGraphicsDevice::_createDebugReport()
@@ -87,12 +90,12 @@ void yuki::VulkanGraphicsDevice::_createDebugReport()
         vk::DebugReportFlagBitsEXT(0)
     );
     debug_info.setPfnCallback(&_debugLayerCallback);
-    mDebugReportCallback = mInstance.createDebugReportCallbackEXT(debug_info);
+    mDebugReportCallback = mInstance->createDebugReportCallbackEXTUnique(debug_info);
 }
 
 void yuki::VulkanGraphicsDevice::_selectPhysicalDevice()
 {
-    auto physical_devices = mInstance.enumeratePhysicalDevices();
+    auto physical_devices = mInstance->enumeratePhysicalDevices();
     for(auto &&dev : physical_devices)
     {
         auto prop = dev.getProperties();
@@ -135,7 +138,8 @@ void yuki::VulkanGraphicsDevice::_createGraphicsQueue()
     vk::DeviceCreateInfo device_create_info;
 
     vk::DeviceQueueCreateInfo queue_create_info;
-    queue_create_info.setQueueFamilyIndex(graphics_queue_index - queue_family.begin());
+    mGraphicsQueueFamilyIndex = graphics_queue_index - queue_family.begin();
+    queue_create_info.setQueueFamilyIndex(mGraphicsQueueFamilyIndex);
     queue_create_info.setQueueCount(1);
     float queue_priority = 1;
     queue_create_info.setPQueuePriorities(&queue_priority);
@@ -155,8 +159,8 @@ void yuki::VulkanGraphicsDevice::_createGraphicsQueue()
     vk::PhysicalDeviceFeatures physical_device_features;
     device_create_info.setPEnabledFeatures(&physical_device_features);
 
-    mDevice = mPhysicalDevice.createDevice(device_create_info);
-    mGraphicsQueue = mDevice.getQueue(queue_create_info.queueFamilyIndex, 0);
+    mDevice = mPhysicalDevice.createDeviceUnique(device_create_info);
+    mGraphicsQueue = mDevice->getQueue(queue_create_info.queueFamilyIndex, 0);
 }
 
 yuki::VulkanGraphicsDevice::VulkanGraphicsDevice()
@@ -167,23 +171,86 @@ yuki::VulkanGraphicsDevice::VulkanGraphicsDevice()
     _createGraphicsQueue();
 }
 
-yuki::VulkanGraphicsDevice::~VulkanGraphicsDevice()
-{
-    mDevice.destroy();
-    mInstance.destroyDebugReportCallbackEXT(mDebugReportCallback);
-    mInstance.destroy();
-}
-
 std::shared_ptr<yuki::SwapChain> yuki::VulkanGraphicsDevice::createSwapChain(std::shared_ptr<Window> window)
 {
     if(auto native_window = std::dynamic_pointer_cast<Win32Window>(window))
     {
-        return std::make_shared<VulkanSwapChain>(shared_from_this(), native_window->getProcessInstanceHandle(), native_window->getNativeWindowHandle());
+        return std::make_shared<VulkanSwapChain>(this, native_window->getProcessInstanceHandle(), native_window->getNativeWindowHandle());
     }
     throw OSAPIUnsupportedPlatformException() << PlatformDescriptionInfo("The windowing system on Win32 is not native.");
 }
 
 std::shared_ptr<yuki::GraphicsPipeline> yuki::VulkanGraphicsDevice::createGraphicsPipeline()
 {
-    return std::make_shared<VulkanGraphicsPipeline>(shared_from_this());
+    return std::make_shared<VulkanGraphicsPipeline>(this);
+}
+
+std::shared_ptr<yuki::GraphicsCommandPool> yuki::VulkanGraphicsDevice::createGraphicsCommandPool()
+{
+    auto pool = std::make_shared<VulkanGraphicsCommandPool>(this);
+    return pool;
+}
+
+void yuki::VulkanGraphicsDevice::submitGraphicsCommandList(
+    class GraphicsCommandList *command_list,
+    const std::vector<const GraphicsSemaphore *> &wait_semaphores,
+    const std::vector<const GraphicsSemaphore *> &signal_semaphores
+)
+{
+    VulkanGraphicsCommandList *vulkan_cmd_list = dynamic_cast<VulkanGraphicsCommandList*>(command_list);
+    if(!vulkan_cmd_list) throw MismatchedSubsystemComponentException() << SubsystemInfo("Rendering") << ComponentInfo("VulkanCommandList");
+
+    std::vector<vk::Semaphore> vulkan_wait_semaphores, vulkan_signal_semaphores;
+    std::vector<vk::PipelineStageFlags> wait_stages;
+    for(auto &&s : wait_semaphores)
+    {
+        vulkan_wait_semaphores.push_back(vk::Semaphore(reinterpret_cast<VkSemaphore>(s->getSemaphoreHandle())));
+        wait_stages.push_back(vk::PipelineStageFlags(static_cast<vk::PipelineStageFlagBits>(s->getNativePipelineStage())));
+    }
+    for(auto &&s : signal_semaphores)
+    {
+        vulkan_signal_semaphores.push_back(vk::Semaphore(reinterpret_cast<VkSemaphore>(s->getSemaphoreHandle())));
+    }
+
+    auto buffer = vulkan_cmd_list->_getCommandBuffer();
+    vk::SubmitInfo submit_info;
+    submit_info.setCommandBufferCount(1);
+    submit_info.setPCommandBuffers(&buffer);
+    submit_info.setWaitSemaphoreCount(vulkan_wait_semaphores.size());
+    submit_info.setPWaitSemaphores(vulkan_wait_semaphores.data());
+    submit_info.setPWaitDstStageMask(wait_stages.data());
+    submit_info.setSignalSemaphoreCount(vulkan_signal_semaphores.size());
+    submit_info.setPSignalSemaphores(vulkan_signal_semaphores.data());
+
+    mGraphicsQueue.submit({ submit_info }, { });
+}
+
+void yuki::VulkanGraphicsDevice::waitIdle()
+{
+    mDevice->waitIdle();
+}
+
+uint32_t yuki::VulkanGraphicsDevice::getGraphicsQueueFamilyIndex() const
+{
+    return mGraphicsQueueFamilyIndex;
+}
+
+vk::Device yuki::VulkanGraphicsDevice::_getDevice() const
+{
+    return mDevice.get();
+}
+
+vk::PhysicalDevice yuki::VulkanGraphicsDevice::_getPhysicalDevice() const
+{
+    return mPhysicalDevice;
+}
+
+vk::Instance yuki::VulkanGraphicsDevice::_getInstance() const
+{
+    return mInstance.get();
+}
+
+vk::Queue yuki::VulkanGraphicsDevice::_getGraphicsQueue() const
+{
+    return mGraphicsQueue;
 }

@@ -17,19 +17,32 @@ struct LogicException : virtual Exception { };
 struct APIException : virtual RuntimeException { };
 struct OSException : virtual RuntimeException { };
 struct GraphicsException : virtual RuntimeException { };
+struct FileException : virtual RuntimeException { };
+
+// - File Exceptions
+
+struct CorruptedDataFileException : virtual FileException { };
+struct CannotOpenFileException : virtual FileException { };
+
+// - Graphics Exceptions
+
+struct GraphicsSwapChainNotAvailableException : virtual GraphicsException { };
 
 // - Incompatible Environment Exception Family
 
 struct IncompatibleEnvironmentException : virtual RuntimeException { };
-typedef boost::error_info<struct tagFeatureDescription, const char *> FeatureDescriptionInfo;
+typedef boost::error_info<struct tagFeatureDescription, std::string> FeatureDescriptionInfo;
 struct UnsupportedFeatureException : virtual IncompatibleEnvironmentException { };
-typedef boost::error_info<struct tagPlatformDescription, const char *> PlatformDescriptionInfo;
+typedef boost::error_info<struct tagPlatformDescription, std::string> PlatformDescriptionInfo;
 struct UnsupportedPlatformException : virtual IncompatibleEnvironmentException { };
 
 // Logic Exceptions
 
-typedef boost::error_info<struct tagEnumName, const char *> EnumNameInfo;
-struct InvalidEnumException : virtual LogicException { };
+typedef boost::error_info<struct tagEnum, std::string> EnumInfo;
+struct EnumTranslationException : virtual LogicException { };
+typedef boost::error_info<struct tagSubsystem, std::string> SubsystemInfo;
+typedef boost::error_info<struct tagComponent, std::string> ComponentInfo;
+struct MismatchedSubsystemComponentException : virtual LogicException { };
 
 // Combined Exception Types
 
@@ -41,7 +54,7 @@ struct OSAPIUnsupportedPlatformException : virtual OSAPIException, virtual Unsup
 // - Graphics API Exception Family
 
 struct GraphicsAPIException : virtual APIException, virtual GraphicsException { };
-struct GraphicsAPIInvalidEnumException : virtual GraphicsAPIException, virtual InvalidEnumException { };
+struct GraphicsAPIEnumTranslationException : virtual GraphicsAPIException, virtual EnumTranslationException { };
 struct GraphicsAPIUnsupportedFeatureException : virtual GraphicsAPIException, virtual UnsupportedFeatureException { };
 
 }

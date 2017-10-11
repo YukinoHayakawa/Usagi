@@ -3,6 +3,8 @@
 #define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vulkan.hpp>
 
+#include "VulkanSemaphore.hpp"
+
 #include <Usagi/Engine/Runtime/Graphics/SwapChain.hpp>
 
 namespace yuki
@@ -13,15 +15,14 @@ namespace yuki
  */
 class VulkanSwapChain : public SwapChain
 {
-    std::shared_ptr<class VulkanGraphicsDevice> mVulkanGD;
+    class VulkanGraphicsDevice *mVulkanGD;
 
-    vk::UniqueSemaphore mImageAvailableSemaphore, mRenderingFinishedSemaphore;
+    VulkanSemaphore mImageAvailableSemaphore, mRenderingFinishedSemaphore;
     vk::UniqueSurfaceKHR mSurface;
-    vk::Format mSurfaceFormat;
+    vk::Format mSurfaceFormat = vk::Format::eUndefined;
     vk::UniqueSwapchainKHR mSwapChain;
-    std::vector<vk::Image> mSwapChainImages;
-    vk::UniqueCommandPool mPresentCommandPool;
-    std::vector<vk::UniqueCommandBuffer> mPresentCommandBuffers;
+    std::vector<std::unique_ptr<class VulkanSwapChainImage>> mSwapChainImages;
+    uint32_t mCurrentImageIndex = 0;
 
     uint32_t mPresentationQueueFamilyIndex = 0;
 
@@ -34,16 +35,19 @@ class VulkanSwapChain : public SwapChain
      * \brief Initialize the swap chain, or create a new swap chain after the window changes its size.
      */
     void _createSwapChain();
-    void _createCommandBuffers();
-    void _recordCommands();
 
 public:
-    VulkanSwapChain(std::shared_ptr<VulkanGraphicsDevice> device, HINSTANCE hInstance, HWND hWnd);
-    ~VulkanSwapChain() override;
+    // todo create with window
+    VulkanSwapChain(VulkanGraphicsDevice *device, HINSTANCE hInstance, HWND hWnd);
 
+    void acquireNextImage() override;
+    GraphicsImage * getCurrentImage() override;
     void present() override;
 
-    uint64_t getSurfaceFormat() override;
+    const GraphicsSemaphore * accessImageAvailableSemaphore() const override;
+    const GraphicsSemaphore * accessRenderingFinishedSemaphore() const override;
+
+    uint32_t getNativeImageFormat() override;
 };
 
 }

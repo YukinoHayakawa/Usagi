@@ -2,10 +2,11 @@
 #include <Usagi/Engine/Extension/Win32/Win32Window.hpp>
 #include <Usagi/Engine/Runtime/Graphics/SwapChain.hpp>
 #include <Usagi/Engine/Runtime/Graphics/SPIRVShader.hpp>
+#include <Usagi/Engine/Runtime/Graphics/GraphicsPipeline.hpp>
+#include <Usagi/Engine/Runtime/Graphics/GraphicsCommandPool.hpp>
+#include <Usagi/Engine/Runtime/Graphics/GraphicsCommandList.hpp>
 
 using namespace yuki;
-
-
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,7 @@ int main(int argc, char *argv[])
     window->showWindow(true);
     auto swap_chain = graphics_device->createSwapChain(window);
     auto pipeline = graphics_device->createGraphicsPipeline();
+    auto command_pool = graphics_device->createGraphicsCommandPool();
 
     GraphicsPipelineCreateInfo graphics_pipeline_create_info;
     graphics_pipeline_create_info.vertex_shader = SPIRVShader::readFromFile(R"(D:\Development\IntroductionToVulkan\Project\Tutorial03\Data03\vert.spv)");
@@ -25,12 +27,32 @@ int main(int argc, char *argv[])
     graphics_pipeline_create_info.rasterization.polygon_mode = RasterizationState::PolygonMode::FILL;
     graphics_pipeline_create_info.depth_stencil.enable_depth_test = false;
     graphics_pipeline_create_info.color_blend.enable = false;
-    pipeline->init(graphics_pipeline_create_info, swap_chain->getSurfaceFormat());
+    graphics_pipeline_create_info.attachment_usages.push_back({ swap_chain->getNativeImageFormat(), GraphicsImageLayout::UNDEFINED, GraphicsImageLayout::PRESENT_SRC });
+    pipeline->init(graphics_pipeline_create_info);
 
     while(true)
     {
         window->processEvents();
+
+        swap_chain->acquireNextImage();
+
+        auto command_buffer = command_pool->createCommandList();
+
+        GraphicsPipelineAssembly pipeline_assembly;
+        pipeline_assembly.pipeline = pipeline.get();
+        pipeline_assembly.attachments.push_back({ swap_chain->getCurrentImage() });
+
+        command_buffer->begin(pipeline_assembly);
+        command_buffer->setScissor(0, 0, 1280, 720);
+        command_buffer->setViewport(0, 0, 1280, 720);
+        command_buffer->draw(3, 1, 0, 0);
+        command_buffer->end();
+
+        graphics_device->submitGraphicsCommandList(command_buffer.get(), { swap_chain->accessImageAvailableSemaphore() }, { swap_chain->accessRenderingFinishedSemaphore() });
+
         swap_chain->present();
+        graphics_device->waitIdle();
+
         Sleep(10);
     }
 

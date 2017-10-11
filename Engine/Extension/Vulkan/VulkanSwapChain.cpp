@@ -3,6 +3,7 @@
 
 #include "VulkanSwapChain.hpp"
 #include "VulkanGraphicsDevice.hpp"
+#include "VulkanImage.hpp"
 
 vk::SurfaceFormatKHR yuki::VulkanSwapChain::_selectSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surface_formats)
 {
@@ -52,11 +53,11 @@ vk::PresentModeKHR yuki::VulkanSwapChain::_selectPresentMode(const std::vector<v
 
 uint32_t yuki::VulkanSwapChain::_selectPresentationQueueFamily() const
 {
-    const auto queue_families = mVulkanGD->mPhysicalDevice.getQueueFamilyProperties();
+    const auto queue_families = mVulkanGD->_getPhysicalDevice().getQueueFamilyProperties();
     for(auto iter = queue_families.begin(); iter != queue_families.end(); ++iter)
     {
         const uint32_t queue_index = iter - queue_families.begin();
-        if(mVulkanGD->mPhysicalDevice.getSurfaceSupportKHR(queue_index, mSurface.get()))
+        if(mVulkanGD->_getPhysicalDevice().getSurfaceSupportKHR(queue_index, mSurface.get()))
             return queue_index;
     }
     throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo("no queue family supporting WSI was found");
@@ -67,9 +68,9 @@ void yuki::VulkanSwapChain::_createSwapChain()
 {
     mPresentationQueueFamilyIndex = _selectPresentationQueueFamily();
 
-    const auto surface_capabilities = mVulkanGD->mPhysicalDevice.getSurfaceCapabilitiesKHR(mSurface.get());
-    const auto surface_formats = mVulkanGD->mPhysicalDevice.getSurfaceFormatsKHR(mSurface.get());
-    const auto surface_present_modes = mVulkanGD->mPhysicalDevice.getSurfacePresentModesKHR(mSurface.get());
+    const auto surface_capabilities = mVulkanGD->_getPhysicalDevice().getSurfaceCapabilitiesKHR(mSurface.get());
+    const auto surface_formats = mVulkanGD->_getPhysicalDevice().getSurfaceFormatsKHR(mSurface.get());
+    const auto surface_present_modes = mVulkanGD->_getPhysicalDevice().getSurfacePresentModesKHR(mSurface.get());
 
     vk::SwapchainCreateInfoKHR swapchain_create_info_khr;
 
@@ -95,99 +96,49 @@ void yuki::VulkanSwapChain::_createSwapChain()
 
     swapchain_create_info_khr.setOldSwapchain(mSwapChain.get());
 
-    mSwapChain = mVulkanGD->mDevice.createSwapchainKHRUnique(swapchain_create_info_khr);
+    mSwapChain = mVulkanGD->_getDevice().createSwapchainKHRUnique(swapchain_create_info_khr);
 }
 
-void yuki::VulkanSwapChain::_createCommandBuffers()
-{
-    vk::CommandPoolCreateInfo cmd_pool_create_info;
-    cmd_pool_create_info.setQueueFamilyIndex(mPresentationQueueFamilyIndex);
-    mPresentCommandPool = mVulkanGD->mDevice.createCommandPoolUnique(cmd_pool_create_info);
-
-    mSwapChainImages = mVulkanGD->mDevice.getSwapchainImagesKHR(mSwapChain.get());
-
-    vk::CommandBufferAllocateInfo cmd_buffer_allocate_info;
-    cmd_buffer_allocate_info.setCommandPool(mPresentCommandPool.get());
-    cmd_buffer_allocate_info.setLevel(vk::CommandBufferLevel::ePrimary);
-    cmd_buffer_allocate_info.setCommandBufferCount(mSwapChainImages.size());
-    mPresentCommandBuffers = mVulkanGD->mDevice.allocateCommandBuffersUnique(cmd_buffer_allocate_info);
-}
-
-void yuki::VulkanSwapChain::_recordCommands()
-{
-    vk::CommandBufferBeginInfo cmd_buffer_begin_info;
-    cmd_buffer_begin_info.setFlags(vk::CommandBufferUsageFlagBits::eSimultaneousUse);
-
-    vk::ClearColorValue clear_color;
-    clear_color.setFloat32({ 1.0f, 0.8f, 0.4f, 0.0f });
-
-    vk::ImageSubresourceRange image_subresource_range;
-    image_subresource_range.setAspectMask(vk::ImageAspectFlagBits::eColor);
-    image_subresource_range.setBaseMipLevel(0);
-    image_subresource_range.setLevelCount(1);
-    image_subresource_range.setBaseArrayLayer(0);
-    image_subresource_range.setLayerCount(1);
-
-    const uint32_t image_count = static_cast<uint32_t>(mSwapChainImages.size());
-    for(uint32_t i = 0; i < image_count; ++i)
-    {
-        vk::ImageMemoryBarrier barrier_from_present_to_clear;
-        barrier_from_present_to_clear.setSrcAccessMask({ });
-        barrier_from_present_to_clear.setDstAccessMask(vk::AccessFlagBits::eTransferWrite);
-        barrier_from_present_to_clear.setOldLayout(vk::ImageLayout::eUndefined); // discard old content
-        barrier_from_present_to_clear.setNewLayout(vk::ImageLayout::eTransferDstOptimal);
-        barrier_from_present_to_clear.setSrcQueueFamilyIndex(mPresentationQueueFamilyIndex); // ?
-        barrier_from_present_to_clear.setDstQueueFamilyIndex(mPresentationQueueFamilyIndex);
-        barrier_from_present_to_clear.setImage(mSwapChainImages[i]);
-        barrier_from_present_to_clear.setSubresourceRange(image_subresource_range);
-
-        vk::ImageMemoryBarrier barrier_from_clear_to_present;
-        barrier_from_clear_to_present.setSrcAccessMask(vk::AccessFlagBits::eTransferWrite);
-        barrier_from_clear_to_present.setDstAccessMask(vk::AccessFlagBits::eMemoryRead);
-        barrier_from_clear_to_present.setOldLayout(vk::ImageLayout::eTransferDstOptimal);
-        barrier_from_clear_to_present.setNewLayout(vk::ImageLayout::ePresentSrcKHR);
-        barrier_from_clear_to_present.setSrcQueueFamilyIndex(mPresentationQueueFamilyIndex);
-        barrier_from_clear_to_present.setDstQueueFamilyIndex(mPresentationQueueFamilyIndex);
-        barrier_from_clear_to_present.setImage(mSwapChainImages[i]);
-        barrier_from_clear_to_present.setSubresourceRange(image_subresource_range); 
-
-        mPresentCommandBuffers[i]->begin(cmd_buffer_begin_info);
-        // todo: understand the semantic
-        mPresentCommandBuffers[i]->pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eTransfer, { }, nullptr, nullptr, { barrier_from_present_to_clear });
-        // todo: the operation should be posted to graphics command queue
-        mPresentCommandBuffers[i]->clearColorImage(mSwapChainImages[i], vk::ImageLayout::eTransferDstOptimal, clear_color, { image_subresource_range });
-        mPresentCommandBuffers[i]->pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eBottomOfPipe, { }, nullptr, nullptr, { barrier_from_clear_to_present });
-        mPresentCommandBuffers[i]->end();
-    }
-}
-
-yuki::VulkanSwapChain::VulkanSwapChain(std::shared_ptr<VulkanGraphicsDevice> device, HINSTANCE hInstance, HWND hWnd)
+yuki::VulkanSwapChain::VulkanSwapChain(VulkanGraphicsDevice *device, HINSTANCE hInstance, HWND hWnd)
     : mVulkanGD(std::move(device))
 {
     vk::SemaphoreCreateInfo semaphore_create_info;
-    mImageAvailableSemaphore = mVulkanGD->mDevice.createSemaphoreUnique(semaphore_create_info);
-    mRenderingFinishedSemaphore = mVulkanGD->mDevice.createSemaphoreUnique(semaphore_create_info);
+    mImageAvailableSemaphore = { mVulkanGD->_getDevice().createSemaphoreUnique(semaphore_create_info), vk::PipelineStageFlagBits::eColorAttachmentOutput };
+    // todo correct stage
+    mRenderingFinishedSemaphore = { mVulkanGD->_getDevice().createSemaphoreUnique(semaphore_create_info), vk::PipelineStageFlagBits::eBottomOfPipe };
 
     vk::Win32SurfaceCreateInfoKHR surface_create_info;
     surface_create_info.setHinstance(hInstance);
     surface_create_info.setHwnd(hWnd);
-    mSurface = mVulkanGD->mInstance.createWin32SurfaceKHRUnique(surface_create_info);
+    mSurface = mVulkanGD->_getInstance().createWin32SurfaceKHRUnique(surface_create_info);
 
     _createSwapChain();
-    _createCommandBuffers();
-    _recordCommands();
+
+    auto images = mVulkanGD->_getDevice().getSwapchainImagesKHR(mSwapChain.get());
+    for(auto &&image : images)
+    {
+        vk::ImageViewCreateInfo image_view_create_info;
+        image_view_create_info.setImage(image);
+        image_view_create_info.setViewType(vk::ImageViewType::e2D);
+        image_view_create_info.setFormat(mSurfaceFormat);
+        vk::ImageSubresourceRange image_subresource_range;
+        image_subresource_range.setAspectMask(vk::ImageAspectFlagBits::eColor);
+        image_subresource_range.setBaseMipLevel(0);
+        image_subresource_range.setLevelCount(1);
+        image_subresource_range.setBaseArrayLayer(0);
+        image_subresource_range.setLayerCount(1);
+        image_view_create_info.setSubresourceRange(image_subresource_range);
+        auto full_image_view = mVulkanGD->_getDevice().createImageViewUnique(image_view_create_info);
+        mSwapChainImages.push_back(std::make_unique<VulkanSwapChainImage>(image, std::move(full_image_view)));
+    }
 }
 
-yuki::VulkanSwapChain::~VulkanSwapChain()
+void yuki::VulkanSwapChain::acquireNextImage()
 {
-}
-
-void yuki::VulkanSwapChain::present()
-{
-    const auto result = mVulkanGD->mDevice.acquireNextImageKHR(
+    const auto result = mVulkanGD->_getDevice().acquireNextImageKHR(
         mSwapChain.get(),
-        100000000, // 100ms
-        mImageAvailableSemaphore.get(), { }
+        1000000000, // 1s
+        mImageAvailableSemaphore._getSemaphore(), { }
     );
     switch(result.result)
     {
@@ -195,33 +146,41 @@ void yuki::VulkanSwapChain::present()
         case vk::Result::eNotReady:
         case vk::Result::eTimeout:
         case vk::Result::eSuboptimalKHR:
-        default:
-            throw;
+        default: throw GraphicsSwapChainNotAvailableException();
     }
+    mCurrentImageIndex = result.value;
+}
 
-    vk::PipelineStageFlags wait_dst_stage_mask = vk::PipelineStageFlagBits::eTransfer;
-    vk::SubmitInfo submit_info;
-    submit_info.setWaitSemaphoreCount(1);
-    submit_info.setPWaitSemaphores(&*mImageAvailableSemaphore);
-    submit_info.setPWaitDstStageMask(&wait_dst_stage_mask);
-    submit_info.setCommandBufferCount(1);
-    submit_info.setPCommandBuffers(&*mPresentCommandBuffers[result.value]);
-    submit_info.setSignalSemaphoreCount(1);
-    submit_info.setPSignalSemaphores(&*mRenderingFinishedSemaphore);
-    // todo create real presentation queue
-    mVulkanGD->mGraphicsQueue.submit({ submit_info }, { });
+yuki::GraphicsImage * yuki::VulkanSwapChain::getCurrentImage()
+{
+    return mSwapChainImages[mCurrentImageIndex].get();
+}
 
+void yuki::VulkanSwapChain::present()
+{
     vk::PresentInfoKHR present_info;
     present_info.setWaitSemaphoreCount(1);
-    present_info.setPWaitSemaphores(&*mRenderingFinishedSemaphore);
+    auto wait = mRenderingFinishedSemaphore._getSemaphore();
+    present_info.setPWaitSemaphores(&wait);
     // todo multi window presentation
     present_info.setSwapchainCount(1);
     present_info.setPSwapchains(&*mSwapChain);
-    present_info.setPImageIndices(&result.value);
-    mVulkanGD->mGraphicsQueue.presentKHR(present_info);
+    present_info.setPImageIndices(&mCurrentImageIndex);
+    // todo present to present queue
+    mVulkanGD->_getGraphicsQueue().presentKHR(present_info);
 }
 
-uint64_t yuki::VulkanSwapChain::getSurfaceFormat()
+const yuki::GraphicsSemaphore * yuki::VulkanSwapChain::accessImageAvailableSemaphore() const
 {
-    return static_cast<uint64_t>(mSurfaceFormat);
+    return &mImageAvailableSemaphore;
+}
+
+const yuki::GraphicsSemaphore * yuki::VulkanSwapChain::accessRenderingFinishedSemaphore() const
+{
+    return &mRenderingFinishedSemaphore;
+}
+
+uint32_t yuki::VulkanSwapChain::getNativeImageFormat()
+{
+    return static_cast<uint32_t>(mSurfaceFormat);
 }

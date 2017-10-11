@@ -40,13 +40,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -114,6 +114,8 @@
   <ItemGroup>
     <ClInclude Include="Camera\PerspectiveCamera.hpp" />
     <ClInclude Include="Component\Component.hpp" />
+    <ClInclude Include="Component\FrameEventListener.hpp" />
+    <ClInclude Include="Component\RayTraceableComponent.hpp" />
     <ClInclude Include="Debugging\DebugKeyMouseEventListener.hpp" />
     <ClInclude Include="Entity\Controller\EntityController.hpp" />
     <ClInclude Include="Entity\Controller\NoClipEntityController.hpp" />
@@ -121,6 +123,13 @@
     <ClInclude Include="Component\InteractiveComponent.hpp" />
     <ClInclude Include="Component\TimeVariantComponent.hpp" />
     <ClInclude Include="Extension\Extension.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGraphicsCommandList.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGraphicsCommandPool.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipeline.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGraphicsDevice.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanImage.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanSemaphore.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanSwapChain.hpp" />
     <ClInclude Include="Extension\Win32\WindowsHeader.hpp" />
     <ClInclude Include="Geometry\Angle.hpp" />
     <ClInclude Include="Geometry\Bound.hpp" />
@@ -134,9 +143,34 @@
     <ClInclude Include="Filesystem\Filesystem.hpp" />
     <ClInclude Include="Extension\GTA\GTA3IMGv2Filesystem.hpp" />
     <ClInclude Include="Camera\Camera.hpp" />
-    <ClInclude Include="Geometry\Transform.hpp" />
+    <ClInclude Include="Geometry\Shape.hpp" />
     <ClInclude Include="Renderer\Renderer.hpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGraphicsCommandList.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanExtension.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGraphicsCommandPool.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGraphicsDevice.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipeline.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanImage.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanSemaphore.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanSwapChain.cpp" />
+    <ClCompile Include="Runtime\Graphics\GraphicsPipeline.cpp" />
+    <ClCompile Include="Runtime\Graphics\SPIRVShader.cpp" />
+    <ClCompile Include="Runtime\Subsystem\ImmediateGuiImpl.cpp">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClInclude Include="Runtime\Exception.hpp" />
+    <ClInclude Include="Runtime\Graphics\GraphicsCommandPool.hpp" />
+    <ClInclude Include="Runtime\Graphics\GraphicsDevice2.hpp" />
+    <ClInclude Include="Runtime\Graphics\GraphicsImage.hpp" />
+    <ClInclude Include="Runtime\Graphics\GraphicsCommandList.hpp" />
+    <ClInclude Include="Runtime\Graphics\GraphicsImageLayout.hpp" />
+    <ClInclude Include="Runtime\Graphics\GraphicsPipeline.hpp" />
+    <ClInclude Include="Runtime\Graphics\GraphicsSemaphore.hpp" />
+    <ClInclude Include="Runtime\Graphics\SPIRVShader.hpp" />
+    <ClInclude Include="Runtime\Subsystem\ImmediateGuiManager.hpp" />
+    <ClInclude Include="Runtime\Graphics\SwapChain.hpp" />
     <ClInclude Include="Scene\Entity.hpp" />
+    <ClInclude Include="Sampling\Sampler.hpp" />
     <ClInclude Include="Time\Clock.hpp" />
     <ClInclude Include="Runtime\GraphicsDevice\ConstantBuffer.hpp" />
     <ClInclude Include="Debugging\DebugFullscreenTriangle.hpp" />
@@ -174,8 +208,8 @@
     <ClInclude Include="Extension\Win32\Win32Window.hpp" />
     <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Utility\BindingSentry.hpp" />
-    <ClInclude Include="Utility\Exception.hpp" />
     <ClInclude Include="Utility\File.hpp" />
+    <ClInclude Include="Utility\Math.hpp" />
     <ClInclude Include="Utility\Noncopyable.hpp" />
     <ClInclude Include="Utility\String.hpp" />
     <ClInclude Include="Utility\TypeCast.hpp" />
@@ -195,10 +229,13 @@
     <ClCompile Include="Filesystem\Filesystem.cpp" />
     <ClCompile Include="Extension\GTA\GTA3IMGv2Filesystem.cpp" />
     <ClCompile Include="Camera\Camera.cpp" />
+    <ClCompile Include="Geometry\Shape.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Runtime\HID\Keyboard\KeyCode.cpp" />
     <ClCompile Include="Runtime\HID\Mouse\MouseButtonCode.cpp" />
+    <ClCompile Include="Runtime\Subsystem\ImmediateGuiManager.cpp" />
     <ClCompile Include="Scene\Entity.cpp" />
+    <ClCompile Include="Sampling\Sampler.cpp" />
     <ClCompile Include="Time\Clock.cpp" />
     <ClCompile Include="Debugging\DebugFullscreenTriangle.cpp" />
     <ClCompile Include="Extension\OpenGL\detail\OpenGLBuffer.cpp" />

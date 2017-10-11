@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <Usagi/Engine/Runtime/GraphicsDevice/NativeDataType.hpp>
+#include "GraphicsImageLayout.hpp"
 
 namespace yuki
 {
@@ -99,6 +100,14 @@ struct GraphicsPipelineCreateInfo
     RasterizationState rasterization;
     DepthStencilState depth_stencil;
     ColorBlendState color_blend;
+
+    struct AttachmentUsage
+    {
+        uint32_t native_format;
+        GraphicsImageLayout initial_layout;
+        GraphicsImageLayout final_layout;
+    };
+    std::vector<AttachmentUsage> attachment_usages;
 };
 
 /**
@@ -112,8 +121,7 @@ class GraphicsPipeline
 public:
     virtual ~GraphicsPipeline() = default;
 
-    // todo remove format param
-    virtual void init(const GraphicsPipelineCreateInfo &info, uint64_t render_target_format) = 0;
+    virtual void init(const GraphicsPipelineCreateInfo &info) = 0;
 };
 
 }
