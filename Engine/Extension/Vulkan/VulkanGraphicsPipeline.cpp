@@ -10,7 +10,19 @@ yuki::VulkanGraphicsPipeline::VulkanGraphicsPipeline(VulkanGraphicsDevice *vulka
 {
 }
 
-vk::VertexInputRate yuki::VulkanGraphicsPipeline::translateVertexInputRate(yuki::VertexBufferBinding::InputRate rate)
+vk::Format yuki::VulkanGraphicsPipeline::translateSourceFormat(const GraphicsBufferElementType native_data)
+{
+    switch(native_data)
+    {
+        case GraphicsBufferElementType::R32_SFLOAT: return vk::Format::eR32Sfloat;
+        case GraphicsBufferElementType::R32G32_SFLOAT: return vk::Format::eR32G32Sfloat;
+        case GraphicsBufferElementType::R32G32B32_SFLOAT: return vk::Format::eR32G32B32Sfloat;
+        case GraphicsBufferElementType::R32G32B32A32_SFLOAT: return vk::Format::eR32G32B32A32Sfloat;
+        default: throw GraphicsAPIEnumTranslationException() << EnumInfo("vk::Format");
+    }
+}
+
+vk::VertexInputRate yuki::VulkanGraphicsPipeline::translateVertexInputRate(const yuki::VertexBufferBinding::InputRate rate)
 {
     switch(rate)
     {
@@ -112,7 +124,7 @@ vk::Pipeline yuki::VulkanGraphicsPipeline::_getPipeline() const
     return mPipeline.get();
 }
 
-void yuki::VulkanGraphicsPipeline::init(const GraphicsPipelineCreateInfo &info)
+void yuki::VulkanGraphicsPipeline::create(const GraphicsPipelineCreateInfo &info)
 {
     vk::GraphicsPipelineCreateInfo pipeline_create_info;
 
@@ -134,32 +146,30 @@ void yuki::VulkanGraphicsPipeline::init(const GraphicsPipelineCreateInfo &info)
     pipeline_create_info.setPStages(shader_stage_create_info);
 
     // vertex input
-    //vk::PipelineVertexInputStateCreateInfo vertex_input_state_create_info;
-    //std::vector<vk::VertexInputBindingDescription> vertex_input_binding;
-    //for(auto &&binding : info.vertex_input.bindings)
-    //{
-    //    vk::VertexInputBindingDescription vulkan_binding;
-    //    vulkan_binding.binding = binding.binding_slot;
-    //    vulkan_binding.stride = binding.stride;
-    //    vulkan_binding.inputRate = _translateVertexInputRate(binding.input_rate);
-    //    vertex_input_binding.push_back(std::move(vulkan_binding));
-    //}
-    //std::vector<vk::VertexInputAttributeDescription> vertex_input_attribute;
-    //for(auto &&attr : info.vertex_input.attributes)
-    //{
-    //    vk::VertexInputAttributeDescription vulkan_attr;
-    //    vulkan_attr.location = attr.location;
-    //    vulkan_attr.binding = attr.binding_slot;
-    //    vulkan_attr.offset = attr.offset;
-    //    vulkan_attr.format = _translatSourceFormat(attr.source_format);
-    //    vertex_input_attribute.push_back(std::move(vulkan_attr));
-    //}
-    //vertex_input_state_create_info.vertexBindingDescriptionCount = vertex_input_binding.size();
-    //vertex_input_state_create_info.pVertexBindingDescriptions = &vertex_input_binding[0];
-    //vertex_input_state_create_info.vertexAttributeDescriptionCount = vertex_input_attribute.size();
-    //vertex_input_state_create_info.pVertexAttributeDescriptions = &vertex_input_attribute[0];
-    //pipeline_create_info.pVertexInputState = &vertex_input_state_create_info;
     vk::PipelineVertexInputStateCreateInfo vertex_input_state_create_info;
+    std::vector<vk::VertexInputBindingDescription> vertex_input_binding;
+    for(auto &&binding : info.vertex_input.bindings)
+    {
+        vk::VertexInputBindingDescription vulkan_binding;
+        vulkan_binding.setBinding(binding.binding_slot);
+        vulkan_binding.setStride(binding.stride);
+        vulkan_binding.setInputRate(translateVertexInputRate(binding.input_rate));
+        vertex_input_binding.push_back(std::move(vulkan_binding));
+    }
+    std::vector<vk::VertexInputAttributeDescription> vertex_input_attribute;
+    for(auto &&attr : info.vertex_input.attributes)
+    {
+        vk::VertexInputAttributeDescription vulkan_attr;
+        vulkan_attr.setLocation(attr.location);
+        vulkan_attr.setBinding(attr.binding_slot);
+        vulkan_attr.setOffset(attr.offset);
+        vulkan_attr.setFormat(translateSourceFormat(attr.source_format));
+        vertex_input_attribute.push_back(std::move(vulkan_attr));
+    }
+    vertex_input_state_create_info.setVertexBindingDescriptionCount(vertex_input_binding.size());
+    vertex_input_state_create_info.setPVertexBindingDescriptions(vertex_input_binding.data());
+    vertex_input_state_create_info.setVertexAttributeDescriptionCount(vertex_input_attribute.size());
+    vertex_input_state_create_info.setPVertexAttributeDescriptions(vertex_input_attribute.data());
     pipeline_create_info.setPVertexInputState(&vertex_input_state_create_info);
 
     // input assembly
@@ -171,22 +181,9 @@ void yuki::VulkanGraphicsPipeline::init(const GraphicsPipelineCreateInfo &info)
 
     // viewport
     vk::PipelineViewportStateCreateInfo viewport_state_create_info;
-    vk::Viewport viewport;
-    // todo: link with window size
-    viewport.setX(0);
-    viewport.setY(0);
-    viewport.setWidth(1280);
-    viewport.setHeight(720);
-    viewport.setMinDepth(0);
-    viewport.setMaxDepth(1);
+    // these two are set as dynamic states in command lists
     viewport_state_create_info.setViewportCount(1);
-    viewport_state_create_info.setPViewports(&viewport);
-    vk::Rect2D scissor;
-    // todo: window size
-    scissor.setExtent({ 1280, 720 });
-    scissor.setOffset({ 0, 0 });
     viewport_state_create_info.setScissorCount(1);
-    viewport_state_create_info.setPScissors(&scissor);
     pipeline_create_info.setPViewportState(&viewport_state_create_info);
 
     // rasterization
@@ -261,11 +258,30 @@ void yuki::VulkanGraphicsPipeline::init(const GraphicsPipelineCreateInfo &info)
     subpass_description.setColorAttachmentCount(attachment_references.size());
     subpass_description.setPColorAttachments(attachment_references.data());
     
+    std::vector<vk::SubpassDependency> subpass_dependencies { 2, { } };
+    subpass_dependencies[0].setSrcSubpass(VK_SUBPASS_EXTERNAL);
+    subpass_dependencies[0].setDstSubpass(0);
+    subpass_dependencies[0].setSrcStageMask(vk::PipelineStageFlagBits::eBottomOfPipe);
+    subpass_dependencies[0].setDstStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
+    subpass_dependencies[0].setSrcAccessMask(vk::AccessFlagBits::eMemoryRead);
+    subpass_dependencies[0].setDstAccessMask(vk::AccessFlagBits::eColorAttachmentWrite);
+    subpass_dependencies[0].setDependencyFlags(vk::DependencyFlagBits::eByRegion);
+
+    subpass_dependencies[1].setSrcSubpass(0);
+    subpass_dependencies[1].setDstSubpass(VK_SUBPASS_EXTERNAL);
+    subpass_dependencies[1].setSrcStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
+    subpass_dependencies[1].setDstStageMask(vk::PipelineStageFlagBits::eBottomOfPipe);
+    subpass_dependencies[1].setSrcAccessMask(vk::AccessFlagBits::eColorAttachmentWrite);
+    subpass_dependencies[1].setDstAccessMask(vk::AccessFlagBits::eMemoryRead);
+    subpass_dependencies[1].setDependencyFlags(vk::DependencyFlagBits::eByRegion);
+
     vk::RenderPassCreateInfo render_pass_create_info;
     render_pass_create_info.setAttachmentCount(attachment_descriptions.size());
     render_pass_create_info.setPAttachments(attachment_descriptions.data());
     render_pass_create_info.setSubpassCount(1);
     render_pass_create_info.setPSubpasses(&subpass_description);
+    render_pass_create_info.setDependencyCount(subpass_dependencies.size());
+    render_pass_create_info.setPDependencies(subpass_dependencies.data());
     mRenderPass = mVulkanGD->_getDevice().createRenderPassUnique(render_pass_create_info);
     
     pipeline_create_info.setRenderPass(mRenderPass.get());

@@ -4,6 +4,7 @@
 #include "VulkanImage.hpp"
 #include "VulkanGraphicsDevice.hpp"
 #include "VulkanGraphicsPipeline.hpp"
+#include "VulkanVertexBuffer.hpp"
 
 //void yuki::VulkanGraphicsCommandList::imageMemoryBarrier(GraphicsImage *image, vk::AccessFlags src_access_mask,
 //    vk::AccessFlags dst_access_mask, GraphicsImageLayout old_layout, GraphicsImageLayout new_layout,
@@ -94,6 +95,14 @@ void yuki::VulkanGraphicsCommandList::setViewport(float x, float y, float width,
 void yuki::VulkanGraphicsCommandList::setScissor(int32_t x, int32_t y, int32_t width, int32_t height)
 {
     mCommandBuffer->setScissor(0, { { { x, y }, { static_cast<uint32_t>(width), static_cast<uint32_t>(height) } } });
+}
+
+void yuki::VulkanGraphicsCommandList::bindVertexBuffer(uint32_t slot, VertexBuffer *buffer)
+{
+    VulkanVertexBuffer *vulkan_vertex_buffer = dynamic_cast<VulkanVertexBuffer*>(buffer);
+    if(!vulkan_vertex_buffer) throw MismatchedSubsystemComponentException() << SubsystemInfo("Rendering") << ComponentInfo("VulkanVertexBuffer");
+
+    mCommandBuffer->bindVertexBuffers(slot, { vulkan_vertex_buffer->_getBuffer() }, { 0 });
 }
 
 void yuki::VulkanGraphicsCommandList::draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex,

@@ -18,6 +18,8 @@ public:
     const ByteCodeWord * getByteCode() const;
 
     static std::shared_ptr<SPIRVShader> readFromFile(const std::string &file_path);
+    //static std::shared_ptr<SPIRVShader> compileFromFile(const std::string &file_path);
+    //static std::shared_ptr<SPIRVShader> compileFromString(const std::string &source_code);
 };
 
 }

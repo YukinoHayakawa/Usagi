@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include <Usagi/Engine/Runtime/GraphicsDevice/NativeDataType.hpp>
 #include "GraphicsImageLayout.hpp"
+#include "GraphicsBufferElementType.hpp"
 
 namespace yuki
 {
@@ -83,7 +83,7 @@ struct VertexAttribute
 {
     uint32_t location;
     uint32_t binding_slot;
-    NativeDataType source_format;
+    GraphicsBufferElementType source_format;
     uint32_t offset;
 };
 
@@ -94,7 +94,7 @@ struct GraphicsPipelineCreateInfo
         std::vector<VertexBufferBinding> bindings;
         std::vector<VertexAttribute> attributes;
     } vertex_input;
-    
+
     std::shared_ptr<class SPIRVShader> vertex_shader, fragment_shader;
     InputAssembleState input_assembly;
     RasterizationState rasterization;
@@ -121,7 +121,7 @@ class GraphicsPipeline
 public:
     virtual ~GraphicsPipeline() = default;
 
-    virtual void init(const GraphicsPipelineCreateInfo &info) = 0;
+    virtual void create(const GraphicsPipelineCreateInfo &info) = 0;
 };
 
 }

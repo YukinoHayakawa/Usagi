@@ -9,6 +9,7 @@
 #include "VulkanGraphicsPipeline.hpp"
 #include "VulkanGraphicsCommandPool.hpp"
 #include "VulkanGraphicsCommandList.hpp"
+#include "VulkanVertexBuffer.hpp"
 
 VkBool32 yuki::VulkanGraphicsDevice::_debugLayerCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char *layerPrefix, const char *msg, void *userData)
 {
@@ -171,6 +172,11 @@ yuki::VulkanGraphicsDevice::VulkanGraphicsDevice()
     _createGraphicsQueue();
 }
 
+yuki::VulkanGraphicsDevice::~VulkanGraphicsDevice()
+{
+    VulkanGraphicsDevice::waitIdle();
+}
+
 std::shared_ptr<yuki::SwapChain> yuki::VulkanGraphicsDevice::createSwapChain(std::shared_ptr<Window> window)
 {
     if(auto native_window = std::dynamic_pointer_cast<Win32Window>(window))
@@ -191,8 +197,13 @@ std::shared_ptr<yuki::GraphicsCommandPool> yuki::VulkanGraphicsDevice::createGra
     return pool;
 }
 
+std::shared_ptr<yuki::VertexBuffer> yuki::VulkanGraphicsDevice::createVertexBuffer(size_t size)
+{
+    return std::make_shared<VulkanVertexBuffer>(size, _getDevice(), _getPhysicalDevice());
+}
+
 void yuki::VulkanGraphicsDevice::submitGraphicsCommandList(
-    class GraphicsCommandList *command_list,
+    GraphicsCommandList *command_list,
     const std::vector<const GraphicsSemaphore *> &wait_semaphores,
     const std::vector<const GraphicsSemaphore *> &signal_semaphores
 )

@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <memory>
 #include <vulkan/vulkan.hpp>
 
 #include <Usagi/Engine/Runtime/Graphics/GraphicsDevice2.hpp>
@@ -35,11 +34,13 @@ class VulkanGraphicsDevice : public GraphicsDevice2
 
 public:
     VulkanGraphicsDevice();
+    ~VulkanGraphicsDevice() override;
 
     // todo: remove param
-    std::shared_ptr<class SwapChain> createSwapChain(std::shared_ptr<class Window> window) override;
-    std::shared_ptr<class GraphicsPipeline> createGraphicsPipeline() override;
-    std::shared_ptr<class GraphicsCommandPool> createGraphicsCommandPool() override;
+    std::shared_ptr<SwapChain> createSwapChain(std::shared_ptr<class Window> window) override;
+    std::shared_ptr<GraphicsPipeline> createGraphicsPipeline() override;
+    std::shared_ptr<GraphicsCommandPool> createGraphicsCommandPool() override;
+    std::shared_ptr<VertexBuffer> createVertexBuffer(size_t size) override;
 
     void submitGraphicsCommandList(
         class GraphicsCommandList *command_list,

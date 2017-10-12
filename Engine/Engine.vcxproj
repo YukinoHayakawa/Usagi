@@ -123,6 +123,7 @@
     <ClInclude Include="Component\InteractiveComponent.hpp" />
     <ClInclude Include="Component\TimeVariantComponent.hpp" />
     <ClInclude Include="Extension\Extension.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanBuffer.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanGraphicsCommandList.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanGraphicsCommandPool.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipeline.hpp" />
@@ -130,6 +131,7 @@
     <ClInclude Include="Extension\Vulkan\VulkanImage.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanSemaphore.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanSwapChain.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanVertexBuffer.hpp" />
     <ClInclude Include="Extension\Win32\WindowsHeader.hpp" />
     <ClInclude Include="Geometry\Angle.hpp" />
     <ClInclude Include="Geometry\Bound.hpp" />
@@ -145,6 +147,7 @@
     <ClInclude Include="Camera\Camera.hpp" />
     <ClInclude Include="Geometry\Shape.hpp" />
     <ClInclude Include="Renderer\Renderer.hpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanBuffer.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanGraphicsCommandList.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanExtension.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanGraphicsCommandPool.cpp" />
@@ -153,12 +156,14 @@
     <ClCompile Include="Extension\Vulkan\VulkanImage.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanSemaphore.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanSwapChain.cpp" />
-    <ClCompile Include="Runtime\Graphics\GraphicsPipeline.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanVertexBuffer.cpp" />
+    <ClCompile Include="Runtime\Graphics\GraphicsBuffer.cpp" />
     <ClCompile Include="Runtime\Graphics\SPIRVShader.cpp" />
     <ClCompile Include="Runtime\Subsystem\ImmediateGuiImpl.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>
     <ClInclude Include="Runtime\Exception.hpp" />
+    <ClInclude Include="Runtime\Graphics\GraphicsBuffer.hpp" />
     <ClInclude Include="Runtime\Graphics\GraphicsCommandPool.hpp" />
     <ClInclude Include="Runtime\Graphics\GraphicsDevice2.hpp" />
     <ClInclude Include="Runtime\Graphics\GraphicsImage.hpp" />
@@ -167,6 +172,8 @@
     <ClInclude Include="Runtime\Graphics\GraphicsPipeline.hpp" />
     <ClInclude Include="Runtime\Graphics\GraphicsSemaphore.hpp" />
     <ClInclude Include="Runtime\Graphics\SPIRVShader.hpp" />
+    <ClInclude Include="Runtime\Graphics\GraphicsBufferElementType.hpp" />
+    <ClInclude Include="Runtime\Graphics\VertexBuffer.hpp" />
     <ClInclude Include="Runtime\Subsystem\ImmediateGuiManager.hpp" />
     <ClInclude Include="Runtime\Graphics\SwapChain.hpp" />
     <ClInclude Include="Scene\Entity.hpp" />
