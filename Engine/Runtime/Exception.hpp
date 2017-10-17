@@ -19,6 +19,7 @@ struct OSException : virtual RuntimeException { };
 struct GraphicsException : virtual RuntimeException { };
 struct FileException : virtual RuntimeException { };
 struct MemoryException : virtual RuntimeException { };
+struct TimeoutException : virtual RuntimeException { };
 
 // - File Exceptions
 
@@ -50,6 +51,10 @@ struct OutOfBoundException : virtual LogicException { };
 typedef boost::error_info<struct tagSubsystem, std::string> SubsystemInfo;
 typedef boost::error_info<struct tagComponent, std::string> ComponentInfo;
 struct MismatchedSubsystemComponentException : virtual LogicException { };
+struct InvalidArgumentException : virtual LogicException { };
+struct NotExpectedToBeReachedException : virtual LogicException { };
+typedef boost::error_info<struct tagConfigure, std::string> ConfigureInfo;
+struct InappropriatelyConfiguredException : virtual LogicException { };
 
 // Combined Exception Types
 
@@ -68,6 +73,6 @@ struct GraphicsDeviceMemoryAllocationFailureException : virtual GraphicsExceptio
 
 // - Memory Exception Family
 struct MemoryAccessOutOfBoundException : virtual MemoryException, virtual OutOfBoundException { };
-struct UnmappingUnmappedMemoryRangeException : virtual MemoryException, virtual LogicException { };
+struct UnmatchedMemoryPoolException : virtual MemoryException, virtual LogicException { };
 
 }

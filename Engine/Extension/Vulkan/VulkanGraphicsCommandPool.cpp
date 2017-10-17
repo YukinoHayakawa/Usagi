@@ -6,6 +6,7 @@ yuki::VulkanGraphicsCommandPool::VulkanGraphicsCommandPool(VulkanGraphicsDevice 
     : mVulkanGD { vulkan_gd }
 {
     vk::CommandPoolCreateInfo pool_create_info;
+    pool_create_info.setFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer | vk::CommandPoolCreateFlagBits::eTransient);
     pool_create_info.setQueueFamilyIndex(mVulkanGD->getGraphicsQueueFamilyIndex());
 
     mCommandPool = mVulkanGD->_getDevice().createCommandPoolUnique(pool_create_info);

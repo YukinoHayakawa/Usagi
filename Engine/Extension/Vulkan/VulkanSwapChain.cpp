@@ -104,8 +104,6 @@ yuki::VulkanSwapChain::VulkanSwapChain(VulkanGraphicsDevice *device, HINSTANCE h
 {
     vk::SemaphoreCreateInfo semaphore_create_info;
     mImageAvailableSemaphore = { mVulkanGD->_getDevice().createSemaphoreUnique(semaphore_create_info), vk::PipelineStageFlagBits::eColorAttachmentOutput };
-    // todo correct stage
-    mRenderingFinishedSemaphore = { mVulkanGD->_getDevice().createSemaphoreUnique(semaphore_create_info), vk::PipelineStageFlagBits::eBottomOfPipe };
 
     vk::Win32SurfaceCreateInfoKHR surface_create_info;
     surface_create_info.setHinstance(hInstance);
@@ -137,7 +135,7 @@ void yuki::VulkanSwapChain::acquireNextImage()
 {
     const auto result = mVulkanGD->_getDevice().acquireNextImageKHR(
         mSwapChain.get(),
-        1000000000, // 1s
+        UINT64_MAX,
         mImageAvailableSemaphore._getSemaphore(), { }
     );
     switch(result.result)
@@ -156,12 +154,13 @@ yuki::GraphicsImage * yuki::VulkanSwapChain::getCurrentImage()
     return mSwapChainImages[mCurrentImageIndex].get();
 }
 
-void yuki::VulkanSwapChain::present()
+void yuki::VulkanSwapChain::present(const std::vector<yuki::GraphicsSemaphore *> wait_semaphores)
 {
+    std::vector<vk::Semaphore> vulkan_semaphores = VulkanSemaphore::_convertToVulkanHandles(wait_semaphores, nullptr);
+
     vk::PresentInfoKHR present_info;
-    present_info.setWaitSemaphoreCount(1);
-    auto wait = mRenderingFinishedSemaphore._getSemaphore();
-    present_info.setPWaitSemaphores(&wait);
+    present_info.setWaitSemaphoreCount(vulkan_semaphores.size());
+    present_info.setPWaitSemaphores(vulkan_semaphores.data());
     // todo multi window presentation
     present_info.setSwapchainCount(1);
     present_info.setPSwapchains(&*mSwapChain);
@@ -170,14 +169,9 @@ void yuki::VulkanSwapChain::present()
     mVulkanGD->_getGraphicsQueue().presentKHR(present_info);
 }
 
-const yuki::GraphicsSemaphore * yuki::VulkanSwapChain::accessImageAvailableSemaphore() const
+yuki::GraphicsSemaphore * yuki::VulkanSwapChain::getImageAvailableSemaphore() 
 {
     return &mImageAvailableSemaphore;
-}
-
-const yuki::GraphicsSemaphore * yuki::VulkanSwapChain::accessRenderingFinishedSemaphore() const
-{
-    return &mRenderingFinishedSemaphore;
 }
 
 uint32_t yuki::VulkanSwapChain::getNativeImageFormat()

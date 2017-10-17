@@ -129,6 +129,7 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
     _ensureWindowSubsystemInitialized();
     _createWindowHandle(title, width, height);
     _registerRawInputDevices();
+    Win32Window::showWindow(true);
     Win32Window::centerCursor();
 }
 
@@ -161,6 +162,11 @@ void yuki::Win32Window::processEvents()
 Eigen::Vector2f yuki::Win32Window::getWindowSize() const
 {
     return mWindowSize.cast<float>();
+}
+
+bool yuki::Win32Window::isWindowOpen() const
+{
+    return !mClosed;
 }
 
 LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -435,7 +441,7 @@ void yuki::Win32Window::_processKeyboardInput(RAWINPUT *raw)
     // ignore keys other than those on 101 keyboard
     if(key == KeyCode::UNKNOWN) return;
 
-    bool pressed = (kb.Flags & RI_KEY_BREAK) == 0;
+    const bool pressed = (kb.Flags & RI_KEY_BREAK) == 0;
     bool repeated = false;
 
     if(pressed)
@@ -537,9 +543,14 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
         {
             break;
         }
+        case WM_CLOSE:
+        {
+            DestroyWindow(mWindowHandle);
+            break;
+        }
         case WM_DESTROY:
         {
-            // todo: fix the message loop does not exit after closing the window
+            mClosed = true;
             PostQuitMessage(0);
             break;
         }
@@ -585,7 +596,7 @@ bool yuki::Win32Window::_isCursorCaptured()
 
 void yuki::Win32Window::centerCursor()
 {
-    auto rect = _getClientScreenRect();
+    const auto rect = _getClientScreenRect();
     Eigen::Vector2i cursor {
         (rect.left + rect.right) / 2,
         (rect.top + rect.bottom) / 2
@@ -603,7 +614,7 @@ void yuki::Win32Window::showCursor(bool show)
 
 bool yuki::Win32Window::isMouseButtonPressed(MouseButtonCode button) const
 {
-    auto idx = static_cast<size_t>(button);
+    const auto idx = static_cast<size_t>(button);
     if(idx > sizeof(mMouseButtonDown) / sizeof(bool)) return false;
     return mMouseButtonDown[idx];
 }

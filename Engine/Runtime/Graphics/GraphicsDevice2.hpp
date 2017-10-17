@@ -16,15 +16,15 @@ public:
     virtual ~GraphicsDevice2() = default;
 
     // todo: remove param
-    virtual std::shared_ptr<class SwapChain> createSwapChain(std::shared_ptr<class Window> window) = 0;
-    virtual std::shared_ptr<class GraphicsPipeline> createGraphicsPipeline() = 0;
-    virtual std::shared_ptr<class GraphicsCommandPool> createGraphicsCommandPool() = 0;
-    virtual std::shared_ptr<class VertexBuffer> createVertexBuffer(size_t size) = 0;
+    virtual std::unique_ptr<class SwapChain> createSwapChain(class Window *window) = 0;
+    virtual std::unique_ptr<class GraphicsPipeline> createGraphicsPipeline() = 0;
+    virtual std::unique_ptr<class FrameController> createFrameController(size_t num_frames) = 0;
+    virtual std::unique_ptr<class GraphicsCommandPool> createGraphicsCommandPool() = 0;
 
     virtual void submitGraphicsCommandList(
         class GraphicsCommandList *command_list,
-        const std::vector<const GraphicsSemaphore *> &wait_semaphores,
-        const std::vector<const GraphicsSemaphore *> &signal_semaphores
+        const std::vector<GraphicsSemaphore *> &wait_semaphores,
+        const std::vector<GraphicsSemaphore *> &signal_semaphores
     ) = 0;
 
     virtual void waitIdle() = 0;

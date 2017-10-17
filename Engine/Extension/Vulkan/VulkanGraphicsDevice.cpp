@@ -9,7 +9,7 @@
 #include "VulkanGraphicsPipeline.hpp"
 #include "VulkanGraphicsCommandPool.hpp"
 #include "VulkanGraphicsCommandList.hpp"
-#include "VulkanVertexBuffer.hpp"
+#include "VulkanFrameController.hpp"
 
 VkBool32 yuki::VulkanGraphicsDevice::_debugLayerCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char *layerPrefix, const char *msg, void *userData)
 {
@@ -177,51 +177,42 @@ yuki::VulkanGraphicsDevice::~VulkanGraphicsDevice()
     VulkanGraphicsDevice::waitIdle();
 }
 
-std::shared_ptr<yuki::SwapChain> yuki::VulkanGraphicsDevice::createSwapChain(std::shared_ptr<Window> window)
+std::unique_ptr<yuki::SwapChain> yuki::VulkanGraphicsDevice::createSwapChain(yuki::Window *window)
 {
-    if(auto native_window = std::dynamic_pointer_cast<Win32Window>(window))
+    if(auto native_window = dynamic_cast<Win32Window*>(window))
     {
-        return std::make_shared<VulkanSwapChain>(this, native_window->getProcessInstanceHandle(), native_window->getNativeWindowHandle());
+        return std::make_unique<VulkanSwapChain>(this, native_window->getProcessInstanceHandle(), native_window->getNativeWindowHandle());
     }
     throw OSAPIUnsupportedPlatformException() << PlatformDescriptionInfo("The windowing system on Win32 is not native.");
 }
 
-std::shared_ptr<yuki::GraphicsPipeline> yuki::VulkanGraphicsDevice::createGraphicsPipeline()
+std::unique_ptr<yuki::GraphicsPipeline> yuki::VulkanGraphicsDevice::createGraphicsPipeline()
 {
-    return std::make_shared<VulkanGraphicsPipeline>(this);
+    return std::make_unique<VulkanGraphicsPipeline>(this);
 }
 
-std::shared_ptr<yuki::GraphicsCommandPool> yuki::VulkanGraphicsDevice::createGraphicsCommandPool()
+std::unique_ptr<yuki::GraphicsCommandPool> yuki::VulkanGraphicsDevice::createGraphicsCommandPool()
 {
-    auto pool = std::make_shared<VulkanGraphicsCommandPool>(this);
-    return pool;
+    return std::make_unique<VulkanGraphicsCommandPool>(this);
 }
 
-std::shared_ptr<yuki::VertexBuffer> yuki::VulkanGraphicsDevice::createVertexBuffer(size_t size)
+std::unique_ptr<yuki::FrameController> yuki::VulkanGraphicsDevice::createFrameController(size_t num_frames)
 {
-    return std::make_shared<VulkanVertexBuffer>(size, _getDevice(), _getPhysicalDevice());
+    return std::make_unique<VulkanFrameController> (this, 2);
 }
 
 void yuki::VulkanGraphicsDevice::submitGraphicsCommandList(
     GraphicsCommandList *command_list,
-    const std::vector<const GraphicsSemaphore *> &wait_semaphores,
-    const std::vector<const GraphicsSemaphore *> &signal_semaphores
+    const std::vector<yuki::GraphicsSemaphore *> &wait_semaphores,
+    const std::vector<yuki::GraphicsSemaphore *> &signal_semaphores
 )
 {
     VulkanGraphicsCommandList *vulkan_cmd_list = dynamic_cast<VulkanGraphicsCommandList*>(command_list);
     if(!vulkan_cmd_list) throw MismatchedSubsystemComponentException() << SubsystemInfo("Rendering") << ComponentInfo("VulkanCommandList");
 
-    std::vector<vk::Semaphore> vulkan_wait_semaphores, vulkan_signal_semaphores;
     std::vector<vk::PipelineStageFlags> wait_stages;
-    for(auto &&s : wait_semaphores)
-    {
-        vulkan_wait_semaphores.push_back(vk::Semaphore(reinterpret_cast<VkSemaphore>(s->getSemaphoreHandle())));
-        wait_stages.push_back(vk::PipelineStageFlags(static_cast<vk::PipelineStageFlagBits>(s->getNativePipelineStage())));
-    }
-    for(auto &&s : signal_semaphores)
-    {
-        vulkan_signal_semaphores.push_back(vk::Semaphore(reinterpret_cast<VkSemaphore>(s->getSemaphoreHandle())));
-    }
+    std::vector<vk::Semaphore> vulkan_wait_semaphores = VulkanSemaphore::_convertToVulkanHandles(wait_semaphores, &wait_stages),
+        vulkan_signal_semaphores = VulkanSemaphore::_convertToVulkanHandles(signal_semaphores, nullptr);
 
     auto buffer = vulkan_cmd_list->_getCommandBuffer();
     vk::SubmitInfo submit_info;

@@ -25,6 +25,7 @@ class Win32Window
     HWND mWindowHandle = nullptr;
     Eigen::Vector2i mWindowSize;
     bool mWindowActive;
+    bool mClosed = false;
 
     static void _ensureWindowSubsystemInitialized();
     RECT _getClientScreenRect() const;
@@ -87,6 +88,7 @@ public:
     void showWindow(bool show) override;
     bool isWindowActive() const override;
     Eigen::Vector2f getWindowSize() const override;
+    bool isWindowOpen() const override;
 
     void processEvents() override;
 

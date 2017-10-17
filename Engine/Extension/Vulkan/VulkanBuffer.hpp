@@ -2,27 +2,26 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <Usagi/Engine/Runtime/Graphics/VertexBuffer.hpp>
+#include <Usagi/Engine/Runtime/Graphics/GraphicsBuffer.hpp>
+#include "VulkanMemoryAllocator.hpp"
 
 namespace yuki
 {
 
-class VulkanBuffer : public virtual GraphicsBuffer
+class VulkanBuffer : public GraphicsBuffer
 {
-protected:
-    vk::Device mDevice;
-    vk::UniqueBuffer mBuffer;
-    vk::UniqueDeviceMemory mMemory;
-    bool mIsMapped = false;
-    size_t mMappingOffset = 0;
+    class GraphicsMemoryAllocator *mAllocator = nullptr;
+    GraphicsMemoryAllocator::Allocation mAllocation;
 
 public:
-    VulkanBuffer::VulkanBuffer(vk::BufferUsageFlags usage, size_t size, vk::Device device, vk::PhysicalDevice physical_device);
+    VulkanBuffer(size_t size, class GraphicsMemoryAllocator *allocator);
 
-    void * map(size_t offset, size_t size) override;
-    void unmap() override;
+    void * getMappedAddress() override;
+    void flush() override;
+    void reallocate() override;
 
     vk::Buffer _getBuffer() const;
+    size_t _getOffset() const;
 };
 
 }

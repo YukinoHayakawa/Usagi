@@ -17,12 +17,12 @@ class VulkanSwapChain : public SwapChain
 {
     class VulkanGraphicsDevice *mVulkanGD;
 
-    VulkanSemaphore mImageAvailableSemaphore, mRenderingFinishedSemaphore;
     vk::UniqueSurfaceKHR mSurface;
     vk::Format mSurfaceFormat = vk::Format::eUndefined;
     vk::UniqueSwapchainKHR mSwapChain;
     std::vector<std::unique_ptr<class VulkanSwapChainImage>> mSwapChainImages;
     uint32_t mCurrentImageIndex = 0;
+    VulkanSemaphore mImageAvailableSemaphore;
 
     uint32_t mPresentationQueueFamilyIndex = 0;
 
@@ -42,10 +42,9 @@ public:
 
     void acquireNextImage() override;
     GraphicsImage * getCurrentImage() override;
-    void present() override;
+    void present(const std::vector<GraphicsSemaphore *> wait_semaphores) override;
 
-    const GraphicsSemaphore * accessImageAvailableSemaphore() const override;
-    const GraphicsSemaphore * accessRenderingFinishedSemaphore() const override;
+    GraphicsSemaphore * getImageAvailableSemaphore() override;
 
     uint32_t getNativeImageFormat() override;
 };

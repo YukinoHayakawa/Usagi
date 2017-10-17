@@ -10,8 +10,15 @@ namespace yuki
 class VulkanGraphicsCommandList : public GraphicsCommandList
 {
     class VulkanGraphicsDevice *mVulkanGD;
+
     vk::UniqueCommandBuffer mCommandBuffer;
+
+    std::vector<vk::ImageView> mImageViews;
+    std::vector<vk::ClearValue> mClearColors;
+    vk::FramebufferCreateInfo mFrameBufferCreateInfo;
     vk::UniqueFramebuffer mFramebuffer;
+    bool mInvalidFramebuffer = true;
+    class VulkanGraphicsPipeline *mCurrentPipeline = nullptr;
 
     //void imageMemoryBarrier(
     //    GraphicsImage *image,
@@ -26,18 +33,21 @@ class VulkanGraphicsCommandList : public GraphicsCommandList
 public:
     VulkanGraphicsCommandList(VulkanGraphicsDevice *vulkan_gd, vk::UniqueCommandBuffer command_buffer);
 
-    void begin(const GraphicsPipelineAssembly &assembly) override;
+    void begin() override;
+
+    void bindPipeline(GraphicsPipeline *pipeline) override;
 
     void setViewport(float x, float y, float width, float height) override;
     void setScissor(int32_t x, int32_t y, int32_t width, int32_t height) override;
 
-    void bindVertexBuffer(uint32_t slot, VertexBuffer *buffer) override;
+    void bindVertexBuffer(uint32_t slot, GraphicsBuffer *buffer) override;
 
     void draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex, uint32_t first_instance) override;
 
     void end() override;
 
     vk::CommandBuffer _getCommandBuffer() const;
+    void _setAttachments(const std::vector<class GraphicsImage *> &attachments);
 };
 
 }

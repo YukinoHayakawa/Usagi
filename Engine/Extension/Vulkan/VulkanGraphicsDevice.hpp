@@ -37,15 +37,15 @@ public:
     ~VulkanGraphicsDevice() override;
 
     // todo: remove param
-    std::shared_ptr<SwapChain> createSwapChain(std::shared_ptr<class Window> window) override;
-    std::shared_ptr<GraphicsPipeline> createGraphicsPipeline() override;
-    std::shared_ptr<GraphicsCommandPool> createGraphicsCommandPool() override;
-    std::shared_ptr<VertexBuffer> createVertexBuffer(size_t size) override;
+    std::unique_ptr<SwapChain> createSwapChain(Window *window) override;
+    std::unique_ptr<GraphicsPipeline> createGraphicsPipeline() override;
+    std::unique_ptr<GraphicsCommandPool> createGraphicsCommandPool() override;
+    std::unique_ptr<FrameController> createFrameController(size_t num_frames) override;
 
     void submitGraphicsCommandList(
         class GraphicsCommandList *command_list,
-        const std::vector<const GraphicsSemaphore *> &wait_semaphores,
-        const std::vector<const GraphicsSemaphore *> &signal_semaphores
+        const std::vector<GraphicsSemaphore *> &wait_semaphores,
+        const std::vector<GraphicsSemaphore *> &signal_semaphores
     ) override;
 
     void waitIdle() override;

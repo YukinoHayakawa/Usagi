@@ -4,6 +4,7 @@ namespace yuki
 {
 
 enum class KeyCode;
+class Keyboard;
 
 struct KeyEvent
 {
