@@ -83,6 +83,8 @@ void yuki::VulkanGraphicsCommandList::bindPipeline(GraphicsPipeline *pipeline)
 
     mCommandBuffer->beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline);
     mCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, vulkan_pipeline->_getPipeline());
+
+    mCurrentPipeline = vulkan_pipeline;
 }
 
 void yuki::VulkanGraphicsCommandList::setViewport(float x, float y, float width, float height)
