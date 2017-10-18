@@ -32,8 +32,8 @@ int main(int argc, char *argv[])
         window->addMouseEventListener(camman);
         window->addKeyEventListener(camman);
 
-        auto inputdebug = std::make_shared<DebugKeyMouseEventListener>();
-        window->addKeyEventListener(inputdebug);
+        //auto inputdebug = std::make_shared<DebugKeyMouseEventListener>();
+        //window->addKeyEventListener(inputdebug);
         //window->addMouseEventListener(inputdebug);
 
 
@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
 
             device->clearCurrentFrameBuffer();
             debug_draw_manager.render(master_clock);
-
             device->swapFrameBuffers();
         }
     }

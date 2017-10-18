@@ -8,20 +8,20 @@ namespace yuki
 /**
  * \brief Provide a simple measurement of time.
  * 
- * todo: the precision of double changes over time, use a data type with invariant precesion instead.
+ * todo: the precision of double changes over time, use a data type with invariant precision instead.
  */
 class Clock
 {
-    typedef std::chrono::high_resolution_clock ClockType;
-    typedef ClockType::time_point TimePoint;
+    typedef std::chrono::high_resolution_clock Time;
+    typedef Time::time_point TimePoint;
 
-    TimePoint mClockStart = std::chrono::high_resolution_clock::now();
+    TimePoint mClockStart = Time::now();
     TimePoint mLastTick = mClockStart;
 
     static double _getDuration(const TimePoint &begin, const TimePoint &end)
     {
         // todo: check precision
-        std::chrono::duration<double, std::deca> diff = end - begin;
+        std::chrono::duration<double> diff = end - begin;
         return diff.count();
     }
 
@@ -30,27 +30,24 @@ public:
      * \brief 
      * \return Time since the creation of this class in seconds.
      */
-    double getTime() const
+    double getTotalElapsedTime() const
     {
-        return _getDuration(mClockStart, ClockType::now());
+        return _getDuration(mClockStart, Time::now());
     }
 
     /**
-     * \brief 
-     * \return Time since last tick in seconds.
+     * \brief Reset tick timer and return elapsed time.
      */
-    double getElapsedTime() const
+    double tick()
     {
-        return _getDuration(mClockStart, mLastTick);
+        const auto now = Time::now();
+        const double duration = _getDuration(mLastTick, now);
+        mLastTick = now;
+        return duration;
     }
 
-    /**
-     * \brief Reset tick timer.
-     */
-    void tick()
-    {
-        mLastTick = ClockType::now();
-    }
+    // todo remove
+    double getTimeSinceLastTick() const { return 0; }
 };
 
 }

@@ -20,15 +20,15 @@ namespace
 const char *lpvs = R"(
 #version 450
 
-layout(location = 0) in vec3 in_Position;
-layout(location = 1) in vec4 in_ColorPointSize;
-
-out vec4 v_Color;
-
 layout(std140, binding = 0) uniform View
 {
     mat4 u_MvpMatrix;
 };
+
+layout(location = 0) in vec3 in_Position;
+layout(location = 1) in vec4 in_ColorPointSize;
+
+out vec4 v_Color;
 
 void main()
 {
@@ -42,6 +42,7 @@ const char *lpfs = R"(
 #version 450
 
 in vec4 v_Color;
+
 out vec4 out_FragColor;
 
 void main()
@@ -53,14 +54,14 @@ void main()
 const char *tvs = R"(
 #version 450
 
-layout(location = 0) in vec2 in_Position;
-layout(location = 1) in vec2 in_TexCoords;
-layout(location = 2) in vec3 in_Color;
-
 layout(std140, binding = 0) uniform Screen
 {
     vec2 u_screenDimensions;
 };
+
+layout(location = 0) in vec2 in_Position;
+layout(location = 1) in vec2 in_TexCoords;
+layout(location = 2) in vec3 in_Color;
 
 out vec2 v_TexCoords;
 out vec4 v_Color;
@@ -80,10 +81,10 @@ void main()
 const char *tfs = R"(
 #version 450
 
+layout(binding = 16) uniform sampler2D u_glyphTexture;
+
 in vec2 v_TexCoords;
 in vec4 v_Color;
-
-layout(binding = 16) uniform sampler2D u_glyphTexture;
 
 out vec4 out_FragColor;
 
@@ -266,7 +267,7 @@ yuki::DebugDrawManager::DebugDrawManager(std::shared_ptr<GraphicsDevice> graphic
         vs->compile();
         mLinePointPipeline->vsUseVertexShader(std::move(vs));
     }
-    mLinePointPipeline->rsSetFaceCulling(GDPipeline::FaceCullingType::FRONT);
+    mLinePointPipeline->raSetFaceCulling(GDPipeline::FaceCullingType::FRONT);
     {
         auto fs = mGraphicsDevice->createFragmentShader();
         fs->useSourceString(lpfs);
@@ -348,7 +349,7 @@ void yuki::DebugDrawManager::render(const Clock &render_clock)
     float scrdim[2] { windowWidth, windowHeight };
     mTextConstantBuffer->setAttributeData(0, scrdim);
 
-    dd::flush(render_clock.getTime() * 1000);
+    dd::flush(render_clock.getTotalElapsedTime() * 1000);
 }
 
 dd::GlyphTextureHandle yuki::DebugDrawManager::createGlyphTexture(int width, int height, const void *pixels)
@@ -380,7 +381,7 @@ void yuki::DebugDrawManager::drawPointList(const dd::DrawVertex *points, int cou
     assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
 
     mLinePointVertexBuffer->streamFromHostBuffer(points, count * sizeof(dd::DrawVertex));
-    mLinePointPipeline->fdEnableDepthTest(depthEnabled);
+    mLinePointPipeline->ftEnableDepthTest(depthEnabled);
 
     mLinePointPipeline->assemble();
 
@@ -393,7 +394,7 @@ void yuki::DebugDrawManager::drawLineList(const dd::DrawVertex *lines, int count
     assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
 
     mLinePointVertexBuffer->streamFromHostBuffer(lines, count * sizeof(dd::DrawVertex));
-    mLinePointPipeline->fdEnableDepthTest(depthEnabled);
+    mLinePointPipeline->ftEnableDepthTest(depthEnabled);
 
     mLinePointPipeline->assemble();
 
