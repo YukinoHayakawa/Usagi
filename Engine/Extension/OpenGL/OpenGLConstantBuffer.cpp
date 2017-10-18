@@ -49,6 +49,7 @@ void yuki::OpenGLConstantBuffer::setAttributeFormat(const std::vector<yuki::Cons
     _reallocate();
 }
 
+// todo: remove implicit synchronization caused by mapping the buffer
 size_t yuki::OpenGLConstantBuffer::setAttributeData(size_t index, const void *data)
 {
     auto &attr = mAttributes[index];

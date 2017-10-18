@@ -119,8 +119,8 @@ public:
     void vsBindSampler(size_t slot, const std::shared_ptr<GDSampler> &sampler) override;
     void vsSamplerUsageHint(const std::vector<SamplerUsage> &usages) override;
 
-    void rsSetVertexOrder(VertexOrder order) override;
-    void rsSetFaceCulling(FaceCullingType type) override;
+    void raSetVertexOrder(VertexOrder order) override;
+    void raSetFaceCulling(FaceCullingType type) override;
 
     void fsBindConstantBuffer(size_t slot, const std::shared_ptr<ConstantBuffer> &buffer) override;
     void fsUseFragmentShader(const std::shared_ptr<FragmentShader> &shader) override;
@@ -128,8 +128,8 @@ public:
     void fsBindSampler(size_t slot, const std::shared_ptr<GDSampler> &sampler) override;
     void fsSamplerUsageHint(const std::vector<SamplerUsage> &usages) override;
 
-    void fdEnableScissor(bool enable) override;
-    void fdEnableDepthTest(bool enable) override;
+    void ftEnableScissorTest(bool enable) override;
+    void ftEnableDepthTest(bool enable) override;
 
     void bldEnableBlend(bool enable) override;
     void bldSetColorOp(BlendingOperation op) override;

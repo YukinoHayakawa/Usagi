@@ -40,6 +40,8 @@ public:
     void drawPoints(size_t first, size_t num_indices) override;
     void drawLines(size_t first, size_t num_indices) override;
     void drawTriangles(size_t first, size_t num_indices) override;
+
+    void setViewport(int x, int y, int width, int height) override;
 };
 
 }

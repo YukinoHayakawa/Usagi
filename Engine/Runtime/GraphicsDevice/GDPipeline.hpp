@@ -52,7 +52,7 @@ public:
 		 * For HLSL, the semantic names are queried by their indices
 		 * using shader reflection.
 		 * https://www.khronos.org/opengl/wiki/Vertex_Shader#Inputs
-		 * todo: is this field redundant to vector index?
+		 * todo: is this field redundant to vector index? - we may omit some index to apply default values to those inputs
 		 */
 		int					index;
 		/**
@@ -126,13 +126,13 @@ public:
 	 * \param order 
 	 * \return 
 	 */
-	virtual void rsSetVertexOrder(VertexOrder order) = 0;
+	virtual void raSetVertexOrder(VertexOrder order) = 0;
 	/**
 	 * \brief NONE by default.
 	 * \param type 
 	 * \return 
 	 */
-	virtual void rsSetFaceCulling(FaceCullingType type) = 0;
+	virtual void raSetFaceCulling(FaceCullingType type) = 0;
 
 	/*
 	 * Fragment Shading
@@ -148,7 +148,7 @@ public:
     virtual void fsSamplerUsageHint(const std::vector<SamplerUsage> &usages) = 0;
 
 	/*
-	 * Fragment Discarding
+	 * Fragment Testing
 	 * 
 	 * Filter out the fragments fail the tests.
 	 */
@@ -159,13 +159,13 @@ public:
 	 * \param enable 
 	 * \return 
 	 */
-	virtual void fdEnableScissor(bool enable) = 0;
+	virtual void ftEnableScissorTest(bool enable) = 0;
 	/**
 	 * \brief Depth test. Enabled by default.
 	 * \param enable 
 	 * \return 
 	 */
-	virtual void fdEnableDepthTest(bool enable) = 0;
+	virtual void ftEnableDepthTest(bool enable) = 0;
 
     /*
      * Color Blending

@@ -28,8 +28,6 @@ namespace yuki
  * Manage GPU resources such as textures and shaders.
  * Issue drawing commands.
  * Maintain a swap chain.
- * 
- * todo: PipelineStateObject?
  */
 class GraphicsDevice : public Noncopyable
 {
@@ -86,6 +84,8 @@ public:
     virtual void drawPoints(size_t first, size_t num_indices) = 0;
     virtual void drawLines(size_t first, size_t num_indices) = 0;
     virtual void drawTriangles(size_t first, size_t num_indices) = 0;
+
+    virtual void setViewport(int x, int y, int width, int height) = 0;
 };
 
 }

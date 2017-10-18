@@ -9,6 +9,7 @@ namespace yuki
 /**
  * \brief 
  * todo: add method for setting array elements
+ * todo: shared big constant buffer - each user allocate a piece of it
  */
 class ConstantBuffer : public virtual GDBuffer
 {

@@ -63,12 +63,12 @@ void yuki::OpenGLGraphicsDevice::swapFrameBuffers()
 
 void yuki::OpenGLGraphicsDevice::clearCurrentFrameBuffer()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void yuki::OpenGLGraphicsDevice::setScissorRect(int x, int y, int width, int height)
 {
-    // todo: scissor
+    glScissor(x, y, width, height);
 }
 
 void yuki::OpenGLGraphicsDevice::drawLines(size_t first, size_t num_indices)
@@ -79,6 +79,11 @@ void yuki::OpenGLGraphicsDevice::drawLines(size_t first, size_t num_indices)
 void yuki::OpenGLGraphicsDevice::drawTriangles(size_t first, size_t num_indices)
 {
     _draw(GL_TRIANGLES, first, num_indices);
+}
+
+void yuki::OpenGLGraphicsDevice::setViewport(int x, int y, int width, int height)
+{
+    glViewport(x, y, width, height);
 }
 
 void yuki::OpenGLGraphicsDevice::_draw(GLenum mode, size_t first, size_t num_indices)

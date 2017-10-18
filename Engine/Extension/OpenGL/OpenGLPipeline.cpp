@@ -127,12 +127,12 @@ void yuki::OpenGLPipeline::vsSamplerUsageHint(const std::vector<yuki::GDPipeline
     mVertexTextureUnitManager.samplerUsageHint(usages);
 }
 
-void yuki::OpenGLPipeline::rsSetVertexOrder(VertexOrder order)
+void yuki::OpenGLPipeline::raSetVertexOrder(VertexOrder order)
 {
     mVertexOrder = order;
 }
 
-void yuki::OpenGLPipeline::rsSetFaceCulling(FaceCullingType type)
+void yuki::OpenGLPipeline::raSetFaceCulling(FaceCullingType type)
 {
     mFaceCulling = type;
 }
@@ -164,12 +164,12 @@ void yuki::OpenGLPipeline::fsSamplerUsageHint(const std::vector<SamplerUsage> &u
     mFragmentTextureUnitManager.samplerUsageHint(usages);
 }
 
-void yuki::OpenGLPipeline::fdEnableScissor(bool enable)
+void yuki::OpenGLPipeline::ftEnableScissorTest(bool enable)
 {
     mScissorTest = enable;
 }
 
-void yuki::OpenGLPipeline::fdEnableDepthTest(bool enable)
+void yuki::OpenGLPipeline::ftEnableDepthTest(bool enable)
 {
     mDepthTest = enable;
 }

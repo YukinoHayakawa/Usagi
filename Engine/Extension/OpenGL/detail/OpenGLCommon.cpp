@@ -5,6 +5,7 @@
 
 void yuki::OpenGLCheckError(const char *file, int line)
 {
+    // todo: possible implicit synchronization
     const char *errname;
     while(GLenum err = glGetError())
     {
