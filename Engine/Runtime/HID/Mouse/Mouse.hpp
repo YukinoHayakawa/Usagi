@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <eigen3/Eigen/Core>
+#include "MouseButtonCode.hpp"
 
 namespace yuki
 {
@@ -47,6 +48,13 @@ public:
      * \brief Put the mouse cursor at the center of the rendering area of the window.
      */
     virtual void centerCursor() = 0;
+    /**
+    * \brief Set the visibility of the mouse cursor.
+    * \param show True to show the cursor, false to hide it.
+    */
+    virtual void showCursor(bool show) = 0;
+
+    virtual bool isMouseButtonPressed(MouseButtonCode button) const = 0;
 
 private:
     /**
@@ -60,11 +68,6 @@ private:
     */
     virtual void _releaseCursor() = 0;
     virtual bool _isCursorCaptured() = 0;
-    /**
-     * \brief Set the visibility of the mouse cursor.
-     * \param show True to show the cursor, false to hide it.
-     */
-    virtual void _showCursor(bool show) = 0;
 };
 
 }

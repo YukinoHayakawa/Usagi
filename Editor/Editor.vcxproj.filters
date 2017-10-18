@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main2.cpp">
+    <ClCompile Include="vulkanmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

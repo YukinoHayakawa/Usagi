@@ -67,7 +67,8 @@ yuki::WGLContext::WGLContext(HDC dc)
     pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
     pfd.iPixelType = PFD_TYPE_RGBA;
     pfd.cColorBits = 32;
-    pfd.cDepthBits = 32;
+    pfd.cDepthBits = 24;
+    pfd.cStencilBits = 8;
     pfd.iLayerType = PFD_MAIN_PLANE;
 
     // set the pixel format of DC to which we like

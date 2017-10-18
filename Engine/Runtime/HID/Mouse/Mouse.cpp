@@ -11,12 +11,12 @@ void yuki::Mouse::setImmersiveMode(bool enable)
     if(enable)
     {
         _captureCursor();
-        _showCursor(false);
+        showCursor(false);
     }
     else
     {
         _releaseCursor();
-        _showCursor(true);
+        showCursor(true);
     }
     mImmersiveMode = enable;
 }
