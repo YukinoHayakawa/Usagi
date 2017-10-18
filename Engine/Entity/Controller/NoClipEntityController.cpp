@@ -50,7 +50,7 @@ void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
             movement = mEntity->getLocalToWorldTransform().linear() * movement;
             movement.y() = 0; // lock in x-z plane
             movement.normalize();
-            mEntity->move(movement * mMoveSpeed * clock.getElapsedTime());
+            mEntity->move(movement * mMoveSpeed * clock.getTimeSinceLastTick());
             movement.setZero();
         }
 
@@ -60,7 +60,7 @@ void yuki::NoClipEntityController::tickUpdate(const Clock &clock)
         if(!movement.isZero())
         {
             movement.normalize();
-            mEntity->move(movement * mMoveSpeed * clock.getElapsedTime());
+            mEntity->move(movement * mMoveSpeed * clock.getTimeSinceLastTick());
         }
     }
 
