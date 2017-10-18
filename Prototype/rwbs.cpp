@@ -531,8 +531,7 @@ private:
         _skipHeader(in); // skip Struct header
         in.read(reinterpret_cast<char*>(&num_materials), sizeof(num_materials));
         // mat_indices = decltype(mat_indices) { num_materials, 0 }; -> will be recognized as an initializer list so does not work
-        mat_indices.clear();
-        mat_indices.insert(mat_indices.end(), num_materials, 0);
+        mat_indices = decltype(mat_indices)(num_materials, 0);
         assert(mat_indices.size() == num_materials);
         in.read(reinterpret_cast<char*>(&mat_indices[0]), sizeof(decltype(mat_indices)::value_type) * mat_indices.size());
 
@@ -713,7 +712,7 @@ std::shared_ptr<RwBinaryStreamFile> parseRwBinaryStreamFile(std::istream &in)
         in.read(reinterpret_cast<char*>(&header), sizeof(RwSectionHeader));
         // rewind to the beginning of header to let RwStreamSection parse the header again.
         // here just use the section type to determine the type of instantiated object.
-        in.seekg(-sizeof(RwSectionHeader), std::ios_base::cur);
+        in.seekg(-static_cast<int>(sizeof(RwSectionHeader)), std::ios_base::cur);
 
         switch(static_cast<RwStreamSectionType>(header.type))
         {
