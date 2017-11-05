@@ -24,6 +24,7 @@ class VulkanTriangle : public graphics::Renderable
         float   r, g, b, a;
     };
     std::unique_ptr<graphics::Buffer> mVertexBuffer;
+    std::unique_ptr<graphics::Sampler> mSampler;
     float mCounter1 = 0.f;
 
 public:

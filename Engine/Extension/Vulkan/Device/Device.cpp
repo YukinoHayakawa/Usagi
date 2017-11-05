@@ -4,13 +4,15 @@
 #include <Usagi/Engine/Runtime/Exception.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Device/Waitable.hpp>
 
-#include "Device.hpp"
 #include "SwapChain.hpp"
 #include "../Workload/Pipeline.hpp"
 #include "../Workload/CommandPool.hpp"
 #include "../Workload/CommandList.hpp"
 #include "../Resource/FrameController.hpp"
+#include "../Resource/Sampler.hpp"
 #include "Fence.hpp"
+
+#include "Device.hpp"
 
 namespace yuki::vulkan
 {
@@ -202,9 +204,9 @@ std::unique_ptr<graphics::SwapChain> Device::createSwapChain(Window *window)
     throw OSAPIUnsupportedPlatformException() << PlatformDescriptionInfo("The windowing system on Win32 is not native.");
 }
 
-std::unique_ptr<graphics::Pipeline> Device::createPipeline()
+std::unique_ptr<graphics::Pipeline> Device::createPipeline(const graphics::PipelineCreateInfo &info)
 {
-    return std::make_unique<Pipeline>(this);
+    return Pipeline::create(this, info);
 }
 
 std::unique_ptr<graphics::CommandPool> Device::createGraphicsCommandPool()
@@ -215,6 +217,11 @@ std::unique_ptr<graphics::CommandPool> Device::createGraphicsCommandPool()
 std::unique_ptr<graphics::FrameController> Device::createFrameController(size_t num_frames)
 {
     return std::make_unique<FrameController>(this, 2);
+}
+
+std::unique_ptr<graphics::Sampler> Device::createSampler(const graphics::SamplerCreateInfo &info)
+{
+    return Sampler::create(this, info);
 }
 
 void Device::submitGraphicsCommandList(

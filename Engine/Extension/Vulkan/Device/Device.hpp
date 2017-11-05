@@ -38,9 +38,10 @@ public:
 
     // todo: remove param
     std::unique_ptr<graphics::SwapChain> createSwapChain(Window *window) override;
-    std::unique_ptr<graphics::Pipeline> createPipeline() override;
+    std::unique_ptr<graphics::Pipeline> createPipeline(const graphics::PipelineCreateInfo &info) override;
     std::unique_ptr<graphics::CommandPool> createGraphicsCommandPool() override;
     std::unique_ptr<graphics::FrameController> createFrameController(size_t num_frames) override;
+    std::unique_ptr<graphics::Sampler> createSampler(const graphics::SamplerCreateInfo &info) override;
 
     void submitGraphicsCommandList(
         class graphics::CommandList *command_list,

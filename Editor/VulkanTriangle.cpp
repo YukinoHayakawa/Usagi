@@ -1,5 +1,4 @@
-﻿#include <Usagi/Engine/Runtime/Graphics/Workload/Pipeline.hpp>
-#include <Usagi/Engine/Runtime/Graphics/Device/Device.hpp>
+﻿#include <Usagi/Engine/Runtime/Graphics/Device/Device.hpp>
 #include <Usagi/Engine/Runtime/Graphics/SpirvShader.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Environment.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Device/SwapChain.hpp>
@@ -7,6 +6,9 @@
 #include <Usagi/Engine/Runtime/Graphics/Resource/FrameController.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/ResourceAllocator.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/Buffer.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/Sampler.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Workload/PipelineCreateInfo.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/SamplerCreateInfo.hpp>
 
 #include "VulkanTriangle.hpp"
 
@@ -15,24 +17,34 @@ using namespace yuki::graphics;
 yuki::VulkanTriangle::VulkanTriangle(Environment *env)
     : mEnv { env }
 {
-    mPipeline = env->graphics_device->createPipeline();
-    PipelineCreateInfo graphics_pipeline_create_info;
-    graphics_pipeline_create_info.vertex_input.bindings.push_back({ 0, sizeof(VertexData) });
-    graphics_pipeline_create_info.vertex_input.attributes.push_back({ 0, 0, DataFormat::R32G32B32A32_SFLOAT, 0 });
-    graphics_pipeline_create_info.vertex_input.attributes.push_back({ 1, 0, DataFormat::R32G32B32A32_SFLOAT, 4 * sizeof(float) });
-    graphics_pipeline_create_info.vertex_shader = SpirvShader::readFromFile(R"(D:\Development\IntroductionToVulkan\Project\Tutorial04\Data04\vert.spv)");
-    graphics_pipeline_create_info.fragment_shader = SpirvShader::readFromFile(R"(D:\Development\IntroductionToVulkan\Project\Tutorial04\Data04\frag.spv)");
-    graphics_pipeline_create_info.input_assembly.topology = InputAssembleState::PrimitiveTopology::TRIANGLE_STRIP;
-    graphics_pipeline_create_info.rasterization.face_culling_mode = RasterizationState::FaceCullingMode::BACK;
-    graphics_pipeline_create_info.rasterization.front_face = RasterizationState::FrontFace::COUNTER_CLOCKWISE;
-    graphics_pipeline_create_info.rasterization.polygon_mode = RasterizationState::PolygonMode::FILL;
-    graphics_pipeline_create_info.depth_stencil.enable_depth_test = false;
-    graphics_pipeline_create_info.color_blend.enable = false;
-    // todo: Renderable shouldn't know the actual render targets, as they are managed on the application layer
-    graphics_pipeline_create_info.attachment_usages.push_back({ env->swap_chain->getNativeImageFormat(), ImageLayout::UNDEFINED, ImageLayout::PRESENT_SRC });
-    mPipeline->create(graphics_pipeline_create_info);
+    {
+        PipelineCreateInfo graphics_pipeline_create_info;
+        graphics_pipeline_create_info.vertex_input.bindings.push_back({ 0, sizeof(VertexData) });
+        graphics_pipeline_create_info.vertex_input.attributes.push_back({ 0, 0, DataFormat::R32G32B32A32_SFLOAT, 0 });
+        graphics_pipeline_create_info.vertex_input.attributes.push_back({ 1, 0, DataFormat::R32G32B32A32_SFLOAT, 4 * sizeof(float) });
+        graphics_pipeline_create_info.vertex_shader = SpirvShader::readFromFile(R"(D:\Development\IntroductionToVulkan\Project\Tutorial04\Data04\vert.spv)");
+        graphics_pipeline_create_info.fragment_shader = SpirvShader::readFromFile(R"(D:\Development\IntroductionToVulkan\Project\Tutorial04\Data04\frag.spv)");
+        graphics_pipeline_create_info.input_assembly.topology = InputAssembleState::PrimitiveTopology::TRIANGLE_STRIP;
+        graphics_pipeline_create_info.rasterization.face_culling_mode = RasterizationState::FaceCullingMode::BACK;
+        graphics_pipeline_create_info.rasterization.front_face = RasterizationState::FrontFace::COUNTER_CLOCKWISE;
+        graphics_pipeline_create_info.rasterization.polygon_mode = RasterizationState::PolygonMode::FILL;
+        graphics_pipeline_create_info.depth_stencil.enable_depth_test = false;
+        graphics_pipeline_create_info.color_blend.enable = false;
+        // todo: Renderable shouldn't know the actual render targets, as they are managed on the application layer
+        graphics_pipeline_create_info.attachment_usages.push_back({ env->swap_chain->getNativeImageFormat(), ImageLayout::UNDEFINED, ImageLayout::PRESENT_SRC });
+        mPipeline = env->graphics_device->createPipeline(graphics_pipeline_create_info);
+    }
 
     mVertexBuffer = env->frame_control->getResourceAllocator()->createDynamicBuffer(sizeof(VertexData) * 4);
+
+    {
+        SamplerCreateInfo sampler_create_info;
+        sampler_create_info.address_mode_u = SamplerCreateInfo::AddressMode::CLAMP_TO_EDGE;
+        sampler_create_info.address_mode_v = SamplerCreateInfo::AddressMode::CLAMP_TO_EDGE;
+        sampler_create_info.magnify_filter = SamplerCreateInfo::Filter::NEAREST;
+        sampler_create_info.minify_filter = SamplerCreateInfo::Filter::LINEAR;
+        mSampler = env->graphics_device->createSampler(sampler_create_info);
+    }
 }
 
 yuki::VulkanTriangle::~VulkanTriangle()

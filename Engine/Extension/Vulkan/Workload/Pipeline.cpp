@@ -8,11 +8,6 @@
 namespace yuki::vulkan
 {
 
-Pipeline::Pipeline(Device *vulkan_graphics_device)
-    : mVulkanGD { std::move(vulkan_graphics_device) }
-{
-}
-
 vk::Format Pipeline::translateSourceFormat(const graphics::DataFormat native_data)
 {
     switch(native_data)
@@ -82,12 +77,12 @@ vk::PolygonMode Pipeline::translatePolygonMode(const graphics::RasterizationStat
     }
 }
 
-vk::UniqueShaderModule Pipeline::_createShaderModule(const graphics::SpirvShader *shader_bytecode) const
+vk::UniqueShaderModule Pipeline::_createShaderModule(vk::Device device, const graphics::SpirvShader *shader_bytecode)
 {
     vk::ShaderModuleCreateInfo shader_module_create_info;
     shader_module_create_info.setCodeSize(shader_bytecode->getByteCodeSize());
     shader_module_create_info.setPCode(shader_bytecode->getByteCode());
-    auto shader_module = mVulkanGD->_getDevice().createShaderModuleUnique(shader_module_create_info);
+    auto shader_module = device.createShaderModuleUnique(shader_module_create_info);
     return shader_module;
 }
 
@@ -127,8 +122,10 @@ vk::Pipeline Pipeline::_getPipeline() const
     return mPipeline.get();
 }
 
-void Pipeline::create(const graphics::PipelineCreateInfo &info)
+std::unique_ptr<Pipeline> Pipeline::create(class Device *vulkan_gd, const graphics::PipelineCreateInfo &info)
 {
+    auto pipeline = std::make_unique<Pipeline>();
+
     vk::GraphicsPipelineCreateInfo pipeline_create_info;
 
     // shader stages
@@ -137,11 +134,11 @@ void Pipeline::create(const graphics::PipelineCreateInfo &info)
         VERTEX, FRAGMENT, SHADER_STAGE_COUNT
     };
     vk::PipelineShaderStageCreateInfo shader_stage_create_info[SHADER_STAGE_COUNT];
-    auto vertex_shader = _createShaderModule(info.vertex_shader.get());
+    auto vertex_shader = _createShaderModule(vulkan_gd->_getDevice(), info.vertex_shader.get());
     shader_stage_create_info[VERTEX].setModule(vertex_shader.get());
     shader_stage_create_info[VERTEX].setPName("main"); // entry point name
     shader_stage_create_info[VERTEX].setStage(vk::ShaderStageFlagBits::eVertex);
-    auto fragment_shader = _createShaderModule(info.fragment_shader.get());
+    auto fragment_shader = _createShaderModule(vulkan_gd->_getDevice(), info.fragment_shader.get());
     shader_stage_create_info[FRAGMENT].setModule(fragment_shader.get());
     shader_stage_create_info[FRAGMENT].setPName("main"); // entry point name
     shader_stage_create_info[FRAGMENT].setStage(vk::ShaderStageFlagBits::eFragment);
@@ -234,8 +231,8 @@ void Pipeline::create(const graphics::PipelineCreateInfo &info)
 
     // pipeline layout
     vk::PipelineLayoutCreateInfo pipeline_layout_create_info;
-    mPipelineLayout = mVulkanGD->_getDevice().createPipelineLayoutUnique(pipeline_layout_create_info);
-    pipeline_create_info.setLayout(mPipelineLayout.get());
+    pipeline->mPipelineLayout = vulkan_gd->_getDevice().createPipelineLayoutUnique(pipeline_layout_create_info);
+    pipeline_create_info.setLayout(pipeline->mPipelineLayout.get());
 
     // render pass
     std::vector<vk::AttachmentDescription> attachment_descriptions;
@@ -285,12 +282,14 @@ void Pipeline::create(const graphics::PipelineCreateInfo &info)
     render_pass_create_info.setPSubpasses(&subpass_description);
     render_pass_create_info.setDependencyCount(subpass_dependencies.size());
     render_pass_create_info.setPDependencies(subpass_dependencies.data());
-    mRenderPass = mVulkanGD->_getDevice().createRenderPassUnique(render_pass_create_info);
+    pipeline->mRenderPass = vulkan_gd->_getDevice().createRenderPassUnique(render_pass_create_info);
 
-    pipeline_create_info.setRenderPass(mRenderPass.get());
+    pipeline_create_info.setRenderPass(pipeline->mRenderPass.get());
     pipeline_create_info.setSubpass(0);
 
-    mPipeline = mVulkanGD->_getDevice().createGraphicsPipelineUnique({ }, pipeline_create_info);
+    pipeline->mPipeline = vulkan_gd->_getDevice().createGraphicsPipelineUnique({ }, pipeline_create_info);
+
+    return std::move(pipeline);
 }
 
 }

@@ -4,24 +4,21 @@
 
 #include <Usagi/Engine/Runtime/Graphics/Workload/Pipeline.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/DataFormat.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Workload/PipelineCreateInfo.hpp>
 
 namespace yuki::vulkan
 {
 
 class Pipeline : public graphics::Pipeline
 {
-    class Device *mVulkanGD;
-
     vk::UniquePipelineLayout mPipelineLayout;
     vk::UniqueRenderPass mRenderPass;
     vk::UniquePipeline mPipeline;
 
-    vk::UniqueShaderModule _createShaderModule(const class graphics::SpirvShader *shader_bytecode) const;
+    static vk::UniqueShaderModule _createShaderModule(vk::Device device, const class graphics::SpirvShader *shader_bytecode);
 
 public:
-    Pipeline(Device *vulkan_graphics_device);
-
-    void create(const graphics::PipelineCreateInfo &info) override;
+    static std::unique_ptr<Pipeline> create(class Device *vulkan_gd, const graphics::PipelineCreateInfo &info);
 
     static vk::Format translateSourceFormat(const graphics::DataFormat native_data);
     static vk::VertexInputRate translateVertexInputRate(const graphics::VertexBufferBinding::InputRate rate);
