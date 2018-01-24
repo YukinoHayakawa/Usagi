@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <utility>
+#include <functional>
 
 namespace yuki::utility
 {
@@ -42,6 +43,8 @@ public:
         CyclicContainerAdaptor &mAdaptor;
         BaseIterator mBase;
         size_t mCurrentCycle = 0;
+        // called when the underlying iterator is wrapped to begin or end.
+        std::function<void(int)> mWrapCallback;
 
     public:
         Iterator()
@@ -66,7 +69,10 @@ public:
         {
             ++mBase;
             if(mBase == mAdaptor.mContainer.end())
+            {
                 mBase = mAdaptor.mContainer.begin();
+                if(mWrapCallback) mWrapCallback(1);
+            }
             if(mBase == mAdaptor.mPseudoBegin)
                 ++mCurrentCycle;
             return *this;
@@ -105,7 +111,10 @@ public:
             if(mBase == mAdaptor.mPseudoBegin)
                 --mCurrentCycle;
             if(mBase == mAdaptor.mContainer.begin())
-                mBase = --mAdaptor.mContainer.end();
+            {
+                mBase = mAdaptor.mContainer.end();
+                if(mWrapCallback) mWrapCallback(-1);
+            }
             --mBase;
             return *this;
         }
@@ -115,6 +124,11 @@ public:
             auto old_iter = *this;
             --*this;
             return old_iter;
+        }
+
+        void setWrapCallback(std::function<void(int)> wrap_callback)
+        {
+            mWrapCallback = std::move(wrap_callback);
         }
     };
 
