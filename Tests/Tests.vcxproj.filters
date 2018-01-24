@@ -15,25 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Preprocessor\infix_join_test.cpp">
+    <ClCompile Include="Engine\CyclicContainerAdaptorTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Preprocessor\make_nested_namespace_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="run_all_tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Preprocessor\identifier_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Preprocessor\tuple_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Meta\premain_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Meta\make_delegate_test.cpp">
+    <ClCompile Include="RunAllTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
