@@ -130,6 +130,11 @@ public:
         {
             mWrapCallback = std::move(wrap_callback);
         }
+
+        BaseIterator base() const
+        {
+            return mBase;
+        }
     };
 
     Iterator begin()
