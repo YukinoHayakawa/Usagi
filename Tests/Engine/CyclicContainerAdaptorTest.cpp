@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <vector>
-#include "../Engine/Utility/CyclicContainerAdaptor.hpp"
+
+#include <Usagi/Engine/Utility/CyclicContainerAdaptor.hpp>
 
 class CyclicContainerAdaptorTest : public ::testing::Test {
  protected:

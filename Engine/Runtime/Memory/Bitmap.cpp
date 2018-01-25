@@ -5,8 +5,13 @@
 #include "Bitmap.hpp"
 
 yuki::memory::Bitmap::Bitmap(size_t num_blocks)
-    : mBitmap(num_blocks, Block::FREE)
 {
+    reset(num_blocks);
+}
+
+void yuki::memory::Bitmap::reset(size_t num_blocks)
+{
+    mBitmap = { num_blocks, Block::FREE };
 }
 
 size_t yuki::memory::Bitmap::allocate(size_t num_blocks, size_t start_block)
@@ -74,4 +79,9 @@ void yuki::memory::Bitmap::deallocate(const size_t start_block)
         ++iter;
         if(iter == mBitmap.end() || *iter != Block::USED) break;
     }
+}
+
+size_t yuki::memory::Bitmap::blockCount() const
+{
+    return mBitmap.size();
 }

@@ -24,7 +24,10 @@ class Bitmap
     std::vector<Block> mBitmap;
     
 public:
+    Bitmap() = default;
     explicit Bitmap(size_t num_blocks);
+
+    void reset(size_t num_blocks);
 
     /**
      * \brief Allocate contiguous blocks. A starting position can be
@@ -45,5 +48,7 @@ public:
      * \param start_block 
      */
     void deallocate(size_t start_block);
+
+    size_t blockCount() const;
 };
 }
