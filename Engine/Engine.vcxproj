@@ -22,6 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{19097A41-38D5-4564-92E0-702887CF5259}</ProjectGuid>
     <RootNamespace>Engine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -163,7 +164,8 @@
     <ClCompile Include="Extension\Vulkan\Device\SwapChain.cpp" />
     <ClCompile Include="Runtime\Graphics\Resource\FrameController.cpp" />
     <ClCompile Include="Runtime\Graphics\SpirvShader.cpp" />
-    <ClCompile Include="Runtime\Memory\StackMemoryAllocator.cpp" />
+    <ClCompile Include="Runtime\Memory\Bitmap.cpp" />
+    <ClCompile Include="Runtime\Memory\BitmapAllocator.cpp" />
     <ClCompile Include="Runtime\Subsystem\ImmediateGuiImpl.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>
@@ -185,6 +187,8 @@
     <ClInclude Include="Runtime\Graphics\SpirvShader.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\DataFormat.hpp" />
     <ClInclude Include="Extension\Vulkan\Device\Fence.hpp" />
+    <ClInclude Include="Runtime\Memory\BitmapAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\CircularAllocator.hpp" />
     <ClInclude Include="Runtime\Memory\MemoryAllocator.hpp" />
     <ClInclude Include="Runtime\Memory\StackMemoryAllocator.hpp" />
     <ClInclude Include="Runtime\Subsystem\ImmediateGuiManager.hpp" />
@@ -228,7 +232,11 @@
     <ClInclude Include="Extension\Win32\Win32Window.hpp" />
     <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Utility\BindingSentry.hpp" />
+    <ClInclude Include="Runtime\Memory\Bitmap.hpp" />
+    <ClInclude Include="Utility\BitHack.hpp" />
+    <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
     <ClInclude Include="Utility\File.hpp" />
+    <ClInclude Include="Utility\Iterator.h" />
     <ClInclude Include="Utility\Math.hpp" />
     <ClInclude Include="Utility\Noncopyable.hpp" />
     <ClInclude Include="Utility\Rounding.hpp" />
@@ -280,11 +288,6 @@
     <ClCompile Include="Utility\File.cpp" />
     <ClCompile Include="Utility\Rounding.cpp" />
     <ClCompile Include="World\Geometry\Geometry.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
-    <None Include="ClassDiagram1.cd" />
-    <None Include="ClassDiagram2.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

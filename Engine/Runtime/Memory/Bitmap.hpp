@@ -21,8 +21,11 @@ class Bitmap
         USED = 1,
         USED_BEGIN = 2,
     };
+
     std::vector<Block> mBitmap;
-    
+
+    std::vector<Block>::iterator determineScanningBegin(size_t start_block);
+
 public:
     Bitmap() = default;
     explicit Bitmap(size_t num_blocks);

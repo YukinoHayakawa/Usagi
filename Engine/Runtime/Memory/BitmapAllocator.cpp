@@ -3,7 +3,8 @@
 #include <Usagi/Engine/Utility/BitHack.hpp>
 #include <Usagi/Engine/Utility/Rounding.hpp>
 
-yuki::memory::BitmapAllocator::BitmapAllocator(void *base, const size_t total_size,
+yuki::memory::BitmapAllocator::BitmapAllocator(void *base,
+    const size_t total_size,
     const size_t block_size, const size_t max_alignment)
     : mBase { static_cast<char*>(base) }
     , mTotalSize { total_size }
@@ -47,8 +48,12 @@ void * yuki::memory::BitmapAllocator::allocate(const size_t num_bytes,
     const size_t alloc_unit = utility::calculateSpanningPages(num_bytes,
         mBlockSize);
 
-    std::lock_guard<std::mutex> lock_guard(mBitmapLock);
-    const auto allocation = mAllocation.allocate(alloc_unit);
+    size_t allocation;
+    {
+        std::lock_guard<std::mutex> lock_guard(mBitmapLock);
+        allocation = mAllocation.allocate(alloc_unit);
+    }
+
     return mBase + allocation * mBlockSize;
 }
 

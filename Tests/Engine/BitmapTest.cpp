@@ -48,7 +48,7 @@ TEST_F(BitmapTest, IgnoreStartHint)
     EXPECT_EQ(bitmap.allocate(4, 8), 4);
 }
 
-TEST_F(BitmapTest, NoCircularAllocation)
+TEST_F(BitmapTest, NoWrappedAllocation)
 {
     bitmap.allocate(4);
     bitmap.allocate(4);
