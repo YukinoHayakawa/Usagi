@@ -19,7 +19,7 @@ TEST_F(BitmapTest, PositiveAllocationAmount)
 
 TEST_F(BitmapTest, TotalFree)
 {
-    size_t alloc = 0;
+    std::size_t alloc = 0;
     EXPECT_NO_THROW(alloc = bitmap.allocate(16));
     EXPECT_EQ(alloc, 0); // alloc success
     EXPECT_THROW(alloc = bitmap.allocate(1), std::bad_alloc);
@@ -29,14 +29,14 @@ TEST_F(BitmapTest, TotalFree)
 
 TEST_F(BitmapTest, ContinuousAllocation)
 {
-    const size_t alloc_unit = 4;
-    size_t alloc_begin = 0;
-    for(size_t i = 0; i < alloc_unit; ++i)
+    const std::size_t alloc_unit = 4;
+    std::size_t alloc_begin = 0;
+    for(std::size_t i = 0; i < alloc_unit; ++i)
     {
         alloc_begin = bitmap.allocate(alloc_unit, alloc_begin);
         EXPECT_EQ(alloc_begin, alloc_unit * i);
     }
-    for(size_t i = 0; i < alloc_unit; ++i)
+    for(std::size_t i = 0; i < alloc_unit; ++i)
     {
         EXPECT_NO_THROW(bitmap.deallocate(alloc_unit * i));
     }

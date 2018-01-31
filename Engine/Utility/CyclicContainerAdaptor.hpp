@@ -24,11 +24,11 @@ class CyclicContainerAdaptor
 {
     Container &mContainer;
     BaseIterator mPseudoBegin;
-    size_t mMaxCycle;
+    std::size_t mMaxCycle;
 
 public:
     CyclicContainerAdaptor(Container &container, BaseIterator pseudo_begin,
-        const size_t max_cycle)
+        const std::size_t max_cycle)
         : mContainer { container }
         , mPseudoBegin { std::move(pseudo_begin) }
         , mMaxCycle { max_cycle }
@@ -42,7 +42,7 @@ public:
     {
         CyclicContainerAdaptor &mAdaptor;
         BaseIterator mBase;
-        size_t mCurrentCycle = 0;
+        std::size_t mCurrentCycle = 0;
         // called when the underlying iterator is wrapped to begin or end.
         std::function<void(int)> mWrapCallback;
 
@@ -52,7 +52,7 @@ public:
         }
 
         Iterator(CyclicContainerAdaptor &container, BaseIterator base,
-            const size_t current_cycle)
+            const std::size_t current_cycle)
             : mAdaptor { container }
             , mBase { base }
             , mCurrentCycle { current_cycle }

@@ -482,9 +482,6 @@
     <ClCompile Include="Extension\Vulkan\VulkanExtension.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\Rounding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\Graphics\Resource\FrameController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

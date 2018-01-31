@@ -286,7 +286,6 @@
     <ClCompile Include="Runtime\Subsystem\DebugDrawManager.cpp" />
     <ClCompile Include="Extension\Win32\Win32Window.cpp" />
     <ClCompile Include="Utility\File.cpp" />
-    <ClCompile Include="Utility\Rounding.cpp" />
     <ClCompile Include="World\Geometry\Geometry.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

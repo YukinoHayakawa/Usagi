@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iterator>
-#include <cstddef>
 
 namespace yuki::utility
 {
@@ -18,10 +17,10 @@ namespace yuki::utility
  */
 template <typename ForwardIterator, typename T>
 ForwardIterator findFirstConsecutive(ForwardIterator begin, ForwardIterator end,
-    const T &value, const size_t min_count)
+    const T &value, const std::size_t min_count)
 {
     auto ret = begin;
-    size_t count = 0;
+    std::size_t count = 0;
     for(; count < min_count && begin != end; ++begin)
     {
         if(*begin != value)

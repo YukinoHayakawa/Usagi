@@ -24,13 +24,13 @@ class Bitmap
 
     std::vector<Block> mBitmap;
 
-    std::vector<Block>::iterator determineScanningBegin(size_t start_block);
+    std::vector<Block>::iterator determineScanningBegin(std::size_t start_block);
 
 public:
     Bitmap() = default;
-    explicit Bitmap(size_t num_blocks);
+    explicit Bitmap(std::size_t num_blocks);
 
-    void reset(size_t num_blocks);
+    void reset(std::size_t num_blocks);
 
     /**
      * \brief Allocate contiguous blocks. A starting position can be
@@ -42,7 +42,7 @@ public:
      * \param start_block 
      * \return The index of first allocated block.
      */
-    size_t allocate(size_t num_blocks, size_t start_block = 0);
+    std::size_t allocate(std::size_t num_blocks, std::size_t start_block = 0);
 
     /**
      * \brief Mark the block sequence started from the specified block as
@@ -50,8 +50,8 @@ public:
      * or is already free, a std::invalid_argument is thrown.
      * \param start_block 
      */
-    void deallocate(size_t start_block);
+    void deallocate(std::size_t start_block);
 
-    size_t blockCount() const;
+    std::size_t blockCount() const;
 };
 }

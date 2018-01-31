@@ -4,8 +4,8 @@
 #include <Usagi/Engine/Utility/Rounding.hpp>
 
 yuki::memory::BitmapAllocator::BitmapAllocator(void *base,
-    const size_t total_size,
-    const size_t block_size, const size_t max_alignment)
+    const std::size_t total_size,
+    const std::size_t block_size, const std::size_t max_alignment)
     : mBase { static_cast<char*>(base) }
     , mTotalSize { total_size }
     , mBlockSize { block_size }
@@ -22,7 +22,7 @@ yuki::memory::BitmapAllocator::BitmapAllocator(void *base,
             "alignment must be power-of-two or zero");
     if(max_alignment)
     {
-        if(reinterpret_cast<size_t>(mBase) % max_alignment)
+        if(reinterpret_cast<std::size_t>(mBase) % max_alignment)
             throw std::invalid_argument(
                 "base address not aligned to maximum alignment");
         if(block_size % max_alignment)
@@ -33,8 +33,8 @@ yuki::memory::BitmapAllocator::BitmapAllocator(void *base,
     mAllocation.reset(total_size / block_size);
 }
 
-void * yuki::memory::BitmapAllocator::allocate(const size_t num_bytes,
-    const size_t alignment)
+void * yuki::memory::BitmapAllocator::allocate(const std::size_t num_bytes,
+    const std::size_t alignment)
 {
     if(num_bytes == 0)
         throw std::invalid_argument(
@@ -45,10 +45,10 @@ void * yuki::memory::BitmapAllocator::allocate(const size_t num_bytes,
     if(!utility::isPowerOfTwoOrZero(alignment))
         throw std::invalid_argument("alignment must be power-of-two or zero");
 
-    const size_t alloc_unit = utility::calculateSpanningPages(num_bytes,
+    const std::size_t alloc_unit = utility::calculateSpanningPages(num_bytes,
         mBlockSize);
 
-    size_t allocation;
+    std::size_t allocation;
     {
         std::lock_guard<std::mutex> lock_guard(mBitmapLock);
         allocation = mAllocation.allocate(alloc_unit);
@@ -59,8 +59,8 @@ void * yuki::memory::BitmapAllocator::allocate(const size_t num_bytes,
 
 void yuki::memory::BitmapAllocator::deallocate(void *pointer)
 {
-    const size_t offset = static_cast<char*>(pointer) - mBase;
-    const size_t block = offset / mBlockSize;
+    const std::size_t offset = static_cast<char*>(pointer) - mBase;
+    const std::size_t block = offset / mBlockSize;
     if(offset % mBlockSize != 0)
         throw std::invalid_argument(
             "the pointer does not point to the beginning of any block");

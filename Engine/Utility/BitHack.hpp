@@ -1,5 +1,4 @@
 #pragma once
-#include <type_traits>
 
 namespace yuki::utility
 {
@@ -7,14 +6,12 @@ namespace yuki::utility
 template <typename T>
 bool isPowerOfTwoOrZero(T value)
 {
-    //static_assert(std::is_unsigned_v<T>);
     return (value & (value - 1)) == 0;
 }
 
 template <typename T>
 bool isPowerOfTwo(T value)
 {
-    //static_assert(std::is_unsigned_v<T>);
     return (value & (value - 1)) == 0 && value != 0;
 }
 }

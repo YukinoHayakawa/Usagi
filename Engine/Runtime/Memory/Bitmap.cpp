@@ -6,18 +6,18 @@
 
 #include "Bitmap.hpp"
 
-yuki::memory::Bitmap::Bitmap(size_t num_blocks)
+yuki::memory::Bitmap::Bitmap(std::size_t num_blocks)
 {
     reset(num_blocks);
 }
 
-void yuki::memory::Bitmap::reset(size_t num_blocks)
+void yuki::memory::Bitmap::reset(std::size_t num_blocks)
 {
     mBitmap = { num_blocks, Block::FREE };
 }
 
 std::vector<yuki::memory::Bitmap::Block>::iterator yuki::memory::Bitmap::
-determineScanningBegin(const size_t start_block)
+determineScanningBegin(const std::size_t start_block)
 {
     auto start_iter = mBitmap.begin() + start_block;
     // forbit allocating from the middle of a free region
@@ -26,7 +26,7 @@ determineScanningBegin(const size_t start_block)
     return start_iter;
 }
 
-size_t yuki::memory::Bitmap::allocate(size_t num_blocks, size_t start_block)
+std::size_t yuki::memory::Bitmap::allocate(std::size_t num_blocks, std::size_t start_block)
 {
     assert(start_block < mBitmap.size());
 
@@ -52,7 +52,7 @@ size_t yuki::memory::Bitmap::allocate(size_t num_blocks, size_t start_block)
     return alloc_begin_index;
 }
 
-void yuki::memory::Bitmap::deallocate(const size_t start_block)
+void yuki::memory::Bitmap::deallocate(const std::size_t start_block)
 {
     assert(start_block < mBitmap.size());
 
@@ -69,7 +69,7 @@ void yuki::memory::Bitmap::deallocate(const size_t start_block)
     }
 }
 
-size_t yuki::memory::Bitmap::blockCount() const
+std::size_t yuki::memory::Bitmap::blockCount() const
 {
     return mBitmap.size();
 }

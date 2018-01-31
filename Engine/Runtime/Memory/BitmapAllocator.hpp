@@ -12,7 +12,7 @@ namespace yuki::memory
 class BitmapAllocator
 {
     char *const mBase = nullptr;
-    const size_t mTotalSize, mBlockSize, mMaxAlignment;
+    const std::size_t mTotalSize, mBlockSize, mMaxAlignment;
     Bitmap mAllocation;
     std::mutex mBitmapLock;
 
@@ -30,13 +30,13 @@ public:
      * \param max_alignment The maximum alignment size allowed. Must be power
      * of two. It can be zero if no alignment is needed.
      */
-    BitmapAllocator(void *base, size_t total_size, size_t block_size,
-        size_t max_alignment);
+    BitmapAllocator(void *base, std::size_t total_size, std::size_t block_size,
+        std::size_t max_alignment);
 
-    size_t managedSize() const { return mTotalSize; }
-    size_t usableSize() const { return mBlockSize * mAllocation.blockCount(); }
+    std::size_t managedSize() const { return mTotalSize; }
+    std::size_t usableSize() const { return mBlockSize * mAllocation.blockCount(); }
 
-    void * allocate(size_t num_bytes, size_t alignment = 0);
+    void * allocate(std::size_t num_bytes, std::size_t alignment = 0);
     void deallocate(void *pointer);
 };
 }
