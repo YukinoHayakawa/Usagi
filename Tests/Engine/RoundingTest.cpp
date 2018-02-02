@@ -16,4 +16,5 @@ TEST(RoundingTest, RoundUpUnsigned) {
     EXPECT_EQ(yuki::utility::roundUpUnsigned(0, 16), 0);
     EXPECT_EQ(yuki::utility::roundUpUnsigned(3, 16), 16);
     EXPECT_EQ(yuki::utility::roundUpUnsigned(16, 16), 16);
+    EXPECT_EQ(yuki::utility::roundUpUnsigned(65536, 7), 65541);
 }

@@ -12,9 +12,11 @@ bool yuki::memory::CircularAllocator::tryAllocateFromRange(
 
     const auto aligned_begin = alignment ?
         reinterpret_cast<char*>(utility::roundUpUnsigned(
-            reinterpret_cast<size_t>(begin),
-            alignment)) :
+            reinterpret_cast<size_t>(begin), alignment)
+        ) :
         begin;
+    if(aligned_begin >= end) return false;
+
     const std::size_t available = end - aligned_begin;
     if(available >= num_bytes)
     {
@@ -28,7 +30,7 @@ bool yuki::memory::CircularAllocator::tryAllocateFromRange(
 }
 
 char * yuki::memory::CircularAllocator::wrapIncrement(char *original,
-    std::size_t increment)
+    const std::size_t increment) const
 {
     original += increment;
     if(original >= mBegin + mSize)
@@ -36,8 +38,7 @@ char * yuki::memory::CircularAllocator::wrapIncrement(char *original,
     return original;
 }
 
-yuki::memory::CircularAllocator::CircularAllocator(void *const begin,
-    const std::size_t size)
+yuki::memory::CircularAllocator::CircularAllocator(void *const begin, const std::size_t size)
     : mBegin { static_cast<char*>(begin) }
     , mSize { size }
 {
@@ -59,12 +60,7 @@ void * yuki::memory::CircularAllocator::allocate(const std::size_t num_bytes,
         mTail = mHead = mBegin;
 
         // since the buffer is empty, allocate from full range
-        if(tryAllocateFromRange(
-            num_bytes,
-            alignment,
-            mBegin,
-            mBegin + mSize,
-            alloc))
+        if(tryAllocateFromRange(num_bytes, alignment, mBegin, mBegin + mSize, alloc))
         {
             mHead = wrapIncrement(mHead, alloc.alignment_padding + alloc.length);
             mAllocations.push_back(alloc);
@@ -73,24 +69,17 @@ void * yuki::memory::CircularAllocator::allocate(const std::size_t num_bytes,
     else if(mHead > mTail) // space between head and tail is allocated
     {
         // allocate from space after head
-        if(tryAllocateFromRange(
-            num_bytes,
-            alignment,
-            mHead,
-            mBegin + mSize,
-            alloc))
+        if(tryAllocateFromRange(num_bytes, alignment, mHead, mBegin + mSize, alloc))
         {
             mHead = wrapIncrement(mHead, alloc.alignment_padding + alloc.length);
+            assert(mHead > mTail || mHead == mBegin);
             mAllocations.push_back(alloc);
         }
-        // allocate from space before tail
-        else if(tryAllocateFromRange(
-            num_bytes,
-            alignment,
-            mBegin,
-            mTail,
-            alloc))
+            // allocate from space before tail
+        else if(tryAllocateFromRange(num_bytes, alignment, mBegin, mTail, alloc))
         {
+            assert(mHead != mBegin);
+
             Allocation padding;
             padding.offset = mHead - mBegin;
             padding.state = Allocation::State::PENDING_FREE;
@@ -98,19 +87,18 @@ void * yuki::memory::CircularAllocator::allocate(const std::size_t num_bytes,
             mAllocations.push_back(padding);
 
             mHead = mBegin + alloc.offset + alloc.length;
+            assert(mHead < mBegin + mSize);
+            assert(mHead <= mTail);
             mAllocations.push_back(alloc);
         }
     }
     else
     {
-        if(tryAllocateFromRange(
-            num_bytes,
-            alignment,
-            mHead,
-            mTail,
-            alloc))
+        if(tryAllocateFromRange(num_bytes, alignment, mHead, mTail, alloc))
         {
             mHead = wrapIncrement(mHead, alloc.alignment_padding + alloc.length);
+            assert(mHead < mBegin + mSize);
+            assert(mHead <= mTail);
             mAllocations.push_back(alloc);
         }
     }
@@ -141,7 +129,8 @@ void yuki::memory::CircularAllocator::deallocate(void *pointer)
     }
     else
     {
-        iter = std::find_if(mAllocations.begin(), mAllocations.end(), [=](const Allocation &alloc) {
+        iter = std::find_if(mAllocations.begin(), mAllocations.end(), [=](const Allocation &alloc)
+        {
             return mBegin + alloc.offset == pointer;
         });
         if(iter == mAllocations.end())

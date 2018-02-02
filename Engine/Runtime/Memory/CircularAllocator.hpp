@@ -41,7 +41,7 @@ class CircularAllocator
     bool tryAllocateFromRange(std::size_t num_bytes,
         std::size_t alignment,
         char *begin, char *end, Allocation &alloc) const;
-    char *wrapIncrement(char *original, std::size_t increment);
+    char *wrapIncrement(char *original, std::size_t increment) const;
 
 public:
     CircularAllocator(void *begin, std::size_t size);
