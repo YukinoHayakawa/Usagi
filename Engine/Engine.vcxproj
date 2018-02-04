@@ -166,6 +166,7 @@
     <ClCompile Include="Runtime\Graphics\SpirvShader.cpp" />
     <ClCompile Include="Runtime\Memory\Bitmap.cpp" />
     <ClCompile Include="Runtime\Memory\BitmapAllocator.cpp" />
+    <ClCompile Include="Runtime\Memory\CircularAllocator.cpp" />
     <ClCompile Include="Runtime\Subsystem\ImmediateGuiImpl.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>

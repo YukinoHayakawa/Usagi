@@ -527,5 +527,8 @@
     <ClCompile Include="Runtime\Memory\BitmapAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Runtime\Memory\CircularAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
