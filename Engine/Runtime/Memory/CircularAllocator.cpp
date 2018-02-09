@@ -1,10 +1,13 @@
 ﻿#include <cassert>
 #include <algorithm>
-#include <exception>
+
+#include <Usagi/Engine/Utility/Rounding.hpp>
 
 #include "CircularAllocator.hpp"
 
-bool yuki::memory::CircularAllocator::tryAllocateFromRange(
+namespace yuki::memory
+{
+bool CircularAllocator::tryAllocateFromRange(
     const std::size_t num_bytes, const std::size_t alignment,
     char *const begin, char *const end, Allocation &alloc) const
 {
@@ -13,7 +16,7 @@ bool yuki::memory::CircularAllocator::tryAllocateFromRange(
     const auto aligned_begin = alignment ?
         reinterpret_cast<char*>(utility::roundUpUnsigned(
             reinterpret_cast<size_t>(begin), alignment)
-        ) :
+            ) :
         begin;
     if(aligned_begin >= end) return false;
 
@@ -29,7 +32,7 @@ bool yuki::memory::CircularAllocator::tryAllocateFromRange(
     return false;
 }
 
-char * yuki::memory::CircularAllocator::wrapIncrement(char *original,
+char * CircularAllocator::wrapIncrement(char *original,
     const std::size_t increment) const
 {
     original += increment;
@@ -38,18 +41,21 @@ char * yuki::memory::CircularAllocator::wrapIncrement(char *original,
     return original;
 }
 
-yuki::memory::CircularAllocator::CircularAllocator(void *const begin, const std::size_t size)
+CircularAllocator::CircularAllocator(void *const begin, const std::size_t size)
     : mBegin { static_cast<char*>(begin) }
     , mSize { size }
 {
 }
 
-void * yuki::memory::CircularAllocator::allocate(const std::size_t num_bytes,
+// todo: refactor
+void * CircularAllocator::allocate(const std::size_t num_bytes,
     const std::size_t alignment)
 {
     assert(num_bytes);
 
     Allocation alloc;
+
+    std::lock_guard<std::mutex> lock(mAllocMutex);
 
     if(mTail == mHead)
     {
@@ -75,7 +81,7 @@ void * yuki::memory::CircularAllocator::allocate(const std::size_t num_bytes,
             assert(mHead > mTail || mHead == mBegin);
             mAllocations.push_back(alloc);
         }
-            // allocate from space before tail
+        // allocate from space before tail
         else if(tryAllocateFromRange(num_bytes, alignment, mBegin, mTail, alloc))
         {
             assert(mHead != mBegin);
@@ -108,8 +114,10 @@ void * yuki::memory::CircularAllocator::allocate(const std::size_t num_bytes,
     return mBegin + alloc.offset;
 }
 
-void yuki::memory::CircularAllocator::deallocate(void *pointer)
+void CircularAllocator::deallocate(void *pointer)
 {
+    std::lock_guard<std::mutex> lock(mAllocMutex);
+
     assert(!mAllocations.empty());
 
     auto iter = mAllocations.begin();
@@ -129,8 +137,7 @@ void yuki::memory::CircularAllocator::deallocate(void *pointer)
     }
     else
     {
-        iter = std::find_if(mAllocations.begin(), mAllocations.end(), [=](const Allocation &alloc)
-        {
+        iter = std::find_if(mAllocations.begin(), mAllocations.end(), [=](const Allocation &alloc) {
             return mBegin + alloc.offset == pointer;
         });
         if(iter == mAllocations.end())
@@ -139,4 +146,5 @@ void yuki::memory::CircularAllocator::deallocate(void *pointer)
         assert(iter->state == Allocation::State::USED);
         iter->state = Allocation::State::PENDING_FREE;
     }
+}
 }

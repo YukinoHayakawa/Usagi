@@ -1,8 +1,7 @@
 ﻿#pragma once
 
 #include <deque>
-
-#include <Usagi/Engine/Utility/Rounding.hpp>
+#include <mutex>
 
 namespace yuki::memory
 {
@@ -37,6 +36,7 @@ class CircularAllocator
     const std::size_t mSize = 0;
     char *mTail = nullptr; // next deallocation position
     char *mHead = nullptr; // next allocation position
+    std::mutex mAllocMutex;
 
     bool tryAllocateFromRange(std::size_t num_bytes,
         std::size_t alignment,

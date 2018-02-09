@@ -8,11 +8,12 @@ namespace yuki::memory
 {
 /**
  * \brief A thread-safe bitmap allocator for managing remote memory.
+ * todo: max_alignment really needed?
  */
 class BitmapAllocator
 {
     char *const mBase = nullptr;
-    const std::size_t mTotalSize, mBlockSize, mMaxAlignment;
+    const std::size_t mTotalSize = 0, mBlockSize = 0, mMaxAlignment = 0;
     Bitmap mAllocation;
     std::mutex mBitmapLock;
 

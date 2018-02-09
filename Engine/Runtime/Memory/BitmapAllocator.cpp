@@ -3,7 +3,9 @@
 #include <Usagi/Engine/Utility/BitHack.hpp>
 #include <Usagi/Engine/Utility/Rounding.hpp>
 
-yuki::memory::BitmapAllocator::BitmapAllocator(void *base,
+namespace yuki::memory
+{
+BitmapAllocator::BitmapAllocator(void *base,
     const std::size_t total_size,
     const std::size_t block_size, const std::size_t max_alignment)
     : mBase { static_cast<char*>(base) }
@@ -33,7 +35,7 @@ yuki::memory::BitmapAllocator::BitmapAllocator(void *base,
     mAllocation.reset(total_size / block_size);
 }
 
-void * yuki::memory::BitmapAllocator::allocate(const std::size_t num_bytes,
+void * BitmapAllocator::allocate(const std::size_t num_bytes,
     const std::size_t alignment)
 {
     if(num_bytes == 0)
@@ -57,7 +59,7 @@ void * yuki::memory::BitmapAllocator::allocate(const std::size_t num_bytes,
     return mBase + allocation * mBlockSize;
 }
 
-void yuki::memory::BitmapAllocator::deallocate(void *pointer)
+void BitmapAllocator::deallocate(void *pointer)
 {
     const std::size_t offset = static_cast<char*>(pointer) - mBase;
     const std::size_t block = offset / mBlockSize;
@@ -67,4 +69,5 @@ void yuki::memory::BitmapAllocator::deallocate(void *pointer)
 
     std::lock_guard<std::mutex> lock_guard(mBitmapLock);
     mAllocation.deallocate(block);
+}
 }
