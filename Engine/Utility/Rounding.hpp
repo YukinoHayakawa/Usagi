@@ -1,21 +1,18 @@
 ﻿#pragma once
 
-#include <type_traits>
 #include <cassert>
 
 namespace yuki::utility
 {
 
 // https://stackoverflow.com/questions/3407012/c-rounding-up-to-the-nearest-multiple-of-a-number
-template <typename UInt>
-UInt roundUpUnsigned(UInt num_to_round, UInt multiple)
+template <typename T>
+T roundUpUnsigned(T num_to_round, T multiple)
 {
-    static_assert(std::is_unsigned_v<UInt>, "UInt is not unsigned type.");
+    assert(num_to_round >= 0);
+    assert(multiple > 0);
 
-    if(multiple == 0)
-        return num_to_round;
-
-    const UInt remainder = num_to_round % multiple;
+    const T remainder = num_to_round % multiple;
     if(remainder == 0)
         return num_to_round;
 

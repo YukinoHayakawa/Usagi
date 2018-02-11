@@ -130,7 +130,9 @@
     <ClCompile Include="Engine\BitHackTest.cpp" />
     <ClCompile Include="Engine\BitmapAllocatorTest.cpp" />
     <ClCompile Include="Engine\BitmapTest.cpp" />
+    <ClCompile Include="Engine\CircularAllocatorTest.cpp" />
     <ClCompile Include="Engine\CyclicContainerAdaptorTest.cpp" />
+    <ClCompile Include="Engine\FlagTest.cpp" />
     <ClCompile Include="Engine\IteratorTest.cpp" />
     <ClCompile Include="Engine\RoundingTest.cpp" />
     <ClCompile Include="RunAllTests.cpp" />
