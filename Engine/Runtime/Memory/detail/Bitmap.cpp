@@ -6,7 +6,7 @@
 
 #include "Bitmap.hpp"
 
-namespace yuki::memory
+namespace yuki::memory::detail
 {
 Bitmap::Bitmap(std::size_t num_blocks)
 {

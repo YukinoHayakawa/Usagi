@@ -2,7 +2,7 @@
 
 #include <mutex>
 
-#include "Bitmap.hpp"
+#include "detail/Bitmap.hpp"
 
 namespace yuki::memory
 {
@@ -14,7 +14,7 @@ class BitmapAllocator
 {
     char *const mBase = nullptr;
     const std::size_t mTotalSize = 0, mBlockSize = 0, mMaxAlignment = 0;
-    Bitmap mAllocation;
+    detail::Bitmap mAllocation;
     std::mutex mBitmapLock;
 
 public:

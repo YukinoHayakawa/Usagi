@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace yuki::memory
+namespace yuki::memory::detail
 {
 /**
  * \brief Tracks the availability of a fixed-size contiguous space by

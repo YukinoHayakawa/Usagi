@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include <Usagi/Engine/Runtime/Memory/Bitmap.hpp>
+#include <Usagi/Engine/Runtime/Memory/detail/Bitmap.hpp>
 
 class BitmapTest : public ::testing::Test
 {
@@ -9,7 +9,7 @@ protected:
     {
     }
 
-    yuki::memory::Bitmap bitmap { 16 };
+    yuki::memory::detail::Bitmap bitmap { 16 };
 };
 
 TEST_F(BitmapTest, PositiveAllocationAmount)
