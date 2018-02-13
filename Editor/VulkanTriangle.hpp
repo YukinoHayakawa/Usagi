@@ -4,27 +4,27 @@
 
 namespace yuki
 {
-
 namespace graphics
 {
-
 class Pipeline;
-class Buffer;
-
+class DynamicBuffer;
+struct Environment;
 }
 
 class VulkanTriangle : public graphics::Renderable
 {
-    struct graphics::Environment *mEnv;
+    graphics::Environment *mEnv = nullptr;
 
     std::unique_ptr<graphics::Pipeline> mPipeline;
+
     struct VertexData
     {
-        float   x, y, z, w;
-        float   r, g, b, a;
+        float x, y, z, w;
+        float r, g, b, a;
     };
-    std::unique_ptr<graphics::Buffer> mVertexBuffer;
-    std::unique_ptr<graphics::Sampler> mSampler;
+
+    std::unique_ptr<graphics::DynamicBuffer> mVertexBuffer;
+//    std::unique_ptr<graphics::Sampler> mSampler;
     float mCounter1 = 0.f;
 
 public:
@@ -34,5 +34,4 @@ public:
     void update(double delta_time) override;
     void populateCommandList(graphics::CommandList *command_list) override;
 };
-
 }
