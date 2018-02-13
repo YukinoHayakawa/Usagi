@@ -2,6 +2,7 @@
 
 #include <boost/exception/all.hpp>
 
+// todo: https://isocpp.org/wiki/faq/exceptions#mindset-for-proper-use-of-eh
 namespace yuki
 {
 

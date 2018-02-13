@@ -10,7 +10,7 @@ namespace yuki::graphics
 enum class ImageLayout;
 
 }
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 class Image : public graphics::Image

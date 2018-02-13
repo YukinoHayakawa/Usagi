@@ -5,6 +5,8 @@ namespace yuki::utility
 template <typename Flag>
 bool matchAllFlags(const Flag &flags, const Flag &checks)
 {
-    return (!flags & checks) == 0;
+    Flag neg = ~flags;
+    neg &= checks;
+    return !neg;
 }
 }

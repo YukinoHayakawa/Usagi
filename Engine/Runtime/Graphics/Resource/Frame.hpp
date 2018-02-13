@@ -17,7 +17,6 @@ public:
     // virtual class GraphicsCommandList * createCommandList(class GraphicsCommandPool *pool) = 0;
     // todo multiple command list
     virtual class CommandList * getCommandList() = 0;
-    virtual class ResourceAllocator * getResourceAllocator() = 0;
     virtual class Waitable * getRenderingFinishedSemaphore() = 0;
     virtual class Waitable * getRenderingFinishedFence() = 0;
 

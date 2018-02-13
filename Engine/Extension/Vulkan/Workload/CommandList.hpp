@@ -4,7 +4,7 @@
 
 #include <Usagi/Engine/Runtime/Graphics/Workload/CommandList.hpp>
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 class CommandList : public graphics::CommandList

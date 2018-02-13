@@ -5,7 +5,7 @@
 #include "Device.hpp"
 #include "../Resource/Image.hpp"
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 vk::SurfaceFormatKHR SwapChain::_selectSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surface_formats)
@@ -56,11 +56,11 @@ vk::PresentModeKHR SwapChain::_selectPresentMode(const std::vector<vk::PresentMo
 
 uint32_t SwapChain::_selectPresentationQueueFamily() const
 {
-    const auto queue_families = mVulkanGD->_getPhysicalDevice().getQueueFamilyProperties();
+    const auto queue_families = mVulkanGD->physicalDevice().getQueueFamilyProperties();
     for(auto iter = queue_families.begin(); iter != queue_families.end(); ++iter)
     {
         const uint32_t queue_index = iter - queue_families.begin();
-        if(mVulkanGD->_getPhysicalDevice().getSurfaceSupportKHR(queue_index, mSurface.get()))
+        if(mVulkanGD->physicalDevice().getSurfaceSupportKHR(queue_index, mSurface.get()))
             return queue_index;
     }
     throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo("no queue family supporting WSI was found");
@@ -71,9 +71,9 @@ void SwapChain::_createSwapChain()
 {
     mPresentationQueueFamilyIndex = _selectPresentationQueueFamily();
 
-    const auto surface_capabilities = mVulkanGD->_getPhysicalDevice().getSurfaceCapabilitiesKHR(mSurface.get());
-    const auto surface_formats = mVulkanGD->_getPhysicalDevice().getSurfaceFormatsKHR(mSurface.get());
-    const auto surface_present_modes = mVulkanGD->_getPhysicalDevice().getSurfacePresentModesKHR(mSurface.get());
+    const auto surface_capabilities = mVulkanGD->physicalDevice().getSurfaceCapabilitiesKHR(mSurface.get());
+    const auto surface_formats = mVulkanGD->physicalDevice().getSurfaceFormatsKHR(mSurface.get());
+    const auto surface_present_modes = mVulkanGD->physicalDevice().getSurfacePresentModesKHR(mSurface.get());
 
     vk::SwapchainCreateInfoKHR swapchain_create_info_khr;
 
@@ -99,14 +99,14 @@ void SwapChain::_createSwapChain()
 
     swapchain_create_info_khr.setOldSwapchain(mSwapChain.get());
 
-    mSwapChain = mVulkanGD->_getDevice().createSwapchainKHRUnique(swapchain_create_info_khr);
+    mSwapChain = mVulkanGD->device().createSwapchainKHRUnique(swapchain_create_info_khr);
 }
 
 SwapChain::SwapChain(Device *device, HINSTANCE hInstance, HWND hWnd)
     : mVulkanGD(std::move(device))
 {
     vk::SemaphoreCreateInfo semaphore_create_info;
-    mImageAvailableSemaphore = { mVulkanGD->_getDevice().createSemaphoreUnique(semaphore_create_info), vk::PipelineStageFlagBits::eColorAttachmentOutput };
+    mImageAvailableSemaphore = { mVulkanGD->device().createSemaphoreUnique(semaphore_create_info), vk::PipelineStageFlagBits::eColorAttachmentOutput };
 
     vk::Win32SurfaceCreateInfoKHR surface_create_info;
     surface_create_info.setHinstance(hInstance);
@@ -115,7 +115,7 @@ SwapChain::SwapChain(Device *device, HINSTANCE hInstance, HWND hWnd)
 
     _createSwapChain();
 
-    auto images = mVulkanGD->_getDevice().getSwapchainImagesKHR(mSwapChain.get());
+    auto images = mVulkanGD->device().getSwapchainImagesKHR(mSwapChain.get());
     for(auto &&image : images)
     {
         vk::ImageViewCreateInfo image_view_create_info;
@@ -129,14 +129,14 @@ SwapChain::SwapChain(Device *device, HINSTANCE hInstance, HWND hWnd)
         image_subresource_range.setBaseArrayLayer(0);
         image_subresource_range.setLayerCount(1);
         image_view_create_info.setSubresourceRange(image_subresource_range);
-        auto full_image_view = mVulkanGD->_getDevice().createImageViewUnique(image_view_create_info);
+        auto full_image_view = mVulkanGD->device().createImageViewUnique(image_view_create_info);
         mSwapChainImages.push_back(std::make_unique<SwapChainImage>(image, std::move(full_image_view)));
     }
 }
 
 void SwapChain::acquireNextImage()
 {
-    const auto result = mVulkanGD->_getDevice().acquireNextImageKHR(
+    const auto result = mVulkanGD->device().acquireNextImageKHR(
         mSwapChain.get(),
         UINT64_MAX,
         mImageAvailableSemaphore._getSemaphore(), { }

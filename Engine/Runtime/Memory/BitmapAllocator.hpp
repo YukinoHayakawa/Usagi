@@ -2,6 +2,8 @@
 
 #include <mutex>
 
+#include <Usagi/Engine/Utility/Noncopyable.hpp>
+
 #include "detail/Bitmap.hpp"
 
 namespace yuki::memory
@@ -10,7 +12,7 @@ namespace yuki::memory
  * \brief A thread-safe bitmap allocator for managing remote memory.
  * todo: max_alignment really needed?
  */
-class BitmapAllocator
+class BitmapAllocator : Noncopyable
 {
     char *const mBase = nullptr;
     const std::size_t mTotalSize = 0, mBlockSize = 0, mMaxAlignment = 0;

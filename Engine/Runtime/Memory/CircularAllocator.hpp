@@ -3,6 +3,8 @@
 #include <deque>
 #include <mutex>
 
+#include <Usagi/Engine/Utility/Noncopyable.hpp>
+
 namespace yuki::memory
 {
 /**
@@ -12,7 +14,7 @@ namespace yuki::memory
  * Structure:
  * [ tail | allocated | head ]
  */
-class CircularAllocator
+class CircularAllocator : Noncopyable
 {
     struct Allocation
     {

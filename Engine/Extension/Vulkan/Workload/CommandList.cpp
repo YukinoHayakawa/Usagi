@@ -4,11 +4,11 @@
 #include "../Resource/Image.hpp"
 #include "../Device/Device.hpp"
 #include "../Workload/Pipeline.hpp"
-#include "../Resource/Buffer.hpp"
+#include <Usagi/Engine/Runtime/Graphics/Resource/Buffer.hpp>
+#include <Usagi/Engine/Extension/Vulkan/Resource/detail/Buffer.hpp>
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
-
 //void CommandList::imageMemoryBarrier(GraphicsImage *image, vk::AccessFlags src_access_mask,
 //    vk::AccessFlags dst_access_mask, GraphicsImageLayout old_layout, GraphicsImageLayout new_layout,
 //    uint32_t src_queue_family_index, uint32_t dst_queue_family_index)
@@ -47,7 +47,9 @@ CommandList::CommandList(Device *vulkan_gd,
 
 void CommandList::begin()
 {
-    if(mInvalidFramebuffer) throw InappropriatelyConfiguredException() << ConfigureInfo("render targets are not specified");
+    if(mInvalidFramebuffer)
+        throw InappropriatelyConfiguredException() << ConfigureInfo(
+            "render targets are not specified");
 
     mCurrentPipeline = nullptr;
 
@@ -62,7 +64,9 @@ void CommandList::begin()
 void CommandList::bindPipeline(graphics::Pipeline *pipeline)
 {
     Pipeline *vulkan_pipeline = dynamic_cast<Pipeline*>(pipeline);
-    if(!vulkan_pipeline) throw MismatchedSubsystemComponentException() << SubsystemInfo("Rendering") << ComponentInfo("VulkanGraphicsPipeline");
+    if(!vulkan_pipeline)
+        throw MismatchedSubsystemComponentException() <<
+            SubsystemInfo("Rendering") << ComponentInfo("VulkanGraphicsPipeline");
 
     if(vulkan_pipeline == mCurrentPipeline) return;
 
@@ -73,7 +77,7 @@ void CommandList::bindPipeline(graphics::Pipeline *pipeline)
     }
 
     mFrameBufferCreateInfo.setRenderPass(vulkan_pipeline->_getRenderPass());
-    mFramebuffer = mVulkanGD->_getDevice().createFramebufferUnique(mFrameBufferCreateInfo);
+    mFramebuffer = mVulkanGD->device().createFramebufferUnique(mFrameBufferCreateInfo);
 
     // todo: decouple render pass from pipeline and avoid changes of render passes as much as possible
     vk::RenderPassBeginInfo render_pass_begin_info;
@@ -85,7 +89,8 @@ void CommandList::bindPipeline(graphics::Pipeline *pipeline)
     render_pass_begin_info.setPClearValues(mClearColors.data());
 
     mCommandBuffer->beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline);
-    mCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, vulkan_pipeline->_getPipeline());
+    mCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics,
+        vulkan_pipeline->_getPipeline());
 
     mCurrentPipeline = vulkan_pipeline;
 }
@@ -97,18 +102,27 @@ void CommandList::setViewport(float x, float y, float width, float height)
 
 void CommandList::setScissor(int32_t x, int32_t y, int32_t width, int32_t height)
 {
-    mCommandBuffer->setScissor(0, { { { x, y }, { static_cast<uint32_t>(width), static_cast<uint32_t>(height) } } });
+    mCommandBuffer->setScissor(0, {
+        { { x, y }, { static_cast<uint32_t>(width), static_cast<uint32_t>(height) } }
+    });
 }
 
 void CommandList::bindVertexBuffer(uint32_t slot, graphics::Buffer *buffer)
 {
     Buffer *vulkan_buffer = dynamic_cast<Buffer*>(buffer);
-    if(!vulkan_buffer) throw MismatchedSubsystemComponentException() << SubsystemInfo("Rendering") << ComponentInfo("VulkanVertexBuffer");
+    if(!vulkan_buffer)
+        throw MismatchedSubsystemComponentException() <<
+            SubsystemInfo("Rendering") << ComponentInfo("VulkanVertexBuffer");
 
-    mCommandBuffer->bindVertexBuffers(slot, { vulkan_buffer->_getBuffer() }, { vulkan_buffer->_getOffset() });
+    auto bind_info = vulkan_buffer->getBindInfo();
+    mCommandBuffer->bindVertexBuffers(slot,
+        { bind_info.first },
+        { bind_info.second }
+    );
 }
 
-void CommandList::draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex,
+void CommandList::draw(uint32_t vertex_count, uint32_t instance_count,
+    uint32_t first_vertex,
     uint32_t first_instance)
 {
     mCommandBuffer->draw(vertex_count, instance_count, first_vertex, first_instance);
@@ -140,7 +154,9 @@ void CommandList::_setAttachments(const std::vector<graphics::Image *> &attachme
     for(auto &&attachment : attachments)
     {
         Image *vulkan_image = dynamic_cast<Image*>(attachment);
-        if(!vulkan_image) throw MismatchedSubsystemComponentException() << SubsystemInfo("Rendering") << ComponentInfo("VulkanImage");
+        if(!vulkan_image)
+            throw MismatchedSubsystemComponentException() <<
+                SubsystemInfo("Rendering") << ComponentInfo("VulkanImage");
         mImageViews.push_back(vulkan_image->_getFullView());
         mClearColors.emplace_back(clear_color);
     }
@@ -154,5 +170,4 @@ void CommandList::_setAttachments(const std::vector<graphics::Image *> &attachme
 
     mInvalidFramebuffer = false;
 }
-
 }

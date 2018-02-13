@@ -16,6 +16,7 @@ struct PipelineAssembly
     std::vector<class Image*> attachments;
 };
 
+// todo provide higher level abstraction of commands e.g. render pass to ensure that pipeline is bound
 class CommandList : Noncopyable
 {
 public:

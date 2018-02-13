@@ -4,7 +4,7 @@
 
 #include <Usagi/Engine/Runtime/Graphics/Device/Waitable.hpp>
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 class Fence : public graphics::Waitable

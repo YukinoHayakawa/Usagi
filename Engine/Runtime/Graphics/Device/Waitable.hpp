@@ -10,6 +10,8 @@ class Waitable
 {
 public:
     virtual ~Waitable() = default;
+
+    // virtual bool signaled() = 0; 
 };
 
 }

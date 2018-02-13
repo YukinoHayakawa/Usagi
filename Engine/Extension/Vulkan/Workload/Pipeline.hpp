@@ -6,7 +6,7 @@
 #include <Usagi/Engine/Runtime/Graphics/Resource/DataFormat.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Workload/PipelineCreateInfo.hpp>
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 class Pipeline : public graphics::Pipeline

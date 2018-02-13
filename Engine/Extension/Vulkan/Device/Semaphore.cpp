@@ -1,6 +1,6 @@
 ﻿#include "Semaphore.hpp"
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 Semaphore::Semaphore(vk::UniqueSemaphore semaphore, vk::PipelineStageFlags signal_stage)

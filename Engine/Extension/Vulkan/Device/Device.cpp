@@ -1,50 +1,50 @@
 ﻿#include <iostream>
 
+#include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Extension/Win32/Win32Window.hpp>
 #include <Usagi/Engine/Runtime/Exception.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Device/Waitable.hpp>
+#include <Usagi/Engine/Utility/Flag.hpp>
+#include <Usagi/Engine/Core/Logging.hpp>
 
 #include "SwapChain.hpp"
 #include "../Workload/Pipeline.hpp"
 #include "../Workload/CommandPool.hpp"
 #include "../Workload/CommandList.hpp"
 #include "../Resource/FrameController.hpp"
-#include "../Resource/Sampler.hpp"
 #include "Fence.hpp"
 
 #include "Device.hpp"
+#include <Usagi/Engine/Extension/Vulkan/Resource/ResourceManager.hpp>
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
-
-VkBool32 Device::_debugLayerCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char *layerPrefix, const char *msg, void *userData)
+VkBool32 Device::_debugLayerCallback(VkDebugReportFlagsEXT flags,
+    VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code,
+    const char *layerPrefix, const char *msg, void *userData)
 {
     const vk::DebugReportFlagsEXT level(static_cast<vk::DebugReportFlagBitsEXT>(flags));
     if(level & vk::DebugReportFlagBitsEXT::eInformation)
     {
-        goto ignore;
-        std::cout << "[INFO] ";
+        LOG(INFO) << msg;
     }
     if(level & vk::DebugReportFlagBitsEXT::eWarning)
     {
-        std::cout << "[WARN] ";
+        LOG(WARNING) << msg;
     }
     if(level & vk::DebugReportFlagBitsEXT::ePerformanceWarning)
     {
-        std::cout << "[PERF] ";
+        LOG(WARNING) << "(PERFORMANCE)" << msg;
     }
     if(level & vk::DebugReportFlagBitsEXT::eError)
     {
-        std::cout << "[ERROR] ";
+        LOG(ERROR) << msg;
     }
     if(level & vk::DebugReportFlagBitsEXT::eDebug)
     {
-        std::cout << "[DEBUG] ";
+        LOG(DEBUG) << msg;
     }
 
-    std::cout << msg << std::endl;
-
-ignore:
     return VK_FALSE;
 }
 
@@ -78,9 +78,12 @@ void Device::_createInstance()
 
     const std::vector<const char *> instance_extensions
     {
-        "VK_KHR_surface", // application window
-        "VK_KHR_win32_surface", // todo remove OS dependency
-        "VK_EXT_debug_report", // provide feedback from validation layer
+        "VK_KHR_surface",
+        // application window
+        "VK_KHR_win32_surface",
+        // todo remove OS dependency
+        "VK_EXT_debug_report",
+        // provide feedback from validation layer
     };
     instance_create_info.setEnabledExtensionCount(instance_extensions.size());
     instance_create_info.setPpEnabledExtensionNames(instance_extensions.data());
@@ -134,36 +137,55 @@ void Device::_selectPhysicalDevice()
             mPhysicalDevice = dev;
     }
     if(!mPhysicalDevice)
-        throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo("no suitable Vulkan device was found!");
-    std::cout << "Using device: " << mPhysicalDevice.getProperties().deviceName << std::endl;
+        throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo(
+            "no suitable Vulkan device was found!");
+    std::cout << "Using device: " << mPhysicalDevice.getProperties().deviceName << std::
+        endl;
 }
 
-void Device::_createGraphicsQueue()
+void Device::selectQueue(std::vector<vk::QueueFamilyProperties> &queue_family,
+    const vk::QueueFlags &queue_flags, std::size_t *selected_index)
 {
-    std::cout << "\nSupported queue families:" << std::endl;
-    std::cout << "=========================" << std::endl;
-    auto queue_family = mPhysicalDevice.getQueueFamilyProperties();
-    auto graphics_queue_index = queue_family.end();
     for(auto iter = queue_family.begin(); iter != queue_family.end(); ++iter)
     {
-        std::cout << "    (" << iter->queueCount << ") " << to_string(iter->queueFlags) << std::endl;
-        if(iter->queueFlags & vk::QueueFlagBits::eGraphics)
-            graphics_queue_index = iter;
-
+        if(utility::matchAllFlags(iter->queueFlags, queue_flags))
+        {
+            *selected_index = iter - queue_family.begin();
+            return;
+        }
     }
-    if(graphics_queue_index == queue_family.end())
-        throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo("no queue family supporting graphics operations was found");
+    throw std::runtime_error("requested queue type not found");
+}
+
+void Device::createDeviceAndQueues()
+{
+    LOG(INFO) << "Creating logical device";
+
+    auto queue_families = mPhysicalDevice.getQueueFamilyProperties();
+    LOG(INFO) << "Supported queue families:";
+    for(auto &&qf : queue_families)
+    {
+        LOG(INFO) << qf.queueCount << ": " << to_string(qf.queueFlags);
+    }
+
+    std::size_t graphics_queue_index;
+
+    selectQueue(queue_families,
+        vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eTransfer,
+        &graphics_queue_index);
+    LOG(INFO) << "Using queue " << graphics_queue_index << " for graphics and transfer";
 
     vk::DeviceCreateInfo device_create_info;
 
-    vk::DeviceQueueCreateInfo queue_create_info;
-    mGraphicsQueueFamilyIndex = graphics_queue_index - queue_family.begin();
-    queue_create_info.setQueueFamilyIndex(mGraphicsQueueFamilyIndex);
-    queue_create_info.setQueueCount(1);
+    vk::DeviceQueueCreateInfo queue_create_info[1];
     float queue_priority = 1;
-    queue_create_info.setPQueuePriorities(&queue_priority);
+
+    queue_create_info[0].setQueueFamilyIndex(graphics_queue_index);
+    queue_create_info[0].setQueueCount(1);
+    queue_create_info[0].setPQueuePriorities(&queue_priority);
+
     device_create_info.setQueueCreateInfoCount(1);
-    device_create_info.setPQueueCreateInfos(&queue_create_info);
+    device_create_info.setPQueueCreateInfos(queue_create_info);
 
     // todo: check device capacity
     const std::vector<const char *> device_extensions
@@ -173,13 +195,9 @@ void Device::_createGraphicsQueue()
     device_create_info.setEnabledExtensionCount(device_extensions.size());
     device_create_info.setPpEnabledExtensionNames(device_extensions.data());
 
-    // note that device layers are deprecated
-
-    vk::PhysicalDeviceFeatures physical_device_features;
-    device_create_info.setPEnabledFeatures(&physical_device_features);
-
     mDevice = mPhysicalDevice.createDeviceUnique(device_create_info);
-    mGraphicsQueue = mDevice->getQueue(queue_create_info.queueFamilyIndex, 0);
+    mGraphicsQueue = mDevice->getQueue(graphics_queue_index, 0);
+    mGraphicsQueueFamilyIndex = graphics_queue_index;
 }
 
 Device::Device()
@@ -187,7 +205,7 @@ Device::Device()
     _createInstance();
     _createDebugReport();
     _selectPhysicalDevice();
-    _createGraphicsQueue();
+    createDeviceAndQueues();
 }
 
 Device::~Device()
@@ -199,14 +217,23 @@ std::unique_ptr<graphics::SwapChain> Device::createSwapChain(Window *window)
 {
     if(auto native_window = dynamic_cast<Win32Window*>(window))
     {
-        return std::make_unique<SwapChain>(this, native_window->getProcessInstanceHandle(), native_window->getNativeWindowHandle());
+        return std::make_unique<SwapChain>(this,
+            native_window->getProcessInstanceHandle(),
+            native_window->getNativeWindowHandle());
     }
-    throw OSAPIUnsupportedPlatformException() << PlatformDescriptionInfo("The windowing system on Win32 is not native.");
+    throw OSAPIUnsupportedPlatformException() << PlatformDescriptionInfo(
+        "The windowing system on Win32 is not native.");
 }
 
-std::unique_ptr<graphics::Pipeline> Device::createPipeline(const graphics::PipelineCreateInfo &info)
+std::unique_ptr<graphics::Pipeline> Device::createPipeline(
+    const graphics::PipelineCreateInfo &info)
 {
     return Pipeline::create(this, info);
+}
+
+std::unique_ptr<graphics::ResourceManager> Device::createResourceManager()
+{
+    return std::make_unique<ResourceManager>(this);
 }
 
 std::unique_ptr<graphics::CommandPool> Device::createGraphicsCommandPool()
@@ -214,15 +241,18 @@ std::unique_ptr<graphics::CommandPool> Device::createGraphicsCommandPool()
     return std::make_unique<CommandPool>(this);
 }
 
-std::unique_ptr<graphics::FrameController> Device::createFrameController(size_t num_frames)
+std::unique_ptr<graphics::FrameController> Device::createFrameController(
+    size_t num_frames)
 {
     return std::make_unique<FrameController>(this, 2);
 }
 
-std::unique_ptr<graphics::Sampler> Device::createSampler(const graphics::SamplerCreateInfo &info)
-{
-    return Sampler::create(this, info);
-}
+//
+//std::unique_ptr<graphics::Sampler> Device::createSampler(
+//    const graphics::SamplerCreateInfo &info)
+//{
+//    return Sampler::create(this, info);
+//}
 
 void Device::submitGraphicsCommandList(
     graphics::CommandList *command_list,
@@ -232,11 +262,15 @@ void Device::submitGraphicsCommandList(
 )
 {
     CommandList *vulkan_cmd_list = dynamic_cast<CommandList*>(command_list);
-    if(!vulkan_cmd_list) throw MismatchedSubsystemComponentException() << SubsystemInfo("Rendering") << ComponentInfo("VulkanCommandList");
+    if(!vulkan_cmd_list)
+        throw MismatchedSubsystemComponentException() <<
+            SubsystemInfo("Rendering") << ComponentInfo("VulkanCommandList");
 
     std::vector<vk::PipelineStageFlags> wait_stages;
-    std::vector<vk::Semaphore> vulkan_wait_semaphores = Semaphore::_convertToVulkanHandles(wait_semaphores, &wait_stages),
-        vulkan_signal_semaphores = Semaphore::_convertToVulkanHandles(signal_semaphores, nullptr);
+    std::vector<vk::Semaphore> vulkan_wait_semaphores = Semaphore::
+            _convertToVulkanHandles(wait_semaphores, &wait_stages),
+        vulkan_signal_semaphores = Semaphore::_convertToVulkanHandles(signal_semaphores,
+            nullptr);
 
     auto buffer = vulkan_cmd_list->_getCommandBuffer();
     vk::SubmitInfo submit_info;
@@ -261,12 +295,12 @@ uint32_t Device::getGraphicsQueueFamilyIndex() const
     return mGraphicsQueueFamilyIndex;
 }
 
-vk::Device Device::_getDevice() const
+vk::Device Device::device() const
 {
     return mDevice.get();
 }
 
-vk::PhysicalDevice Device::_getPhysicalDevice() const
+vk::PhysicalDevice Device::physicalDevice() const
 {
     return mPhysicalDevice;
 }
@@ -281,4 +315,14 @@ vk::Queue Device::_getGraphicsQueue() const
     return mGraphicsQueue;
 }
 
+void Device::submitCommandBuffer(vk::CommandBuffer command_buffer, vk::Fence fence)
+{
+    std::lock_guard<std::mutex> lock(mSubmitMutex);
+
+    vk::SubmitInfo submit_info;
+    submit_info.setCommandBufferCount(1);
+    submit_info.setPCommandBuffers(&command_buffer);
+
+    mGraphicsQueue.submit(submit_info, fence);
+}
 }
