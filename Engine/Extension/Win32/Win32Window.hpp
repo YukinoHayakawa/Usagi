@@ -9,7 +9,6 @@
 
 namespace yuki
 {
-
 enum class MouseButtonCode;
 
 class Win32Window
@@ -33,7 +32,8 @@ class Win32Window
     void _createWindowHandle(const std::string &title, int width, int height);
     void _registerRawInputDevices() const;
 
-    static LRESULT CALLBACK _windowMessageDispatcher(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    static LRESULT CALLBACK _windowMessageDispatcher(HWND hWnd, UINT message,
+        WPARAM wParam, LPARAM lParam);
     LRESULT _handleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
     // raw input
@@ -89,6 +89,7 @@ public:
     bool isWindowActive() const override;
     Eigen::Vector2f getWindowSize() const override;
     bool isWindowOpen() const override;
+    void setTitle(const std::string &title) override;
 
     void processEvents() override;
 
@@ -102,5 +103,4 @@ public:
 
     bool isKeyPressed(KeyCode key) override;
 };
-
 }
