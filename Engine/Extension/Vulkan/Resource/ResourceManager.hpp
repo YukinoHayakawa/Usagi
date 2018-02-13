@@ -6,7 +6,6 @@
 #include <Usagi/Engine/Runtime/Graphics/Resource/ResourceEventHandler.hpp>
 #include <Usagi/Engine/Runtime/Memory/BitmapAllocator.hpp>
 #include <Usagi/Engine/Runtime/Memory/CircularAllocator.hpp>
-#include <atomic>
 
 namespace yuki::extension::vulkan
 {
@@ -70,8 +69,13 @@ class ResourceManager
             WORKING,
         } state = State::IDLE;
 
+        void joinFenceListener();
+
     public:
         CopyCommandBatch(vk::UniqueCommandBuffer buffer, vk::UniqueFence fence);
+        CopyCommandBatch(CopyCommandBatch &&other) = default;
+        CopyCommandBatch & operator=(CopyCommandBatch &&other) = default;
+        ~CopyCommandBatch();
 
         bool idle() const;
         bool full() const;

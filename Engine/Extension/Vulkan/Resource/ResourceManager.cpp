@@ -157,6 +157,7 @@ std::unique_ptr<graphics::DynamicBuffer> ResourceManager::createDynamicBuffer(
 
 void * ResourceManager::allocateStagingMemory(const std::size_t size)
 {
+    // todo handle allocation failure
     auto offset = mStagingAllocator.allocate(size);
     // todo use as base address of mStagingAllocator
     return static_cast<char*>(mMappedStagingMemory)
@@ -196,6 +197,17 @@ ResourceManager::CopyCommandBatch::CopyCommandBatch(vk::UniqueCommandBuffer buff
     handlers.reserve(NUM_COMMANDS_PER_BATCH);
     staging_areas.reserve(NUM_COMMANDS_PER_BATCH);
     reset();
+}
+
+void ResourceManager::CopyCommandBatch::joinFenceListener()
+{
+    if(fence_listener.joinable())
+        fence_listener.join();
+}
+
+ResourceManager::CopyCommandBatch::~CopyCommandBatch()
+{
+    joinFenceListener();
 }
 
 bool ResourceManager::CopyCommandBatch::idle() const
@@ -244,8 +256,7 @@ void ResourceManager::CopyCommandBatch::submit(Device *device)
     device->submitCommandBuffer(command_buffer.get(), fence);
     state = State::WORKING;
     // the thread should be already finished
-    if(fence_listener.joinable())
-        fence_listener.join();
+    joinFenceListener();
     fence_listener = std::thread([=]()
     {
         auto result = device->device().waitForFences(1, &fence, true, -1);
