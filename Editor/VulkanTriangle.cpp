@@ -88,6 +88,7 @@ void yuki::VulkanTriangle::update(double delta_time)
     float b = abs(sin(mCounter1 + 0.25));
     float c = abs(sin(mCounter1 + 0.5));
     float d = abs(sin(mCounter1 + 0.75));
+
     VertexData vertex_data[]
     {
         { -0.7f, -0.7f, 0.0f, 1.0f, a, b, c, 0.0f },
@@ -95,9 +96,12 @@ void yuki::VulkanTriangle::update(double delta_time)
         { 0.7f, -0.7f, 0.0f, 1.0f, b, c, a, 0.0f },
         { 0.7f, 0.7f, 0.0f, 1.0f, c, a, c, 0.0f }
     };
-    const auto mem = mVertexBuffer->map(0, sizeof(vertex_data));
-    memcpy(mem, vertex_data, sizeof(vertex_data));
-    mVertexBuffer->unmap();
+
+    if(const auto mem = mVertexBuffer->map(0, sizeof(vertex_data)))
+    {
+        memcpy(mem, vertex_data, sizeof(vertex_data));
+        mVertexBuffer->unmap();
+    }
 }
 
 void yuki::VulkanTriangle::populateCommandList(CommandList *command_list)

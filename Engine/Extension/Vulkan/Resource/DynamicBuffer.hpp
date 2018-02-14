@@ -2,7 +2,6 @@
 
 #include <Usagi/Engine/Runtime/Graphics/Resource/DynamicBuffer.hpp>
 
-#include "detail/PrimitiveBuffer.hpp"
 #include "detail/Buffer.hpp"
 
 namespace yuki::extension::vulkan

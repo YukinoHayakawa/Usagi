@@ -7,8 +7,8 @@
 
 namespace yuki::extension::vulkan
 {
-
-vk::SurfaceFormatKHR SwapChain::_selectSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surface_formats)
+vk::SurfaceFormatKHR SwapChain::_selectSurfaceFormat(
+    const std::vector<vk::SurfaceFormatKHR> &surface_formats)
 {
     // If the list contains only one entry with undefined format
     // it means that there are no preferred surface formats and any can be chosen
@@ -31,25 +31,36 @@ vk::SurfaceFormatKHR SwapChain::_selectSurfaceFormat(const std::vector<vk::Surfa
     return surface_formats[0];
 }
 
-vk::Extent2D SwapChain::_selectSurfaceExtent(const vk::SurfaceCapabilitiesKHR &surface_capabilities)
+vk::Extent2D SwapChain::_selectSurfaceExtent(
+    const vk::SurfaceCapabilitiesKHR &surface_capabilities)
 {
     // Special value of surface extent is width == height == -1
     // If this is so we define the size by ourselves but it must fit within defined confines
     if(surface_capabilities.currentExtent.width == -1)
     {
         vk::Extent2D swap_chain_extent = { 1280, 720 };
-        swap_chain_extent.width = clamp(swap_chain_extent.width, { surface_capabilities.minImageExtent.width, surface_capabilities.maxImageExtent.width });
-        swap_chain_extent.height = clamp(swap_chain_extent.height, { surface_capabilities.minImageExtent.height, surface_capabilities.maxImageExtent.height });
+        swap_chain_extent.width = clamp(swap_chain_extent.width, {
+            surface_capabilities.minImageExtent.width,
+            surface_capabilities.maxImageExtent.width
+        });
+        swap_chain_extent.height = clamp(swap_chain_extent.height, {
+            surface_capabilities.minImageExtent.height,
+            surface_capabilities.maxImageExtent.height
+        });
         return swap_chain_extent;
     }
     // Most of the cases we define size of the swap_chain images equal to current window's size
     return surface_capabilities.currentExtent;
 }
 
-vk::PresentModeKHR SwapChain::_selectPresentMode(const std::vector<vk::PresentModeKHR> &present_modes)
+vk::PresentModeKHR SwapChain::_selectPresentMode(
+    const std::vector<vk::PresentModeKHR> &present_modes)
 {
+    return vk::PresentModeKHR::eImmediate;
+
     // prefer mailbox mode to achieve triple buffering
-    if(find(present_modes.begin(), present_modes.end(), vk::PresentModeKHR::eMailbox) != present_modes.end())
+    if(find(present_modes.begin(), present_modes.end(), vk::PresentModeKHR::eMailbox) !=
+        present_modes.end())
         return vk::PresentModeKHR::eMailbox;
     return vk::PresentModeKHR::eFifo;
 }
@@ -63,7 +74,8 @@ uint32_t SwapChain::_selectPresentationQueueFamily() const
         if(mVulkanGD->physicalDevice().getSurfaceSupportKHR(queue_index, mSurface.get()))
             return queue_index;
     }
-    throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo("no queue family supporting WSI was found");
+    throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo(
+        "no queue family supporting WSI was found");
 }
 
 // todo recreate after resizing the window
@@ -71,9 +83,12 @@ void SwapChain::_createSwapChain()
 {
     mPresentationQueueFamilyIndex = _selectPresentationQueueFamily();
 
-    const auto surface_capabilities = mVulkanGD->physicalDevice().getSurfaceCapabilitiesKHR(mSurface.get());
-    const auto surface_formats = mVulkanGD->physicalDevice().getSurfaceFormatsKHR(mSurface.get());
-    const auto surface_present_modes = mVulkanGD->physicalDevice().getSurfacePresentModesKHR(mSurface.get());
+    const auto surface_capabilities = mVulkanGD->physicalDevice().
+        getSurfaceCapabilitiesKHR(mSurface.get());
+    const auto surface_formats = mVulkanGD->physicalDevice().getSurfaceFormatsKHR(
+        mSurface.get());
+    const auto surface_present_modes = mVulkanGD->physicalDevice().
+        getSurfacePresentModesKHR(mSurface.get());
 
     vk::SwapchainCreateInfoKHR swapchain_create_info_khr;
 
@@ -86,8 +101,12 @@ void SwapChain::_createSwapChain()
 
     // set up triple buffering
     const uint32_t image_count = 3;
-    if(!withinOpenInterval(image_count, { surface_capabilities.minImageCount, surface_capabilities.maxImageCount }))
-        throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo("the device does not support triple buffering");
+    if(!withinOpenInterval(image_count, {
+        surface_capabilities.minImageCount,
+        surface_capabilities.maxImageCount
+    }))
+        throw GraphicsAPIUnsupportedFeatureException() << FeatureDescriptionInfo(
+            "the device does not support triple buffering");
     swapchain_create_info_khr.setMinImageCount(image_count);
     swapchain_create_info_khr.setPresentMode(_selectPresentMode(surface_present_modes));
 
@@ -95,7 +114,8 @@ void SwapChain::_createSwapChain()
     swapchain_create_info_khr.setImageSharingMode(vk::SharingMode::eExclusive);
     swapchain_create_info_khr.setPreTransform(surface_capabilities.currentTransform);
 
-    swapchain_create_info_khr.setImageUsage(vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferDst);
+    swapchain_create_info_khr.setImageUsage(
+        vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferDst);
 
     swapchain_create_info_khr.setOldSwapchain(mSwapChain.get());
 
@@ -106,7 +126,10 @@ SwapChain::SwapChain(Device *device, HINSTANCE hInstance, HWND hWnd)
     : mVulkanGD(std::move(device))
 {
     vk::SemaphoreCreateInfo semaphore_create_info;
-    mImageAvailableSemaphore = { mVulkanGD->device().createSemaphoreUnique(semaphore_create_info), vk::PipelineStageFlagBits::eColorAttachmentOutput };
+    mImageAvailableSemaphore = {
+        mVulkanGD->device().createSemaphoreUnique(semaphore_create_info),
+        vk::PipelineStageFlagBits::eColorAttachmentOutput
+    };
 
     vk::Win32SurfaceCreateInfoKHR surface_create_info;
     surface_create_info.setHinstance(hInstance);
@@ -129,8 +152,10 @@ SwapChain::SwapChain(Device *device, HINSTANCE hInstance, HWND hWnd)
         image_subresource_range.setBaseArrayLayer(0);
         image_subresource_range.setLayerCount(1);
         image_view_create_info.setSubresourceRange(image_subresource_range);
-        auto full_image_view = mVulkanGD->device().createImageViewUnique(image_view_create_info);
-        mSwapChainImages.push_back(std::make_unique<SwapChainImage>(image, std::move(full_image_view)));
+        auto full_image_view = mVulkanGD->device().createImageViewUnique(
+            image_view_create_info);
+        mSwapChainImages.push_back(
+            std::make_unique<SwapChainImage>(image, std::move(full_image_view)));
     }
 }
 
@@ -159,7 +184,8 @@ graphics::Image * SwapChain::getCurrentImage()
 
 void SwapChain::present(const std::vector<graphics::Waitable *> &wait_semaphores)
 {
-    std::vector<vk::Semaphore> vulkan_semaphores = Semaphore::_convertToVulkanHandles(wait_semaphores, nullptr);
+    std::vector<vk::Semaphore> vulkan_semaphores = Semaphore::convertToVulkanHandles(
+        wait_semaphores, nullptr);
 
     vk::PresentInfoKHR present_info;
     present_info.setWaitSemaphoreCount(vulkan_semaphores.size());
@@ -181,5 +207,4 @@ uint32_t SwapChain::getNativeImageFormat()
 {
     return static_cast<uint32_t>(mSurfaceFormat);
 }
-
 }

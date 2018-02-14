@@ -6,6 +6,7 @@
 #include <Usagi/Engine/Runtime/Graphics/Resource/ResourceEventHandler.hpp>
 #include <Usagi/Engine/Runtime/Memory/BitmapAllocator.hpp>
 #include <Usagi/Engine/Runtime/Memory/CircularAllocator.hpp>
+#include <Usagi/Engine/Extension/Vulkan/Workload/detail/Job.hpp>
 
 namespace yuki::extension::vulkan
 {
@@ -45,51 +46,23 @@ class ResourceManager
     vk::UniqueCommandPool mCopyCommandPool;
     static constexpr std::size_t NUM_COMMAND_BATCHES = 16;
 
-    class CopyCommandBatch
+    struct CopyCommandBatch
     {
         static constexpr std::size_t NUM_COMMANDS_PER_BATCH = 16;
 
-        vk::UniqueCommandBuffer command_buffer;
-        vk::UniqueFence finish_fence;
-        std::thread fence_listener;
+        detail::Job cmd_buffer;
         uint16_t num_batched_commands = 0;
 
-        struct EventHandlerRegistry
-        {
-            ResourceEventHandler *handler;
-            user_param_t param;
-        };
-
-        std::vector<EventHandlerRegistry> handlers;
         std::vector<void*> staging_areas;
 
-        enum class State : uint8_t
-        {
-            IDLE,
-            WORKING,
-        } state = State::IDLE;
-
-        void joinFenceListener();
-
-    public:
         CopyCommandBatch(vk::UniqueCommandBuffer buffer, vk::UniqueFence fence);
-        CopyCommandBatch(CopyCommandBatch &&other) = default;
-        CopyCommandBatch & operator=(CopyCommandBatch &&other) = default;
-        ~CopyCommandBatch();
 
-        bool idle() const;
-        bool full() const;
-        void beginCommandBuffer();
+        void releaseStagingAreas(memory::CircularAllocator &allocator);
+        bool full() const { return num_batched_commands == NUM_COMMANDS_PER_BATCH; }
+        void reset();
+
         void cmdCopyBuffer(vk::Buffer src_buffer, vk::Buffer dst_buffer,
             uint32_t region_count, const vk::BufferCopy *regions);
-        void addBatchFinishHandler(ResourceEventHandler *handler, user_param_t param);
-
-        void submit(Device *device);
-
-        void notifyCopyFinish();
-        void reset();
-        void releaseStagingAreas(memory::CircularAllocator &allocator);
-        void onCopyFinish();
     };
 
     std::vector<CopyCommandBatch> mBatches;
@@ -137,5 +110,7 @@ public:
         user_param_t callback_param);
 
     void onResourceStreamed(user_param_t batch_index) override;
+
+    Device * device() const { return mDevice; }
 };
 }

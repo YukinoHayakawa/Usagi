@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Meta", "Meta\Meta.vcxitems", "{2E1F36EC-AA7F-4008-B485-2ABC067DFAF2}"
 EndProject
@@ -14,10 +14,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Game", "Game", "{2A9134A8-0B09-4FB1-B1DD-AB756E79AEC1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{7654D3DE-FA34-4048-9EB2-3B23BDBB66A1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{19097A41-38D5-4564-92E0-702887CF5259} = {19097A41-38D5-4564-92E0-702887CF5259}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Serialization", "Serialization\Serialization.vcxitems", "{BF921786-7EDA-4227-93D9-B786B6D0120A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor", "Editor\Editor.vcxproj", "{8AACE3BA-7E7E-4609-B42A-CE8F12527D7B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{19097A41-38D5-4564-92E0-702887CF5259} = {19097A41-38D5-4564-92E0-702887CF5259}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{19097A41-38D5-4564-92E0-702887CF5259}"
 EndProject
@@ -84,5 +90,8 @@ Global
 		{BF921786-7EDA-4227-93D9-B786B6D0120A} = {55C1D6F0-D81A-4414-B3DF-0EA0D5B5DA57}
 		{8AACE3BA-7E7E-4609-B42A-CE8F12527D7B} = {2A9134A8-0B09-4FB1-B1DD-AB756E79AEC1}
 		{19097A41-38D5-4564-92E0-702887CF5259} = {2A9134A8-0B09-4FB1-B1DD-AB756E79AEC1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {95FEE4E3-D5D8-4023-8005-336F8A91186A}
 	EndGlobalSection
 EndGlobal

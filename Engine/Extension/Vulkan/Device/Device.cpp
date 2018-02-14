@@ -26,7 +26,7 @@ VkBool32 Device::_debugLayerCallback(VkDebugReportFlagsEXT flags,
     const vk::DebugReportFlagsEXT level(static_cast<vk::DebugReportFlagBitsEXT>(flags));
     if(level & vk::DebugReportFlagBitsEXT::eInformation)
     {
-        LOG(INFO) << msg;
+        //LOG(INFO) << msg;
     }
     if(level & vk::DebugReportFlagBitsEXT::eWarning)
     {
@@ -42,7 +42,7 @@ VkBool32 Device::_debugLayerCallback(VkDebugReportFlagsEXT flags,
     }
     if(level & vk::DebugReportFlagBitsEXT::eDebug)
     {
-        LOG(DEBUG) << msg;
+        //LOG(DEBUG) << msg;
     }
 
     return VK_FALSE;
@@ -173,7 +173,8 @@ void Device::createDeviceAndQueues()
     selectQueue(queue_families,
         vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eTransfer,
         &graphics_queue_index);
-    LOG(INFO) << "Using queue " << graphics_queue_index << " for graphics and transfer";
+    LOG(INFO) << "Using queue family " << graphics_queue_index <<
+        " for graphics and transfer";
 
     vk::DeviceCreateInfo device_create_info;
 
@@ -254,6 +255,7 @@ std::unique_ptr<graphics::FrameController> Device::createFrameController(
 //    return Sampler::create(this, info);
 //}
 
+// todo refactor
 void Device::submitGraphicsCommandList(
     graphics::CommandList *command_list,
     const std::vector<graphics::Waitable *> &wait_semaphores,
@@ -268,8 +270,8 @@ void Device::submitGraphicsCommandList(
 
     std::vector<vk::PipelineStageFlags> wait_stages;
     std::vector<vk::Semaphore> vulkan_wait_semaphores = Semaphore::
-            _convertToVulkanHandles(wait_semaphores, &wait_stages),
-        vulkan_signal_semaphores = Semaphore::_convertToVulkanHandles(signal_semaphores,
+            convertToVulkanHandles(wait_semaphores, &wait_stages),
+        vulkan_signal_semaphores = Semaphore::convertToVulkanHandles(signal_semaphores,
             nullptr);
 
     auto buffer = vulkan_cmd_list->_getCommandBuffer();
@@ -281,6 +283,8 @@ void Device::submitGraphicsCommandList(
     submit_info.setPWaitDstStageMask(wait_stages.data());
     submit_info.setSignalSemaphoreCount(vulkan_signal_semaphores.size());
     submit_info.setPSignalSemaphores(vulkan_signal_semaphores.data());
+
+    std::lock_guard<std::mutex> lock(mSubmitMutex);
 
     mGraphicsQueue.submit({ submit_info }, dynamic_cast<Fence*>(fence)->fence);
 }
@@ -317,11 +321,18 @@ vk::Queue Device::_getGraphicsQueue() const
 
 void Device::submitCommandBuffer(vk::CommandBuffer command_buffer, vk::Fence fence)
 {
-    std::lock_guard<std::mutex> lock(mSubmitMutex);
-
     vk::SubmitInfo submit_info;
     submit_info.setCommandBufferCount(1);
     submit_info.setPCommandBuffers(&command_buffer);
+
+    std::lock_guard<std::mutex> lock(mSubmitMutex);
+
+    mGraphicsQueue.submit(submit_info, fence);
+}
+
+void Device::submitToPrimaryQueue(const vk::SubmitInfo &submit_info, vk::Fence fence)
+{
+    std::lock_guard<std::mutex> lock(mSubmitMutex);
 
     mGraphicsQueue.submit(submit_info, fence);
 }

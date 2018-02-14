@@ -70,5 +70,6 @@ public:
     vk::Queue _getGraphicsQueue() const;
 
     void submitCommandBuffer(vk::CommandBuffer command_buffer, vk::Fence fence);
+    void submitToPrimaryQueue(const vk::SubmitInfo &submit_info, vk::Fence fence);
 };
 }

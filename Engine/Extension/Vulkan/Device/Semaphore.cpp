@@ -19,7 +19,7 @@ vk::PipelineStageFlags Semaphore::_getSignalStage() const
     return mSignalStage;
 }
 
-std::vector<vk::Semaphore> Semaphore::_convertToVulkanHandles(
+std::vector<vk::Semaphore> Semaphore::convertToVulkanHandles(
     const std::vector<Waitable *> &semaphores, std::vector<vk::PipelineStageFlags> *stages)
 {
     std::vector<vk::Semaphore> vulkan_semaphores;

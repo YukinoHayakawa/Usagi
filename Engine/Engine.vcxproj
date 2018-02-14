@@ -129,9 +129,9 @@
     <ClInclude Include="Extension\Vulkan\Resource\Frame.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\FrameController.hpp" />
     <ClInclude Include="Extension\Vulkan\Workload\CommandList.hpp" />
+    <ClInclude Include="Extension\Vulkan\Workload\detail\Job.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\FrameController.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\ResourceEventHandler.hpp" />
-    <ClInclude Include="Extension\Vulkan\Resource\detail\PrimitiveBuffer.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\DynamicBuffer.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\ImmutableBuffer.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\ResourceManager.hpp" />
@@ -157,10 +157,8 @@
     <ClInclude Include="Geometry\Shape.hpp" />
     <ClInclude Include="Core\Logging.hpp" />
     <ClInclude Include="Renderer\Renderer.hpp" />
-    <ClCompile Include="..\..\easyloggingpp\src\easylogging++.cc" />
     <ClCompile Include="Core\Logging.cpp" />
     <ClCompile Include="Extension\Vulkan\Device\SwapChain.cpp" />
-    <ClCompile Include="Extension\Vulkan\Resource\detail\PrimitiveBuffer.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\DynamicBuffer.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\Frame.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\FrameController.cpp" />
@@ -171,6 +169,7 @@
     <ClCompile Include="Extension\Vulkan\Workload\CommandList.cpp" />
     <ClCompile Include="Extension\Vulkan\Workload\CommandPool.cpp" />
     <ClCompile Include="Extension\Vulkan\Device\Device.cpp" />
+    <ClCompile Include="Extension\Vulkan\Workload\detail\Job.cpp" />
     <ClCompile Include="Extension\Vulkan\Workload\Pipeline.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\Image.cpp" />
     <ClCompile Include="Extension\Vulkan\Device\Semaphore.cpp" />

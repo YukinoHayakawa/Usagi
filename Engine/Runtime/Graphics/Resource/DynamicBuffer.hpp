@@ -30,7 +30,7 @@ public:
      * The address may be invalidated when the buffer is swapped.
      * \param offset 
      * \param size 
-     * \return 
+     * \return The mapped address. nullptr if the resource is not available.
      */
     virtual void * map(std::size_t offset, std::size_t size) = 0;
 

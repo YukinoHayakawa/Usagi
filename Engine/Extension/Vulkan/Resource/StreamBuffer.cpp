@@ -1,38 +1,65 @@
 ﻿#include <cassert>
 
+#include <Usagi/Engine/Extension/Vulkan/Device/Device.hpp>
+
 #include "ResourceManager.hpp"
 #include "StreamBuffer.hpp"
 
 namespace yuki::extension::vulkan
 {
+void StreamBuffer::PrimitiveBuffer::init(ResourceManager *resource_manager,
+    std::size_t size)
+{
+    buffer = resource_manager->allocateStreamBuffer(size, &memory_offset);
+
+    vk::SemaphoreCreateInfo semaphore_create_info;
+
+    available_semaphore = resource_manager->device()->device().createSemaphoreUnique(
+        semaphore_create_info);
+}
+
+bool StreamBuffer::PrimitiveBuffer::safeToModify() const
+{
+    return state == graphics::ResourceState::UNINITIALIZED
+        || state == graphics::ResourceState::IDLE;
+}
+
+bool StreamBuffer::PrimitiveBuffer::safeToRead() const
+{
+    return state == graphics::ResourceState::IDLE
+        || state == graphics::ResourceState::WORKING;
+}
+
 std::size_t StreamBuffer::backBufferIndex() const
 {
     return !mFrontBufferIndex;
 }
 
-detail::PrimitiveBuffer & StreamBuffer::backBuffer()
+StreamBuffer::PrimitiveBuffer & StreamBuffer::backBuffer()
 {
     return mBuffers[backBufferIndex()];
 }
 
-detail::PrimitiveBuffer & StreamBuffer::frontBuffer()
+StreamBuffer::PrimitiveBuffer & StreamBuffer::frontBuffer()
 {
     return mBuffers[mFrontBufferIndex];
 }
 
 void StreamBuffer::swapBuffers()
 {
+    assert(mStagingArea == nullptr);
+
     mFrontBufferIndex = !mFrontBufferIndex;
+
+    assert(frontBuffer().safeToRead());
 }
 
 StreamBuffer::StreamBuffer(ResourceManager *resource_manager, std::size_t size)
     : DynamicBuffer { resource_manager, size }
 {
-    std::size_t offset;
     for(auto &buffer : mBuffers)
     {
-        auto allocation = mResourceManager->allocateStreamBuffer(size, &offset);
-        buffer = detail::PrimitiveBuffer { std::move(allocation), offset };
+        buffer.init(resource_manager, size);
     }
 }
 
@@ -40,7 +67,7 @@ StreamBuffer::~StreamBuffer()
 {
     for(auto &buffer : mBuffers)
     {
-        mResourceManager->freeStreamBuffer(buffer.offset());
+        mResourceManager->freeStreamBuffer(buffer.memory_offset);
     }
 }
 
@@ -50,8 +77,15 @@ void * StreamBuffer::map(std::size_t offset, std::size_t size)
 
     assert(mStagingArea == nullptr);
     assert(offset + size <= mSize);
-    assert(backBuffer().state() == graphics::ResourceState::IDLE ||
-        backBuffer().state() == graphics::ResourceState::UNINITIALIZED);
+
+    // the back buffer may be the swapped out front buffer
+    // being used by the device, in which case we does not try
+    // to update it.
+    // todo this may cause stutter?
+    if(!backBuffer().safeToModify())
+    {
+        return nullptr;
+    }
 
     mStagingArea = mResourceManager->allocateStagingMemory(size);
     mMappedOffset = offset;
@@ -65,13 +99,12 @@ void StreamBuffer::unmap()
     std::lock_guard<std::mutex> lock(mMutex);
 
     assert(mStagingArea != nullptr);
-    assert(backBuffer().state() == graphics::ResourceState::IDLE ||
-        backBuffer().state() == graphics::ResourceState::UNINITIALIZED);
+    assert(backBuffer().safeToModify());
 
-    backBuffer().setState(graphics::ResourceState::STREAMING);
+    backBuffer().state = graphics::ResourceState::STREAMING;
     // todo the unchanged content of front buffer not copied to the back buffer. see SwapFlag
     mResourceManager->commitStagedBuffer(
-        mStagingArea, backBuffer().bufferHandle(), mMappedOffset, mMappedSize,
+        mStagingArea, backBuffer().buffer.get(), mMappedOffset, mMappedSize,
         this, backBufferIndex()
     );
     mStagingArea = nullptr;
@@ -79,16 +112,14 @@ void StreamBuffer::unmap()
     mMappedSize = 0;
 }
 
-void StreamBuffer::onResourceStreamed(user_param_t user_param)
+void StreamBuffer::onResourceStreamed(user_param_t buffer_index)
 {
     std::lock_guard<std::mutex> lock(mMutex);
 
-    assert(mStagingArea == nullptr); // not mapped
-    assert(user_param == backBufferIndex()); // not swapped
-    assert(backBuffer().state() == graphics::ResourceState::STREAMING);
+    assert(backBufferIndex() == buffer_index);
+    assert(backBuffer().state == graphics::ResourceState::STREAMING);
 
-    backBuffer().setState(graphics::ResourceState::IDLE);
-
+    backBuffer().state = graphics::ResourceState::IDLE;
     swapBuffers();
 
     // what if the resource is streamed twice when the front buffer is being used?
@@ -96,10 +127,16 @@ void StreamBuffer::onResourceStreamed(user_param_t user_param)
     // - triple buffering?
 }
 
-std::pair<vk::Buffer, std::size_t> StreamBuffer::getBindInfo()
+void StreamBuffer::onResourceReleased(user_param_t buffer_index)
+{
+}
+
+Buffer::BindInfo StreamBuffer::getLatestBindInfo()
 {
     std::lock_guard<std::mutex> lock(mMutex);
 
-    return { frontBuffer().bufferHandle(), 0 };
+    assert(frontBuffer().safeToRead());
+
+    return { frontBuffer().buffer.get(), 0, { } };
 }
 }

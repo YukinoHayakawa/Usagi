@@ -333,9 +333,6 @@
     <ClInclude Include="Extension\Vulkan\Resource\ImmutableBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\detail\PrimitiveBuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Memory\detail\Bitmap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -373,6 +370,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Graphics\Workload\PipelineCreateInfo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\Workload\detail\Job.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -542,16 +542,10 @@
     <ClCompile Include="Extension\Vulkan\Resource\ImmutableBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\detail\PrimitiveBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\Memory\detail\Bitmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Vulkan\Resource\StreamBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\easyloggingpp\src\easylogging++.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\Logging.cpp">
@@ -573,6 +567,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Graphics\Resource\FrameController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\Workload\detail\Job.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

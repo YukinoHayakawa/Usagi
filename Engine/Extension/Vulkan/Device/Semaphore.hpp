@@ -19,7 +19,7 @@ public:
     vk::Semaphore _getSemaphore() const;
     vk::PipelineStageFlags _getSignalStage() const;
 
-    static std::vector<vk::Semaphore> _convertToVulkanHandles(
+    static std::vector<vk::Semaphore> convertToVulkanHandles(
         const std::vector<graphics::Waitable*> &semaphores,
         std::vector<vk::PipelineStageFlags> *stages);
 };

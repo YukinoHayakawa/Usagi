@@ -191,86 +191,12 @@ void ResourceManager::freeStreamBuffer(std::size_t offset)
 
 ResourceManager::CopyCommandBatch::CopyCommandBatch(vk::UniqueCommandBuffer buffer,
     vk::UniqueFence fence)
-    : command_buffer { std::move(buffer) }
-    , finish_fence { std::move(fence) }
+    : cmd_buffer { std::move(buffer), std::move(fence) }
 {
-    handlers.reserve(NUM_COMMANDS_PER_BATCH);
-    staging_areas.reserve(NUM_COMMANDS_PER_BATCH);
-    reset();
-}
-
-void ResourceManager::CopyCommandBatch::joinFenceListener()
-{
-    if(fence_listener.joinable())
-        fence_listener.join();
-}
-
-ResourceManager::CopyCommandBatch::~CopyCommandBatch()
-{
-    joinFenceListener();
-}
-
-bool ResourceManager::CopyCommandBatch::idle() const
-{
-    return state == State::IDLE;
-}
-
-bool ResourceManager::CopyCommandBatch::full() const
-{
-    return num_batched_commands == NUM_COMMANDS_PER_BATCH;
-}
-
-void ResourceManager::CopyCommandBatch::beginCommandBuffer()
-{
-    vk::CommandBufferBeginInfo command_buffer_begin_info;
-    command_buffer_begin_info.setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
-
-    command_buffer->begin(command_buffer_begin_info);
-}
-
-void ResourceManager::CopyCommandBatch::cmdCopyBuffer(vk::Buffer src_buffer,
-    vk::Buffer dst_buffer, uint32_t region_count, const vk::BufferCopy *regions)
-{
-    assert(state == State::IDLE);
-    assert(num_batched_commands < NUM_COMMANDS_PER_BATCH);
-
-    if(num_batched_commands == 0)
-        beginCommandBuffer();
-
-    command_buffer->copyBuffer(src_buffer, dst_buffer, region_count, regions);
-    ++num_batched_commands;
-}
-
-void ResourceManager::CopyCommandBatch::addBatchFinishHandler(
-    ResourceEventHandler *handler, user_param_t param)
-{
-    handlers.push_back({ handler, param });
-}
-
-void ResourceManager::CopyCommandBatch::submit(Device *device)
-{
-    assert(state == State::IDLE);
-    command_buffer->end();
-    auto fence = finish_fence.get();
-    device->device().resetFences(1, &fence);
-    device->submitCommandBuffer(command_buffer.get(), fence);
-    state = State::WORKING;
-    // the thread should be already finished
-    joinFenceListener();
-    fence_listener = std::thread([=]()
+    cmd_buffer.setNotifyPolicy([](auto h, auto p)
     {
-        auto result = device->device().waitForFences(1, &fence, true, -1);
-        assert(result == vk::Result::eSuccess);
-        onCopyFinish();
+        h->onResourceStreamed(p);
     });
-}
-
-void ResourceManager::CopyCommandBatch::notifyCopyFinish()
-{
-    for(auto &&h : handlers)
-    {
-        h.handler->onResourceStreamed(h.param);
-    }
 }
 
 void ResourceManager::CopyCommandBatch::releaseStagingAreas(
@@ -284,16 +210,16 @@ void ResourceManager::CopyCommandBatch::releaseStagingAreas(
 
 void ResourceManager::CopyCommandBatch::reset()
 {
-    handlers.clear();
-    staging_areas.clear();
     num_batched_commands = 0;
-    state = State::IDLE;
 }
 
-void ResourceManager::CopyCommandBatch::onCopyFinish()
+void ResourceManager::CopyCommandBatch::cmdCopyBuffer(vk::Buffer src_buffer,
+    vk::Buffer dst_buffer, uint32_t region_count, const vk::BufferCopy *regions)
 {
-    notifyCopyFinish();
-    reset();
+    assert(num_batched_commands < NUM_COMMANDS_PER_BATCH);
+
+    cmd_buffer.commandBuffer().copyBuffer(src_buffer, dst_buffer, region_count, regions);
+    ++num_batched_commands;
 }
 
 // todo swap buffers after uploading is done.
@@ -308,16 +234,26 @@ void ResourceManager::enqueueCopyBuffer(vk::Buffer src_buffer, vk::Buffer dst_bu
     // otherwise find a idle command buffer and submit immediately
     for(auto i = mBatches.begin(); i != mBatches.end(); ++i)
     {
-        if(i->idle())
+        if(!i->cmd_buffer.working())
         {
+            if(i->cmd_buffer.idle())
+            {
+                vk::CommandBufferBeginInfo command_buffer_begin_info;
+                command_buffer_begin_info.setFlags(
+                    vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+                i->cmd_buffer.commandBuffer().begin(command_buffer_begin_info);
+            }
+
             i->cmdCopyBuffer(src_buffer, dst_buffer, region_count, regions);
             if(handler != nullptr)
-                i->addBatchFinishHandler(handler, callback_param);
+                i->cmd_buffer.addFinishHandler(handler, callback_param);
+
             // submit batch
             if(i->full() || mNumActiveBatches == 0)
             {
-                i->addBatchFinishHandler(this, i - mBatches.begin());
-                i->submit(mDevice);
+                i->cmd_buffer.addFinishHandler(this, i - mBatches.begin());
+                i->cmd_buffer.commandBuffer().end();
+                i->cmd_buffer.submit(mDevice);
                 ++mNumActiveBatches; // todo outofsync on exception?
             }
             return;
@@ -347,7 +283,7 @@ void ResourceManager::onResourceStreamed(user_param_t batch_index)
 {
     auto &batch = mBatches[batch_index];
 
-    assert(!batch.idle());
+    assert(batch.cmd_buffer.working());
 
     // the batch won't be mofified when is WORKING, no need to lock.
     batch.releaseStagingAreas(mStagingAllocator);
@@ -355,6 +291,7 @@ void ResourceManager::onResourceStreamed(user_param_t batch_index)
     // prevent wrong decision on submitting the batch to the device
     std::lock_guard<std::mutex> listener_lock(mBatchMutex);
 
+    batch.reset();
     --mNumActiveBatches;
 }
 }

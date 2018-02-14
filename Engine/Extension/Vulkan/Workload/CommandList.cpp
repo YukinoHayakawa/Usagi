@@ -40,8 +40,11 @@ namespace yuki::extension::vulkan
 
 CommandList::CommandList(Device *vulkan_gd,
     vk::UniqueCommandBuffer command_buffer)
-    : mVulkanGD{ vulkan_gd }
-    , mCommandBuffer{ std::move(command_buffer) }
+    : mVulkanGD { vulkan_gd }
+    , mJob {
+        std::move(command_buffer),
+        vulkan_gd->device().createFenceUnique(FENCE_CREATE_INFO)
+    }
 {
 }
 
@@ -56,7 +59,7 @@ void CommandList::begin()
     vk::CommandBufferBeginInfo command_buffer_begin_info;
     command_buffer_begin_info.setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
 
-    mCommandBuffer->begin(command_buffer_begin_info);
+    mJob.commandBuffer().begin(command_buffer_begin_info);
 
     // todo transition attachment ownership of swapchain image from present queue to render queue
 }
@@ -73,7 +76,7 @@ void CommandList::bindPipeline(graphics::Pipeline *pipeline)
     // unbind last pipeline, assume all resource descriptors are unbound from now on
     if(mCurrentPipeline != nullptr)
     {
-        mCommandBuffer->endRenderPass();
+        mJob.commandBuffer().endRenderPass();
     }
 
     mFrameBufferCreateInfo.setRenderPass(vulkan_pipeline->_getRenderPass());
@@ -88,8 +91,9 @@ void CommandList::bindPipeline(graphics::Pipeline *pipeline)
     render_pass_begin_info.setClearValueCount(mClearColors.size());
     render_pass_begin_info.setPClearValues(mClearColors.data());
 
-    mCommandBuffer->beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline);
-    mCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics,
+    mJob.commandBuffer().beginRenderPass(render_pass_begin_info,
+        vk::SubpassContents::eInline);
+    mJob.commandBuffer().bindPipeline(vk::PipelineBindPoint::eGraphics,
         vulkan_pipeline->_getPipeline());
 
     mCurrentPipeline = vulkan_pipeline;
@@ -97,12 +101,12 @@ void CommandList::bindPipeline(graphics::Pipeline *pipeline)
 
 void CommandList::setViewport(float x, float y, float width, float height)
 {
-    mCommandBuffer->setViewport(0, { { x, y, width, height, 0.f, 1.f } });
+    mJob.commandBuffer().setViewport(0, { { x, y, width, height, 0.f, 1.f } });
 }
 
 void CommandList::setScissor(int32_t x, int32_t y, int32_t width, int32_t height)
 {
-    mCommandBuffer->setScissor(0, {
+    mJob.commandBuffer().setScissor(0, {
         { { x, y }, { static_cast<uint32_t>(width), static_cast<uint32_t>(height) } }
     });
 }
@@ -114,10 +118,10 @@ void CommandList::bindVertexBuffer(uint32_t slot, graphics::Buffer *buffer)
         throw MismatchedSubsystemComponentException() <<
             SubsystemInfo("Rendering") << ComponentInfo("VulkanVertexBuffer");
 
-    auto bind_info = vulkan_buffer->getBindInfo();
-    mCommandBuffer->bindVertexBuffers(slot,
-        { bind_info.first },
-        { bind_info.second }
+    const auto bind_info = vulkan_buffer->getLatestBindInfo();
+    mJob.commandBuffer().bindVertexBuffers(slot,
+        { bind_info.buffer },
+        { bind_info.bind_offset }
     );
 }
 
@@ -125,21 +129,21 @@ void CommandList::draw(uint32_t vertex_count, uint32_t instance_count,
     uint32_t first_vertex,
     uint32_t first_instance)
 {
-    mCommandBuffer->draw(vertex_count, instance_count, first_vertex, first_instance);
+    mJob.commandBuffer().draw(vertex_count, instance_count, first_vertex, first_instance);
 }
 
 void CommandList::end()
 {
-    if(mCurrentPipeline) mCommandBuffer->endRenderPass();
+    if(mCurrentPipeline) mJob.commandBuffer().endRenderPass();
     mCurrentPipeline = nullptr;
-    mCommandBuffer->end();
+    mJob.commandBuffer().end();
 
     mInvalidFramebuffer = true;
 }
 
-vk::CommandBuffer CommandList::_getCommandBuffer() const
+vk::CommandBuffer CommandList::_getCommandBuffer()
 {
-    return mCommandBuffer.get();
+    return mJob.commandBuffer();
 }
 
 void CommandList::_setAttachments(const std::vector<graphics::Image *> &attachments)

@@ -11,10 +11,18 @@ class Buffer
 public:
     virtual ~Buffer() = default;
 
+    struct BindInfo
+    {
+        vk::Buffer buffer;
+        std::size_t bind_offset = 0;
+        vk::Semaphore available_semaphore;
+    };
+
     /**
-     * \brief 
-     * \return <buffer handle, bind offset>
+     * \brief Obtain the buffer with the latest data along with other information
+     * required to use it.
+     * \return 
      */
-    virtual std::pair<vk::Buffer, std::size_t> getBindInfo() = 0;
+    virtual BindInfo getLatestBindInfo() = 0;
 };
 }
