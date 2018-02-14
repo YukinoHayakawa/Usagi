@@ -237,25 +237,13 @@
     <ClInclude Include="Utility\Rounding.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Memory\StackMemoryAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\MemoryAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Graphics\Environment.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Graphics\Renderable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Graphics\Resource\Buffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Graphics\Resource\Frame.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Graphics\Resource\FrameController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Graphics\Resource\Image.hpp">
@@ -276,12 +264,6 @@
     <ClInclude Include="Runtime\Graphics\Device\Device.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Graphics\Resource\MemoryAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Graphics\Resource\ResourceAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Graphics\Device\SwapChain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -294,9 +276,6 @@
     <ClInclude Include="Runtime\Graphics\Resource\DataFormat.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\Buffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Extension\Vulkan\Device\Fence.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -306,13 +285,7 @@
     <ClInclude Include="Extension\Vulkan\Device\Semaphore.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Workload\CommandList.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Extension\Vulkan\Resource\Image.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\Frame.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Extension\Vulkan\Workload\CommandPool.hpp">
@@ -321,13 +294,85 @@
     <ClInclude Include="Extension\Vulkan\Workload\Pipeline.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Runtime\Memory\CircularAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Memory\BitmapAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\CyclicContainerAdaptor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\BitHack.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Iterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Graphics\Resource\ImmutableBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Graphics\Resource\DynamicBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Graphics\Resource\ResourceManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\Resource\ResourceManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Graphics\Resource\BufferUsage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Graphics\Resource\Buffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\Resource\DynamicBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\Resource\ImmutableBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Memory\detail\Bitmap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\Resource\StreamBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Logging.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Flag.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Graphics\Resource\ResourceEventHandler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Graphics\Resource\ResourceState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Extension\Vulkan\Device\SwapChain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\MemoryAllocator.hpp">
+    <ClInclude Include="Extension\Vulkan\Resource\FrameController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\FrameController.hpp">
+    <ClInclude Include="Extension\Vulkan\Resource\Frame.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\Workload\CommandList.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\Resource\detail\Buffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Graphics\Resource\FrameController.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Graphics\Workload\PipelineCreateInfo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\Workload\detail\Job.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -464,19 +509,7 @@
     <ClCompile Include="Extension\Vulkan\VulkanExtension.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\Rounding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\Memory\StackMemoryAllocator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\Graphics\Resource\FrameController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\Graphics\SpirvShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\Buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Vulkan\Device\Device.cpp">
@@ -485,13 +518,7 @@
     <ClCompile Include="Extension\Vulkan\Device\Semaphore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Workload\CommandList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Extension\Vulkan\Resource\Image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\Frame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Vulkan\Workload\CommandPool.cpp">
@@ -500,19 +527,50 @@
     <ClCompile Include="Extension\Vulkan\Workload\Pipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Device\SwapChain.cpp">
+    <ClCompile Include="Runtime\Memory\BitmapAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\MemoryAllocator.cpp">
+    <ClCompile Include="Runtime\Memory\CircularAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\Resource\ResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\Resource\DynamicBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\Resource\ImmutableBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Memory\detail\Bitmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\Resource\StreamBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Logging.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\Device\SwapChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Vulkan\Resource\FrameController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
-    <None Include="ClassDiagram1.cd" />
-    <None Include="ClassDiagram2.cd" />
+    <ClCompile Include="Extension\Vulkan\Resource\Frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\Workload\CommandList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Graphics\Environment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Graphics\Resource\FrameController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\Workload\detail\Job.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

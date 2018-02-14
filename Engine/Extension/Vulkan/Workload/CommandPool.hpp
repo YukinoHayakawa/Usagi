@@ -4,7 +4,7 @@
 
 #include <Usagi/Engine/Runtime/Graphics/Workload/CommandPool.hpp>
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 class CommandPool : public graphics::CommandPool

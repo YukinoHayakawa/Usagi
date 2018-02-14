@@ -3,15 +3,16 @@
 #include <vulkan/vulkan.hpp>
 
 #include <Usagi/Engine/Runtime/Graphics/Workload/CommandList.hpp>
+#include "detail/Job.hpp"
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 class CommandList : public graphics::CommandList
 {
     class Device *mVulkanGD;
 
-    vk::UniqueCommandBuffer mCommandBuffer;
+    detail::Job mJob;
 
     std::vector<vk::ImageView> mImageViews;
     std::vector<vk::ClearValue> mClearColors;
@@ -20,6 +21,8 @@ class CommandList : public graphics::CommandList
     bool mInvalidFramebuffer = true;
     class Pipeline *mCurrentPipeline = nullptr;
 
+    inline static vk::FenceCreateInfo FENCE_CREATE_INFO { };
+    
     //void imageMemoryBarrier(
     //    GraphicsImage *image,
     //    vk::AccessFlags src_access_mask,
@@ -46,7 +49,7 @@ public:
 
     void end() override;
 
-    vk::CommandBuffer _getCommandBuffer() const;
+    vk::CommandBuffer _getCommandBuffer();
     void _setAttachments(const std::vector<class graphics::Image *> &attachments);
 };
 

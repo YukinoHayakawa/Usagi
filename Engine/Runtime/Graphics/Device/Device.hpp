@@ -7,14 +7,11 @@
 
 namespace yuki
 {
-
 class Window;
-
 }
 
 namespace yuki::graphics
 {
-
 class Waitable;
 
 /**
@@ -28,10 +25,13 @@ public:
 
     // todo: remove param
     virtual std::unique_ptr<class SwapChain> createSwapChain(Window *window) = 0;
-    virtual std::unique_ptr<class Pipeline> createPipeline(const struct PipelineCreateInfo &info) = 0;
-    virtual std::unique_ptr<class FrameController> createFrameController(size_t num_frames) = 0;
+    virtual std::unique_ptr<class Pipeline> createPipeline(
+        const struct PipelineCreateInfo &info) = 0;
+    virtual std::unique_ptr<class FrameController> createFrameController(
+        size_t num_frames) = 0;
+    virtual std::unique_ptr<class ResourceManager> createResourceManager() = 0;
     virtual std::unique_ptr<class CommandPool> createGraphicsCommandPool() = 0;
-    virtual std::unique_ptr<class Sampler> createSampler(const struct SamplerCreateInfo &info) = 0;
+    //    virtual std::unique_ptr<class Sampler> createSampler(const struct SamplerCreateInfo &info) = 0;
 
     /**
      * \brief Submit a graphics command list to the GPU and synchronize its execution.
@@ -49,5 +49,4 @@ public:
 
     virtual void waitIdle() = 0;
 };
-
 }

@@ -169,6 +169,12 @@ bool yuki::Win32Window::isWindowOpen() const
     return !mClosed;
 }
 
+void yuki::Win32Window::setTitle(const std::string &title)
+{
+    std::wstring wtitle { title.begin(), title.end() };
+    SetWindowText(mWindowHandle, wtitle.c_str());
+}
+
 LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     auto window = reinterpret_cast<Win32Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));

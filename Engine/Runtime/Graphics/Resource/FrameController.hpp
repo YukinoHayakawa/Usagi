@@ -1,16 +1,11 @@
 ﻿#pragma once
 
 #include "Frame.hpp"
-#include "ResourceAllocator.hpp"
-#include "MemoryAllocator.hpp"
 
 namespace yuki::graphics
 {
 
-class FrameController
-    : public Frame
-    , public ResourceAllocator
-    , public MemoryAllocator
+class FrameController : public Frame
 {
 protected:
     size_t mCurrentFrame = 0;
@@ -18,7 +13,6 @@ protected:
 
 public:
     virtual size_t getFrameCount() const = 0;
-    ResourceAllocator * getResourceAllocator() override;
 };
 
 }

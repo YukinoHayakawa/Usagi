@@ -22,6 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{19097A41-38D5-4564-92E0-702887CF5259}</ProjectGuid>
     <RootNamespace>Engine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -123,17 +124,23 @@
     <ClInclude Include="Component\InteractiveComponent.hpp" />
     <ClInclude Include="Component\TimeVariantComponent.hpp" />
     <ClInclude Include="Extension\Extension.hpp" />
-    <ClInclude Include="Extension\Vulkan\Resource\Buffer.hpp" />
+    <ClInclude Include="Extension\Vulkan\Device\SwapChain.hpp" />
+    <ClInclude Include="Extension\Vulkan\Resource\detail\Buffer.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\Frame.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\FrameController.hpp" />
     <ClInclude Include="Extension\Vulkan\Workload\CommandList.hpp" />
+    <ClInclude Include="Extension\Vulkan\Workload\detail\Job.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\FrameController.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\ResourceEventHandler.hpp" />
+    <ClInclude Include="Extension\Vulkan\Resource\DynamicBuffer.hpp" />
+    <ClInclude Include="Extension\Vulkan\Resource\ImmutableBuffer.hpp" />
+    <ClInclude Include="Extension\Vulkan\Resource\ResourceManager.hpp" />
+    <ClInclude Include="Extension\Vulkan\Resource\StreamBuffer.hpp" />
     <ClInclude Include="Extension\Vulkan\Workload\CommandPool.hpp" />
     <ClInclude Include="Extension\Vulkan\Workload\Pipeline.hpp" />
     <ClInclude Include="Extension\Vulkan\Device\Device.hpp" />
-    <ClInclude Include="Extension\Vulkan\Resource\MemoryAllocator.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\Image.hpp" />
     <ClInclude Include="Extension\Vulkan\Device\Semaphore.hpp" />
-    <ClInclude Include="Extension\Vulkan\Device\SwapChain.hpp" />
     <ClInclude Include="Extension\Win32\WindowsHeader.hpp" />
     <ClInclude Include="Geometry\Angle.hpp" />
     <ClInclude Include="Geometry\Bound.hpp" />
@@ -148,31 +155,41 @@
     <ClInclude Include="Extension\GTA\GTA3IMGv2Filesystem.hpp" />
     <ClInclude Include="Camera\Camera.hpp" />
     <ClInclude Include="Geometry\Shape.hpp" />
+    <ClInclude Include="Core\Logging.hpp" />
     <ClInclude Include="Renderer\Renderer.hpp" />
-    <ClCompile Include="Extension\Vulkan\Resource\Buffer.cpp" />
+    <ClCompile Include="Core\Logging.cpp" />
+    <ClCompile Include="Extension\Vulkan\Device\SwapChain.cpp" />
+    <ClCompile Include="Extension\Vulkan\Resource\DynamicBuffer.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\Frame.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\FrameController.cpp" />
-    <ClCompile Include="Extension\Vulkan\Workload\CommandList.cpp" />
+    <ClCompile Include="Extension\Vulkan\Resource\ImmutableBuffer.cpp" />
+    <ClCompile Include="Extension\Vulkan\Resource\ResourceManager.cpp" />
+    <ClCompile Include="Extension\Vulkan\Resource\StreamBuffer.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanExtension.cpp" />
+    <ClCompile Include="Extension\Vulkan\Workload\CommandList.cpp" />
     <ClCompile Include="Extension\Vulkan\Workload\CommandPool.cpp" />
     <ClCompile Include="Extension\Vulkan\Device\Device.cpp" />
+    <ClCompile Include="Extension\Vulkan\Workload\detail\Job.cpp" />
     <ClCompile Include="Extension\Vulkan\Workload\Pipeline.cpp" />
-    <ClCompile Include="Extension\Vulkan\Resource\MemoryAllocator.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\Image.cpp" />
     <ClCompile Include="Extension\Vulkan\Device\Semaphore.cpp" />
-    <ClCompile Include="Extension\Vulkan\Device\SwapChain.cpp" />
+    <ClCompile Include="Runtime\Graphics\Environment.cpp" />
     <ClCompile Include="Runtime\Graphics\Resource\FrameController.cpp" />
     <ClCompile Include="Runtime\Graphics\SpirvShader.cpp" />
-    <ClCompile Include="Runtime\Memory\StackMemoryAllocator.cpp" />
+    <ClCompile Include="Runtime\Memory\detail\Bitmap.cpp" />
+    <ClCompile Include="Runtime\Memory\BitmapAllocator.cpp" />
+    <ClCompile Include="Runtime\Memory\CircularAllocator.cpp" />
     <ClCompile Include="Runtime\Subsystem\ImmediateGuiImpl.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>
     <ClInclude Include="Runtime\Exception.hpp" />
-    <ClInclude Include="Runtime\Graphics\Resource\MemoryAllocator.hpp" />
-    <ClInclude Include="Runtime\Graphics\Resource\ResourceAllocator.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\BufferUsage.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\DynamicBuffer.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\ImmutableBuffer.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\ResourceManager.hpp" />
     <ClInclude Include="Runtime\Graphics\Environment.hpp" />
-    <ClInclude Include="Runtime\Graphics\Resource\FrameController.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\Buffer.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\ResourceState.hpp" />
     <ClInclude Include="Runtime\Graphics\Workload\CommandPool.hpp" />
     <ClInclude Include="Runtime\Graphics\Device\Device.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\Frame.hpp" />
@@ -185,8 +202,9 @@
     <ClInclude Include="Runtime\Graphics\SpirvShader.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\DataFormat.hpp" />
     <ClInclude Include="Extension\Vulkan\Device\Fence.hpp" />
-    <ClInclude Include="Runtime\Memory\MemoryAllocator.hpp" />
-    <ClInclude Include="Runtime\Memory\StackMemoryAllocator.hpp" />
+    <ClInclude Include="Runtime\Graphics\Workload\PipelineCreateInfo.hpp" />
+    <ClInclude Include="Runtime\Memory\BitmapAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\CircularAllocator.hpp" />
     <ClInclude Include="Runtime\Subsystem\ImmediateGuiManager.hpp" />
     <ClInclude Include="Runtime\Graphics\Device\SwapChain.hpp" />
     <ClInclude Include="Scene\Entity.hpp" />
@@ -228,7 +246,12 @@
     <ClInclude Include="Extension\Win32\Win32Window.hpp" />
     <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Utility\BindingSentry.hpp" />
+    <ClInclude Include="Runtime\Memory\detail\Bitmap.hpp" />
+    <ClInclude Include="Utility\BitHack.hpp" />
+    <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
     <ClInclude Include="Utility\File.hpp" />
+    <ClInclude Include="Utility\Flag.hpp" />
+    <ClInclude Include="Utility\Iterator.h" />
     <ClInclude Include="Utility\Math.hpp" />
     <ClInclude Include="Utility\Noncopyable.hpp" />
     <ClInclude Include="Utility\Rounding.hpp" />
@@ -278,13 +301,7 @@
     <ClCompile Include="Runtime\Subsystem\DebugDrawManager.cpp" />
     <ClCompile Include="Extension\Win32\Win32Window.cpp" />
     <ClCompile Include="Utility\File.cpp" />
-    <ClCompile Include="Utility\Rounding.cpp" />
     <ClCompile Include="World\Geometry\Geometry.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
-    <None Include="ClassDiagram1.cd" />
-    <None Include="ClassDiagram2.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

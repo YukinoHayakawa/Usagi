@@ -5,17 +5,17 @@
 
 using namespace yuki::graphics;
 
-yuki::vulkan::Image::Image(vk::UniqueImageView image_view)
+yuki::extension::vulkan::Image::Image(vk::UniqueImageView image_view)
     : mFullView { std::move(image_view) }
 {
 }
 
-vk::ImageView yuki::vulkan::Image::_getFullView() const
+vk::ImageView yuki::extension::vulkan::Image::_getFullView() const
 {
     return mFullView.get();
 }
 
-vk::ImageLayout yuki::vulkan::Image::translateImageLayout(ImageLayout layout)
+vk::ImageLayout yuki::extension::vulkan::Image::translateImageLayout(ImageLayout layout)
 {
     switch(layout)
     {
@@ -29,13 +29,13 @@ vk::ImageLayout yuki::vulkan::Image::translateImageLayout(ImageLayout layout)
     }
 }
 
-yuki::vulkan::SwapChainImage::SwapChainImage(vk::Image image, vk::UniqueImageView image_view)
+yuki::extension::vulkan::SwapChainImage::SwapChainImage(vk::Image image, vk::UniqueImageView image_view)
     : vulkan::Image { std::move(image_view) }
     , mImage { std::move(image) }
 {
 }
 
-vk::Image yuki::vulkan::SwapChainImage::_getImage() const
+vk::Image yuki::extension::vulkan::SwapChainImage::_getImage() const
 {
     return mImage;
 }

@@ -15,25 +15,31 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Preprocessor\infix_join_test.cpp">
+    <ClCompile Include="Engine\CyclicContainerAdaptorTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Preprocessor\make_nested_namespace_test.cpp">
+    <ClCompile Include="RunAllTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="run_all_tests.cpp">
+    <ClCompile Include="Engine\BitmapTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Preprocessor\identifier_test.cpp">
+    <ClCompile Include="Engine\BitHackTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Preprocessor\tuple_test.cpp">
+    <ClCompile Include="Engine\RoundingTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Meta\premain_test.cpp">
+    <ClCompile Include="Engine\BitmapAllocatorTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Meta\make_delegate_test.cpp">
+    <ClCompile Include="Engine\IteratorTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\CircularAllocatorTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\FlagTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -7,7 +7,7 @@
 
 #include <Usagi/Engine/Runtime/Graphics/Device/SwapChain.hpp>
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 /**

@@ -5,7 +5,7 @@
 #include "../Device/Device.hpp"
 #include "../Resource/Image.hpp"
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 vk::Format Pipeline::translateSourceFormat(const graphics::DataFormat native_data)
@@ -134,11 +134,11 @@ std::unique_ptr<Pipeline> Pipeline::create(class Device *vulkan_gd, const graphi
         VERTEX, FRAGMENT, SHADER_STAGE_COUNT
     };
     vk::PipelineShaderStageCreateInfo shader_stage_create_info[SHADER_STAGE_COUNT];
-    auto vertex_shader = _createShaderModule(vulkan_gd->_getDevice(), info.vertex_shader.get());
+    auto vertex_shader = _createShaderModule(vulkan_gd->device(), info.vertex_shader.get());
     shader_stage_create_info[VERTEX].setModule(vertex_shader.get());
     shader_stage_create_info[VERTEX].setPName("main"); // entry point name
     shader_stage_create_info[VERTEX].setStage(vk::ShaderStageFlagBits::eVertex);
-    auto fragment_shader = _createShaderModule(vulkan_gd->_getDevice(), info.fragment_shader.get());
+    auto fragment_shader = _createShaderModule(vulkan_gd->device(), info.fragment_shader.get());
     shader_stage_create_info[FRAGMENT].setModule(fragment_shader.get());
     shader_stage_create_info[FRAGMENT].setPName("main"); // entry point name
     shader_stage_create_info[FRAGMENT].setStage(vk::ShaderStageFlagBits::eFragment);
@@ -231,7 +231,7 @@ std::unique_ptr<Pipeline> Pipeline::create(class Device *vulkan_gd, const graphi
 
     // pipeline layout
     vk::PipelineLayoutCreateInfo pipeline_layout_create_info;
-    pipeline->mPipelineLayout = vulkan_gd->_getDevice().createPipelineLayoutUnique(pipeline_layout_create_info);
+    pipeline->mPipelineLayout = vulkan_gd->device().createPipelineLayoutUnique(pipeline_layout_create_info);
     pipeline_create_info.setLayout(pipeline->mPipelineLayout.get());
 
     // render pass
@@ -282,12 +282,12 @@ std::unique_ptr<Pipeline> Pipeline::create(class Device *vulkan_gd, const graphi
     render_pass_create_info.setPSubpasses(&subpass_description);
     render_pass_create_info.setDependencyCount(subpass_dependencies.size());
     render_pass_create_info.setPDependencies(subpass_dependencies.data());
-    pipeline->mRenderPass = vulkan_gd->_getDevice().createRenderPassUnique(render_pass_create_info);
+    pipeline->mRenderPass = vulkan_gd->device().createRenderPassUnique(render_pass_create_info);
 
     pipeline_create_info.setRenderPass(pipeline->mRenderPass.get());
     pipeline_create_info.setSubpass(0);
 
-    pipeline->mPipeline = vulkan_gd->_getDevice().createGraphicsPipelineUnique({ }, pipeline_create_info);
+    pipeline->mPipeline = vulkan_gd->device().createGraphicsPipelineUnique({ }, pipeline_create_info);
 
     return std::move(pipeline);
 }

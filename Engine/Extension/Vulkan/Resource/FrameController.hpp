@@ -4,14 +4,12 @@
 
 #include <Usagi/Engine/Runtime/Graphics/Resource/FrameController.hpp>
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 class Frame;
 
-class FrameController
-    : public graphics::FrameController
-    , public graphics::MemoryAllocator
+class FrameController : public graphics::FrameController
 {
     class Device *mDevice;
     std::vector<std::unique_ptr<vulkan::Frame>> mFrameChain; // must have at least one element
@@ -28,17 +26,6 @@ public:
     graphics::Waitable * getRenderingFinishedSemaphore() override;
     graphics::Waitable * getRenderingFinishedFence() override;
     void endFrame() override;
-
-    std::unique_ptr<graphics::Buffer> createDynamicBuffer(size_t size) override;
-
-private:
-    Allocation allocate(size_t size) override;
-    void release(const Allocation &alloc_info) override;
-    Allocation reallocate(const Allocation &alloc_info) override;
-    void reset() override;
-    void * getMappedAddress(const Allocation &allocation) const override;
-    void flushRange(const Allocation &allocation, size_t offset, size_t size) override;
-    graphics::MemoryAllocator * getActualAllocator(const Allocation &allocation) override;
 };
 
 }

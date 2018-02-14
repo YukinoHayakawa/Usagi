@@ -19,6 +19,7 @@ public:
     virtual bool isWindowActive() const = 0;
     virtual bool isWindowOpen() const = 0;
     virtual Eigen::Vector2f getWindowSize() const = 0;
+    virtual void setTitle(const std::string &title) = 0;
 
     virtual void processEvents() = 0;
 };

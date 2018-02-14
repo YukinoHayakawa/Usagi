@@ -2,53 +2,9 @@
 
 #include "FrameController.hpp"
 #include "Frame.hpp"
-#include "Buffer.hpp"
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
-
-std::unique_ptr<graphics::Buffer> FrameController::createDynamicBuffer(size_t size)
-{
-    return std::make_unique<Buffer>(size, this);
-}
-
-graphics::MemoryAllocator::Allocation FrameController::allocate(size_t size)
-{
-    auto alloc = _getCurrentFrame()->_getStackMemoryAllocator()->allocate(size);
-    alloc.pool_id = mCurrentFrame;
-    return alloc;
-}
-
-void FrameController::release(const Allocation &alloc_info)
-{
-    // todo
-}
-
-graphics::MemoryAllocator::Allocation FrameController::reallocate(const Allocation &alloc_info)
-{
-    return allocate(alloc_info.size);
-}
-
-void FrameController::reset()
-{
-
-}
-
-void * FrameController::getMappedAddress(const Allocation &allocation) const
-{
-    return mFrameChain[allocation.pool_id]->_getStackMemoryAllocator()->getMappedAddress(allocation);
-}
-
-void FrameController::flushRange(const Allocation &allocation, size_t offset, size_t size)
-{
-    return getActualAllocator(allocation)->flushRange(allocation, offset, size);
-}
-
-graphics::MemoryAllocator * FrameController::getActualAllocator(const graphics::MemoryAllocator::Allocation &allocation)
-{
-    return mFrameChain[allocation.pool_id]->_getStackMemoryAllocator();
-}
-
 Frame * FrameController::_getCurrentFrame()
 {
     return mFrameChain[mCurrentFrame].get();
@@ -95,5 +51,4 @@ void FrameController::endFrame()
     _getCurrentFrame()->endFrame();
     _swapFrame();
 }
-
 }

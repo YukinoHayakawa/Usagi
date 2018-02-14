@@ -2,7 +2,7 @@
 #include "CommandPool.hpp"
 #include "CommandList.hpp"
 
-namespace yuki::vulkan
+namespace yuki::extension::vulkan
 {
 
 CommandPool::CommandPool(Device *vulkan_gd)
@@ -12,7 +12,7 @@ CommandPool::CommandPool(Device *vulkan_gd)
     pool_create_info.setFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer | vk::CommandPoolCreateFlagBits::eTransient);
     pool_create_info.setQueueFamilyIndex(mVulkanGD->getGraphicsQueueFamilyIndex());
 
-    mCommandPool = mVulkanGD->_getDevice().createCommandPoolUnique(pool_create_info);
+    mCommandPool = mVulkanGD->device().createCommandPoolUnique(pool_create_info);
 }
 
 std::unique_ptr<graphics::CommandList> CommandPool::createCommandList()
@@ -22,7 +22,7 @@ std::unique_ptr<graphics::CommandList> CommandPool::createCommandList()
     command_buffer_allocate_info.setCommandBufferCount(1);
     command_buffer_allocate_info.setLevel(vk::CommandBufferLevel::ePrimary);
 
-    auto buffer = std::move(mVulkanGD->_getDevice().allocateCommandBuffersUnique(command_buffer_allocate_info)[0]);
+    auto buffer = std::move(mVulkanGD->device().allocateCommandBuffersUnique(command_buffer_allocate_info)[0]);
     auto command_list = std::make_unique<CommandList>(mVulkanGD, std::move(buffer));
 
     return std::move(command_list);
