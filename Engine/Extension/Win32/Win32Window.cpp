@@ -19,7 +19,7 @@ void yuki::Win32Window::_ensureWindowSubsystemInitialized()
     // to the same place.
     mProcessInstanceHandle = GetModuleHandle(nullptr);
 
-    WNDCLASSEX wcex = { 0 };
+    WNDCLASSEX wcex { };
 
     wcex.cbSize = sizeof(WNDCLASSEX);
     // CS_OWNDC is required to create OpenGL context
@@ -36,6 +36,8 @@ void yuki::Win32Window::_ensureWindowSubsystemInitialized()
     {
         throw std::runtime_error("RegisterClassEx() failed!");
     }
+
+    SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 }
 
 RECT yuki::Win32Window::_getClientScreenRect() const
@@ -66,7 +68,7 @@ void yuki::Win32Window::_createWindowHandle(const std::string &title, int width,
     static constexpr DWORD window_style = WS_OVERLAPPEDWINDOW;
     static constexpr DWORD window_style_ex = WS_EX_ACCEPTFILES;
 
-    RECT window_rect = { 0 };
+    RECT window_rect { };
     window_rect.bottom = height;
     window_rect.right = width;
     AdjustWindowRectEx(&window_rect, window_style, FALSE, window_style_ex);
@@ -92,7 +94,6 @@ void yuki::Win32Window::_createWindowHandle(const std::string &title, int width,
 
     // associate the class instance with the window so they can be identified in WindowProc
     SetWindowLongPtr(mWindowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-    SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 }
 
 void yuki::Win32Window::_registerRawInputDevices() const
