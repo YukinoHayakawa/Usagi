@@ -32,6 +32,7 @@ public:
      * \param size 
      * \return The mapped address. nullptr if the resource is not available.
      */
+    // todo return a guard<T> object
     virtual void * map(std::size_t offset, std::size_t size) = 0;
 
     /**

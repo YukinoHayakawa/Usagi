@@ -1,0 +1,15 @@
+- install cmake
+- install vulkan sdk
+    https://vulkan.lunarg.com/
+- add CoreLibraries & vulkan to include path
+- add vulkan lib path
+- use /std:c++latest
+- fix output of files with the same name
+    see https://stackoverflow.com/questions/3729515/visual-studio-2010-2008-cant-handle-source-files-with-identical-names-in-diff/3731577
+- import vs & resharper settings
+- install vcpkg
+- vcpkg install ???
+
+if intellisense cannot find headers: remove .vs folder
+! use the new version of vulkan.hpp build from source instead of the version from lunarg vulkan sdk
+! 

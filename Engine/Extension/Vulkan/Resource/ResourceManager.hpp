@@ -112,5 +112,7 @@ public:
     void onResourceStreamed(user_param_t batch_index) override;
 
     Device * device() const { return mDevice; }
+
+
 };
 }

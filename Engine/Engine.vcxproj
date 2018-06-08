@@ -64,9 +64,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\UsagiProjects.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\UsagiProjects.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -130,6 +132,8 @@
     <ClInclude Include="Extension\Vulkan\Resource\FrameController.hpp" />
     <ClInclude Include="Extension\Vulkan\Workload\CommandList.hpp" />
     <ClInclude Include="Extension\Vulkan\Workload\detail\Job.hpp" />
+    <ClInclude Include="Geometry\Shape\Shape.hpp" />
+    <ClInclude Include="Geometry\Shape\Sphere.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\FrameController.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\ResourceEventHandler.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\DynamicBuffer.hpp" />
@@ -154,7 +158,6 @@
     <ClInclude Include="Filesystem\Filesystem.hpp" />
     <ClInclude Include="Extension\GTA\GTA3IMGv2Filesystem.hpp" />
     <ClInclude Include="Camera\Camera.hpp" />
-    <ClInclude Include="Geometry\Shape.hpp" />
     <ClInclude Include="Core\Logging.hpp" />
     <ClInclude Include="Renderer\Renderer.hpp" />
     <ClCompile Include="Core\Logging.cpp" />
@@ -173,12 +176,14 @@
     <ClCompile Include="Extension\Vulkan\Workload\Pipeline.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\Image.cpp" />
     <ClCompile Include="Extension\Vulkan\Device\Semaphore.cpp" />
+    <ClCompile Include="Geometry\Shape\Sphere.cpp" />
     <ClCompile Include="Runtime\Graphics\Environment.cpp" />
     <ClCompile Include="Runtime\Graphics\Resource\FrameController.cpp" />
     <ClCompile Include="Runtime\Graphics\SpirvShader.cpp" />
-    <ClCompile Include="Runtime\Memory\detail\Bitmap.cpp" />
     <ClCompile Include="Runtime\Memory\BitmapAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\CircularAllocator.cpp" />
+    <ClCompile Include="Runtime\Memory\detail\Bitmap.cpp" />
+    <ClCompile Include="Runtime\Memory\TripleBuffer.cpp" />
     <ClCompile Include="Runtime\Subsystem\ImmediateGuiImpl.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>
@@ -205,6 +210,8 @@
     <ClInclude Include="Runtime\Graphics\Workload\PipelineCreateInfo.hpp" />
     <ClInclude Include="Runtime\Memory\BitmapAllocator.hpp" />
     <ClInclude Include="Runtime\Memory\CircularAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\detail\Bitmap.hpp" />
+    <ClInclude Include="Runtime\Memory\TripleBuffer.hpp" />
     <ClInclude Include="Runtime\Subsystem\ImmediateGuiManager.hpp" />
     <ClInclude Include="Runtime\Graphics\Device\SwapChain.hpp" />
     <ClInclude Include="Scene\Entity.hpp" />
@@ -246,7 +253,6 @@
     <ClInclude Include="Extension\Win32\Win32Window.hpp" />
     <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Utility\BindingSentry.hpp" />
-    <ClInclude Include="Runtime\Memory\detail\Bitmap.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
     <ClInclude Include="Utility\File.hpp" />
@@ -273,7 +279,6 @@
     <ClCompile Include="Filesystem\Filesystem.cpp" />
     <ClCompile Include="Extension\GTA\GTA3IMGv2Filesystem.cpp" />
     <ClCompile Include="Camera\Camera.cpp" />
-    <ClCompile Include="Geometry\Shape.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Runtime\HID\Keyboard\KeyCode.cpp" />
     <ClCompile Include="Runtime\HID\Mouse\MouseButtonCode.cpp" />

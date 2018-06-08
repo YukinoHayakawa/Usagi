@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
     VulkanTriangle triangle(&env);
 
-    Clock clock;
+    Clock clock; // todo use chrono::duration
     size_t frame_count = 0;
 
     // todo make a fps counter
@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
     {
         double delta_time = clock.tick();
 
+        // calculate fps
         frame_time_accumulator += delta_time;
         ++fps_sample_count;
 
@@ -47,9 +48,14 @@ int main(int argc, char *argv[])
             fps_sample_count = 0;
         }
 
+        // receive user input
         env.window->processEvents();
+
+        // update 
         triangle.update(delta_time);
 
+        // todo command recording should not wait on next acquiring image, use a pool of command list
+        // todo extensive abstraction leakage below
         env.swap_chain->acquireNextImage();
         env.frame_controller->beginFrame({ env.swap_chain->getCurrentImage() });
 
@@ -58,6 +64,8 @@ int main(int argc, char *argv[])
         triangle.populateCommandList(command_list);
         command_list->end();
 
+
+        // todo: this literally cannot be ported to dx12
         env.graphics_device->submitGraphicsCommandList(
             command_list,
             { env.swap_chain->getImageAvailableSemaphore() },
@@ -72,6 +80,7 @@ int main(int argc, char *argv[])
 
         ++frame_count;
     }
+    // todo: fix streaming first.
 
     // must wait for the device to be idle before releasing resources
     env.graphics_device->waitIdle();

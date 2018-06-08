@@ -1,4 +1,5 @@
 ﻿#include <fstream>
+#include <shaderc/shaderc.hpp>
 
 #include <Usagi/Engine/Runtime/Exception.hpp>
 
@@ -6,7 +7,6 @@
 
 namespace yuki::graphics
 {
-
 size_t SpirvShader::getByteCodeSize() const
 {
     return mByteCode.size();
@@ -25,12 +25,12 @@ std::shared_ptr<SpirvShader> SpirvShader::readFromFile(const std::string &file_p
         throw CannotOpenFileException() << boost::errinfo_file_name(file_path);
 
     auto shader = std::make_shared<SpirvShader>();
-    shader->mByteCode = std::vector<char>(std::istreambuf_iterator<char>(bytecode_file), std::istreambuf_iterator<char>());
+    shader->mByteCode = std::vector<char>(std::istreambuf_iterator<char>(bytecode_file),
+        std::istreambuf_iterator<char>());
 
     if(shader->mByteCode.size() % sizeof(ByteCodeWord) != 0)
         throw CorruptedDataFileException() << boost::errinfo_file_name(file_path);
 
     return shader;
 }
-
 }

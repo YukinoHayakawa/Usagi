@@ -262,4 +262,4 @@ __pycache__/
 
 # diagnosis sessions
 *.diagsession
-*.vspx
+*.xmind

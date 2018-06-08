@@ -36,9 +36,9 @@ yuki::VulkanTriangle::VulkanTriangle(Environment *env)
             4 * sizeof(float)
         });
         graphics_pipeline_create_info.vertex_shader = SpirvShader::readFromFile(
-            R"(E:\Projects\IntroductionToVulkan\Project\Tutorial04\Data04\vert.spv)");
+            R"(D:\Development\IntroductionToVulkan\Project\Tutorial04\Data04\vert.spv)");
         graphics_pipeline_create_info.fragment_shader = SpirvShader::readFromFile(
-            R"(E:\Projects\IntroductionToVulkan\Project\Tutorial04\Data04\frag.spv)");
+            R"(D:\Development\IntroductionToVulkan\Project\Tutorial04\Data04\frag.spv)");
         graphics_pipeline_create_info.input_assembly.topology = InputAssembleState::
             PrimitiveTopology::TRIANGLE_STRIP;
         graphics_pipeline_create_info.rasterization.face_culling_mode = RasterizationState
@@ -85,16 +85,17 @@ void yuki::VulkanTriangle::update(double delta_time)
     mCounter1 += delta_time;
 
     float a = abs(sin(mCounter1));
-    float b = abs(sin(mCounter1 + 0.25));
-    float c = abs(sin(mCounter1 + 0.5));
-    float d = abs(sin(mCounter1 + 0.75));
+    float b = abs(sin(mCounter1 * 2 + 0.25));
+    float c = abs(sin(mCounter1 * 3 + 0.1234));
+    float d = sin(mCounter1 + 0.66);
+    float e = sin(mCounter1 + 0.88);
 
     VertexData vertex_data[]
     {
-        { -0.7f, -0.7f, 0.0f, 1.0f, a, b, c, 0.0f },
-        { -0.7f, 0.7f, 0.0f, 1.0f, c, a, b, 0.0f },
-        { 0.7f, -0.7f, 0.0f, 1.0f, b, c, a, 0.0f },
-        { 0.7f, 0.7f, 0.0f, 1.0f, c, a, c, 0.0f }
+        { -d, -e, 0.0f, 1.0f, a, b, c, 0.0f },
+        { -e, d, 0.0f, 1.0f, c, a, b, 0.0f },
+        { e, -d, 0.0f, 1.0f, b, c, a, 0.0f },
+        { d, e, 0.0f, 1.0f, c, a, c, 0.0f }
     };
 
     if(const auto mem = mVertexBuffer->map(0, sizeof(vertex_data)))
