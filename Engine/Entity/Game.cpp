@@ -2,7 +2,22 @@
 
 #include <algorithm>
 
+#include <Usagi/Engine/Event/AddComponentEvent.hpp>
+
 #include "Subsystem.hpp"
+
+yuki::Game::Game()
+{
+    // add listeners at root entity to allow each subsystem to examine
+    // entities with updated component configurations.
+    mRoot.addEventListener<AddComponentEvent>([&](auto &&e)
+    {
+        for(auto &&s : mSubsystems)
+        {
+            s.subsystem->updateRegistry(e.source());
+        }
+    });
+}
 
 void yuki::Game::addSubsystem(SubsystemInfo subsystem)
 {

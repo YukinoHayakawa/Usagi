@@ -75,6 +75,12 @@
     <ClInclude Include="Event\EventTypeTag.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Event\AddComponentEvent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Event\RemoveComponentEvent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Logging.cpp">

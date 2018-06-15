@@ -25,10 +25,19 @@ struct PhysicalComponent : Component
 
 class PhysicsSubsystem : public Subsystem
 {
+    Entity *mEntity = nullptr;
+
 public:
     void update(const std::chrono::milliseconds &dt) override
     {
-        // fetch all entities with PositionComponent
+        if(mEntity)
+        {
+            // mEntity->getComponent<PhysicalComponent>();
+        }
+    }
+
+    void updateRegistry(Entity *entity) override
+    {
     }
 };
 
@@ -74,24 +83,24 @@ TEST(ECSTest, EventBubblingTest)
     auto b = r->addChild();
     auto c = a->addChild();
     int dr = 0, da = 0, db = 0, dc = 0;
-    r->addEventListener<TestEvent>([&](auto &e)
+    r->addEventListener<TestEvent>([&](auto &&e)
     {
         dr = e.hello;
     });
-    a->addEventListener<TestEvent>([&](auto &e)
+    a->addEventListener<TestEvent>([&](auto &&e)
     {
         da = e.hello;
         e.stopBubbling();
     });
-    b->addEventListener<TestEvent>([&](auto &e)
+    b->addEventListener<TestEvent>([&](auto &&e)
     {
         db = e.hello;
     });
-    c->addEventListener<TestEvent>([&](auto &e)
+    c->addEventListener<TestEvent>([&](auto &&e)
     {
         dc = e.hello;
     });
-    c->fireEvent(TestEvent());
+    c->fireEvent<TestEvent>();
 
     EXPECT_EQ(dr, 0);
     EXPECT_EQ(db, 0);
@@ -106,47 +115,39 @@ TEST(ECSTest, EventCancelTest)
     Game game;
     auto r = game.getRootEntity();
     bool a = false, b = false, c = false;
-    r->addEventListener<TestEvent>([&](auto &e)
+    r->addEventListener<TestEvent>([&](auto &&e)
     {
         a = true;
     });
-    r->addEventListener<TestEvent>([&](auto &e)
+    r->addEventListener<TestEvent>([&](auto &&e)
     {
         b = true;
         e.cancel();
     });
-    r->addEventListener<TestEvent>([&](auto &e)
+    r->addEventListener<TestEvent>([&](auto &&e)
     {
         c = true;
     });
-    r->fireEvent(TestEvent());
+    r->fireEvent<TestEvent>();
 
     EXPECT_TRUE(a);
     EXPECT_TRUE(b);
     EXPECT_FALSE(c);
 }
 
-TEST(ECSTest, EventReferenceTest)
+TEST(ECSTest, ComponentSystemInteractionTest)
 {
     using namespace test;
 
     Game game;
-    TestEvent e;
-    game.getRootEntity()->fireEvent(e);
-    game.getRootEntity()->fireEvent(std::move(e));
-}
-
-TEST(ECSTest, ComponentSystemInteractionTest)
-{
-    Game game;
     {
         SubsystemInfo info;
         info.name = "Physics";
-        info.subsystem = std::make_unique<test::PhysicsSubsystem>();
+        info.subsystem = std::make_unique<PhysicsSubsystem>();
         EXPECT_NO_THROW(game.addSubsystem(std::move(info)));
     }
     auto r = game.getRootEntity();
-    r->addComponent(std::make_unique<test::PositionComponent>());
+    r->addComponent<PositionComponent>();
 
     // world.update()
 }

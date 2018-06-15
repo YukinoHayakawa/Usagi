@@ -26,7 +26,7 @@ struct SubsystemInfo
 class Game final : Noncopyable
 {
 public:
-    Game() = default;
+    Game();
 
     /**
      * \brief

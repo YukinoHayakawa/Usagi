@@ -36,17 +36,24 @@ public:
 
     // Component
 
-    void addComponent(std::unique_ptr<Component> component);
+    template <typename CompT, typename... Args>
+    CompT * addComponent(Args&&... args)
+    {
+        auto comp = std::make_unique<CompT>(std::forward<Args>(args)...);
+        const auto r = comp.get();
+        appendComponent(std::move(comp));
+        return r;
+    }
 
     // Event Handling
 
     template <typename EventT>
     using EventHandler = std::function<void(EventT &)>;
 
-    template <typename EventT>
-    void fireEvent(EventT &&event)
-    {   // this is the only function having access to the original type
-        // info of the event.
+    template <typename EventT, typename... Args>
+    void fireEvent(Args&&... args)
+    {
+        EventT event { std::forward<Args>(args)... };
         event.setSource(this);
         handleEvent(event, typeid(event));
     }
@@ -63,10 +70,12 @@ private:
 
     std::vector<std::unique_ptr<Component>> mComponents;
 
+    void appendComponent(std::unique_ptr<Component> component);
+
     std::multimap<std::type_index, std::any> mEventHandlers;
 
     template <typename EventT, typename... Args>
-    void handleEvent(EventT &&e, const std::type_info &type)
+    void handleEvent(EventT &e, const std::type_info &type)
     {
         const auto range = mEventHandlers.equal_range(type);
         for(auto i = range.first; i != range.second && !e.canceled(); ++i)
