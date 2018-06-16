@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <eigen3/Eigen/Core>
+#include <Eigen/Core>
 
 #include <Usagi/Engine/Entity/Game.hpp>
 #include <Usagi/Engine/Entity/Entity.hpp>

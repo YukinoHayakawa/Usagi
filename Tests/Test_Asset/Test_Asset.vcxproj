@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{19097A41-38D5-4564-92E0-702887CF5259}</ProjectGuid>
-    <RootNamespace>Engine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <ProjectGuid>{F5C95224-95A9-46B5-AA53-BABCB090CBF1}</ProjectGuid>
+    <RootNamespace>TestAsset</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -39,17 +39,17 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -64,11 +64,13 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\UsagiProjects.props" />
+    <Import Project="..\..\UsagiProjects.props" />
+    <Import Project="..\UnitTestDebug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\UsagiProjects.props" />
+    <Import Project="..\..\UsagiProjects.props" />
+    <Import Project="..\UnitTestRelease.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -77,7 +79,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -85,6 +87,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -94,6 +97,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -107,7 +111,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -115,54 +119,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Asset\AssetImporter.hpp" />
-    <ClInclude Include="Asset\AssimpAssetImporter.hpp" />
-    <ClInclude Include="Asset\AssetPackage.hpp" />
-    <ClInclude Include="Camera\Camera.hpp" />
-    <ClInclude Include="Camera\CameraComponent.hpp" />
-    <ClInclude Include="Camera\PerspectiveCamera.hpp" />
-    <ClInclude Include="Entity\ConstrainedSubsystem.hpp" />
-    <ClInclude Include="Event\Library\RemoveComponentEvent.hpp" />
-    <ClInclude Include="Entity\Component.hpp" />
-    <ClInclude Include="Event\Library\AddComponentEvent.hpp" />
-    <ClInclude Include="Event\Event.hpp" />
-    <ClInclude Include="Entity\Entity.hpp" />
-    <ClInclude Include="Entity\Game.hpp" />
-    <ClInclude Include="Entity\Subsystem.hpp" />
-    <ClInclude Include="Event\EventTypeTag.hpp" />
-    <ClInclude Include="Event\TaggedEvent.hpp" />
-    <ClInclude Include="Core\Logging.hpp" />
-    <ClCompile Include="Asset\AssetImporter.cpp" />
-    <ClCompile Include="Asset\AssimpAssetImporter.cpp" />
-    <ClCompile Include="Asset\AssetPackage.cpp" />
-    <ClCompile Include="Camera\Camera.cpp" />
-    <ClCompile Include="Camera\PerspectiveCamera.cpp" />
-    <ClCompile Include="Core\Logging.cpp" />
-    <ClCompile Include="Event\Event.cpp" />
-    <ClCompile Include="Entity\Entity.cpp" />
-    <ClCompile Include="Entity\Game.cpp" />
-    <ClInclude Include="Geometry\Shape\Shape.hpp" />
-    <ClInclude Include="Geometry\Shape\ShapeComponent.hpp" />
-    <ClInclude Include="Geometry\Shape\Sphere.hpp" />
-    <ClInclude Include="Geometry\TransformComponent.hpp" />
-    <ClInclude Include="Graphics\GraphicsSubsystem.hpp" />
-    <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
-    <ClInclude Include="Utility\BindingSentry.hpp" />
-    <ClInclude Include="Utility\BitHack.hpp" />
-    <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
-    <ClInclude Include="Utility\File.hpp" />
-    <ClInclude Include="Utility\Flag.hpp" />
-    <ClInclude Include="Utility\Iterator.h" />
-    <ClInclude Include="Utility\Math.hpp" />
-    <ClInclude Include="Utility\Noncopyable.hpp" />
-    <ClInclude Include="Utility\Rounding.hpp" />
-    <ClInclude Include="Utility\String.hpp" />
-    <ClInclude Include="Utility\TypeCast.hpp" />
+    <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Geometry\Shape\Sphere.cpp" />
-    <ClCompile Include="Graphics\GraphicsSubsystem.cpp" />
-    <ClCompile Include="Utility\File.cpp" />
+    <ProjectReference Include="..\..\Engine\Engine.vcxproj">
+      <Project>{19097a41-38d5-4564-92e0-702887cf5259}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

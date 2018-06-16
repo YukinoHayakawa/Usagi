@@ -11,8 +11,5 @@ class Component : Noncopyable
 {
 public:
     virtual ~Component() = default;
-
-    virtual void enable() { }
-    virtual void disable() { }
 };
 }
