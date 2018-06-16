@@ -75,10 +75,13 @@
     <ClInclude Include="Event\EventTypeTag.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Event\AddComponentEvent.hpp">
+    <ClInclude Include="Event\Library\AddComponentEvent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Event\RemoveComponentEvent.hpp">
+    <ClInclude Include="Event\Library\RemoveComponentEvent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\ConstrainedSubsystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -90,9 +93,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Entity\Entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Entity\Subsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Entity\Game.cpp">

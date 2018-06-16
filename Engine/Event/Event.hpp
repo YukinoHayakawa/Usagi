@@ -24,6 +24,7 @@ class Entity;
 class Event : Noncopyable
 {
     Entity *mSource = nullptr;
+    // todo: c++20, bool mBubbling : 1 = true;
     bool mBubbling : 1;
     bool mCanceled : 1;
 

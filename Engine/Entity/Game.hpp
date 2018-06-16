@@ -33,6 +33,9 @@ public:
      * \param subsystem 
      */
     void addSubsystem(SubsystemInfo subsystem);
+    void setSubsystemEnabled(
+        const std::string &subsystem_name, bool enabled);
+
     Entity * getRootEntity();
 
     /**
@@ -40,10 +43,14 @@ public:
     * of their registration.
     * \param dt The elspased time from last frame.
     */
-    void update(const std::chrono::milliseconds &dt);
+    void update(const std::chrono::seconds &dt);
 
 private:
     std::vector<SubsystemInfo> mSubsystems;
+
+    std::vector<SubsystemInfo>::iterator findSubsystemByName(
+        const std::string &subsystem_name);
+
     Entity mRoot { nullptr };
 };
 }

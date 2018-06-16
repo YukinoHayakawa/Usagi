@@ -1,6 +1,6 @@
 ﻿#include "Entity.hpp"
 
-#include <Usagi/Engine/Event/AddComponentEvent.hpp>
+#include <Usagi/Engine/Event/Library/AddComponentEvent.hpp>
 
 #include "Component.hpp"
 
@@ -23,9 +23,10 @@ yuki::Entity * yuki::Entity::addChild()
     return r;
 }
 
-void yuki::Entity::appendComponent(std::unique_ptr<Component> component)
+void yuki::Entity::insertComponent(const std::type_info &type,
+    std::unique_ptr<Component> component)
 {
     auto p = component.get();
-    mComponents.push_back(std::move(component));
-    fireEvent<AddComponentEvent>(p);
+    mComponents.insert({ type, std::move(component) });
+    fireEvent<AddComponentEvent>(type, p);
 }

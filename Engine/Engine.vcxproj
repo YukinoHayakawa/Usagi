@@ -115,9 +115,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Event\RemoveComponentEvent.hpp" />
+    <ClInclude Include="Entity\ConstrainedSubsystem.hpp" />
+    <ClInclude Include="Event\Library\RemoveComponentEvent.hpp" />
     <ClInclude Include="Entity\Component.hpp" />
-    <ClInclude Include="Event\AddComponentEvent.hpp" />
+    <ClInclude Include="Event\Library\AddComponentEvent.hpp" />
     <ClInclude Include="Event\Event.hpp" />
     <ClInclude Include="Entity\Entity.hpp" />
     <ClInclude Include="Entity\Game.hpp" />
@@ -129,7 +130,6 @@
     <ClCompile Include="Event\Event.cpp" />
     <ClCompile Include="Entity\Entity.cpp" />
     <ClCompile Include="Entity\Game.cpp" />
-    <ClCompile Include="Entity\Subsystem.cpp" />
     <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
     <ClInclude Include="Utility\BindingSentry.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />

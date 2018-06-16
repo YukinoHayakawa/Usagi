@@ -4,6 +4,7 @@
 #include <memory>
 #include <map>
 #include <functional>
+#include <typeinfo>
 #include <typeindex>
 #include <any>
 
@@ -37,12 +38,30 @@ public:
     // Component
 
     template <typename CompT, typename... Args>
-    CompT * addComponent(Args&&... args)
+    CompT * addComponent(Args &&... args)
     {
         auto comp = std::make_unique<CompT>(std::forward<Args>(args)...);
         const auto r = comp.get();
-        appendComponent(std::move(comp));
+        insertComponent(typeid(std::decay_t<CompT>), std::move(comp));
         return r;
+    }
+
+    template <typename CompT>
+    CompT * getComponent()
+    {
+        auto iter = mComponents.find(typeid(CompT));
+        if(iter == mComponents.end())
+            throw std::runtime_error(
+                "Entity does not have such component");
+        // typeid guarantees the type correctness
+        return static_cast<CompT*>(iter->second.get());
+    }
+
+    template <typename CompT>
+    bool hasComponent()
+    {
+        // todo: c++20, use contains()
+        return mComponents.find(typeid(CompT)) != mComponents.end();
     }
 
     // Event Handling
@@ -51,7 +70,7 @@ public:
     using EventHandler = std::function<void(EventT &)>;
 
     template <typename EventT, typename... Args>
-    void fireEvent(Args&&... args)
+    void fireEvent(Args &&... args)
     {
         EventT event { std::forward<Args>(args)... };
         event.setSource(this);
@@ -65,12 +84,18 @@ public:
     }
 
 private:
-    Entity * mParent = nullptr;
+    Entity *mParent = nullptr;
     std::vector<std::unique_ptr<Entity>> mChildren;
 
-    std::vector<std::unique_ptr<Component>> mComponents;
+    std::unordered_map<
+        std::type_index,
+        std::unique_ptr<Component>
+    > mComponents;
 
-    void appendComponent(std::unique_ptr<Component> component);
+    void insertComponent(
+        const std::type_info &type,
+        std::unique_ptr<Component> component
+    );
 
     std::multimap<std::type_index, std::any> mEventHandlers;
 
