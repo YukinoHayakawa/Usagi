@@ -4,7 +4,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_PropertySheetDisplayName>Usagi Projects</_PropertySheetDisplayName>
-    <IncludePath>C:\VulkanSDK\1.1.73.0\Include;D:\Development\CoreLibraries;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>C:\VulkanSDK\1.1.73.0\Include;E:\Projects\CoreLibraries;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <LibraryPath>C:\VulkanSDK\1.1.73.0\Lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
