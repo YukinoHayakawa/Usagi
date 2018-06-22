@@ -129,7 +129,6 @@
     <ClInclude Include="Event\Event.hpp" />
     <ClInclude Include="Entity\Entity.hpp" />
     <ClInclude Include="Entity\Game.hpp" />
-    <ClInclude Include="Entity\Subsystem.hpp" />
     <ClInclude Include="Event\EventTypeTag.hpp" />
     <ClInclude Include="Event\TaggedEvent.hpp" />
     <ClInclude Include="Core\Logging.hpp" />
@@ -142,13 +141,22 @@
     <ClCompile Include="Event\Event.cpp" />
     <ClCompile Include="Entity\Entity.cpp" />
     <ClCompile Include="Entity\Game.cpp" />
+    <ClInclude Include="Extension\Win32\Win32Window.hpp" />
+    <ClInclude Include="Extension\Win32\WindowsHeader.hpp" />
     <ClInclude Include="Geometry\Shape\Shape.hpp" />
     <ClInclude Include="Geometry\Shape\ShapeComponent.hpp" />
     <ClInclude Include="Geometry\Shape\Sphere.hpp" />
     <ClInclude Include="Geometry\TransformComponent.hpp" />
-    <ClInclude Include="Graphics\GraphicsSubsystem.hpp" />
+    <ClInclude Include="Graphics\GraphicsComponent.hpp" />
     <ClInclude Include="Graphics\GraphicsSubsystem.hpp" />
     <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
+    <ClInclude Include="Runtime\HID\Keyboard\Keyboard.hpp" />
+    <ClInclude Include="Runtime\HID\Keyboard\KeyCode.hpp" />
+    <ClInclude Include="Runtime\HID\Keyboard\KeyEventListener.hpp" />
+    <ClInclude Include="Runtime\HID\Mouse\Mouse.hpp" />
+    <ClInclude Include="Runtime\HID\Mouse\MouseButtonCode.hpp" />
+    <ClInclude Include="Runtime\HID\Mouse\MouseEventListener.hpp" />
+    <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Utility\BindingSentry.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
@@ -162,9 +170,14 @@
     <ClInclude Include="Utility\TypeCast.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Extension\Win32\Win32Window.cpp" />
     <ClCompile Include="Geometry\Shape\Sphere.cpp" />
+    <ClCompile Include="Graphics\GraphicsComponent.cpp" />
     <ClCompile Include="Graphics\GraphicsSubsystem.cpp" />
-    <ClCompile Include="Graphics\GraphicsSubsystem.cpp" />
+    <ClCompile Include="Runtime\HID\Keyboard\Keyboard.cpp" />
+    <ClCompile Include="Runtime\HID\Keyboard\KeyCode.cpp" />
+    <ClCompile Include="Runtime\HID\Mouse\Mouse.cpp" />
+    <ClCompile Include="Runtime\HID\Mouse\MouseButtonCode.cpp" />
     <ClCompile Include="Utility\File.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

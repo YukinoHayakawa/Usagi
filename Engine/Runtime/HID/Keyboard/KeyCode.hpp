@@ -2,7 +2,6 @@
 
 namespace yuki
 {
-
 /**
  * \brief Names of keys on the standard 101 keyboard.
  */
@@ -135,6 +134,5 @@ enum class KeyCode
     ENUM_COUNT
 };
 
-const char *getKeyName(KeyCode key);
-
+const char * getKeyName(KeyCode key);
 }

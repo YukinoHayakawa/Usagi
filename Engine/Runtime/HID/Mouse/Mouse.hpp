@@ -8,7 +8,6 @@
 
 namespace yuki
 {
-
 enum class KeyCode;
 
 class Mouse
@@ -69,5 +68,4 @@ private:
     virtual void _releaseCursor() = 0;
     virtual bool _isCursorCaptured() = 0;
 };
-
 }

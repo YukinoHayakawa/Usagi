@@ -2,13 +2,13 @@
 
 namespace yuki
 {
-
 enum class MouseButtonCode
 {
-    LEFT, RIGHT, MIDDLE,
+    LEFT,
+    RIGHT,
+    MIDDLE,
     ENUM_COUNT
 };
 
-const char *getMouseButtonName(MouseButtonCode key);
-
+const char * getMouseButtonName(MouseButtonCode key);
 }

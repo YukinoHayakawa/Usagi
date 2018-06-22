@@ -6,7 +6,6 @@
 
 namespace yuki
 {
-
 struct MouseEvent
 {
     class Mouse *mouse = nullptr;
@@ -33,9 +32,16 @@ class MouseEventListener
 public:
     virtual ~MouseEventListener() = default;
 
-    virtual void onMouseMove(const MousePositionEvent &e) { }
-    virtual void onMouseButtonStateChange(const MouseButtonEvent &e) { }
-    virtual void onMouseWheelScroll(const MouseWheelEvent &e) { }
-};
+    virtual void onMouseMove(const MousePositionEvent &e)
+    {
+    }
 
+    virtual void onMouseButtonStateChange(const MouseButtonEvent &e)
+    {
+    }
+
+    virtual void onMouseWheelScroll(const MouseWheelEvent &e)
+    {
+    }
+};
 }

@@ -15,8 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Header Files</Filter>
-    </ClInclude>
+    </ClCompile>
   </ItemGroup>
 </Project>

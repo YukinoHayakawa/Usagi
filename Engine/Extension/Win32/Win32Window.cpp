@@ -6,8 +6,10 @@
 // include dirty windows headers at last
 #include "Win32Window.hpp"
 #include <ShellScalingAPI.h>
+#pragma comment(lib, "Shcore.lib")
 
-const wchar_t yuki::Win32Window::mWindowClassName[] = L"UsagiNativeWindowWrapper";
+const wchar_t yuki::Win32Window::mWindowClassName[] =
+    L"UsagiNativeWindowWrapper";
 HINSTANCE yuki::Win32Window::mProcessInstanceHandle = nullptr;
 
 void yuki::Win32Window::_ensureWindowSubsystemInitialized()
@@ -59,7 +61,8 @@ RECT yuki::Win32Window::_getClientScreenRect() const
     return rc;
 }
 
-void yuki::Win32Window::_createWindowHandle(const std::string &title, int width, int height)
+void yuki::Win32Window::_createWindowHandle(const std::string &title, int width,
+    int height)
 {
     auto windowTitleWide = string::toWideVector(title);
     // todo update after resizing
@@ -93,7 +96,8 @@ void yuki::Win32Window::_createWindowHandle(const std::string &title, int width,
     }
 
     // associate the class instance with the window so they can be identified in WindowProc
-    SetWindowLongPtr(mWindowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    SetWindowLongPtr(mWindowHandle, GWLP_USERDATA,
+        reinterpret_cast<LONG_PTR>(this));
 }
 
 void yuki::Win32Window::_registerRawInputDevices() const
@@ -176,9 +180,11 @@ void yuki::Win32Window::setTitle(const std::string &title)
     SetWindowText(mWindowHandle, wtitle.c_str());
 }
 
-LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message,
+    WPARAM wParam, LPARAM lParam)
 {
-    auto window = reinterpret_cast<Win32Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+    auto window = reinterpret_cast<Win32Window*>(GetWindowLongPtr(hWnd,
+        GWLP_USERDATA));
     // during window creation some misc messages are sent, we just pass them to the system procedure.
     if(!window)
     {
@@ -187,9 +193,10 @@ LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message, WPA
     return window->_handleWindowMessage(hWnd, message, wParam, lParam);
 }
 
-void yuki::Win32Window::_sendButtonEvent(yuki::MouseButtonCode button, bool pressed)
+void yuki::Win32Window::_sendButtonEvent(yuki::MouseButtonCode button,
+    bool pressed)
 {
-    auto &prev_pressed = mMouseButtonDown[static_cast<size_t>(button)];
+    auto &prev_pressed = mMouseButtonDown[static_cast<std::size_t>(button)];
 
     // if we receive an release event without a prior press event, it means that
     // the user activated our window by clicking. this is only meaningful if we
@@ -210,7 +217,8 @@ void yuki::Win32Window::_sendButtonEvent(yuki::MouseButtonCode button, bool pres
     }
 }
 
-yuki::KeyCode yuki::Win32Window::_translateKeyCodeFromRawInput(const RAWKEYBOARD *keyboard)
+yuki::KeyCode yuki::Win32Window::_translateKeyCodeFromRawInput(
+    const RAWKEYBOARD *keyboard)
 {
     switch(keyboard->VKey)
     {
@@ -317,16 +325,25 @@ yuki::KeyCode yuki::Win32Window::_translateKeyCodeFromRawInput(const RAWKEYBOARD
     {
         case VK_SHIFT:
         {
-            return MapVirtualKey(keyboard->MakeCode, MAPVK_VSC_TO_VK_EX) == VK_LSHIFT ? KeyCode::LEFT_SHIFT : KeyCode::RIGHT_SHIFT;
+            return MapVirtualKey(keyboard->MakeCode, MAPVK_VSC_TO_VK_EX) ==
+                VK_LSHIFT
+                ? KeyCode::LEFT_SHIFT
+                : KeyCode::RIGHT_SHIFT;
         }
-        case VK_CONTROL: return e0_prefixed ? KeyCode::RIGHT_CONTROL : KeyCode::LEFT_CONTROL;
-        case VK_MENU: return e0_prefixed ? KeyCode::RIGHT_ALT : KeyCode::LEFT_ALT;
-        case VK_RETURN: return e0_prefixed ? KeyCode::NUM_ENTER : KeyCode::ENTER;
+        case VK_CONTROL: return e0_prefixed
+                ? KeyCode::RIGHT_CONTROL
+                : KeyCode::LEFT_CONTROL;
+        case VK_MENU: return e0_prefixed
+                ? KeyCode::RIGHT_ALT
+                : KeyCode::LEFT_ALT;
+        case VK_RETURN: return
+                e0_prefixed ? KeyCode::NUM_ENTER : KeyCode::ENTER;
         default: return KeyCode::UNKNOWN;
     }
 }
 
-void yuki::Win32Window::_sendKeyEvent(yuki::KeyCode key, bool pressed, bool repeated)
+void yuki::Win32Window::_sendKeyEvent(yuki::KeyCode key, bool pressed,
+    bool repeated)
 {
     KeyEvent e;
     e.keyboard = this;
@@ -361,7 +378,8 @@ void yuki::Win32Window::_processMouseInput(const RAWINPUT *raw)
     if(!isImmersiveMode())
     {
         auto cursor = getMouseCursorWindowPos();
-        if(cursor.x() < 0 || cursor.y() < 0 || cursor.x() >= mWindowSize.x() || cursor.y() >= mWindowSize.y())
+        if(cursor.x() < 0 || cursor.y() < 0 || cursor.x() >= mWindowSize.x() ||
+            cursor.y() >= mWindowSize.y())
             return;
     }
 
@@ -410,7 +428,8 @@ void yuki::Win32Window::_processMouseInput(const RAWINPUT *raw)
     }
 }
 
-std::unique_ptr<BYTE[]> yuki::Win32Window::_getRawInputBuffer(LPARAM lParam) const
+std::unique_ptr<BYTE[]> yuki::Win32Window::_getRawInputBuffer(
+    LPARAM lParam) const
 {
     UINT dwSize;
 
@@ -430,7 +449,8 @@ std::unique_ptr<BYTE[]> yuki::Win32Window::_getRawInputBuffer(LPARAM lParam) con
         &dwSize,
         sizeof(RAWINPUTHEADER)
     ) != dwSize)
-        throw std::runtime_error("GetRawInputData does not return correct size!");
+        throw std::runtime_error(
+            "GetRawInputData does not return correct size!");
 
     return std::move(lpb);
 }
@@ -475,11 +495,12 @@ void yuki::Win32Window::_clearKeyPressedStates()
     }
 }
 
-LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message,
+    WPARAM wParam, LPARAM lParam)
 {
     switch(message)
     {
-        // unbuffered raw input data
+            // unbuffered raw input data
         case WM_INPUT:
         {
             std::unique_ptr<BYTE[]> lpb = _getRawInputBuffer(lParam);
@@ -501,7 +522,7 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
             }
             break;
         }
-        // window management
+            // window management
         case WM_ACTIVATEAPP:
         {
             // window being activated
@@ -509,7 +530,7 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
             {
                 _recaptureCursor();
             }
-            // window being deactivated
+                // window being deactivated
             else
             {
                 _clearKeyPressedStates();
@@ -517,19 +538,19 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message, WPARAM 
             }
             break;
         }
-        // todo: sent resize/move events
+            // todo: sent resize/move events
         case WM_SIZE:
         case WM_MOVE:
         {
             _recaptureCursor();
             break;
         }
-        // ignore any key events
+            // ignore any key events
         case WM_SYSKEYDOWN:
         case WM_SYSKEYUP:
         case WM_KEYDOWN:
         case WM_KEYUP:
-        // ignore mouse events
+            // ignore mouse events
         case WM_MOUSEMOVE:
         case WM_LBUTTONDBLCLK:
         case WM_LBUTTONDOWN:
@@ -621,7 +642,7 @@ void yuki::Win32Window::showCursor(bool show)
 
 bool yuki::Win32Window::isMouseButtonPressed(MouseButtonCode button) const
 {
-    const auto idx = static_cast<size_t>(button);
+    const auto idx = static_cast<std::size_t>(button);
     if(idx > sizeof(mMouseButtonDown) / sizeof(bool)) return false;
     return mMouseButtonDown[idx];
 }
