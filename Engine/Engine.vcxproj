@@ -122,6 +122,7 @@
     <ClInclude Include="Camera\CameraComponent.hpp" />
     <ClInclude Include="Camera\PerspectiveCamera.hpp" />
     <ClInclude Include="Entity\ConstrainedSubsystem.hpp" />
+    <ClInclude Include="Entity\Subsystem.hpp" />
     <ClInclude Include="Event\Library\RemoveComponentEvent.hpp" />
     <ClInclude Include="Entity\Component.hpp" />
     <ClInclude Include="Event\Library\AddComponentEvent.hpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="Geometry\Shape\Sphere.hpp" />
     <ClInclude Include="Geometry\TransformComponent.hpp" />
     <ClInclude Include="Graphics\GraphicsSubsystem.hpp" />
+    <ClInclude Include="Graphics\GraphicsSubsystem.hpp" />
     <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
     <ClInclude Include="Utility\BindingSentry.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
@@ -161,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Geometry\Shape\Sphere.cpp" />
+    <ClCompile Include="Graphics\GraphicsSubsystem.cpp" />
     <ClCompile Include="Graphics\GraphicsSubsystem.cpp" />
     <ClCompile Include="Utility\File.cpp" />
   </ItemGroup>
