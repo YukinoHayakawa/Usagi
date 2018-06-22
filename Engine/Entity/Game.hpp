@@ -32,9 +32,8 @@ public:
      * \brief
      * \param subsystem 
      */
-    void addSubsystem(SubsystemInfo subsystem);
-    void setSubsystemEnabled(
-        const std::string &subsystem_name, bool enabled);
+    Subsystem * addSubsystem(SubsystemInfo subsystem);
+    void setSubsystemEnabled(const std::string &subsystem_name, bool enabled);
 
     Entity * getRootEntity();
 

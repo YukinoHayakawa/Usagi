@@ -46,15 +46,19 @@ public:
         return r;
     }
 
-    template <typename CompT>
-    CompT * getComponent()
+    void addComponent(std::unique_ptr<Component> component);
+
+    template <typename CompBaseT, typename CompCastT = CompBaseT>
+	CompCastT * getComponent()
     {
-        auto iter = mComponents.find(typeid(CompT));
+        auto iter = mComponents.find(typeid(CompBaseT));
         if(iter == mComponents.end())
             throw std::runtime_error(
                 "Entity does not have such component");
-        // typeid guarantees the type correctness
-        return static_cast<CompT*>(iter->second.get());
+        if constexpr(std::is_same_v<CompBaseT, CompCastT>)
+            return static_cast<CompCastT*>(iter->second.get());
+		else
+            return dynamic_cast<CompCastT*>(iter->second.get());
     }
 
     template <typename CompT>

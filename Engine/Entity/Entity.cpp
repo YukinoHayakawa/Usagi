@@ -23,6 +23,12 @@ yuki::Entity * yuki::Entity::addChild()
     return r;
 }
 
+void yuki::Entity::addComponent(std::unique_ptr<Component> component)
+{
+    auto &info = component->getBaseTypeInfo();
+    insertComponent(info, std::move(component));
+}
+
 void yuki::Entity::insertComponent(const std::type_info &type,
     std::unique_ptr<Component> component)
 {

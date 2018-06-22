@@ -31,14 +31,16 @@ std::vector<yuki::SubsystemInfo>::iterator yuki::Game::findSubsystemByName(
     );
 }
 
-void yuki::Game::addSubsystem(SubsystemInfo subsystem)
+yuki::Subsystem * yuki::Game::addSubsystem(SubsystemInfo subsystem)
 {
     // check that no exisiting subsystem is using the same name
     if(findSubsystemByName(subsystem.name) != mSubsystems.end())
     {
         throw std::runtime_error("Subsystem name already used.");
     }
+    const auto ret = subsystem.subsystem.get();
     mSubsystems.push_back(std::move(subsystem));
+    return ret;
 }
 
 void yuki::Game::setSubsystemEnabled(

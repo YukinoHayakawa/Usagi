@@ -16,11 +16,26 @@ namespace
 struct PositionComponent : Component
 {
     Eigen::Vector3f position { 0, 0, 0 };
+
+    const std::type_info & getBaseTypeInfo() override final
+    {
+        return typeid(PositionComponent);
+    }
 };
 
 struct PhysicalComponent : Component
 {
     Eigen::Vector3f velocity { 1, 2, 3 };
+
+    const std::type_info & getBaseTypeInfo() override final
+    {
+        return typeid(PhysicalComponent);
+    }
+};
+
+struct AdvancedPhysicalComponent : PhysicalComponent
+{
+    Eigen::Vector3f acceleration { 5, 6, 7 };
 };
 
 class PhysicsSubsystem
@@ -44,6 +59,11 @@ public:
         if(canProcess(entity))
             mEntity = entity;
     }
+
+    std::unique_ptr<PhysicalComponent> createPhysicalComponent() const
+    {
+        return std::make_unique<AdvancedPhysicalComponent>();
+    }
 };
 
 struct TestEvent : Event
@@ -65,8 +85,7 @@ TEST(ECSTest, SubsystemNameConflict)
         SubsystemInfo info;
         info.name = "Physics";
         info.subsystem = std::make_unique<PhysicsSubsystem>();
-        EXPECT_THROW(game.addSubsystem(std::move(info)), std::runtime_error
-        );
+        EXPECT_THROW(game.addSubsystem(std::move(info)), std::runtime_error);
     }
 }
 
@@ -87,24 +106,20 @@ TEST(ECSTest, EventBubblingTest)
     auto c = a->addChild();
     int dr = 0, da = 0, db = 0, dc = 0;
     r->addEventListener<TestEvent>(
-        [&](auto &&e)
-        {
+        [&](auto &&e) {
             dr = e.hello;
         });
     a->addEventListener<TestEvent>(
-        [&](auto &&e)
-        {
+        [&](auto &&e) {
             da = e.hello;
             e.stopBubbling();
         });
     b->addEventListener<TestEvent>(
-        [&](auto &&e)
-        {
+        [&](auto &&e) {
             db = e.hello;
         });
     c->addEventListener<TestEvent>(
-        [&](auto &&e)
-        {
+        [&](auto &&e) {
             dc = e.hello;
         });
     c->fireEvent<TestEvent>();
@@ -121,19 +136,16 @@ TEST(ECSTest, EventCancelTest)
     auto r = game.getRootEntity();
     bool a = false, b = false, c = false;
     r->addEventListener<TestEvent>(
-        [&](auto &&e)
-        {
+        [&](auto &&e) {
             a = true;
         });
     r->addEventListener<TestEvent>(
-        [&](auto &&e)
-        {
+        [&](auto &&e) {
             b = true;
             e.cancel();
         });
     r->addEventListener<TestEvent>(
-        [&](auto &&e)
-        {
+        [&](auto &&e) {
             c = true;
         });
     r->fireEvent<TestEvent>();
@@ -194,6 +206,27 @@ TEST(ECSTest, ComponentSystemInteractionTest)
         (r->getComponent<PositionComponent>()->position
             - Eigen::Vector3f(2, 4, 6)).norm(),
         0.f);
+}
+
+TEST(ECSTest, PolymorphicComponentTest)
+{
+    Game game;
+    PhysicsSubsystem *phy = nullptr;
+    {
+        SubsystemInfo info;
+        info.name = "Physics";
+        info.subsystem = std::make_unique<PhysicsSubsystem>();
+        EXPECT_NO_THROW(phy = static_cast<PhysicsSubsystem*>(
+            game.addSubsystem(std::move(info))));
+    }
+    auto r = game.getRootEntity();
+    r->addComponent(phy->createPhysicalComponent());
+    EXPECT_NO_THROW(r->getComponent<PhysicalComponent>());
+    AdvancedPhysicalComponent *c = nullptr;
+    EXPECT_NO_THROW((c = r->getComponent<
+        PhysicalComponent, AdvancedPhysicalComponent
+    >()));
+    EXPECT_FLOAT_EQ((c->acceleration - Eigen::Vector3f(5, 6, 7)).norm(), 0.f);
 }
 
 #include "../GTestMain.hpp"
