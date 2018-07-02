@@ -84,9 +84,6 @@
     <ClInclude Include="Entity\ConstrainedSubsystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\GraphicsSubsystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Geometry\Shape\Shape.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -99,21 +96,6 @@
     <ClInclude Include="Geometry\TransformComponent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera\Camera.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\PerspectiveCamera.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\CameraComponent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Asset\AssetImporter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Asset\AssimpAssetImporter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Asset\AssetPackage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -123,16 +105,25 @@
     <ClInclude Include="Graphics\GraphicsSubsystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\GraphicsComponent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Extension\Win32\Win32Window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Extension\Win32\WindowsHeader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Window\Window.hpp">
+    <ClInclude Include="Asset\AssetImporter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset\AssimpAssetImporter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\Camera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\CameraComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\PerspectiveCamera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\HID\Keyboard\Keyboard.hpp">
@@ -153,6 +144,9 @@
     <ClInclude Include="Runtime\HID\Mouse\MouseEventListener.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Runtime\Window\Window.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Logging.cpp">
@@ -170,16 +164,13 @@
     <ClCompile Include="Event\Event.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\GraphicsSubsystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Geometry\Shape\Sphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera\Camera.cpp">
+    <ClCompile Include="Graphics\GraphicsSubsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera\PerspectiveCamera.cpp">
+    <ClCompile Include="Extension\Win32\Win32Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Asset\AssetImporter.cpp">
@@ -188,16 +179,10 @@
     <ClCompile Include="Asset\AssimpAssetImporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Asset\AssetPackage.cpp">
+    <ClCompile Include="Camera\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\GraphicsSubsystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\GraphicsComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Win32\Win32Window.cpp">
+    <ClCompile Include="Camera\PerspectiveCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\HID\Keyboard\Keyboard.cpp">

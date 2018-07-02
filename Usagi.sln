@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{61EA83A3-A
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Galaxy", "Apps\Galaxy\Galaxy.vcxproj", "{81556E0F-B1D2-4040-8AB1-4FDAC8E646DE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test_Graphics", "Tests\Test_Graphics\Test_Graphics.vcxproj", "{A5F75402-F468-407C-A76C-F27D186AEA9C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -82,6 +84,14 @@ Global
 		{81556E0F-B1D2-4040-8AB1-4FDAC8E646DE}.Release|x64.Build.0 = Release|x64
 		{81556E0F-B1D2-4040-8AB1-4FDAC8E646DE}.Release|x86.ActiveCfg = Release|Win32
 		{81556E0F-B1D2-4040-8AB1-4FDAC8E646DE}.Release|x86.Build.0 = Release|Win32
+		{A5F75402-F468-407C-A76C-F27D186AEA9C}.Debug|x64.ActiveCfg = Debug|x64
+		{A5F75402-F468-407C-A76C-F27D186AEA9C}.Debug|x64.Build.0 = Debug|x64
+		{A5F75402-F468-407C-A76C-F27D186AEA9C}.Debug|x86.ActiveCfg = Debug|Win32
+		{A5F75402-F468-407C-A76C-F27D186AEA9C}.Debug|x86.Build.0 = Debug|Win32
+		{A5F75402-F468-407C-A76C-F27D186AEA9C}.Release|x64.ActiveCfg = Release|x64
+		{A5F75402-F468-407C-A76C-F27D186AEA9C}.Release|x64.Build.0 = Release|x64
+		{A5F75402-F468-407C-A76C-F27D186AEA9C}.Release|x86.ActiveCfg = Release|Win32
+		{A5F75402-F468-407C-A76C-F27D186AEA9C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,6 +106,7 @@ Global
 		{7E355DEA-38C4-40D9-9E81-E002E857E0E3} = {08357938-CB9E-45D3-A528-B0624991E7BB}
 		{F5C95224-95A9-46B5-AA53-BABCB090CBF1} = {AE3E194F-0D09-40FB-B08E-088F91C4ED40}
 		{81556E0F-B1D2-4040-8AB1-4FDAC8E646DE} = {61EA83A3-AFB3-4F40-BBDF-4D689545BEC2}
+		{A5F75402-F468-407C-A76C-F27D186AEA9C} = {AE3E194F-0D09-40FB-B08E-088F91C4ED40}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {95FEE4E3-D5D8-4023-8005-336F8A91186A}

@@ -134,7 +134,6 @@
     <ClInclude Include="Core\Logging.hpp" />
     <ClCompile Include="Asset\AssetImporter.cpp" />
     <ClCompile Include="Asset\AssimpAssetImporter.cpp" />
-    <ClCompile Include="Asset\AssetPackage.cpp" />
     <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
@@ -147,8 +146,6 @@
     <ClInclude Include="Geometry\Shape\ShapeComponent.hpp" />
     <ClInclude Include="Geometry\Shape\Sphere.hpp" />
     <ClInclude Include="Geometry\TransformComponent.hpp" />
-    <ClInclude Include="Graphics\GraphicsComponent.hpp" />
-    <ClInclude Include="Graphics\GraphicsSubsystem.hpp" />
     <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
     <ClInclude Include="Runtime\HID\Keyboard\Keyboard.hpp" />
     <ClInclude Include="Runtime\HID\Keyboard\KeyCode.hpp" />
@@ -172,8 +169,6 @@
   <ItemGroup>
     <ClCompile Include="Extension\Win32\Win32Window.cpp" />
     <ClCompile Include="Geometry\Shape\Sphere.cpp" />
-    <ClCompile Include="Graphics\GraphicsComponent.cpp" />
-    <ClCompile Include="Graphics\GraphicsSubsystem.cpp" />
     <ClCompile Include="Runtime\HID\Keyboard\Keyboard.cpp" />
     <ClCompile Include="Runtime\HID\Keyboard\KeyCode.cpp" />
     <ClCompile Include="Runtime\HID\Mouse\Mouse.cpp" />
