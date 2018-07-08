@@ -2,4 +2,4 @@
 
 INITIALIZE_EASYLOGGINGPP
 
-#include <easyloggingpp/src/easylogging++.cc>
+#include <easylogging++.cc>

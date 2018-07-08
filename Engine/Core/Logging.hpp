@@ -1,3 +1,3 @@
 #pragma once
 
-#include <easyloggingpp/src/easylogging++.h>
+#include <easylogging++.h>

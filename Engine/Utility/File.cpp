@@ -1,17 +1,20 @@
-#include <fstream>
-#include <sstream>
-
 #include "File.hpp"
 
-std::string yuki::readFileContent(const std::string &filename)
+#include <fstream>
+
+namespace fs = std::filesystem;
+
+std::string yuki::readFileAsString(const fs::path &path)
 {
-    std::ifstream src(filename);
-    src.exceptions(std::ios::failbit);
-    std::ostringstream content;
-    std::string line;
-    while(std::getline(src, line))
-    {
-        content << line << '\n';
-    }
-    return content.str();
+	std::ifstream file(path);
+	file.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+	const auto size = fs::file_size(path);
+    return readStreamAsString(file);
+}
+
+std::string yuki::readStreamAsString(std::istream &in)
+{
+	// allows using with forward only streams
+	const std::istreambuf_iterator<char> begin(in), end;
+	return { begin, end };
 }
