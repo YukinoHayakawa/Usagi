@@ -71,7 +71,8 @@
     <Import Project="..\UsagiProjects.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -79,6 +80,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link />
+    <Lib>
+      <AdditionalDependencies>glslangd.lib;SPIRVd.lib;HLSLd.lib;OSDependentd.lib;OGLCompilerd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -113,8 +118,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <Lib>
+      <AdditionalDependencies>glslang.lib;SPIRV.lib;HLSL.lib;OSDependent.lib;OGLCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Utility\File.cpp" />
     <ClInclude Include="Asset\AssetImporter.hpp" />
     <ClInclude Include="Asset\AssimpAssetImporter.hpp" />
     <ClInclude Include="Asset\AssetPackage.hpp" />
@@ -146,6 +155,10 @@
     <ClInclude Include="Geometry\Shape\ShapeComponent.hpp" />
     <ClInclude Include="Geometry\Shape\Sphere.hpp" />
     <ClInclude Include="Geometry\TransformComponent.hpp" />
+    <ClInclude Include="Graphics\GraphicsCommandList.hpp" />
+    <ClInclude Include="Graphics\GraphicsPipelineCompiler.hpp" />
+    <ClInclude Include="Graphics\Shader\ShaderStage.hpp" />
+    <ClInclude Include="Graphics\Shader\SPIRVBinary.hpp" />
     <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
     <ClInclude Include="Runtime\HID\Keyboard\Keyboard.hpp" />
     <ClInclude Include="Runtime\HID\Keyboard\KeyCode.hpp" />
@@ -154,7 +167,6 @@
     <ClInclude Include="Runtime\HID\Mouse\MouseButtonCode.hpp" />
     <ClInclude Include="Runtime\HID\Mouse\MouseEventListener.hpp" />
     <ClInclude Include="Runtime\Window\Window.hpp" />
-    <ClInclude Include="Utility\BindingSentry.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
     <ClInclude Include="Utility\File.hpp" />
@@ -163,17 +175,19 @@
     <ClInclude Include="Utility\Math.hpp" />
     <ClInclude Include="Utility\Noncopyable.hpp" />
     <ClInclude Include="Utility\Rounding.hpp" />
+    <ClInclude Include="Utility\RAIIHelper.hpp" />
     <ClInclude Include="Utility\String.hpp" />
     <ClInclude Include="Utility\TypeCast.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Extension\Win32\Win32Window.cpp" />
     <ClCompile Include="Geometry\Shape\Sphere.cpp" />
+    <ClCompile Include="Graphics\GraphicsCommandList.cpp" />
+    <ClCompile Include="Graphics\Shader\SPIRVBinary.cpp" />
     <ClCompile Include="Runtime\HID\Keyboard\Keyboard.cpp" />
     <ClCompile Include="Runtime\HID\Keyboard\KeyCode.cpp" />
     <ClCompile Include="Runtime\HID\Mouse\Mouse.cpp" />
     <ClCompile Include="Runtime\HID\Mouse\MouseButtonCode.cpp" />
-    <ClCompile Include="Utility\File.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
