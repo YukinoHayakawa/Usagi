@@ -2,14 +2,15 @@
 
 #include <fstream>
 #include <cstring>
+#include <iostream>
 
 #include <glslang/Public/ShaderLang.h>
 #include <glslang/SPIRV/GlslangToSpv.h>
 #include <glslang/SPIRV/disassemble.h>
+#include <loguru.hpp>
 
 #include <Usagi/Engine/Utility/RAIIHelper.hpp>
 #include <Usagi/Engine/Utility/File.hpp>
-#include <iostream>
 
 // See https://www.khronos.org/registry/spir-v/papers/WhitePaper.html for
 // SPIR-V format.
@@ -89,6 +90,8 @@ std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromGlslSourceString(
     const std::string &glsl_source_code,
     const ShaderStage stage)
 {
+    LOG_F(INFO, "Compiling %s shader...", getShaderStageString(stage));
+
     using namespace glslang;
     using namespace spv;
 
@@ -113,7 +116,7 @@ std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromGlslSourceString(
     TBuiltInResource resources { };
 
     const char *strings[] = { glsl_source_code.data() };
-    const int sizes[] = { glsl_source_code.size() };
+    const int sizes[] = { static_cast<int>(glsl_source_code.size()) };
     shader.setStringsWithLengths(strings, sizes, 1);
 
     shader.setEnvInput(EShSourceGlsl, glslang_stage, EShClientVulkan,
@@ -130,10 +133,11 @@ std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromGlslSourceString(
     if(!program.link(messages) || !program.mapIO())
         throw std::runtime_error("Shader linking failed.");
 
-    std::cout << program.getInfoLog();
-    std::cout << program.getInfoDebugLog();
+    LOG_F(INFO, "Info log:\n%s", program.getInfoLog());
+	LOG_F(INFO, "Info debug log:\n%s", program.getInfoDebugLog());
     program.buildReflection();
-    program.dumpReflection();
+	LOG_F(INFO, "Reflection database:");
+	program.dumpReflection();
 
     // Genearte SPIR-V code
     std::vector<Bytecode> spirv;
@@ -146,6 +150,7 @@ std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromGlslSourceString(
 
     GlslangToSpv(*program.getIntermediate(glslang_stage), spirv, &logger,
         &spv_options);
+	LOG_F(INFO, "Disassembly:");
     Disassemble(std::cout, spirv);
 
     return std::make_shared<SPIRVBinary>(std::move(spirv));

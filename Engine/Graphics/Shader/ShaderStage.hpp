@@ -7,4 +7,14 @@ enum class ShaderStage
     VERTEX,
     FRAGMENT,
 };
+
+inline const char * getShaderStageString(const ShaderStage stage)
+{
+    switch(stage)
+    {
+        case ShaderStage::VERTEX: return "Vertex";
+		case ShaderStage::FRAGMENT: return "Fragment";
+        default: throw std::runtime_error("Invalid shader stage");
+    }
+}
 }

@@ -1,5 +1,3 @@
-#include "Logging.hpp"
-
-INITIALIZE_EASYLOGGINGPP
-
-#include <easylogging++.cc>
+#define _CRT_NONSTDC_NO_DEPRECATE
+#define LOGURU_IMPLEMENTATION 1
+#include <loguru.hpp>

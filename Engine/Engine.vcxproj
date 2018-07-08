@@ -123,6 +123,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Logging.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClInclude Include="Asset\AssetImporter.hpp" />
     <ClInclude Include="Asset\AssimpAssetImporter.hpp" />
@@ -137,16 +138,15 @@
     <ClInclude Include="Entity\Game.hpp" />
     <ClInclude Include="Event\EventTypeTag.hpp" />
     <ClInclude Include="Event\TaggedEvent.hpp" />
-    <ClInclude Include="Core\Logging.hpp" />
     <ClCompile Include="Asset\AssetImporter.cpp" />
     <ClCompile Include="Asset\AssimpAssetImporter.cpp" />
-    <ClCompile Include="Core\Logging.cpp" />
     <ClCompile Include="Event\Event.cpp" />
     <ClCompile Include="Entity\Entity.cpp" />
     <ClCompile Include="Entity\Game.cpp" />
     <ClInclude Include="Extension\Win32\Win32Window.hpp" />
     <ClInclude Include="Extension\Win32\WindowsHeader.hpp" />
     <ClInclude Include="Graphics\GraphicsCommandList.hpp" />
+    <ClInclude Include="Graphics\GraphicsPipeline.hpp" />
     <ClInclude Include="Graphics\GraphicsPipelineCompiler.hpp" />
     <ClInclude Include="Graphics\Shader\ShaderStage.hpp" />
     <ClInclude Include="Graphics\Shader\SPIRVBinary.hpp" />
