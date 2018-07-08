@@ -16,7 +16,7 @@ class Win32Window
     , public Mouse
     , public Keyboard
 {
-    static const wchar_t mWindowClassName[];
+    static const wchar_t WINDOW_CLASS_NAME[];
     static HINSTANCE mProcessInstanceHandle;
 
     // window

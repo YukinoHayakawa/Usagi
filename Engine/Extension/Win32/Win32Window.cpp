@@ -8,8 +8,8 @@
 #include <ShellScalingAPI.h>
 #pragma comment(lib, "Shcore.lib")
 
-const wchar_t yuki::Win32Window::mWindowClassName[] =
-    L"UsagiNativeWindowWrapper";
+const wchar_t yuki::Win32Window::WINDOW_CLASS_NAME[] =
+    L"UsagiWin32WindowWrapper";
 HINSTANCE yuki::Win32Window::mProcessInstanceHandle = nullptr;
 
 void yuki::Win32Window::_ensureWindowSubsystemInitialized()
@@ -32,7 +32,7 @@ void yuki::Win32Window::_ensureWindowSubsystemInitialized()
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     // we print the background on our own
     wcex.hbrBackground = nullptr;
-    wcex.lpszClassName = mWindowClassName;
+    wcex.lpszClassName = WINDOW_CLASS_NAME;
 
     if(!RegisterClassEx(&wcex))
     {
@@ -78,7 +78,7 @@ void yuki::Win32Window::_createWindowHandle(const std::string &title, int width,
 
     mWindowHandle = CreateWindowEx(
         window_style_ex,
-        mWindowClassName,
+        WINDOW_CLASS_NAME,
         &windowTitleWide[0],
         window_style,
         CW_USEDEFAULT, CW_USEDEFAULT,
