@@ -127,9 +127,6 @@
     <ClInclude Include="Asset\AssetImporter.hpp" />
     <ClInclude Include="Asset\AssimpAssetImporter.hpp" />
     <ClInclude Include="Asset\AssetPackage.hpp" />
-    <ClInclude Include="Camera\Camera.hpp" />
-    <ClInclude Include="Camera\CameraComponent.hpp" />
-    <ClInclude Include="Camera\PerspectiveCamera.hpp" />
     <ClInclude Include="Entity\ConstrainedSubsystem.hpp" />
     <ClInclude Include="Entity\Subsystem.hpp" />
     <ClInclude Include="Event\Library\RemoveComponentEvent.hpp" />
@@ -143,18 +140,12 @@
     <ClInclude Include="Core\Logging.hpp" />
     <ClCompile Include="Asset\AssetImporter.cpp" />
     <ClCompile Include="Asset\AssimpAssetImporter.cpp" />
-    <ClCompile Include="Camera\Camera.cpp" />
-    <ClCompile Include="Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
     <ClCompile Include="Event\Event.cpp" />
     <ClCompile Include="Entity\Entity.cpp" />
     <ClCompile Include="Entity\Game.cpp" />
     <ClInclude Include="Extension\Win32\Win32Window.hpp" />
     <ClInclude Include="Extension\Win32\WindowsHeader.hpp" />
-    <ClInclude Include="Geometry\Shape\Shape.hpp" />
-    <ClInclude Include="Geometry\Shape\ShapeComponent.hpp" />
-    <ClInclude Include="Geometry\Shape\Sphere.hpp" />
-    <ClInclude Include="Geometry\TransformComponent.hpp" />
     <ClInclude Include="Graphics\GraphicsCommandList.hpp" />
     <ClInclude Include="Graphics\GraphicsPipelineCompiler.hpp" />
     <ClInclude Include="Graphics\Shader\ShaderStage.hpp" />
@@ -181,7 +172,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Extension\Win32\Win32Window.cpp" />
-    <ClCompile Include="Geometry\Shape\Sphere.cpp" />
     <ClCompile Include="Graphics\GraphicsCommandList.cpp" />
     <ClCompile Include="Graphics\Shader\SPIRVBinary.cpp" />
     <ClCompile Include="Runtime\HID\Keyboard\Keyboard.cpp" />

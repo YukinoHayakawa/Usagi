@@ -7,7 +7,7 @@
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 #include <Usagi/Engine/Entity/Entity.hpp>
 
-namespace yuki
+namespace usagi
 {
 class Subsystem;
 

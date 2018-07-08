@@ -3,7 +3,7 @@
 #include <Usagi/Engine/Geometry/Ray.hpp>
 #include <Usagi/Engine/Geometry/Intersection.hpp>
 
-namespace yuki
+namespace usagi
 {
 class Shape
 {

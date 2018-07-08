@@ -2,7 +2,7 @@
 
 #include <eigen3/Eigen/Dense>
 
-namespace yuki
+namespace usagi
 {
 
 /**

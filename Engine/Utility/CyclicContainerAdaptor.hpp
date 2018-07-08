@@ -3,7 +3,7 @@
 #include <utility>
 #include <functional>
 
-namespace yuki::utility
+namespace usagi::utility
 {
 /**
  * \brief Simulate a repeating sequence using an existing container.

@@ -2,7 +2,7 @@
 
 #include <Usagi/Engine/Component/DynamicComponent.hpp>
 
-namespace yuki
+namespace usagi
 {
 
 /**

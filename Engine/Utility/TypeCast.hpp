@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace yuki
+namespace usagi
 {
 
 template <typename Target, typename Source>

@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-namespace yuki::utility
+namespace usagi::utility
 {
 
 // https://stackoverflow.com/questions/3407012/c-rounding-up-to-the-nearest-multiple-of-a-number

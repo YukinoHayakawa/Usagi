@@ -78,18 +78,6 @@
     <ClInclude Include="Entity\ConstrainedSubsystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\Shape\Shape.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Geometry\Shape\Sphere.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Geometry\Shape\ShapeComponent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Geometry\TransformComponent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Asset\AssetPackage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -100,15 +88,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Asset\AssimpAssetImporter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\Camera.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\CameraComponent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\PerspectiveCamera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\HID\Keyboard\Keyboard.hpp">
@@ -170,19 +149,10 @@
     <ClCompile Include="Event\Event.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Geometry\Shape\Sphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Asset\AssetImporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Asset\AssimpAssetImporter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera\PerspectiveCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\HID\Keyboard\Keyboard.cpp">

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace yuki
+namespace usagi
 {
 enum class ShaderStage
 {

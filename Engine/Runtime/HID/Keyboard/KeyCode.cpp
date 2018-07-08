@@ -1,6 +1,6 @@
 ﻿#include "KeyCode.hpp"
 
-const char * yuki::getKeyName(KeyCode key)
+const char * usagi::getKeyName(KeyCode key)
 {
     switch(key)
     {

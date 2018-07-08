@@ -4,7 +4,7 @@
 
 namespace fs = std::filesystem;
 
-std::string yuki::readFileAsString(const fs::path &path)
+std::string usagi::readFileAsString(const fs::path &path)
 {
 	std::ifstream file(path);
 	file.exceptions(std::ifstream::badbit | std::ifstream::failbit);
@@ -12,7 +12,7 @@ std::string yuki::readFileAsString(const fs::path &path)
     return readStreamAsString(file);
 }
 
-std::string yuki::readStreamAsString(std::istream &in)
+std::string usagi::readStreamAsString(std::istream &in)
 {
 	// allows using with forward only streams
 	const std::istreambuf_iterator<char> begin(in), end;

@@ -8,11 +8,11 @@
 #include <ShellScalingAPI.h>
 #pragma comment(lib, "Shcore.lib")
 
-const wchar_t yuki::Win32Window::WINDOW_CLASS_NAME[] =
+const wchar_t usagi::Win32Window::WINDOW_CLASS_NAME[] =
     L"UsagiWin32WindowWrapper";
-HINSTANCE yuki::Win32Window::mProcessInstanceHandle = nullptr;
+HINSTANCE usagi::Win32Window::mProcessInstanceHandle = nullptr;
 
-void yuki::Win32Window::_ensureWindowSubsystemInitialized()
+void usagi::Win32Window::_ensureWindowSubsystemInitialized()
 {
     if(mProcessInstanceHandle)
         return;
@@ -42,7 +42,7 @@ void yuki::Win32Window::_ensureWindowSubsystemInitialized()
     SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 }
 
-RECT yuki::Win32Window::_getClientScreenRect() const
+RECT usagi::Win32Window::_getClientScreenRect() const
 {
     // Get the window client area.
     RECT rc;
@@ -61,7 +61,7 @@ RECT yuki::Win32Window::_getClientScreenRect() const
     return rc;
 }
 
-void yuki::Win32Window::_createWindowHandle(const std::string &title, int width,
+void usagi::Win32Window::_createWindowHandle(const std::string &title, int width,
     int height)
 {
     auto windowTitleWide = string::toWideVector(title);
@@ -100,7 +100,7 @@ void yuki::Win32Window::_createWindowHandle(const std::string &title, int width,
         reinterpret_cast<LONG_PTR>(this));
 }
 
-void yuki::Win32Window::_registerRawInputDevices() const
+void usagi::Win32Window::_registerRawInputDevices() const
 {
     RAWINPUTDEVICE Rid[2];
 
@@ -129,7 +129,7 @@ void yuki::Win32Window::_registerRawInputDevices() const
     }
 }
 
-yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
+usagi::Win32Window::Win32Window(const std::string &title, int width, int height)
 {
     _ensureWindowSubsystemInitialized();
     _createWindowHandle(title, width, height);
@@ -138,22 +138,22 @@ yuki::Win32Window::Win32Window(const std::string &title, int width, int height)
     Win32Window::centerCursor();
 }
 
-HDC yuki::Win32Window::getDeviceContext() const
+HDC usagi::Win32Window::getDeviceContext() const
 {
     return GetDC(mWindowHandle);
 }
 
-void yuki::Win32Window::showWindow(bool show)
+void usagi::Win32Window::showWindow(bool show)
 {
     ShowWindow(mWindowHandle, show ? SW_SHOWNORMAL : SW_HIDE);
 }
 
-bool yuki::Win32Window::isWindowActive() const
+bool usagi::Win32Window::isWindowActive() const
 {
     return mWindowActive;
 }
 
-void yuki::Win32Window::processEvents()
+void usagi::Win32Window::processEvents()
 {
     MSG msg;
     // hwnd should be nullptr or the loop won't end when close the window
@@ -164,23 +164,23 @@ void yuki::Win32Window::processEvents()
     }
 }
 
-Eigen::Vector2f yuki::Win32Window::getWindowSize() const
+Eigen::Vector2f usagi::Win32Window::getWindowSize() const
 {
     return mWindowSize.cast<float>();
 }
 
-bool yuki::Win32Window::isWindowOpen() const
+bool usagi::Win32Window::isWindowOpen() const
 {
     return !mClosed;
 }
 
-void yuki::Win32Window::setTitle(const std::string &title)
+void usagi::Win32Window::setTitle(const std::string &title)
 {
     std::wstring wtitle { title.begin(), title.end() };
     SetWindowText(mWindowHandle, wtitle.c_str());
 }
 
-LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message,
+LRESULT usagi::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam)
 {
     auto window = reinterpret_cast<Win32Window*>(GetWindowLongPtr(hWnd,
@@ -193,7 +193,7 @@ LRESULT yuki::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message,
     return window->_handleWindowMessage(hWnd, message, wParam, lParam);
 }
 
-void yuki::Win32Window::_sendButtonEvent(yuki::MouseButtonCode button,
+void usagi::Win32Window::_sendButtonEvent(usagi::MouseButtonCode button,
     bool pressed)
 {
     auto &prev_pressed = mMouseButtonDown[static_cast<std::size_t>(button)];
@@ -217,7 +217,7 @@ void yuki::Win32Window::_sendButtonEvent(yuki::MouseButtonCode button,
     }
 }
 
-yuki::KeyCode yuki::Win32Window::_translateKeyCodeFromRawInput(
+usagi::KeyCode usagi::Win32Window::_translateKeyCodeFromRawInput(
     const RAWKEYBOARD *keyboard)
 {
     switch(keyboard->VKey)
@@ -342,7 +342,7 @@ yuki::KeyCode yuki::Win32Window::_translateKeyCodeFromRawInput(
     }
 }
 
-void yuki::Win32Window::_sendKeyEvent(yuki::KeyCode key, bool pressed,
+void usagi::Win32Window::_sendKeyEvent(usagi::KeyCode key, bool pressed,
     bool repeated)
 {
     KeyEvent e;
@@ -356,7 +356,7 @@ void yuki::Win32Window::_sendKeyEvent(yuki::KeyCode key, bool pressed,
     }
 }
 
-void yuki::Win32Window::_confineCursorInClientArea() const
+void usagi::Win32Window::_confineCursorInClientArea() const
 {
     if(!mWindowActive) return;
 
@@ -364,7 +364,7 @@ void yuki::Win32Window::_confineCursorInClientArea() const
     ClipCursor(&client_rect);
 }
 
-void yuki::Win32Window::_processMouseInput(const RAWINPUT *raw)
+void usagi::Win32Window::_processMouseInput(const RAWINPUT *raw)
 {
     auto &mouse = raw->data.mouse;
 
@@ -428,7 +428,7 @@ void yuki::Win32Window::_processMouseInput(const RAWINPUT *raw)
     }
 }
 
-std::unique_ptr<BYTE[]> yuki::Win32Window::_getRawInputBuffer(
+std::unique_ptr<BYTE[]> usagi::Win32Window::_getRawInputBuffer(
     LPARAM lParam) const
 {
     UINT dwSize;
@@ -455,12 +455,12 @@ std::unique_ptr<BYTE[]> yuki::Win32Window::_getRawInputBuffer(
     return std::move(lpb);
 }
 
-void yuki::Win32Window::_recaptureCursor()
+void usagi::Win32Window::_recaptureCursor()
 {
     if(mMouseCursorCaptured) _captureCursor();
 }
 
-void yuki::Win32Window::_processKeyboardInput(RAWINPUT *raw)
+void usagi::Win32Window::_processKeyboardInput(RAWINPUT *raw)
 {
     auto &kb = raw->data.keyboard;
 
@@ -486,7 +486,7 @@ void yuki::Win32Window::_processKeyboardInput(RAWINPUT *raw)
     _sendKeyEvent(key, pressed, repeated);
 }
 
-void yuki::Win32Window::_clearKeyPressedStates()
+void usagi::Win32Window::_clearKeyPressedStates()
 {
     for(auto iter = mKeyPressed.begin(); iter != mKeyPressed.end();)
     {
@@ -495,7 +495,7 @@ void yuki::Win32Window::_clearKeyPressedStates()
     }
 }
 
-LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message,
+LRESULT usagi::Win32Window::_handleWindowMessage(HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam)
 {
     switch(message)
@@ -590,12 +590,12 @@ LRESULT yuki::Win32Window::_handleWindowMessage(HWND hWnd, UINT message,
     return 0;
 }
 
-bool yuki::Win32Window::isKeyPressed(KeyCode key)
+bool usagi::Win32Window::isKeyPressed(KeyCode key)
 {
     return mKeyPressed.count(key) != 0;
 }
 
-Eigen::Vector2f yuki::Win32Window::getMouseCursorWindowPos()
+Eigen::Vector2f usagi::Win32Window::getMouseCursorWindowPos()
 {
     POINT pt;
     GetCursorPos(&pt);
@@ -603,26 +603,26 @@ Eigen::Vector2f yuki::Win32Window::getMouseCursorWindowPos()
     return { pt.x, pt.y };
 }
 
-void yuki::Win32Window::_captureCursor()
+void usagi::Win32Window::_captureCursor()
 {
     _confineCursorInClientArea();
 
     mMouseCursorCaptured = true;
 }
 
-void yuki::Win32Window::_releaseCursor()
+void usagi::Win32Window::_releaseCursor()
 {
     // remove cursor restriction
     ClipCursor(nullptr);
     mMouseCursorCaptured = false;
 }
 
-bool yuki::Win32Window::_isCursorCaptured()
+bool usagi::Win32Window::_isCursorCaptured()
 {
     return mMouseCursorCaptured;
 }
 
-void yuki::Win32Window::centerCursor()
+void usagi::Win32Window::centerCursor()
 {
     const auto rect = _getClientScreenRect();
     Eigen::Vector2i cursor {
@@ -632,7 +632,7 @@ void yuki::Win32Window::centerCursor()
     SetCursorPos(cursor.x(), cursor.y());
 }
 
-void yuki::Win32Window::showCursor(bool show)
+void usagi::Win32Window::showCursor(bool show)
 {
     if(mShowMouseCursor == show) return;
 
@@ -640,19 +640,19 @@ void yuki::Win32Window::showCursor(bool show)
     mShowMouseCursor = show;
 }
 
-bool yuki::Win32Window::isMouseButtonPressed(MouseButtonCode button) const
+bool usagi::Win32Window::isMouseButtonPressed(MouseButtonCode button) const
 {
     const auto idx = static_cast<std::size_t>(button);
     if(idx > sizeof(mMouseButtonDown) / sizeof(bool)) return false;
     return mMouseButtonDown[idx];
 }
 
-HWND yuki::Win32Window::getNativeWindowHandle() const
+HWND usagi::Win32Window::getNativeWindowHandle() const
 {
     return mWindowHandle;
 }
 
-HINSTANCE yuki::Win32Window::getProcessInstanceHandle()
+HINSTANCE usagi::Win32Window::getProcessInstanceHandle()
 {
     return mProcessInstanceHandle;
 }

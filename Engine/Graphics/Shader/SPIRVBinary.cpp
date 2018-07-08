@@ -13,7 +13,7 @@
 
 // See https://www.khronos.org/registry/spir-v/papers/WhitePaper.html for
 // SPIR-V format.
-yuki::SPIRVBinary::SPIRVBinary(std::vector<std::uint32_t> bytecodes)
+usagi::SPIRVBinary::SPIRVBinary(std::vector<std::uint32_t> bytecodes)
     : mBytecodes { std::move(bytecodes) }
 {
     // check header magic code
@@ -24,13 +24,13 @@ yuki::SPIRVBinary::SPIRVBinary(std::vector<std::uint32_t> bytecodes)
 
 namespace fs = std::filesystem;
 
-void yuki::SPIRVBinary::dump(std::ostream &output)
+void usagi::SPIRVBinary::dump(std::ostream &output)
 {
     output.write(reinterpret_cast<const char *>(mBytecodes.data()),
         mBytecodes.size() * sizeof(Bytecode));
 }
 
-std::shared_ptr<yuki::SPIRVBinary> yuki::SPIRVBinary::fromFile(
+std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromFile(
     const fs::path &binary_path)
 {
     std::ifstream file(binary_path);
@@ -48,7 +48,7 @@ std::shared_ptr<yuki::SPIRVBinary> yuki::SPIRVBinary::fromFile(
     return std::make_shared<SPIRVBinary>(std::move(content));
 }
 
-std::shared_ptr<yuki::SPIRVBinary> yuki::SPIRVBinary::fromStream(
+std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromStream(
     std::istream &glsl_source_stream)
 {
     const auto old_exceptions = glsl_source_stream.exceptions();
@@ -74,18 +74,18 @@ std::shared_ptr<yuki::SPIRVBinary> yuki::SPIRVBinary::fromStream(
 
 namespace
 {
-EShLanguage translateShaderStage(yuki::ShaderStage stage)
+EShLanguage translateShaderStage(usagi::ShaderStage stage)
 {
     switch(stage)
     {
-        case yuki::ShaderStage::VERTEX: return EShLangVertex;
-        case yuki::ShaderStage::FRAGMENT: return EShLangFragment;
+        case usagi::ShaderStage::VERTEX: return EShLangVertex;
+        case usagi::ShaderStage::FRAGMENT: return EShLangFragment;
         default: throw std::runtime_error("Invalid shader stage.");
     }
 }
 }
 
-std::shared_ptr<yuki::SPIRVBinary> yuki::SPIRVBinary::fromGlslSourceString(
+std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromGlslSourceString(
     const std::string &glsl_source_code,
     const ShaderStage stage)
 {
@@ -151,14 +151,14 @@ std::shared_ptr<yuki::SPIRVBinary> yuki::SPIRVBinary::fromGlslSourceString(
     return std::make_shared<SPIRVBinary>(std::move(spirv));
 }
 
-std::shared_ptr<yuki::SPIRVBinary> yuki::SPIRVBinary::fromGlslSourceFile(
+std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromGlslSourceFile(
     const fs::path &glsl_source_path,
     const ShaderStage stage)
 {
     return fromGlslSourceString(readFileAsString(glsl_source_path), stage);
 }
 
-std::shared_ptr<yuki::SPIRVBinary> yuki::SPIRVBinary::fromGlslSourceStream(
+std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromGlslSourceStream(
     std::istream &glsl_source_stream,
     const ShaderStage stage)
 {

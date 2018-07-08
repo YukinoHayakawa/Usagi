@@ -3,7 +3,7 @@
 #include <Usagi/Engine/Geometry/Angle.hpp>
 #include "Camera.hpp"
 
-namespace yuki
+namespace usagi
 {
 
 class PerspectiveCamera : public Camera

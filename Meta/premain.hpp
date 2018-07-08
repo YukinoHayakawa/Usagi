@@ -2,7 +2,7 @@
 
 #include <Usagi/Preprocessor/export.hpp>
 
-namespace yuki
+namespace usagi
 {
 
 /**
@@ -10,9 +10,9 @@ namespace yuki
  * \tparam Action A class, whose constructor will be called before main().
  */
 template <typename Action>
-struct YUKI_EXPORT_DECL premain_action
+struct usagi_EXPORT_DECL premain_action
 {
-    struct YUKI_EXPORT_DECL action : Action
+    struct usagi_EXPORT_DECL action : Action
     {
     };
 

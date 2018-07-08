@@ -2,7 +2,7 @@
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 
-namespace yuki
+namespace usagi
 {
 class Entity;
 

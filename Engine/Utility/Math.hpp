@@ -1,6 +1,6 @@
 #pragma once
 
-namespace yuki
+namespace usagi
 {
 template <typename T>
 struct Interval

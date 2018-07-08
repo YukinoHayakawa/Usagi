@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace yuki
+namespace usagi
 {
 /**
  * \brief Names of keys on the standard 101 keyboard.

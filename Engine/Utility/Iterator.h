@@ -2,7 +2,7 @@
 
 #include <iterator>
 
-namespace yuki::utility
+namespace usagi::utility
 {
 /**
  * \brief Find the beginning of the first consecutive sequence of a particular

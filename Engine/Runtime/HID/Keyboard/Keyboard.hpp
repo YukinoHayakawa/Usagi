@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-namespace yuki
+namespace usagi
 {
 
 enum class KeyCode;

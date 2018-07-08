@@ -4,7 +4,7 @@
 
 #include "MouseButtonCode.hpp"
 
-namespace yuki
+namespace usagi
 {
 struct MouseEvent
 {

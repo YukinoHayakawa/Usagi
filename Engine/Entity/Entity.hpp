@@ -10,7 +10,7 @@
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 
-namespace yuki
+namespace usagi
 {
 class Event;
 class Component;

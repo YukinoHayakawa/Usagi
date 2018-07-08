@@ -1,6 +1,6 @@
 ﻿#include "Event.hpp"
 
-yuki::Event::Event()
+usagi::Event::Event()
     : mBubbling { true }
     , mCanceled { false }
 {

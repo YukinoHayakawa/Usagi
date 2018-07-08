@@ -2,7 +2,7 @@
 
 #include "Shape.hpp"
 
-namespace yuki
+namespace usagi
 {
 class Sphere : public Shape
 {

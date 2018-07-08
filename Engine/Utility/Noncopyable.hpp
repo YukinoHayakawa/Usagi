@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace yuki
+namespace usagi
 {
 /**
  * \brief Remove the implicit copy constructor and assgnment operators

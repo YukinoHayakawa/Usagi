@@ -6,7 +6,7 @@
 #include <eigen3/Eigen/Core>
 #include "MouseButtonCode.hpp"
 
-namespace yuki
+namespace usagi
 {
 enum class KeyCode;
 

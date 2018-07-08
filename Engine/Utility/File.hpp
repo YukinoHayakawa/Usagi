@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <istream>
 
-namespace yuki
+namespace usagi
 {
 /**
  * \brief Read the full sequence of bytes into a string from a file, which

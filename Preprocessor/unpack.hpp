@@ -11,17 +11,17 @@
  * use the name of this macro before the parameter.
  * 
  * e.g.
- * #define MERGE(set1, set2) YUKI_UNPACK(x, y, z), YUKI_UNPACK(a, b, c)
+ * #define MERGE(set1, set2) USAGI_UNPACK(x, y, z), USAGI_UNPACK(a, b, c)
  * and MERGE((x, y, z), (a, b, c)) will be expanded to x, y, z, a, b, c
  * 
  * Ref: http://stackoverflow.com/a/35999754
  */
-#define YUKI_UNPACK(...) __VA_ARGS__
+#define USAGI_UNPACK(...) __VA_ARGS__
 
 /**
- * \brief Similar to YUKI_UNPACK, but automatically prepend a comma only if the input is
+ * \brief Similar to USAGI_UNPACK, but automatically prepend a comma only if the input is
  * not empty.
  */
-#define YUKI_TAIL_UNPACK(...) BOOST_PP_COMMA_IF(BOOST_PP_NOT(BOOST_VMD_IS_EMPTY(__VA_ARGS__))) __VA_ARGS__
+#define USAGI_TAIL_UNPACK(...) BOOST_PP_COMMA_IF(BOOST_PP_NOT(BOOST_VMD_IS_EMPTY(__VA_ARGS__))) __VA_ARGS__
 
-#define YUKI_HEAD_UNPACK(...) __VA_ARGS__ BOOST_PP_COMMA_IF(BOOST_PP_NOT(BOOST_VMD_IS_EMPTY(__VA_ARGS__)))
+#define USAGI_HEAD_UNPACK(...) __VA_ARGS__ BOOST_PP_COMMA_IF(BOOST_PP_NOT(BOOST_VMD_IS_EMPTY(__VA_ARGS__)))

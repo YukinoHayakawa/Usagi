@@ -2,7 +2,7 @@
 
 #include <Usagi/Engine/Asset/AssetPackage.hpp>
 
-using namespace yuki;
+using namespace usagi;
 
 namespace
 {

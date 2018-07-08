@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace yuki
+namespace usagi
 {
 namespace string
 {

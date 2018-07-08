@@ -4,7 +4,7 @@
 
 #include "../Event.hpp"
 
-namespace yuki
+namespace usagi
 {
 class Component;
 

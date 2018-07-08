@@ -4,18 +4,18 @@
 
 #include "Component.hpp"
 
-yuki::Entity::Entity(Entity *parent)
+usagi::Entity::Entity(Entity *parent)
     : mParent { parent }
 {
 }
 
-yuki::Entity::~Entity()
+usagi::Entity::~Entity()
 {
     // Component header is not included in Entity header so its destruction
     // can only be done here.
 }
 
-yuki::Entity * yuki::Entity::addChild()
+usagi::Entity * usagi::Entity::addChild()
 {
     auto c = std::make_unique<Entity>(this);
     const auto r = c.get();
@@ -23,13 +23,13 @@ yuki::Entity * yuki::Entity::addChild()
     return r;
 }
 
-void yuki::Entity::addComponent(std::unique_ptr<Component> component)
+void usagi::Entity::addComponent(std::unique_ptr<Component> component)
 {
     auto &info = component->getBaseTypeInfo();
     insertComponent(info, std::move(component));
 }
 
-void yuki::Entity::insertComponent(const std::type_info &type,
+void usagi::Entity::insertComponent(const std::type_info &type,
     std::unique_ptr<Component> component)
 {
     auto p = component.get();

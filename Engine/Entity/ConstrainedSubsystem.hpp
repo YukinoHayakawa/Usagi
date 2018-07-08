@@ -3,7 +3,7 @@
 #include "Subsystem.hpp"
 #include "Entity.hpp"
 
-namespace yuki
+namespace usagi
 {
 template <typename... RequiredComponents>
 class ConstrainedSubsystem : public Subsystem

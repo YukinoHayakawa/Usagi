@@ -9,7 +9,7 @@
 #include <Usagi/Engine/Event/Event.hpp>
 #include <Usagi/Engine/Entity/ConstrainedSubsystem.hpp>
 
-using namespace yuki;
+using namespace usagi;
 
 namespace
 {

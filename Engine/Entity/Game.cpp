@@ -6,7 +6,7 @@
 
 #include "Subsystem.hpp"
 
-yuki::Game::Game()
+usagi::Game::Game()
 {
     // add listeners at root entity to allow each subsystem to examine
     // entities with updated component configurations.
@@ -20,7 +20,7 @@ yuki::Game::Game()
     );
 }
 
-std::vector<yuki::SubsystemInfo>::iterator yuki::Game::findSubsystemByName(
+std::vector<usagi::SubsystemInfo>::iterator usagi::Game::findSubsystemByName(
     const std::string &subsystem_name)
 {
     return std::find_if(
@@ -31,7 +31,7 @@ std::vector<yuki::SubsystemInfo>::iterator yuki::Game::findSubsystemByName(
     );
 }
 
-yuki::Subsystem * yuki::Game::addSubsystem(SubsystemInfo subsystem)
+usagi::Subsystem * usagi::Game::addSubsystem(SubsystemInfo subsystem)
 {
     // check that no exisiting subsystem is using the same name
     if(findSubsystemByName(subsystem.name) != mSubsystems.end())
@@ -43,7 +43,7 @@ yuki::Subsystem * yuki::Game::addSubsystem(SubsystemInfo subsystem)
     return ret;
 }
 
-void yuki::Game::setSubsystemEnabled(
+void usagi::Game::setSubsystemEnabled(
     const std::string &subsystem_name, bool enabled)
 {
     const auto iter = findSubsystemByName(subsystem_name);
@@ -52,12 +52,12 @@ void yuki::Game::setSubsystemEnabled(
     iter->enabled = enabled;
 }
 
-yuki::Entity * yuki::Game::getRootEntity()
+usagi::Entity * usagi::Game::getRootEntity()
 {
     return &mRoot;
 }
 
-void yuki::Game::update(const std::chrono::seconds &dt)
+void usagi::Game::update(const std::chrono::seconds &dt)
 {
     for(auto &&s : mSubsystems)
     {

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace yuki::utility
+namespace usagi::utility
 {
 // https://stackoverflow.com/questions/108318/whats-the-simplest-way-to-test-whether-a-number-is-a-power-of-2-in-c
 template <typename T>

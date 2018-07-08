@@ -4,7 +4,7 @@
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 
-namespace yuki
+namespace usagi
 {
 /**
  * \brief Piece of data of an entity.

@@ -1,6 +1,6 @@
 ﻿#include "MouseButtonCode.hpp"
 
-const char * yuki::getMouseButtonName(MouseButtonCode key)
+const char * usagi::getMouseButtonName(MouseButtonCode key)
 {
     switch(key)
     {

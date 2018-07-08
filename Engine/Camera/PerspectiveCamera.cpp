@@ -1,6 +1,6 @@
 ﻿#include "PerspectiveCamera.hpp"
 
-void yuki::PerspectiveCamera::setPerspective(Radians fovY, float aspect, float near, float far)
+void usagi::PerspectiveCamera::setPerspective(Radians fovY, float aspect, float near, float far)
 {
     float theta = fovY * 0.5f;
     float range = far - near;

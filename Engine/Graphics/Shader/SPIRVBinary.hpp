@@ -5,7 +5,7 @@
 
 #include "ShaderStage.hpp"
 
-namespace yuki
+namespace usagi
 {
 class SPIRVBinary
 {

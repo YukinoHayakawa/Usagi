@@ -1,12 +1,12 @@
 ﻿#include "Mouse.hpp"
 
-void yuki::Mouse::addMouseEventListener(
+void usagi::Mouse::addMouseEventListener(
     std::shared_ptr<MouseEventListener> listener)
 {
     mMouseEventListeners.push_back(std::move(listener));
 }
 
-void yuki::Mouse::setImmersiveMode(bool enable)
+void usagi::Mouse::setImmersiveMode(bool enable)
 {
     if(enable == isImmersiveMode()) return;
     if(enable)
@@ -22,7 +22,7 @@ void yuki::Mouse::setImmersiveMode(bool enable)
     mImmersiveMode = enable;
 }
 
-bool yuki::Mouse::isImmersiveMode() const
+bool usagi::Mouse::isImmersiveMode() const
 {
     return mImmersiveMode;
 }

@@ -5,8 +5,8 @@
 
 #include "unpack.hpp"
 
-#define YUKI_TUPLE_IS_EMPTY(tuple) \
-    BOOST_VMD_IS_EMPTY(YUKI_UNPACK tuple) \
+#define USAGI_TUPLE_IS_EMPTY(tuple) \
+    BOOST_VMD_IS_EMPTY(USAGI_UNPACK tuple) \
 /**/
 
 /**
@@ -16,14 +16,14 @@
  * https://svn.boost.org/trac/boost/ticket/7560
  * \param tuple 
  */
-#define YUKI_TUPLE_SIZE(tuple) \
-    BOOST_PP_IF(YUKI_TUPLE_IS_EMPTY(tuple), 0, BOOST_PP_TUPLE_SIZE(tuple)) \
+#define USAGI_TUPLE_SIZE(tuple) \
+    BOOST_PP_IF(USAGI_TUPLE_IS_EMPTY(tuple), 0, BOOST_PP_TUPLE_SIZE(tuple)) \
 /**/
 
-#define YUKI_PAIR_FIRST_IMPL(x, y) x
-#define YUKI_PAIR_SECOND_IMPL(x, y) y
+#define USAGI_PAIR_FIRST_IMPL(x, y) x
+#define USAGI_PAIR_SECOND_IMPL(x, y) y
 
-#define YUKI_PAIR_FIRST(pair) YUKI_PAIR_FIRST_IMPL pair
-#define YUKI_PAIR_SECOND(pair) YUKI_PAIR_SECOND_IMPL pair
+#define USAGI_PAIR_FIRST(pair) USAGI_PAIR_FIRST_IMPL pair
+#define USAGI_PAIR_SECOND(pair) USAGI_PAIR_SECOND_IMPL pair
 
-#define YUKI_PAIR(x, y) (x, y)
+#define USAGI_PAIR(x, y) (x, y)

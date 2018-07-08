@@ -1,6 +1,6 @@
 ﻿#include <Usagi/Engine/Extension/Win32/Win32Window.hpp>
 
-using namespace yuki;
+using namespace usagi;
 
 int main(int argc, char *argv[])
 {

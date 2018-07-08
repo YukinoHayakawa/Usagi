@@ -7,7 +7,7 @@
 #include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
 #include "WindowsHeader.hpp"
 
-namespace yuki
+namespace usagi
 {
 enum class MouseButtonCode;
 
