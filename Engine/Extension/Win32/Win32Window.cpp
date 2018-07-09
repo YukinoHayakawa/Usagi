@@ -193,7 +193,7 @@ LRESULT usagi::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message,
     return window->_handleWindowMessage(hWnd, message, wParam, lParam);
 }
 
-void usagi::Win32Window::_sendButtonEvent(usagi::MouseButtonCode button,
+void usagi::Win32Window::_sendButtonEvent(MouseButtonCode button,
     bool pressed)
 {
     auto &prev_pressed = mMouseButtonDown[static_cast<std::size_t>(button)];
@@ -342,7 +342,7 @@ usagi::KeyCode usagi::Win32Window::_translateKeyCodeFromRawInput(
     }
 }
 
-void usagi::Win32Window::_sendKeyEvent(usagi::KeyCode key, bool pressed,
+void usagi::Win32Window::_sendKeyEvent(KeyCode key, bool pressed,
     bool repeated)
 {
     KeyEvent e;

@@ -8,7 +8,7 @@ std::string usagi::readFileAsString(const fs::path &path)
 {
 	std::ifstream file(path);
 	file.exceptions(std::ifstream::badbit | std::ifstream::failbit);
-	const auto size = fs::file_size(path);
+	const auto size = file_size(path);
     return readStreamAsString(file);
 }
 

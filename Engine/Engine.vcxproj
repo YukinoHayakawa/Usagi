@@ -124,10 +124,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Logging.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGraphicsCommandList.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipeline.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClInclude Include="Asset\AssetImporter.hpp" />
     <ClInclude Include="Asset\AssimpAssetImporter.hpp" />
     <ClInclude Include="Asset\AssetPackage.hpp" />
+    <ClInclude Include="Core\Math.hpp" />
     <ClInclude Include="Entity\ConstrainedSubsystem.hpp" />
     <ClInclude Include="Entity\Subsystem.hpp" />
     <ClInclude Include="Event\Library\RemoveComponentEvent.hpp" />
@@ -143,6 +146,8 @@
     <ClCompile Include="Event\Event.cpp" />
     <ClCompile Include="Entity\Entity.cpp" />
     <ClCompile Include="Entity\Game.cpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGraphicsCommandList.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipeline.hpp" />
     <ClInclude Include="Extension\Win32\Win32Window.hpp" />
     <ClInclude Include="Extension\Win32\WindowsHeader.hpp" />
     <ClInclude Include="Graphics\GraphicsCommandList.hpp" />
