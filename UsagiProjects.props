@@ -14,10 +14,6 @@
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <PreprocessorDefinitions>_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AssemblerListingLocation>$(IntDir)\%(RelativeDir)</AssemblerListingLocation>
-      <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
-      <ProgramDataBaseFileName>$(IntDir)\%(RelativeDir)\vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
-      <XMLDocumentationFileName>$(IntDir)\%(RelativeDir)</XMLDocumentationFileName>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
