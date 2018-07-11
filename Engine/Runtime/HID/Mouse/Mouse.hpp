@@ -3,7 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include <eigen3/Eigen/Core>
+#include <Usagi/Engine/Core/Math.hpp>
+
 #include "MouseButtonCode.hpp"
 
 namespace usagi
@@ -23,7 +24,7 @@ public:
 
     void addMouseEventListener(std::shared_ptr<MouseEventListener> listener);
 
-    virtual Eigen::Vector2f getMouseCursorWindowPos() = 0;
+    virtual Vector2f getMouseCursorWindowPos() = 0;
 
     /**
      * \brief Immersive mode allows continuous movement of the mouse without

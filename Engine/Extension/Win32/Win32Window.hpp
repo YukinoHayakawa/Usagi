@@ -5,6 +5,7 @@
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Runtime/HID/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
+
 #include "WindowsHeader.hpp"
 
 namespace usagi
@@ -22,7 +23,7 @@ class Win32Window
     // window
 
     HWND mWindowHandle = nullptr;
-    Eigen::Vector2i mWindowSize;
+    Vector2i mWindowSize;
     bool mWindowActive;
     bool mClosed = false;
 
@@ -48,7 +49,7 @@ class Win32Window
      * see https://msdn.microsoft.com/en-us/library/windows/desktop/ms648396(v=vs.85).aspx
      */
     bool mShowMouseCursor = true;
-    bool mMouseButtonDown[static_cast<size_t>(MouseButtonCode::ENUM_COUNT)] = { false };
+    bool mMouseButtonDown[static_cast<std::size_t>(MouseButtonCode::ENUM_COUNT)] = { false };
 
     void _sendButtonEvent(MouseButtonCode button, bool pressed);
 
@@ -87,7 +88,7 @@ public:
 
     void showWindow(bool show) override;
     bool isWindowActive() const override;
-    Eigen::Vector2f getWindowSize() const override;
+    Vector2f getWindowSize() const override;
     bool isWindowOpen() const override;
     void setTitle(const std::string &title) override;
 
@@ -95,7 +96,7 @@ public:
 
     // mouse
 
-    Eigen::Vector2f getMouseCursorWindowPos() override;
+    Vector2f getMouseCursorWindowPos() override;
     void centerCursor() override;
     bool isMouseButtonPressed(MouseButtonCode button) const override;
 

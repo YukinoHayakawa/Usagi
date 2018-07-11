@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <eigen3/Eigen/Core>
+#include <Usagi/Engine/Core/Math.hpp>
 
 #include "MouseButtonCode.hpp"
 
@@ -13,7 +13,7 @@ struct MouseEvent
 
 struct MousePositionEvent : MouseEvent
 {
-    Eigen::Vector2f cursorPosDelta = Eigen::Vector2f::Zero();
+    Vector2f cursorPosDelta = Vector2f::Zero();
 };
 
 struct MouseButtonEvent : MouseEvent

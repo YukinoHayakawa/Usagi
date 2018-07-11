@@ -164,7 +164,7 @@ void usagi::Win32Window::processEvents()
     }
 }
 
-Eigen::Vector2f usagi::Win32Window::getWindowSize() const
+usagi::Vector2f usagi::Win32Window::getWindowSize() const
 {
     return mWindowSize.cast<float>();
 }
@@ -595,7 +595,7 @@ bool usagi::Win32Window::isKeyPressed(KeyCode key)
     return mKeyPressed.count(key) != 0;
 }
 
-Eigen::Vector2f usagi::Win32Window::getMouseCursorWindowPos()
+usagi::Vector2f usagi::Win32Window::getMouseCursorWindowPos()
 {
     POINT pt;
     GetCursorPos(&pt);
@@ -625,7 +625,7 @@ bool usagi::Win32Window::_isCursorCaptured()
 void usagi::Win32Window::centerCursor()
 {
     const auto rect = _getClientScreenRect();
-    Eigen::Vector2i cursor {
+    Vector2i cursor {
         (rect.left + rect.right) / 2,
         (rect.top + rect.bottom) / 2
     };
