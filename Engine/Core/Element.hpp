@@ -16,24 +16,24 @@ class Event;
 class Component;
 
 /**
- * \brief An entity is an agent in the game representing anything visible
+ * \brief An element is an agent in the game representing anything visible
  * or logical. Entities are organized in a tree in logical sense. The
  * interaction with entity and the game world is carried out by components
  * and subsystems. Inter-entity communication is performed by event system.
  */
-class Entity : Noncopyable
+class Element : Noncopyable
 {
 public:
-    explicit Entity(Entity *parent);
-    ~Entity();
+    explicit Element(Element *parent);
+    ~Element();
 
     // move operations change the parent links so prohibit them.
-    Entity(Entity &&other) = delete;
-    Entity & operator=(Entity &&other) = delete;
+    Element(Element &&other) = delete;
+    Element & operator=(Element &&other) = delete;
 
     // Entity Hierarchy
 
-    Entity * addChild();
+    Element * addChild();
 
     // Component
 
@@ -88,8 +88,8 @@ public:
     }
 
 private:
-    Entity *mParent = nullptr;
-    std::vector<std::unique_ptr<Entity>> mChildren;
+    Element *mParent = nullptr;
+    std::vector<std::unique_ptr<Element>> mChildren;
 
     std::unordered_map<
         std::type_index,

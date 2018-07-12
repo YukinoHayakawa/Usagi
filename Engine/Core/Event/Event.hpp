@@ -4,7 +4,7 @@
 
 namespace usagi
 {
-class Entity;
+class Element;
 
 /**
  * \brief Note on event system:
@@ -23,20 +23,20 @@ class Entity;
  */
 class Event : Noncopyable
 {
-    Entity *mSource = nullptr;
+    Element *mSource = nullptr;
     // todo: c++20, bool mBubbling : 1 = true;
     bool mBubbling : 1;
     bool mCanceled : 1;
 
-    friend class Entity;
+    friend class Element;
 
-    void setSource(Entity *source) { mSource = source; }
+    void setSource(Element *source) { mSource = source; }
 
 public:
     Event();
     virtual ~Event() = default;
 
-    Entity * source() const { return mSource; }
+    Element * source() const { return mSource; }
     bool bubbling() const { return mBubbling; }
     bool canceled() const { return mCanceled; }
 

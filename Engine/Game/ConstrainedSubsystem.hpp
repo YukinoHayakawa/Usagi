@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Engine/Entity/Entity.hpp>
+#include <Usagi/Engine/Core/Element.hpp>
 
 #include "Subsystem.hpp"
 
@@ -10,7 +10,7 @@ template <typename... RequiredComponents>
 class ConstrainedSubsystem : public Subsystem
 {
 public:
-    bool handles(Entity *entity) override
+    bool handles(Element *entity) override
     {
         return (... && entity->hasComponent<RequiredComponents>());
     }

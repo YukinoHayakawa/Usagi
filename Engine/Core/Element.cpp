@@ -1,35 +1,34 @@
-﻿#include "Entity.hpp"
-
-#include <Usagi/Engine/Event/Library/AddComponentEvent.hpp>
+﻿#include "Element.hpp"
 
 #include "Component.hpp"
+#include "Event/Library/AddComponentEvent.hpp"
 
-usagi::Entity::Entity(Entity *parent)
+usagi::Element::Element(Element *parent)
     : mParent { parent }
 {
 }
 
-usagi::Entity::~Entity()
+usagi::Element::~Element()
 {
     // Component header is not included in Entity header so its destruction
     // can only be done here.
 }
 
-usagi::Entity * usagi::Entity::addChild()
+usagi::Element * usagi::Element::addChild()
 {
-    auto c = std::make_unique<Entity>(this);
+    auto c = std::make_unique<Element>(this);
     const auto r = c.get();
     mChildren.push_back(std::move(c));
     return r;
 }
 
-void usagi::Entity::addComponent(std::unique_ptr<Component> component)
+void usagi::Element::addComponent(std::unique_ptr<Component> component)
 {
     auto &info = component->getBaseTypeInfo();
     insertComponent(info, std::move(component));
 }
 
-void usagi::Entity::insertComponent(const std::type_info &type,
+void usagi::Element::insertComponent(const std::type_info &type,
     std::unique_ptr<Component> component)
 {
     auto p = component.get();

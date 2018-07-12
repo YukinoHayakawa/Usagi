@@ -5,7 +5,7 @@
 #include <chrono>
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
-#include <Usagi/Engine/Entity/Entity.hpp>
+#include <Usagi/Engine/Core/Element.hpp>
 
 namespace usagi
 {
@@ -25,7 +25,7 @@ class Game : Noncopyable
     std::unique_ptr<Window> mWindow;
     std::unique_ptr<GpuDevice> mGraphicsDevice;
     std::vector<SubsystemInfo> mSubsystems;
-	Entity mRootEntity { nullptr };
+	Element mRootEntity { nullptr };
 
 	std::vector<SubsystemInfo>::iterator findSubsystemByName(
 		const std::string &subsystem_name);
@@ -35,6 +35,7 @@ class Game : Noncopyable
 
 public:
    Game();
+   ~Game();
 
     /**
      * \brief
@@ -45,7 +46,7 @@ public:
     void enableSubsystem(const std::string &subsystem_name);
     void disableSubsystem(const std::string &subsystem_name);
 
-    Entity * rootEntity() { return &mRootEntity; }
+    Element * rootEntity() { return &mRootEntity; }
 
     /**
     * \brief Invoke update methods on each enabled subsystem by the order

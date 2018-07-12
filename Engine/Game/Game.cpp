@@ -2,9 +2,9 @@
 
 #include <algorithm>
 
-#include <Usagi/Engine/Event/Library/AddComponentEvent.hpp>
-#include <Usagi/Engine/Graphics/GpuDevice.hpp>
+#include <Usagi/Engine/Core/Event/Library/AddComponentEvent.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
+#include <Usagi/Engine/Graphics/GpuDevice.hpp>
 
 #include "Subsystem.hpp"
 
@@ -20,6 +20,10 @@ usagi::Game::Game()
             }
         }
     );
+}
+
+usagi::Game::~Game()
+{
 }
 
 std::vector<usagi::SubsystemInfo>::iterator usagi::Game::findSubsystemByName(

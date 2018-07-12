@@ -4,9 +4,9 @@
 
 #include <Eigen/Core>
 
-#include <Usagi/Engine/Entity/Entity.hpp>
-#include <Usagi/Engine/Entity/Component.hpp>
-#include <Usagi/Engine/Event/Event.hpp>
+#include <Usagi/Engine/Core/Element.hpp>
+#include <Usagi/Engine/Core/Component.hpp>
+#include <Usagi/Engine/Core/Event/Event.hpp>
 #include <Usagi/Engine/Game/Game.hpp>
 #include <Usagi/Engine/Game/ConstrainedSubsystem.hpp>
 
@@ -42,7 +42,7 @@ struct AdvancedPhysicalComponent : PhysicalComponent
 class PhysicsSubsystem
     : public ConstrainedSubsystem<PositionComponent, PhysicalComponent>
 {
-    Entity *mEntity = nullptr;
+    Element *mEntity = nullptr;
 
 public:
     void update(const std::chrono::seconds &dt) override
@@ -55,7 +55,7 @@ public:
         }
     }
 
-    void updateRegistry(Entity *entity) override
+    void updateRegistry(Element *entity) override
     {
         if(handles(entity))
             mEntity = entity;
@@ -170,7 +170,7 @@ TEST(ECSTest, ComponentIdentityTest)
 TEST(ECSTest, ConstrainedSubsystemTest)
 {
     PhysicsSubsystem s;
-    Entity e { nullptr };
+    Element e { nullptr };
     EXPECT_FALSE(s.handles(&e));
     e.addComponent<PositionComponent>();
     EXPECT_FALSE(s.handles(&e));

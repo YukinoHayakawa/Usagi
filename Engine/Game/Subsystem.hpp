@@ -6,7 +6,7 @@
 
 namespace usagi
 {
-class Entity;
+class Element;
 
 class Subsystem : Noncopyable
 {
@@ -23,7 +23,7 @@ public:
      * \brief Returns whether the entity will be processed by the subsystem.
      * \param entity 
      */
-    virtual bool handles(Entity *entity) = 0;
+    virtual bool handles(Element *entity) = 0;
 
     /**
     * \brief Check whether the entity has relevant components. If it has,
@@ -33,6 +33,6 @@ public:
     * entity by the Game object.
     * \param entity
     */
-    virtual void updateRegistry(Entity *entity) = 0;
+    virtual void updateRegistry(Element *entity) = 0;
 };
 }
