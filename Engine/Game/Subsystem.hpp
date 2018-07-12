@@ -20,10 +20,10 @@ public:
     virtual void update(const std::chrono::seconds &dt) = 0;
 
     /**
-     * \brief Determines whether the entity is interested by the subsystem.
+     * \brief Returns whether the entity will be processed by the subsystem.
      * \param entity 
      */
-    virtual bool canProcess(Entity *entity) = 0;
+    virtual bool handles(Entity *entity) = 0;
 
     /**
     * \brief Check whether the entity has relevant components. If it has,

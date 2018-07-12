@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+
 #include <Eigen/Core>
 
-#include <Usagi/Engine/Entity/Game.hpp>
 #include <Usagi/Engine/Entity/Entity.hpp>
 #include <Usagi/Engine/Entity/Component.hpp>
 #include <Usagi/Engine/Event/Event.hpp>
-#include <Usagi/Engine/Entity/ConstrainedSubsystem.hpp>
+#include <Usagi/Engine/Game/Game.hpp>
+#include <Usagi/Engine/Game/ConstrainedSubsystem.hpp>
 
 using namespace usagi;
 
@@ -56,7 +57,7 @@ public:
 
     void updateRegistry(Entity *entity) override
     {
-        if(canProcess(entity))
+        if(handles(entity))
             mEntity = entity;
     }
 
@@ -100,7 +101,7 @@ TEST(ECSTest, EventBubblingTest)
     //     c
 
     Game game;
-    auto r = game.getRootEntity();
+    auto r = game.rootEntity();
     auto a = r->addChild();
     auto b = r->addChild();
     auto c = a->addChild();
@@ -133,7 +134,7 @@ TEST(ECSTest, EventBubblingTest)
 TEST(ECSTest, EventCancelTest)
 {
     Game game;
-    auto r = game.getRootEntity();
+    auto r = game.rootEntity();
     bool a = false, b = false, c = false;
     r->addEventListener<TestEvent>(
         [&](auto &&e) {
@@ -158,7 +159,7 @@ TEST(ECSTest, EventCancelTest)
 TEST(ECSTest, ComponentIdentityTest)
 {
     Game game;
-    auto r = game.getRootEntity();
+    auto r = game.rootEntity();
     r->addComponent<PhysicalComponent>();
     EXPECT_TRUE(r->hasComponent<PhysicalComponent>());
     EXPECT_FALSE(r->hasComponent<PositionComponent>());
@@ -170,11 +171,11 @@ TEST(ECSTest, ConstrainedSubsystemTest)
 {
     PhysicsSubsystem s;
     Entity e { nullptr };
-    EXPECT_FALSE(s.canProcess(&e));
+    EXPECT_FALSE(s.handles(&e));
     e.addComponent<PositionComponent>();
-    EXPECT_FALSE(s.canProcess(&e));
+    EXPECT_FALSE(s.handles(&e));
     e.addComponent<PhysicalComponent>();
-    EXPECT_TRUE(s.canProcess(&e));
+    EXPECT_TRUE(s.handles(&e));
 }
 
 TEST(ECSTest, ComponentSystemInteractionTest)
@@ -188,7 +189,7 @@ TEST(ECSTest, ComponentSystemInteractionTest)
         info.subsystem = std::make_unique<PhysicsSubsystem>();
         EXPECT_NO_THROW(game.addSubsystem(std::move(info)));
     }
-    auto r = game.getRootEntity();
+    auto r = game.rootEntity();
     r->addComponent<PositionComponent>();
     r->addComponent<PhysicalComponent>();
     EXPECT_FLOAT_EQ(
@@ -200,7 +201,7 @@ TEST(ECSTest, ComponentSystemInteractionTest)
         (r->getComponent<PositionComponent>()->position
             - Eigen::Vector3f(2, 4, 6)).norm(),
         0.f);
-    game.setSubsystemEnabled("Physics", false);
+    game.disableSubsystem("Physics");
     game.update(2s);
     EXPECT_FLOAT_EQ(
         (r->getComponent<PositionComponent>()->position
@@ -219,7 +220,7 @@ TEST(ECSTest, PolymorphicComponentTest)
         EXPECT_NO_THROW(phy = static_cast<PhysicsSubsystem*>(
             game.addSubsystem(std::move(info))));
     }
-    auto r = game.getRootEntity();
+    auto r = game.rootEntity();
     r->addComponent(phy->createPhysicalComponent());
     EXPECT_NO_THROW(r->getComponent<PhysicalComponent>());
     AdvancedPhysicalComponent *c = nullptr;
