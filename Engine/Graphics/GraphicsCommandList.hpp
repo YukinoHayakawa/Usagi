@@ -1,13 +1,15 @@
 ﻿#pragma once
 
-#include <Eigen/Core>
-
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 #include <Usagi/Engine/Core/Math.hpp>
+
+#include "Shader/ShaderStage.hpp"
+#include "GraphicsIndexType.hpp"
 
 namespace usagi
 {
 class GraphicsPipeline;
+class GpuBuffer;
 
 class GraphicsCommandList : Noncopyable
 {
@@ -32,21 +34,25 @@ public:
     virtual void setViewport(
         std::uint32_t index,
         Vector2f origin,
-        Vector2f size) = 0;
+        Vector2f size
+	) = 0;
 
     virtual void setScissor(
         std::uint32_t viewport_index,
         Vector2i32 origin,
-        Vector2u32 size) = 0;
+        Vector2u32 size
+	) = 0;
 
     // Resource
 
     /**
-     * \brief Set the value of speficied variable embedded in the command buffer.
+     * \brief Set the value of field located in a special uniform buffer
+     * called constant buffer.
      * e.g. Push constants in Vulkan, constants in root signatures in DX12.
      * Before calling this method, there must be an active pipeline bind
      * previously using current command buffer so that the layout of constant
      * can be determined.
+     * \param stage The shader stage within which the name is defined.
      * \param name The name of the field which is extracted from the shaders
      * of the active pipeline.
      * \param data The source buffer to be read from, containing the data
@@ -55,9 +61,22 @@ public:
      * buffer. This must equal to the size of variable declared in the shaders.
      */
     virtual void setConstant(
+        ShaderStage stage,
         const char *name,
         const void *data,
         std::size_t size
+	) = 0;
+
+    virtual void bindIndexBuffer(
+        GpuBuffer *buffer,
+        std::size_t offset,
+        GraphicsIndexType type
+    ) = 0;
+
+    virtual void bindVertexBuffer(
+        std::uint32_t binding_index,
+        GpuBuffer *buffer,
+        std::size_t offset
     ) = 0;
 
     // Draw
@@ -76,6 +95,7 @@ public:
         std::uint32_t instance_count,
         std::uint32_t first_index,
         std::int32_t vertex_offset,
-        std::uint32_t first_instance) = 0;
+        std::uint32_t first_instance
+	) = 0;
 };
 }

@@ -11,7 +11,7 @@ namespace usagi
 {
 class Subsystem;
 class Window;
-class GraphicsDevice;
+class GpuDevice;
 
 struct SubsystemInfo
 {
@@ -23,7 +23,7 @@ struct SubsystemInfo
 class Game : Noncopyable
 {
     std::unique_ptr<Window> mWindow;
-    std::unique_ptr<GraphicsDevice> mGraphicsDevice;
+    std::unique_ptr<GpuDevice> mGraphicsDevice;
     std::vector<SubsystemInfo> mSubsystems;
 	Entity mRootEntity { nullptr };
 

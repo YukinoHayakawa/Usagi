@@ -1,4 +1,4 @@
-﻿#include "SPIRVBinary.hpp"
+﻿#include "SpirvBinary.hpp"
 
 #include <fstream>
 #include <cstring>
@@ -14,8 +14,9 @@
 
 // See https://www.khronos.org/registry/spir-v/papers/WhitePaper.html for
 // SPIR-V format.
-usagi::SPIRVBinary::SPIRVBinary(std::vector<std::uint32_t> bytecodes)
+usagi::SpirvBinary::SpirvBinary(std::vector<std::uint32_t> bytecodes)
     : mBytecodes { std::move(bytecodes) }
+    , mReflectionCompiler { mBytecodes }
 {
     // check header magic code
     if(mBytecodes.empty() || mBytecodes.front() != 0x07230203)
@@ -25,13 +26,13 @@ usagi::SPIRVBinary::SPIRVBinary(std::vector<std::uint32_t> bytecodes)
 
 namespace fs = std::filesystem;
 
-void usagi::SPIRVBinary::dump(std::ostream &output)
+void usagi::SpirvBinary::dumpBytecodeBitstream(std::ostream &output)
 {
     output.write(reinterpret_cast<const char *>(mBytecodes.data()),
         mBytecodes.size() * sizeof(Bytecode));
 }
 
-std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromFile(
+std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromFile(
     const fs::path &binary_path)
 {
     std::ifstream file(binary_path);
@@ -46,10 +47,10 @@ std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromFile(
     content.resize(size / sizeof(Bytecode));
     file.read(reinterpret_cast<char*>(content.data()), size);
 
-    return std::make_shared<SPIRVBinary>(std::move(content));
+    return std::make_shared<SpirvBinary>(std::move(content));
 }
 
-std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromStream(
+std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromStream(
     std::istream &glsl_source_stream)
 {
     const auto old_exceptions = glsl_source_stream.exceptions();
@@ -70,7 +71,7 @@ std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromStream(
     content.resize(dump.size() / 4);
     std::memcpy(content.data(), dump.data(), dump.size());
 
-    return std::make_shared<SPIRVBinary>(std::move(content));
+    return std::make_shared<SpirvBinary>(std::move(content));
 }
 
 namespace
@@ -86,7 +87,7 @@ EShLanguage translateShaderStage(usagi::ShaderStage stage)
 }
 }
 
-std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromGlslSourceString(
+std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
     const std::string &glsl_source_code,
     const ShaderStage stage)
 {
@@ -153,17 +154,17 @@ std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromGlslSourceString(
 	LOG_F(INFO, "Disassembly:");
     Disassemble(std::cout, spirv);
 
-    return std::make_shared<SPIRVBinary>(std::move(spirv));
+    return std::make_shared<SpirvBinary>(std::move(spirv));
 }
 
-std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromGlslSourceFile(
+std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceFile(
     const fs::path &glsl_source_path,
     const ShaderStage stage)
 {
     return fromGlslSourceString(readFileAsString(glsl_source_path), stage);
 }
 
-std::shared_ptr<usagi::SPIRVBinary> usagi::SPIRVBinary::fromGlslSourceStream(
+std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceStream(
     std::istream &glsl_source_stream,
     const ShaderStage stage)
 {

@@ -1,8 +1,23 @@
 ﻿#include "VulkanGraphicsCommandList.hpp"
 
-#include "VulkanGraphicsPipeline.hpp"
-
 #include <loguru.hpp>
+
+#include "VulkanGraphicsPipeline.hpp"
+#include "VulkanGpuBuffer.hpp"
+
+vk::IndexType usagi::VulkanGraphicsCommandList::translateIndexType(
+    const GraphicsIndexType type)
+{
+    switch(type)
+    {
+        case GraphicsIndexType::UINT16:
+            return vk::IndexType::eUint16;
+        case GraphicsIndexType::UINT32:
+            return vk::IndexType::eUint32;
+        default:
+            throw std::runtime_error("Invalid index type.");
+    }
+}
 
 usagi::VulkanGraphicsCommandList::VulkanGraphicsCommandList(
     const vk::CommandBuffer vk_command_buffer)
@@ -29,12 +44,12 @@ void usagi::VulkanGraphicsCommandList::finishRecording()
 
 void usagi::VulkanGraphicsCommandList::bindPipeline(GraphicsPipeline *pipeline)
 {
-    const auto vk_pipeline = dynamic_cast<VulkanGraphicsPipeline*>(pipeline);
+    auto &vk_pipeline = dynamic_cast<VulkanGraphicsPipeline&>(*pipeline);
 
     mCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics,
-        vk_pipeline->pipeline());
+        vk_pipeline.pipeline());
 
-    mCurrentPipeline = vk_pipeline;
+    mCurrentPipeline = &vk_pipeline;
 }
 
 void usagi::VulkanGraphicsCommandList::setViewport(
@@ -61,6 +76,7 @@ void usagi::VulkanGraphicsCommandList::setScissor(
 }
 
 void usagi::VulkanGraphicsCommandList::setConstant(
+    ShaderStage stage,
     const char *name,
     const void *data,
     const std::size_t size)
@@ -69,17 +85,44 @@ void usagi::VulkanGraphicsCommandList::setConstant(
         throw std::runtime_error(
             "No active pipeline is bound, unable to retrieve pipeline layout.");
 
-    const auto constant_info = mCurrentPipeline->queryConstantInfo(name);
+    const auto constant_info = mCurrentPipeline->queryConstantInfo(stage, name);
 	CHECK_F(size == constant_info.size,
 		"Unmatched constant size: input is %zubytes, "
 		"but the pipeline layout says it should be %zu bytes.",
 		size, constant_info.size);
+
     mCommandBuffer.pushConstants(
         mCurrentPipeline->layout(),
         vk::ShaderStageFlagBits::eAll,
         constant_info.offset, constant_info.size,
         data
     );
+}
+
+void usagi::VulkanGraphicsCommandList::bindIndexBuffer(
+	GpuBuffer *buffer,
+	std::size_t offset,
+	GraphicsIndexType type)
+{
+	auto &vk_buffer = dynamic_cast<VulkanGpuBuffer&>(*buffer);
+
+    mCommandBuffer.bindIndexBuffer(
+		vk_buffer.buffer(), offset,
+        translateIndexType(type)
+	);
+}
+
+void usagi::VulkanGraphicsCommandList::bindVertexBuffer(
+	std::uint32_t binding_index,
+	GpuBuffer *buffer,
+	std::size_t offset)
+{
+	auto &vk_buffer = dynamic_cast<VulkanGpuBuffer&>(*buffer);
+
+	vk::Buffer buffers[] = { vk_buffer.buffer() };
+    vk::DeviceSize sizes[] = { offset };
+
+    mCommandBuffer.bindVertexBuffers(binding_index, 1, buffers, sizes);
 }
 
 void usagi::VulkanGraphicsCommandList::drawIndexedInstanced(

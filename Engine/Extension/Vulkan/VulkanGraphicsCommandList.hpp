@@ -15,6 +15,8 @@ class VulkanGraphicsCommandList : public GraphicsCommandList
     vk::CommandBuffer mCommandBuffer;
     VulkanGraphicsPipeline *mCurrentPipeline = nullptr;
 
+    static vk::IndexType translateIndexType(GraphicsIndexType type);
+
 public:
     explicit VulkanGraphicsCommandList(vk::CommandBuffer vk_command_buffer);
 
@@ -34,9 +36,20 @@ public:
         Vector2u32 size) override;
 
     void setConstant(
+        ShaderStage stage,
         const char *name,
         const void *data,
         std::size_t size) override;
+
+    void bindIndexBuffer(
+        GpuBuffer *buffer,
+        std::size_t offset,
+        GraphicsIndexType type) override;
+
+    void bindVertexBuffer(
+        std::uint32_t binding_index,
+        GpuBuffer *buffer,
+        std::size_t offset) override;
 
     void drawIndexedInstanced(
         std::uint32_t index_count,

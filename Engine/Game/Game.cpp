@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include <Usagi/Engine/Event/Library/AddComponentEvent.hpp>
-#include <Usagi/Engine/Graphics/GraphicsDevice.hpp>
+#include <Usagi/Engine/Graphics/GpuDevice.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 
 #include "Subsystem.hpp"
