@@ -1,7 +1,11 @@
 ﻿#include "Element.hpp"
 
+#include <algorithm>
+
 #include "Component.hpp"
-#include "Event/Library/AddComponentEvent.hpp"
+#include "Event/Library/Component/ComponentAddedEvent.hpp"
+#include "Event/Library/Element/PreElementRemovalEvent.hpp"
+#include "Event/Library/Element/ChildElementRemovedEvent.hpp"
 
 usagi::Element::Element(Element *parent)
     : mParent { parent }
@@ -14,12 +18,18 @@ usagi::Element::~Element()
     // can only be done here.
 }
 
-usagi::Element * usagi::Element::addChild()
+void usagi::Element::removeChild(Element *child)
 {
-    auto c = std::make_unique<Element>(this);
-    const auto r = c.get();
-    mChildren.push_back(std::move(c));
-    return r;
+    const auto iter = std::find_if(
+		mChildren.begin(), mChildren.end(),
+		[=](auto &&c) { return c == child; }
+	);
+    if(iter == mChildren.end())
+        throw std::runtime_error("Cannot find specified child.");
+    auto p = iter->get();
+    p->fireEvent<PreElementRemovalEvent>();
+    mChildren.erase(iter);
+    fireEvent<ChildElementRemovedEvent>();
 }
 
 void usagi::Element::addComponent(std::unique_ptr<Component> component)
@@ -33,5 +43,5 @@ void usagi::Element::insertComponent(const std::type_info &type,
 {
     auto p = component.get();
     mComponents.insert({ type, std::move(component) });
-    fireEvent<AddComponentEvent>(type, p);
+    fireEvent<ComponentAddedEvent>(type, p);
 }
