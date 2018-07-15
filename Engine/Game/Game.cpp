@@ -2,9 +2,10 @@
 
 #include <algorithm>
 
-#include <Usagi/Engine/Core/Event/Library/AddComponentEvent.hpp>
+#include <Usagi/Engine/Core/Event/Library/Component/ComponentAddedEvent.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Graphics/GpuDevice.hpp>
+#include <Usagi/Engine/Asset/AssetRoot.hpp>
 
 #include "Subsystem.hpp"
 
@@ -12,7 +13,7 @@ usagi::Game::Game()
 {
     // add listeners at root entity to allow each subsystem to examine
     // entities with updated component configurations.
-    mRootEntity.addEventListener<AddComponentEvent>(
+    mRootElement.addEventListener<ComponentAddedEvent>(
         [&](auto &&e) {
             for(auto &&s : mSubsystems)
             {
@@ -20,6 +21,9 @@ usagi::Game::Game()
             }
         }
     );
+
+    mRootElement.setName("ElementRoot");
+    mAssetRoot = mRootElement.addChild<AssetRoot>();
 }
 
 usagi::Game::~Game()
@@ -66,6 +70,11 @@ void usagi::Game::setSubsystemEnabled(
     if(iter == mSubsystems.end())
         throw std::runtime_error("No such subsystem");
     iter->enabled = enabled;
+}
+
+usagi::Asset * usagi::Game::assets() const
+{
+    return mAssetRoot;
 }
 
 void usagi::Game::update(const std::chrono::seconds &dt)

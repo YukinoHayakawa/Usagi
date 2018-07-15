@@ -1,45 +1,22 @@
 ﻿#pragma once
 
-#include <string>
-#include <memory>
-#include <any>
-
-#include <Usagi/Engine/Utility/Noncopyable.hpp>
+#include "Asset.hpp"
 
 namespace usagi
 {
-class Asset;
-
 /**
  * \brief Stored shared resources. All assets are wrapped in a shared_ptr.
  */
-class AssetPackage : Noncopyable
+class AssetPackage : public Asset
 {
 public:
     virtual ~AssetPackage() = default;
 
-    // assets should be stored using their common based types, no matter
-    // how were them created, so that they can be accessed without knowing
-    // the exact type. if the user think he knows the real type, he can
-    // use the next template to perform a dynamic cast.
-    template <typename AssetT>
-    std::shared_ptr<AssetT> getAsset(const std::string &name)
-    {
-        return std::any_cast<std::shared_ptr<AssetT>>(getAssetAny(name));
-    }
-
-    template <typename AssetT, typename DerivedAssetT>
-    std::shared_ptr<DerivedAssetT> getAsset(const std::string &name)
-    {
-        auto p = std::dynamic_pointer_cast<DerivedAssetT>(
-            getAsset<AssetT>(name)
-        );
-        if(p == nullptr)
-            throw std::bad_cast();
-        return std::move(p);
-    }
+    AssetType assetType() override;
+    Asset * findByUuid(const boost::uuids::uuid &uuid) override;
+    Asset * findByPath(const AssetPath &path) override;
 
 private:
-    virtual std::any getAssetAny(const std::string &name) = 0;
+	bool acceptChild(Element *child) override;
 };
 }

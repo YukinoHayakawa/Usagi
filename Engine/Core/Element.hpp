@@ -30,6 +30,7 @@ class Component;
 class Element : Noncopyable
 {
 	Element *mParent = nullptr;
+    std::string mName;
 	using ChildrenArray = std::vector<std::unique_ptr<Element>>;
 	ChildrenArray mChildren;
 
@@ -81,12 +82,15 @@ class Element : Noncopyable
     }
 
 public:
-    explicit Element(Element *parent);
+    explicit Element(Element *parent, std::string name = { });
     virtual ~Element();
 
     // move operations change the parent links so prohibit them.
     Element(Element &&other) = delete;
     Element & operator=(Element &&other) = delete;
+
+    std::string name() const { return mName; }
+	void setName(const std::string &name) { mName = name; }
 
     // Entity Hierarchy
 

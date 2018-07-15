@@ -7,8 +7,9 @@
 #include "Event/Library/Element/PreElementRemovalEvent.hpp"
 #include "Event/Library/Element/ChildElementRemovedEvent.hpp"
 
-usagi::Element::Element(Element *parent)
+usagi::Element::Element(Element *parent, std::string name)
     : mParent { parent }
+    , mName { std::move(name) }
 {
 }
 

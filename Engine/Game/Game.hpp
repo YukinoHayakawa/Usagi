@@ -9,33 +9,40 @@
 
 namespace usagi
 {
+class Asset;
+class AssetRoot;
 class Subsystem;
 class Window;
 class GpuDevice;
 
 struct SubsystemInfo
 {
-	std::string name;
-	std::unique_ptr<Subsystem> subsystem;
-	bool enabled = true;
+    std::string name;
+    std::unique_ptr<Subsystem> subsystem;
+    bool enabled = true;
 };
 
 class Game : Noncopyable
 {
     std::unique_ptr<Window> mWindow;
-    std::unique_ptr<GpuDevice> mGraphicsDevice;
+    std::unique_ptr<GpuDevice> mGpuDevice;
     std::vector<SubsystemInfo> mSubsystems;
-	Element mRootEntity { nullptr };
+    Element mRootElement { nullptr };
+    AssetRoot *mAssetRoot = nullptr;
 
-	std::vector<SubsystemInfo>::iterator findSubsystemByName(
-		const std::string &subsystem_name);
+    std::vector<SubsystemInfo>::iterator findSubsystemByName(
+        const std::string &subsystem_name);
 
-	void setSubsystemEnabled(
-		const std::string &subsystem_name, bool enabled);
+    void setSubsystemEnabled(
+        const std::string &subsystem_name,
+        bool enabled);
 
 public:
-   Game();
-   ~Game();
+    Game();
+    ~Game();
+
+	Window * window() const { return mWindow.get(); }
+	GpuDevice * gpuDevice() const { return mGpuDevice.get(); }
 
     /**
      * \brief
@@ -46,7 +53,8 @@ public:
     void enableSubsystem(const std::string &subsystem_name);
     void disableSubsystem(const std::string &subsystem_name);
 
-    Element * rootEntity() { return &mRootEntity; }
+    Element * rootElement() { return &mRootElement; }
+    Asset * assets() const;
 
     /**
     * \brief Invoke update methods on each enabled subsystem by the order
