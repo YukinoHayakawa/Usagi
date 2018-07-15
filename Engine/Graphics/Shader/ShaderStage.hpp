@@ -8,7 +8,7 @@ enum class ShaderStage
     FRAGMENT,
 };
 
-inline const char * getShaderStageString(const ShaderStage stage)
+inline const char * to_string(const ShaderStage stage)
 {
     switch(stage)
     {

@@ -91,7 +91,7 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
     const std::string &glsl_source_code,
     const ShaderStage stage)
 {
-    LOG_F(INFO, "Compiling %s shader...", getShaderStageString(stage));
+    LOG_F(INFO, "Compiling %s shader...", to_string(stage));
 
     using namespace glslang;
     using namespace spv;

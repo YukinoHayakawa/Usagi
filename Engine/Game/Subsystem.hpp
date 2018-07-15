@@ -21,9 +21,9 @@ public:
 
     /**
      * \brief Returns whether the entity will be processed by the subsystem.
-     * \param entity 
+     * \param element 
      */
-    virtual bool handles(Element *entity) = 0;
+    virtual bool handles(Element *element) = 0;
 
     /**
     * \brief Check whether the entity has relevant components. If it has,
@@ -31,8 +31,8 @@ public:
     * record from the subsystem record if it exists. This is called by
     * the first event listener on component add/remove events at the root
     * entity by the Game object.
-    * \param entity
+    * \param element
     */
-    virtual void updateRegistry(Element *entity) = 0;
+    virtual void updateRegistry(Element *element) = 0;
 };
 }

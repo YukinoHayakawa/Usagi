@@ -54,7 +54,7 @@ public:
     void disableSubsystem(const std::string &subsystem_name);
 
     Element * rootElement() { return &mRootElement; }
-    Asset * assets() const;
+    AssetRoot * assets() const { return mAssetRoot; }
 
     /**
     * \brief Invoke update methods on each enabled subsystem by the order

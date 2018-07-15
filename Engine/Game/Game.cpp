@@ -23,7 +23,7 @@ usagi::Game::Game()
     );
 
     mRootElement.setName("ElementRoot");
-    mAssetRoot = mRootElement.addChild<AssetRoot>();
+    mAssetRoot = mRootElement.createChild<AssetRoot>();
 }
 
 usagi::Game::~Game()
@@ -70,11 +70,6 @@ void usagi::Game::setSubsystemEnabled(
     if(iter == mSubsystems.end())
         throw std::runtime_error("No such subsystem");
     iter->enabled = enabled;
-}
-
-usagi::Asset * usagi::Game::assets() const
-{
-    return mAssetRoot;
 }
 
 void usagi::Game::update(const std::chrono::seconds &dt)

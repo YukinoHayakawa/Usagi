@@ -4,7 +4,7 @@
 
 namespace usagi
 {
-class ChildElementEvent : Event
+class ChildElementEvent : public Event
 {
 public:
 	Element * const child;

@@ -4,7 +4,7 @@
 
 namespace usagi
 {
-class ChildElementRemovedEvent : ChildElementEvent
+class ChildElementRemovedEvent : public ChildElementEvent
 {
 public:
 	explicit ChildElementRemovedEvent()

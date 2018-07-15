@@ -1,24 +1,29 @@
 ﻿#pragma once
 
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/nil_generator.hpp>
 
 #include <Usagi/Engine/Core/Element.hpp>
 #include <Usagi/Engine/Utility/TypeCast.hpp>
 
 #include "AssetType.hpp"
-#include "AssetPath.hpp"
 
 namespace usagi
 {
 class Asset : public Element
 {
-    boost::uuids::uuid mUuid;
-    std::any mPayload;
-
     bool acceptChild(Element *child) override;
 
+protected:
+    const boost::uuids::uuid mUuid;
+    std::any mPayload;
+
 public:
-    Asset(Element *parent, std::string name, boost::uuids::uuid uuid);
+    Asset(
+        Element *parent,
+        std::string name,
+        boost::uuids::uuid uuid = boost::uuids::nil_uuid()
+	);
 
     boost::uuids::uuid uuid() const { return mUuid; }
     virtual AssetType assetType() { return AssetType::DIRECTORY; }
@@ -26,18 +31,6 @@ public:
     virtual bool loaded() const { return mPayload.has_value(); }
     virtual void load() { }
     virtual void unload() { }
-
-    /**
-     * \brief Package root should maintain a mapping between uuids and assets.
-     * \param uuid 
-     * \return 
-     */
-    virtual Asset * findByUuid(const boost::uuids::uuid &uuid)
-    {
-        return uuid == mUuid ? this : nullptr;
-    }
-
-    virtual Asset * findByPath(const AssetPath &path);
 
     /**
      * \brief Cast payload to stored type. AssetT must match the resource

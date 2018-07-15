@@ -34,11 +34,10 @@ public:
     const std::vector<Bytecode> & bytecodes() const { return mBytecodes; }
     void dumpBytecodeBitstream(std::ostream &output);
 
-    const spirv_cross::Compiler & getReflectionCompiler() const
+    const spirv_cross::Compiler & reflectionCompiler() const
     {
         return mReflectionCompiler;
     }
-
 
     static std::shared_ptr<SpirvBinary> fromFile(
         const std::filesystem::path &binary_path);

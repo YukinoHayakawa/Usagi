@@ -1,22 +1,22 @@
 ﻿#pragma once
 
-#include "Asset.hpp"
+#include <boost/uuid/uuid.hpp>
+
+#include <Usagi/Engine/Core/Element.hpp>
 
 namespace usagi
 {
-/**
- * \brief Stored shared resources. All assets are wrapped in a shared_ptr.
- */
-class AssetPackage : public Asset
+class Asset;
+
+class AssetPackage : public Element
 {
+    bool acceptChild(Element *child) override;
+
 public:
+    AssetPackage(Element *parent, std::string name);
     virtual ~AssetPackage() = default;
 
-    AssetType assetType() override;
-    Asset * findByUuid(const boost::uuids::uuid &uuid) override;
-    Asset * findByPath(const AssetPath &path) override;
-
-private:
-	bool acceptChild(Element *child) override;
+    virtual Asset * findByUuid(const boost::uuids::uuid &uuid) = 0;
+    virtual Asset * findByString(const std::string &string) = 0;
 };
 }

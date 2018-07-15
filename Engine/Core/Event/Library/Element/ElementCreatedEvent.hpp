@@ -4,7 +4,7 @@
 
 namespace usagi
 {
-class ElementCreatedEvent : Event
+class ElementCreatedEvent : public Event
 {
 };
 }

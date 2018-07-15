@@ -49,8 +49,7 @@ class Element : Noncopyable
 	{
 		auto iter = mComponents.find(typeid(CompBaseT));
 		if(iter == mComponents.end())
-			throw std::runtime_error(
-				"Entity does not have such a component.");
+			throw std::runtime_error("Element has no such component.");
         return iter;
 	}
 
@@ -72,7 +71,7 @@ class Element : Noncopyable
 
     /**
      * \brief Invoked before adding a child. If false is returned, the addition
-     * is aborted and a std::logic_error is thrown by addChild().
+     * is aborted and a std::logic_error is thrown by createChild().
      * \param child 
      * \return 
      */
@@ -94,20 +93,24 @@ public:
 
     // Entity Hierarchy
 
-    template <typename ElementType = Element>
-    ElementType * addChild()
+    Element * parent() const { return mParent; }
+
+    template <typename ElementType = Element, typename... Args>
+    ElementType * createChild(Args && ...args)
     {
         static_assert(std::is_base_of_v<Element, ElementType>,
 			"ElementType is not derived from Element.");
-		auto c = std::make_unique<ElementType>(this);
+		auto c = std::make_unique<ElementType>(
+			this, std::forward<Args>(args)...
+		);
         // ElementCreatedEvent is fired before acceptance test, so it gets
         // a change to pass the test. (todo: is this a good idea?)
         c->template fireEvent<ElementCreatedEvent>();
         if(!acceptChild(c.get()))
-            throw std::logic_error("Child element cannot be added.");
+            throw std::logic_error("Child element is rejected by parent.");
 		const auto r = c.get();
 		mChildren.push_back(std::move(c));
-        fireEvent<ChildElementAddedEvent>();
+        fireEvent<ChildElementAddedEvent>(r);
 		return r;
     }
 
@@ -122,6 +125,8 @@ public:
     {
         return mChildren.end();
     }
+
+    Element * findChildByName(const std::string &name) const;
 
     // Component
 

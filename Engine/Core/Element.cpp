@@ -23,7 +23,7 @@ void usagi::Element::removeChild(Element *child)
 {
     const auto iter = std::find_if(
 		mChildren.begin(), mChildren.end(),
-		[=](auto &&c) { return c == child; }
+		[=](auto &&c) { return c.get() == child; }
 	);
     if(iter == mChildren.end())
         throw std::runtime_error("Cannot find specified child.");
@@ -31,6 +31,15 @@ void usagi::Element::removeChild(Element *child)
     p->fireEvent<PreElementRemovalEvent>();
     mChildren.erase(iter);
     fireEvent<ChildElementRemovedEvent>();
+}
+
+usagi::Element * usagi::Element::findChildByName(const std::string &name) const
+{
+    const auto iter = std::find_if(
+		childrenBegin(), childrenEnd(),
+		[&](auto &&c) { return c->name() == name; }
+	);
+    return iter == childrenEnd() ? nullptr : iter->get();
 }
 
 void usagi::Element::addComponent(std::unique_ptr<Component> component)

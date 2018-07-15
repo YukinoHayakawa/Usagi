@@ -2,7 +2,7 @@
 
 namespace usagi
 {
-class PreElementRemovalEvent : Event
+class PreElementRemovalEvent : public Event
 {
 };
 }
