@@ -5,8 +5,10 @@
 #include <iostream>
 
 #include <glslang/Public/ShaderLang.h>
+#include <glslang/StandAlone/ResourceLimits.h>
 #include <glslang/SPIRV/GlslangToSpv.h>
 #include <glslang/SPIRV/disassemble.h>
+
 #include <loguru.hpp>
 
 #include <Usagi/Engine/Utility/RAIIHelper.hpp>
@@ -35,7 +37,7 @@ void usagi::SpirvBinary::dumpBytecodeBitstream(std::ostream &output)
 std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromFile(
     const fs::path &binary_path)
 {
-    std::ifstream file(binary_path);
+    std::ifstream file(binary_path, std::ios::binary);
     file.exceptions(std::ifstream::badbit | std::ifstream::failbit);
     const auto size = file_size(binary_path);
 
@@ -110,11 +112,11 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
         []() { InitializeProcess(); },
         []() { FinalizeProcess(); }
     };
-    // shader must be released after program, as the program may reference
+    // shader must be released after program because the program may reference
     // the shaders.
     TShader shader(glslang_stage);
     TProgram program;
-    TBuiltInResource resources { };
+    TBuiltInResource resources = glslang::DefaultTBuiltInResource;
 
     const char *strings[] = { glsl_source_code.data() };
     const int sizes[] = { static_cast<int>(glsl_source_code.size()) };
@@ -126,16 +128,26 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
     shader.setEnvTarget(EShTargetSpv, target_version);
 
     TShader::ForbidIncluder includer;
-    if(!shader.parse(&resources, default_version, false, messages, includer))
-        throw std::runtime_error("Shader compilation failed.");
+    const auto compilation_suceeded =
+        shader.parse(&resources, default_version, false, messages, includer);
+
+    if(shader.getInfoLog()[0])
+        LOG_F(INFO, "Compiler output:\n%s", shader.getInfoLog());
+    if(shader.getInfoDebugLog()[0]) 
+        LOG_F(INFO, "Compiler debug output:\n%s", shader.getInfoDebugLog());
 
     program.addShader(&shader);
 
-    if(!program.link(messages) || !program.mapIO())
-        throw std::runtime_error("Shader linking failed.");
+    const auto link_succeeded = program.link(messages) && program.mapIO();
 
-    LOG_F(INFO, "Info log:\n%s", program.getInfoLog());
-	LOG_F(INFO, "Info debug log:\n%s", program.getInfoDebugLog());
+    if(program.getInfoLog()[0])
+        LOG_F(INFO, "Linker output:\n%s", program.getInfoLog());
+	if(program.getInfoDebugLog()[0])
+        LOG_F(INFO, "Linker debug output:\n%s", program.getInfoDebugLog());
+
+    if(!compilation_suceeded || !link_succeeded)
+        throw std::runtime_error("Shader compilation failed.");
+
     program.buildReflection();
 	LOG_F(INFO, "Reflection database:");
 	program.dumpReflection();
