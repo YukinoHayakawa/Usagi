@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include <Usagi/Engine/Core/Event/Library/Component/ComponentAddedEvent.hpp>
-#include <Usagi/Engine/Runtime/Window/Window.hpp>
+#include <Usagi/Engine/Core/Event/Library/Input/MouseMoveEvent.hpp>
 #include <Usagi/Engine/Graphics/GpuDevice.hpp>
 #include <Usagi/Engine/Asset/AssetRoot.hpp>
 
@@ -23,7 +23,7 @@ usagi::Game::Game()
     );
 
     mRootElement.setName("ElementRoot");
-    mAssetRoot = mRootElement.createChild<AssetRoot>();
+    mAssetRoot = mRootElement.addChild<AssetRoot>();
 }
 
 usagi::Game::~Game()
@@ -70,6 +70,26 @@ void usagi::Game::setSubsystemEnabled(
     if(iter == mSubsystems.end())
         throw std::runtime_error("No such subsystem");
     iter->enabled = enabled;
+}
+
+void usagi::Game::onMouseMove(const MousePositionEvent &e)
+{
+    mRootElement.fireEvent<MouseMoveEvent>(e.cursor_position_delta);
+}
+
+void usagi::Game::onMouseButtonStateChange(const MouseButtonEvent &e)
+{
+    // todo
+}
+
+void usagi::Game::onMouseWheelScroll(const MouseWheelEvent &e)
+{
+    // todo
+}
+
+void usagi::Game::onKeyStateChange(const KeyEvent &e)
+{
+    // todo
 }
 
 void usagi::Game::update(const std::chrono::seconds &dt)

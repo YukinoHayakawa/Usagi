@@ -23,62 +23,64 @@ class Win32Window
     // window
 
     HWND mWindowHandle = nullptr;
-    Vector2i mWindowSize;
-    bool mWindowActive;
+    Vector2u32 mWindowSize;
+    bool mWindowActive = false;
     bool mClosed = false;
 
-    static void _ensureWindowSubsystemInitialized();
-    RECT _getClientScreenRect() const;
+    static void ensureWindowSubsystemInitialized();
+    RECT getClientScreenRect() const;
 
-    void _createWindowHandle(const std::string &title, int width, int height);
+    void createWindowHandle(const std::string &title, int width, int height);
     void _registerRawInputDevices() const;
 
-    static LRESULT CALLBACK _windowMessageDispatcher(HWND hWnd, UINT message,
+    static LRESULT CALLBACK windowMessageDispatcher(HWND hWnd, UINT message,
         WPARAM wParam, LPARAM lParam);
-    LRESULT _handleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    LRESULT handleWindowMessage(HWND hWnd, UINT message,
+        WPARAM wParam,LPARAM lParam);
 
     // raw input
 
-    std::unique_ptr<BYTE[]> _getRawInputBuffer(LPARAM lParam) const;
+    std::unique_ptr<BYTE[]> getRawInputBuffer(LPARAM lParam) const;
 
     // mouse
 
     bool mMouseCursorCaptured = false;
     /**
-     * \brief Mouse cursor use a counter to determine whether it should be displayed.
+     * \brief Mouse cursor use a counter to determine whether it should be
+     * displayed.
      * see https://msdn.microsoft.com/en-us/library/windows/desktop/ms648396(v=vs.85).aspx
      */
     bool mShowMouseCursor = true;
-    bool mMouseButtonDown[static_cast<std::size_t>(MouseButtonCode::ENUM_COUNT)] = { false };
+    bool mMouseButtonDown[static_cast<std::size_t>(MouseButtonCode::ENUM_COUNT)]
+        = { false };
 
-    void _sendButtonEvent(MouseButtonCode button, bool pressed);
+    void sendButtonEvent(MouseButtonCode button, bool pressed);
 
-    void _captureCursor() override;
-    void _releaseCursor() override;
-    bool _isCursorCaptured() override;
+    void captureCursor() override;
+    void releaseCursor() override;
+    bool isCursorCaptured() override;
     void showCursor(bool show) override;
-    void _recaptureCursor();
-    void _confineCursorInClientArea() const;
-    void _processMouseInput(const RAWINPUT *raw);
+    void recaptureCursor();
+    void confineCursorInClientArea() const;
+    void processMouseInput(const RAWINPUT *raw);
 
     // keyboard
 
     std::set<KeyCode> mKeyPressed;
 
-    static KeyCode _translateKeyCodeFromRawInput(const RAWKEYBOARD *keyboard);
-    void _sendKeyEvent(KeyCode key, bool pressed, bool repeated);
+    static KeyCode translate(const RAWKEYBOARD *keyboard);
+    void sendKeyEvent(KeyCode key, bool pressed, bool repeated);
 
-    void _processKeyboardInput(RAWINPUT *raw);
-    void _clearKeyPressedStates();
+    void processKeyboardInput(RAWINPUT *raw);
+    void clearKeyPressedStates();
 
 public:
     /**
      * \brief Create an empty window.
      * \param title 
-     * \param width 
-     * \param height 
+     * \param size 
      */
-    Win32Window(const std::string &title, int width, int height);
+    Win32Window(const std::string &title, const Vector2u32 &size);
 
     // window
 
@@ -86,19 +88,19 @@ public:
     HWND getNativeWindowHandle() const;
     static HINSTANCE getProcessInstanceHandle();
 
-    void showWindow(bool show) override;
-    bool isWindowActive() const override;
-    Vector2f getWindowSize() const override;
-    bool isWindowOpen() const override;
+    void show(bool show) override;
+    bool isFocused() const override;
+    Vector2f size() const override;
+    bool isOpen() const override;
     void setTitle(const std::string &title) override;
 
     void processEvents() override;
 
     // mouse
 
-    Vector2f getMouseCursorWindowPos() override;
+    Vector2f getCursorPositionInWindow() override;
     void centerCursor() override;
-    bool isMouseButtonPressed(MouseButtonCode button) const override;
+    bool isButtonPressed(MouseButtonCode button) const override;
 
     // keyboard
 

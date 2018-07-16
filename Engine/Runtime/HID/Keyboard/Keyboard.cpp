@@ -1,6 +1,6 @@
 ﻿#include "Keyboard.hpp"
 
-void usagi::Keyboard::addKeyEventListener(std::shared_ptr<KeyEventListener> listener)
+void usagi::Keyboard::addEventListener(KeyEventListener *listener)
 {
-    mKeyEventListeners.push_back(std::move(listener));
+    mKeyEventListeners.push_back(listener);
 }

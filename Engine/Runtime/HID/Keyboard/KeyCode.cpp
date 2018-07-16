@@ -1,6 +1,6 @@
 ﻿#include "KeyCode.hpp"
 
-const char * usagi::getKeyName(KeyCode key)
+const char * usagi::to_string(KeyCode key)
 {
     switch(key)
     {
@@ -20,17 +20,17 @@ const char * usagi::getKeyName(KeyCode key)
         case KeyCode::PRINT_SCREEN: return "PrintScreen";
         case KeyCode::SCROLL_LOCK: return "ScrollLock";
         case KeyCode::PAUSE: return "Pause";
-        case KeyCode::BACKQUOTE: return "Backquote";
-        case KeyCode::DIGIT_0: return "Digit0";
-        case KeyCode::DIGIT_1: return "Digit1";
-        case KeyCode::DIGIT_2: return "Digit2";
-        case KeyCode::DIGIT_3: return "Digit3";
-        case KeyCode::DIGIT_4: return "Digit4";
-        case KeyCode::DIGIT_5: return "Digit5";
-        case KeyCode::DIGIT_6: return "Digit6";
-        case KeyCode::DIGIT_7: return "Digit7";
-        case KeyCode::DIGIT_8: return "Digit8";
-        case KeyCode::DIGIT_9: return "Digit9";
+        case KeyCode::BACKQUOTE: return "`";
+        case KeyCode::DIGIT_0: return "0";
+        case KeyCode::DIGIT_1: return "1";
+        case KeyCode::DIGIT_2: return "2";
+        case KeyCode::DIGIT_3: return "3";
+        case KeyCode::DIGIT_4: return "4";
+        case KeyCode::DIGIT_5: return "5";
+        case KeyCode::DIGIT_6: return "6";
+        case KeyCode::DIGIT_7: return "7";
+        case KeyCode::DIGIT_8: return "8";
+        case KeyCode::DIGIT_9: return "9";
         case KeyCode::A: return "A";
         case KeyCode::B: return "B";
         case KeyCode::C: return "C";
@@ -57,16 +57,16 @@ const char * usagi::getKeyName(KeyCode key)
         case KeyCode::X: return "X";
         case KeyCode::Y: return "Y";
         case KeyCode::Z: return "Z";
-        case KeyCode::MINUS: return "Minus";
-        case KeyCode::EQUAL: return "Equal";
-        case KeyCode::LEFT_BRACKET: return "LeftBracket";
-        case KeyCode::RIGHT_BRACKET: return "RightBracket";
-        case KeyCode::BACKSLASH: return "Backslash";
-        case KeyCode::SEMICOLON: return "Semicolon";
-        case KeyCode::QUOTE: return "Quote";
-        case KeyCode::COMMA: return "Comma";
-        case KeyCode::PERIOD: return "Period";
-        case KeyCode::SLASH: return "Slash";
+        case KeyCode::MINUS: return "-";
+        case KeyCode::EQUAL: return "=";
+        case KeyCode::LEFT_BRACKET: return "[";
+        case KeyCode::RIGHT_BRACKET: return "]";
+        case KeyCode::BACKSLASH: return "/";
+        case KeyCode::SEMICOLON: return ";";
+        case KeyCode::QUOTE: return "'";
+        case KeyCode::COMMA: return ",";
+        case KeyCode::PERIOD: return ".";
+        case KeyCode::SLASH: return "\\";
         case KeyCode::SPACE: return "Space";
         case KeyCode::BACKSPACE: return "Backspace";
         case KeyCode::TAB: return "Tab";
@@ -92,10 +92,10 @@ const char * usagi::getKeyName(KeyCode key)
         case KeyCode::LEFT: return "Left";
         case KeyCode::RIGHT: return "Right";
         case KeyCode::NUM_LOCK: return "NumLock";
-        case KeyCode::NUM_DIVIDE: return "NumDivide";
-        case KeyCode::NUM_MULTIPLY: return "NumMultiply";
-        case KeyCode::NUM_SUBTRACT: return "NumSubtract";
-        case KeyCode::NUM_ADD: return "NumAdd";
+        case KeyCode::NUM_DIVIDE: return "Num/";
+        case KeyCode::NUM_MULTIPLY: return "Num*";
+        case KeyCode::NUM_SUBTRACT: return "Num-";
+        case KeyCode::NUM_ADD: return "Num+";
         case KeyCode::NUM_0: return "Num0";
         case KeyCode::NUM_1: return "Num1";
         case KeyCode::NUM_2: return "Num2";
@@ -106,7 +106,7 @@ const char * usagi::getKeyName(KeyCode key)
         case KeyCode::NUM_7: return "Num7";
         case KeyCode::NUM_8: return "Num8";
         case KeyCode::NUM_9: return "Num9";
-        case KeyCode::NUM_DECIMAL: return "NumDecimal";
+        case KeyCode::NUM_DECIMAL: return "Num.";
         case KeyCode::NUM_ENTER: return "NumEnter";
         default: return "Unknown";
     }

@@ -6,9 +6,13 @@
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 #include <Usagi/Engine/Core/Element.hpp>
+#include <Usagi/Engine/Runtime/HID/Mouse/MouseEventListener.hpp>
+#include <Usagi/Engine/Runtime/HID/Keyboard/KeyEventListener.hpp>
 
 namespace usagi
 {
+class Keyboard;
+class Mouse;
 class Asset;
 class AssetRoot;
 class Subsystem;
@@ -22,10 +26,16 @@ struct SubsystemInfo
     bool enabled = true;
 };
 
-class Game : Noncopyable
+class Game
+    : Noncopyable
+    , public KeyEventListener
+    , public MouseEventListener
 {
-    std::unique_ptr<Window> mWindow;
+    std::shared_ptr<Window> mWindow;
+    std::shared_ptr<Keyboard> mKeyboard;
+    std::shared_ptr<Mouse> mMouse;
     std::unique_ptr<GpuDevice> mGpuDevice;
+
     std::vector<SubsystemInfo> mSubsystems;
     Element mRootElement { nullptr };
     AssetRoot *mAssetRoot = nullptr;
@@ -37,11 +47,23 @@ class Game : Noncopyable
         const std::string &subsystem_name,
         bool enabled);
 
+    void onMouseMove(const MousePositionEvent &e) override;
+    void onMouseButtonStateChange(const MouseButtonEvent &e) override;
+    void onMouseWheelScroll(const MouseWheelEvent &e) override;
+    void onKeyStateChange(const KeyEvent &e) override;
+
 public:
     Game();
     ~Game();
 
+    /**
+     * \brief Create platform-dependent devices such as window and GPU device.
+     */
+    void initializeDevices();
+
 	Window * window() const { return mWindow.get(); }
+    Mouse * mouse() const { return mMouse.get(); }
+    Keyboard * keyboard() const { return mKeyboard.get(); }
 	GpuDevice * gpuDevice() const { return mGpuDevice.get(); }
 
     /**

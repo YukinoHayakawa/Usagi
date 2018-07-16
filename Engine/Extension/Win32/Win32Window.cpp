@@ -12,13 +12,13 @@ const wchar_t usagi::Win32Window::WINDOW_CLASS_NAME[] =
     L"UsagiWin32WindowWrapper";
 HINSTANCE usagi::Win32Window::mProcessInstanceHandle = nullptr;
 
-void usagi::Win32Window::_ensureWindowSubsystemInitialized()
+void usagi::Win32Window::ensureWindowSubsystemInitialized()
 {
     if(mProcessInstanceHandle)
         return;
 
-    // get the process handle, all windows created using this class get dispatched
-    // to the same place.
+    // get the process handle, all windows created using this class get
+    // dispatched to the same place.
     mProcessInstanceHandle = GetModuleHandle(nullptr);
 
     WNDCLASSEX wcex { };
@@ -26,7 +26,7 @@ void usagi::Win32Window::_ensureWindowSubsystemInitialized()
     wcex.cbSize = sizeof(WNDCLASSEX);
     // CS_OWNDC is required to create OpenGL context
     wcex.style = CS_OWNDC;
-    wcex.lpfnWndProc = &_windowMessageDispatcher;
+    wcex.lpfnWndProc = &windowMessageDispatcher;
     wcex.hInstance = mProcessInstanceHandle;
     // hInstance must be null to use predefined cursors
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
@@ -42,7 +42,7 @@ void usagi::Win32Window::_ensureWindowSubsystemInitialized()
     SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 }
 
-RECT usagi::Win32Window::_getClientScreenRect() const
+RECT usagi::Win32Window::getClientScreenRect() const
 {
     // Get the window client area.
     RECT rc;
@@ -61,8 +61,8 @@ RECT usagi::Win32Window::_getClientScreenRect() const
     return rc;
 }
 
-void usagi::Win32Window::_createWindowHandle(const std::string &title, int width,
-    int height)
+void usagi::Win32Window::createWindowHandle(
+    const std::string &title, int width, int height)
 {
     auto windowTitleWide = string::toWideVector(title);
     // todo update after resizing
@@ -95,7 +95,8 @@ void usagi::Win32Window::_createWindowHandle(const std::string &title, int width
         throw std::runtime_error("mWindowHandle() failed");
     }
 
-    // associate the class instance with the window so they can be identified in WindowProc
+    // associate the class instance with the window so they can be identified 
+    // in WindowProc
     SetWindowLongPtr(mWindowHandle, GWLP_USERDATA,
         reinterpret_cast<LONG_PTR>(this));
 }
@@ -104,20 +105,23 @@ void usagi::Win32Window::_registerRawInputDevices() const
 {
     RAWINPUTDEVICE Rid[2];
 
-    // adds HID mouse, RIDEV_NOLEGACY is not used because we need the system to process non-client area.
+    // adds HID mouse, RIDEV_NOLEGACY is not used because we need the system
+    // to process non-client area.
     Rid[0].usUsagePage = 0x01;
     Rid[0].usUsage = 0x02;
     Rid[0].dwFlags = 0;
     Rid[0].hwndTarget = 0;
 
-    // adds HID keyboard, RIDEV_NOLEGACY is not used to allow the system process hotkeys like
-    // print screen. note that alt+f4 is not handled if related key messages not passed to
-    // DefWindowProc(). generally, RIDEV_NOLEGACY should only be used when having a single fullscreen
+    // adds HID keyboard, RIDEV_NOLEGACY is not used to allow the system
+    // process hotkeys like print screen. note that alt+f4 is not handled
+    // if related key messages not passed to DefWindowProc(). generally,
+    // RIDEV_NOLEGACY should only be used when having a single fullscreen
     // window.
     Rid[1].usUsagePage = 0x01;
     Rid[1].usUsage = 0x06;
-    // interestingly, RIDEV_NOHOTKEYS will prevent the explorer from using the fancy window-choosing
-    // popup, and we still receive key events when switching window, so it is not used here.
+    // interestingly, RIDEV_NOHOTKEYS will prevent the explorer from using
+    // the fancy window-choosing popup, and we still receive key events when
+    // switching window, so it is not used here.
     Rid[1].dwFlags = 0;
     Rid[1].hwndTarget = 0;
 
@@ -129,12 +133,13 @@ void usagi::Win32Window::_registerRawInputDevices() const
     }
 }
 
-usagi::Win32Window::Win32Window(const std::string &title, int width, int height)
+usagi::Win32Window::Win32Window(
+    const std::string &title, const Vector2u32 &size)
 {
-    _ensureWindowSubsystemInitialized();
-    _createWindowHandle(title, width, height);
+    ensureWindowSubsystemInitialized();
+    createWindowHandle(title, size.x(), size.y());
     _registerRawInputDevices();
-    Win32Window::showWindow(true);
+    Win32Window::show(true);
     Win32Window::centerCursor();
 }
 
@@ -143,12 +148,12 @@ HDC usagi::Win32Window::getDeviceContext() const
     return GetDC(mWindowHandle);
 }
 
-void usagi::Win32Window::showWindow(bool show)
+void usagi::Win32Window::show(bool show)
 {
     ShowWindow(mWindowHandle, show ? SW_SHOWNORMAL : SW_HIDE);
 }
 
-bool usagi::Win32Window::isWindowActive() const
+bool usagi::Win32Window::isFocused() const
 {
     return mWindowActive;
 }
@@ -164,12 +169,12 @@ void usagi::Win32Window::processEvents()
     }
 }
 
-usagi::Vector2f usagi::Win32Window::getWindowSize() const
+usagi::Vector2f usagi::Win32Window::size() const
 {
     return mWindowSize.cast<float>();
 }
 
-bool usagi::Win32Window::isWindowOpen() const
+bool usagi::Win32Window::isOpen() const
 {
     return !mClosed;
 }
@@ -180,20 +185,21 @@ void usagi::Win32Window::setTitle(const std::string &title)
     SetWindowText(mWindowHandle, wtitle.c_str());
 }
 
-LRESULT usagi::Win32Window::_windowMessageDispatcher(HWND hWnd, UINT message,
+LRESULT usagi::Win32Window::windowMessageDispatcher(HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam)
 {
     auto window = reinterpret_cast<Win32Window*>(GetWindowLongPtr(hWnd,
         GWLP_USERDATA));
-    // during window creation some misc messages are sent, we just pass them to the system procedure.
+    // during window creation some misc messages are sent, we just pass them
+    // to the system procedure.
     if(!window)
     {
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
-    return window->_handleWindowMessage(hWnd, message, wParam, lParam);
+    return window->handleWindowMessage(hWnd, message, wParam, lParam);
 }
 
-void usagi::Win32Window::_sendButtonEvent(MouseButtonCode button,
+void usagi::Win32Window::sendButtonEvent(MouseButtonCode button,
     bool pressed)
 {
     auto &prev_pressed = mMouseButtonDown[static_cast<std::size_t>(button)];
@@ -217,7 +223,7 @@ void usagi::Win32Window::_sendButtonEvent(MouseButtonCode button,
     }
 }
 
-usagi::KeyCode usagi::Win32Window::_translateKeyCodeFromRawInput(
+usagi::KeyCode usagi::Win32Window::translate(
     const RAWKEYBOARD *keyboard)
 {
     switch(keyboard->VKey)
@@ -320,7 +326,7 @@ usagi::KeyCode usagi::Win32Window::_translateKeyCodeFromRawInput(
         case VK_OEM_7: return KeyCode::QUOTE;
         default: break;
     }
-    int e0_prefixed = (keyboard->Flags & RI_KEY_E0) != 0;
+    const int e0_prefixed = (keyboard->Flags & RI_KEY_E0) != 0;
     switch(keyboard->VKey)
     {
         case VK_SHIFT:
@@ -342,12 +348,12 @@ usagi::KeyCode usagi::Win32Window::_translateKeyCodeFromRawInput(
     }
 }
 
-void usagi::Win32Window::_sendKeyEvent(KeyCode key, bool pressed,
+void usagi::Win32Window::sendKeyEvent(KeyCode key, bool pressed,
     bool repeated)
 {
     KeyEvent e;
     e.keyboard = this;
-    e.keyCode = key;
+    e.key_code = key;
     e.pressed = pressed;
     e.repeated = repeated;
     for(auto &&h : mKeyEventListeners)
@@ -356,28 +362,30 @@ void usagi::Win32Window::_sendKeyEvent(KeyCode key, bool pressed,
     }
 }
 
-void usagi::Win32Window::_confineCursorInClientArea() const
+void usagi::Win32Window::confineCursorInClientArea() const
 {
     if(!mWindowActive) return;
 
-    RECT client_rect = _getClientScreenRect();
+    RECT client_rect = getClientScreenRect();
     ClipCursor(&client_rect);
 }
 
-void usagi::Win32Window::_processMouseInput(const RAWINPUT *raw)
+void usagi::Win32Window::processMouseInput(const RAWINPUT *raw)
 {
     auto &mouse = raw->data.mouse;
 
-    // only receive relative movement. note that the mouse driver typically won't generate
-    // mouse input data based on absolute data.
+    // only receive relative movement. note that the mouse driver typically
+    // won't generate mouse input data based on absolute data.
     // see https://stackoverflow.com/questions/14113303/raw-input-device-rawmouse-usage
     if(mouse.usFlags != MOUSE_MOVE_RELATIVE) return;
 
     // when in GUI mode, only receive events inside the window rect
-    // todo since we use raw input, we receive the mouse messages even if the part of window is covered, in which case the user might perform undesired actions.
+    // todo since we use raw input, we receive the mouse messages even if the
+    // part of window is covered, in which case the user might perform
+    // undesired actions.
     if(!isImmersiveMode())
     {
-        auto cursor = getMouseCursorWindowPos();
+        auto cursor = getCursorPositionInWindow();
         if(cursor.x() < 0 || cursor.y() < 0 || cursor.x() >= mWindowSize.x() ||
             cursor.y() >= mWindowSize.y())
             return;
@@ -388,7 +396,7 @@ void usagi::Win32Window::_processMouseInput(const RAWINPUT *raw)
     {
         MousePositionEvent e;
         e.mouse = this;
-        e.cursorPosDelta = { mouse.lLastX, mouse.lLastY };
+        e.cursor_position_delta = { mouse.lLastX, mouse.lLastY };
         for(auto &&h : mMouseEventListeners)
         {
             h->onMouseMove(e);
@@ -398,21 +406,21 @@ void usagi::Win32Window::_processMouseInput(const RAWINPUT *raw)
     if(mouse.usButtonFlags)
     {
         // process mouse buttons
-        // note that it is impossible to activate another window while holding a mouse
-        // button pressed within the active window, so it is unnecessary to clear
-        // button press states when deactive the window. however this does not hold
-        // for the keyboard.
-#define _MOUSE_BTN_EVENT(button) \
+        // note that it is impossible to activate another window while holding
+        // a mouse button pressed within the active window, so it is
+        // unnecessary to clear button press states when deactive the window.
+        // however this does not hold for the keyboard.
+#define MOUSE_BTN_EVENT(button) \
     if(mouse.usButtonFlags & RI_MOUSE_##button##_BUTTON_DOWN) \
-        _sendButtonEvent(MouseButtonCode::button, true); \
+        sendButtonEvent(MouseButtonCode::button, true); \
     else if(mouse.usButtonFlags & RI_MOUSE_##button##_BUTTON_UP) \
-        _sendButtonEvent(MouseButtonCode::button, false) \
+        sendButtonEvent(MouseButtonCode::button, false) \
 /**/
-        _MOUSE_BTN_EVENT(LEFT);
-        _MOUSE_BTN_EVENT(MIDDLE);
-        _MOUSE_BTN_EVENT(RIGHT);
+        MOUSE_BTN_EVENT(LEFT);
+        MOUSE_BTN_EVENT(MIDDLE);
+        MOUSE_BTN_EVENT(RIGHT);
         // ignore other buttons
-#undef _MOUSE_BTN_EVENT
+#undef MOUSE_BTN_EVENT
 
         // process scrolling
         if(mouse.usButtonFlags & RI_MOUSE_WHEEL)
@@ -428,7 +436,7 @@ void usagi::Win32Window::_processMouseInput(const RAWINPUT *raw)
     }
 }
 
-std::unique_ptr<BYTE[]> usagi::Win32Window::_getRawInputBuffer(
+std::unique_ptr<BYTE[]> usagi::Win32Window::getRawInputBuffer(
     LPARAM lParam) const
 {
     UINT dwSize;
@@ -455,16 +463,16 @@ std::unique_ptr<BYTE[]> usagi::Win32Window::_getRawInputBuffer(
     return std::move(lpb);
 }
 
-void usagi::Win32Window::_recaptureCursor()
+void usagi::Win32Window::recaptureCursor()
 {
-    if(mMouseCursorCaptured) _captureCursor();
+    if(mMouseCursorCaptured) captureCursor();
 }
 
-void usagi::Win32Window::_processKeyboardInput(RAWINPUT *raw)
+void usagi::Win32Window::processKeyboardInput(RAWINPUT *raw)
 {
     auto &kb = raw->data.keyboard;
 
-    auto key = _translateKeyCodeFromRawInput(&kb);
+    auto key = translate(&kb);
     // ignore keys other than those on 101 keyboard
     if(key == KeyCode::UNKNOWN) return;
 
@@ -483,74 +491,74 @@ void usagi::Win32Window::_processKeyboardInput(RAWINPUT *raw)
         mKeyPressed.erase(key);
     }
 
-    _sendKeyEvent(key, pressed, repeated);
+    sendKeyEvent(key, pressed, repeated);
 }
 
-void usagi::Win32Window::_clearKeyPressedStates()
+void usagi::Win32Window::clearKeyPressedStates()
 {
     for(auto iter = mKeyPressed.begin(); iter != mKeyPressed.end();)
     {
-        _sendKeyEvent(*iter, false, false);
+        sendKeyEvent(*iter, false, false);
         iter = mKeyPressed.erase(iter);
     }
 }
 
-LRESULT usagi::Win32Window::_handleWindowMessage(HWND hWnd, UINT message,
+LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam)
 {
     switch(message)
     {
-            // unbuffered raw input data
+        // unbuffered raw input data
         case WM_INPUT:
         {
-            std::unique_ptr<BYTE[]> lpb = _getRawInputBuffer(lParam);
+            std::unique_ptr<BYTE[]> lpb = getRawInputBuffer(lParam);
             RAWINPUT *raw = reinterpret_cast<RAWINPUT*>(lpb.get());
 
             switch(raw->header.dwType)
             {
                 case RIM_TYPEKEYBOARD:
                 {
-                    _processKeyboardInput(raw);
+                    processKeyboardInput(raw);
                     break;
                 }
                 case RIM_TYPEMOUSE:
                 {
-                    _processMouseInput(raw);
+                    processMouseInput(raw);
                     break;
                 }
                 default: break;
             }
             break;
         }
-            // window management
+        // window management
         case WM_ACTIVATEAPP:
         {
             // window being activated
             if((mWindowActive = (wParam == TRUE)))
             {
-                _recaptureCursor();
+                recaptureCursor();
             }
                 // window being deactivated
             else
             {
-                _clearKeyPressedStates();
+                clearKeyPressedStates();
                 break;
             }
             break;
         }
-            // todo: sent resize/move events
+        // todo: sent resize/move events
         case WM_SIZE:
         case WM_MOVE:
         {
-            _recaptureCursor();
+            recaptureCursor();
             break;
         }
-            // ignore any key events
+        // ignore any key events (RawInput is used instead)
         case WM_SYSKEYDOWN:
         case WM_SYSKEYUP:
         case WM_KEYDOWN:
         case WM_KEYUP:
-            // ignore mouse events
+        // ignore mouse events (RawInput is used instead)
         case WM_MOUSEMOVE:
         case WM_LBUTTONDBLCLK:
         case WM_LBUTTONDOWN:
@@ -595,7 +603,7 @@ bool usagi::Win32Window::isKeyPressed(KeyCode key)
     return mKeyPressed.count(key) != 0;
 }
 
-usagi::Vector2f usagi::Win32Window::getMouseCursorWindowPos()
+usagi::Vector2f usagi::Win32Window::getCursorPositionInWindow()
 {
     POINT pt;
     GetCursorPos(&pt);
@@ -603,28 +611,28 @@ usagi::Vector2f usagi::Win32Window::getMouseCursorWindowPos()
     return { pt.x, pt.y };
 }
 
-void usagi::Win32Window::_captureCursor()
+void usagi::Win32Window::captureCursor()
 {
-    _confineCursorInClientArea();
+    confineCursorInClientArea();
 
     mMouseCursorCaptured = true;
 }
 
-void usagi::Win32Window::_releaseCursor()
+void usagi::Win32Window::releaseCursor()
 {
     // remove cursor restriction
     ClipCursor(nullptr);
     mMouseCursorCaptured = false;
 }
 
-bool usagi::Win32Window::_isCursorCaptured()
+bool usagi::Win32Window::isCursorCaptured()
 {
     return mMouseCursorCaptured;
 }
 
 void usagi::Win32Window::centerCursor()
 {
-    const auto rect = _getClientScreenRect();
+    const auto rect = getClientScreenRect();
     Vector2i cursor {
         (rect.left + rect.right) / 2,
         (rect.top + rect.bottom) / 2
@@ -640,7 +648,7 @@ void usagi::Win32Window::showCursor(bool show)
     mShowMouseCursor = show;
 }
 
-bool usagi::Win32Window::isMouseButtonPressed(MouseButtonCode button) const
+bool usagi::Win32Window::isButtonPressed(MouseButtonCode button) const
 {
     const auto idx = static_cast<std::size_t>(button);
     if(idx > sizeof(mMouseButtonDown) / sizeof(bool)) return false;

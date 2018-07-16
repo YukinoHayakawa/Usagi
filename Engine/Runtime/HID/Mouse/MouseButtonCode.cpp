@@ -1,6 +1,6 @@
 ﻿#include "MouseButtonCode.hpp"
 
-const char * usagi::getMouseButtonName(MouseButtonCode key)
+const char * usagi::to_string(MouseButtonCode key)
 {
     switch(key)
     {

@@ -1,28 +1,23 @@
 ﻿#include "Mouse.hpp"
 
-void usagi::Mouse::addMouseEventListener(
-    std::shared_ptr<MouseEventListener> listener)
+void usagi::Mouse::addEventListener(MouseEventListener *listener)
 {
-    mMouseEventListeners.push_back(std::move(listener));
+    mMouseEventListeners.push_back(listener);
 }
 
 void usagi::Mouse::setImmersiveMode(bool enable)
 {
-    if(enable == isImmersiveMode()) return;
+    if(enable == isImmersiveMode())
+        return;
     if(enable)
     {
-        _captureCursor();
+        captureCursor();
         showCursor(false);
     }
     else
     {
-        _releaseCursor();
+        releaseCursor();
         showCursor(true);
     }
     mImmersiveMode = enable;
-}
-
-bool usagi::Mouse::isImmersiveMode() const
-{
-    return mImmersiveMode;
 }

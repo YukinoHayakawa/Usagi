@@ -13,12 +13,12 @@ struct MouseEvent
 
 struct MousePositionEvent : MouseEvent
 {
-    Vector2f cursorPosDelta = Vector2f::Zero();
+    Vector2f cursor_position_delta = Vector2f::Zero();
 };
 
 struct MouseButtonEvent : MouseEvent
 {
-    MouseButtonCode button;
+    MouseButtonCode button = MouseButtonCode::UNKNOWN;
     bool pressed = false;
 };
 

@@ -7,8 +7,10 @@ enum class MouseButtonCode
     LEFT,
     RIGHT,
     MIDDLE,
-    ENUM_COUNT
+    UNKNOWN,
+
+    ENUM_COUNT,
 };
 
-const char * getMouseButtonName(MouseButtonCode key);
+const char * to_string(MouseButtonCode key);
 }

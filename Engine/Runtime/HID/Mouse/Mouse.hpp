@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <memory>
 #include <vector>
 
 #include <Usagi/Engine/Core/Math.hpp>
@@ -9,12 +8,10 @@
 
 namespace usagi
 {
-enum class KeyCode;
-
 class Mouse
 {
 protected:
-    std::vector<std::shared_ptr<class MouseEventListener>> mMouseEventListeners;
+    std::vector<class MouseEventListener*> mMouseEventListeners;
 
 private:
     bool mImmersiveMode = false;
@@ -22,9 +19,9 @@ private:
 public:
     virtual ~Mouse() = default;
 
-    void addMouseEventListener(std::shared_ptr<MouseEventListener> listener);
+    void addEventListener(MouseEventListener *listener);
 
-    virtual Vector2f getMouseCursorWindowPos() = 0;
+    virtual Vector2f getCursorPositionInWindow() = 0;
 
     /**
      * \brief Immersive mode allows continuous movement of the mouse without
@@ -42,7 +39,7 @@ public:
      * window should be generated like the system default.
      */
     void setImmersiveMode(bool enable);
-    bool isImmersiveMode() const;
+    bool isImmersiveMode() const { return mImmersiveMode; }
 
     /**
      * \brief Put the mouse cursor at the center of the rendering area of the window.
@@ -54,7 +51,7 @@ public:
     */
     virtual void showCursor(bool show) = 0;
 
-    virtual bool isMouseButtonPressed(MouseButtonCode button) const = 0;
+    virtual bool isButtonPressed(MouseButtonCode button) const = 0;
 
 private:
     /**
@@ -62,11 +59,11 @@ private:
     * events will continue to generate even if the cursor touches the area border as
     * if moving on an infinitely large surface.
     */
-    virtual void _captureCursor() = 0;
+    virtual void captureCursor() = 0;
     /**
     * \brief Allow the mouse cursor to move outwards the rendering area of the window.
     */
-    virtual void _releaseCursor() = 0;
-    virtual bool _isCursorCaptured() = 0;
+    virtual void releaseCursor() = 0;
+    virtual bool isCursorCaptured() = 0;
 };
 }

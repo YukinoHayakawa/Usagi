@@ -130,9 +130,7 @@ enum class KeyCode
     NUM_9,
     NUM_DECIMAL,
     NUM_ENTER,
-
-    ENUM_COUNT
 };
 
-const char * getKeyName(KeyCode key);
+const char * to_string(KeyCode key);
 }
