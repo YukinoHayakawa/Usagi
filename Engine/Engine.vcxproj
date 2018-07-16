@@ -82,7 +82,7 @@
     </ClCompile>
     <Link />
     <Lib>
-      <AdditionalDependencies>glslangd.lib;SPIRVd.lib;HLSLd.lib;OSDependentd.lib;OGLCompilerd.lib;glslang-default-resource-limitsd.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glslangd.lib;SPIRVd.lib;HLSLd.lib;OSDependentd.lib;OGLCompilerd.lib;glslang-default-resource-limitsd.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -119,7 +119,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>glslang.lib;SPIRV.lib;HLSL.lib;OSDependent.lib;OGLCompiler.lib;glslang-default-resource-limits.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glslang.lib;SPIRV.lib;HLSL.lib;OSDependent.lib;OGLCompiler.lib;glslang-default-resource-limits.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -128,11 +128,15 @@
     <ClCompile Include="Asset\Filesystem\FilesystemAsset.cpp" />
     <ClCompile Include="Asset\Filesystem\FilesystemAssetPackage.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanExtensions.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGpuDevice.cpp" />
     <ClCompile Include="Extension\Win32\WGLContext.cpp" />
     <ClCompile Include="Extension\Win32\Win32Keyboard.cpp" />
     <ClCompile Include="Extension\Win32\Win32Mouse.cpp" />
     <ClCompile Include="Extension\Win32\Win32Window.cpp" />
-    <ClCompile Include="Game\Win32Game.cpp" />
+    <ClCompile Include="Graphics\GpuCommandPool.cpp" />
+    <ClCompile Include="Runtime\Init\VulkanGame.cpp" />
+    <ClCompile Include="Runtime\Init\Win32Game.cpp" />
     <ClCompile Include="Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClInclude Include="Asset\Asset.hpp" />
@@ -149,6 +153,8 @@
     <ClInclude Include="Core\Event\Library\Element\ChildElementEvent.hpp" />
     <ClInclude Include="Core\Event\Library\Element\PreElementRemovalEvent.hpp" />
     <ClInclude Include="Core\Math.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGpuBuffer.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGpuDevice.hpp" />
     <ClInclude Include="Extension\Win32\WGLContext.hpp" />
     <ClInclude Include="Extension\Win32\Win32Keyboard.hpp" />
     <ClInclude Include="Extension\Win32\Win32Mouse.hpp" />
@@ -170,8 +176,16 @@
     <ClInclude Include="Graphics\Enum\GpuImageLayout.hpp" />
     <ClInclude Include="Graphics\Enum\GraphicsImageLayout.hpp" />
     <ClInclude Include="Graphics\Enum\GraphicsIndexType.hpp" />
+    <ClInclude Include="Graphics\GpuBuffer.hpp" />
+    <ClInclude Include="Graphics\GpuCommandPool.hpp" />
+    <ClInclude Include="Graphics\GpuDevice.hpp" />
+    <ClInclude Include="Graphics\GraphicsCommandList.hpp" />
+    <ClInclude Include="Graphics\GraphicsPipeline.hpp" />
+    <ClInclude Include="Graphics\GraphicsPipelineCompiler.hpp" />
+    <ClInclude Include="Graphics\PipelineCreateInfo.hpp" />
     <ClInclude Include="Graphics\Shader\ShaderStage.hpp" />
     <ClInclude Include="Graphics\Shader\SpirvBinary.hpp" />
+    <ClInclude Include="Graphics\TransferCommandList.hpp" />
     <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
     <ClInclude Include="Runtime\HID\Keyboard\Keyboard.hpp" />
     <ClInclude Include="Runtime\HID\Keyboard\KeyCode.hpp" />

@@ -56,10 +56,8 @@ public:
     Game();
     ~Game();
 
-    /**
-     * \brief Create platform-dependent devices such as window and GPU device.
-     */
-    void initializeDevices();
+    void initializeInput();
+    void initializeGraphics();
 
 	Window * window() const { return mWindow.get(); }
     Mouse * mouse() const { return mMouse.get(); }

@@ -10,7 +10,8 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateDebugReportCallbackEXT(
     const VkAllocationCallbacks *pAllocator,
     VkDebugReportCallbackEXT *pCallback)
 {
-    if(auto func = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT")))
+    if(auto func = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(
+        vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT")))
     {
         return func(instance, pCreateInfo, pAllocator, pCallback);
     }
@@ -22,7 +23,8 @@ VKAPI_ATTR void VKAPI_CALL vkDestroyDebugReportCallbackEXT(
     VkDebugReportCallbackEXT callback,
     const VkAllocationCallbacks *pAllocator)
 {
-    if(auto func = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT")))
+    if(auto func = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(
+        vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT")))
     {
         func(instance, callback, pAllocator);
     }
@@ -38,8 +40,10 @@ VKAPI_ATTR void VKAPI_CALL vkDebugReportMessageEXT(
     const char *pLayerPrefix,
     const char *pMessage)
 {
-    if(auto func = reinterpret_cast<PFN_vkDebugReportMessageEXT>(vkGetInstanceProcAddr(instance, "vkDebugReportMessageEXT")))
+    if(auto func = reinterpret_cast<PFN_vkDebugReportMessageEXT>(
+        vkGetInstanceProcAddr(instance, "vkDebugReportMessageEXT")))
     {
-        func(instance, flags, objectType, object, location, messageCode, pLayerPrefix, pMessage);
+        func(instance, flags, objectType, object, location, messageCode,
+            pLayerPrefix, pMessage);
     }
 }

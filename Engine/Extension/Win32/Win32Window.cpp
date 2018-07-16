@@ -139,7 +139,6 @@ usagi::Win32Window::Win32Window(
     createWindowHandle(title, size.x(), size.y());
     registerRawInputDevices();
     Win32Window::show(true);
-    mMouse.centerCursor();
 }
 
 HDC usagi::Win32Window::deviceContext() const

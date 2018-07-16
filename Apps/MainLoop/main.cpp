@@ -64,7 +64,7 @@ public:
 int main(int argc, char *argv[])
 {
     Game game;
-    game.initializeDevices();
+    game.initializeInput();
 
     InputHandler handler { &game };
     game.keyboard()->addEventListener(&handler);

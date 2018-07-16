@@ -1,10 +1,10 @@
 ﻿#ifdef _WIN32
 
-#include "Game.hpp"
+#include <Usagi/Engine/Game/Game.hpp>
 
 #include <Usagi/Engine/Extension/Win32/Win32Window.hpp>
 
-void usagi::Game::initializeDevices()
+void usagi::Game::initializeInput()
 {
     // todo: window params
     const auto window = std::make_shared<Win32Window>(
