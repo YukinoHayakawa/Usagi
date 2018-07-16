@@ -74,7 +74,7 @@ void usagi::Game::setSubsystemEnabled(
 
 void usagi::Game::onMouseMove(const MousePositionEvent &e)
 {
-    mRootElement.fireEvent<MouseMoveEvent>(e.cursor_position_delta);
+    mRootElement.fireEvent<MouseMoveEvent>(e.distance);
 }
 
 void usagi::Game::onMouseButtonStateChange(const MouseButtonEvent &e)

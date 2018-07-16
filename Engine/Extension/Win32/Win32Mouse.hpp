@@ -25,6 +25,7 @@ class Win32Mouse : public Mouse
         = { false };
 
     void sendButtonEvent(MouseButtonCode button, bool pressed);
+    void sendWheelEvent(const Vector2f &distance);
 
     void recaptureCursor();
     void confineCursorInClientArea() const;

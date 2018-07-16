@@ -21,7 +21,7 @@ public:
     void onMouseMove(const MousePositionEvent &e) override
     {
         LOG_F(INFO, "Mouse moved:   %f, %f",
-            e.cursor_position_delta.x(), e.cursor_position_delta.y()
+            e.distance.x(), e.distance.y()
         );
     }
 
@@ -34,8 +34,8 @@ public:
 
     void onMouseWheelScroll(const MouseWheelEvent &e) override
     {
-        LOG_F(INFO, "Mouse wheel:   %d, %d",
-            0, e.distance
+        LOG_F(INFO, "Mouse wheel:   %f, %f",
+            e.distance.x(), e.distance.y()
         );
     }
 

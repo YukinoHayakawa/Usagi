@@ -13,7 +13,7 @@ struct MouseEvent
 
 struct MousePositionEvent : MouseEvent
 {
-    Vector2f cursor_position_delta = Vector2f::Zero();
+    Vector2f distance = Vector2f::Zero();
 };
 
 struct MouseButtonEvent : MouseEvent
@@ -24,7 +24,7 @@ struct MouseButtonEvent : MouseEvent
 
 struct MouseWheelEvent : MouseEvent
 {
-    int distance = 0;
+    Vector2f distance = Vector2f::Zero();
 };
 
 class MouseEventListener

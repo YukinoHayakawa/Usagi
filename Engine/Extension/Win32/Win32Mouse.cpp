@@ -27,6 +27,17 @@ void usagi::Win32Mouse::sendButtonEvent(MouseButtonCode button, bool pressed)
     }
 }
 
+void usagi::Win32Mouse::sendWheelEvent(const Vector2f &distance)
+{
+    MouseWheelEvent e;
+    e.mouse = this;
+    e.distance = distance;
+    for(auto &&h : mMouseEventListeners)
+    {
+        h->onMouseWheelScroll(e);
+    }
+}
+
 void usagi::Win32Mouse::recaptureCursor()
 {
     if(mMouseCursorCaptured) captureCursor();
@@ -67,7 +78,7 @@ void usagi::Win32Mouse::processMouseInput(const RAWINPUT *raw)
     {
         MousePositionEvent e;
         e.mouse = this;
-        e.cursor_position_delta = { mouse.lLastX, mouse.lLastY };
+        e.distance = { mouse.lLastX, mouse.lLastY };
         for(auto &&h : mMouseEventListeners)
         {
             h->onMouseMove(e);
@@ -80,30 +91,27 @@ void usagi::Win32Mouse::processMouseInput(const RAWINPUT *raw)
         // note that it is impossible to activate another window while holding
         // a mouse button pressed within the active window, so it is
         // unnecessary to clear button press states when deactive the window.
-        // however this does not hold for the keyboard.
-#define MOUSE_BTN_EVENT(button) \
-    if(mouse.usButtonFlags & RI_MOUSE_##button##_BUTTON_DOWN) \
-        sendButtonEvent(MouseButtonCode::button, true); \
-    else if(mouse.usButtonFlags & RI_MOUSE_##button##_BUTTON_UP) \
-        sendButtonEvent(MouseButtonCode::button, false) \
+        // however this is not the case for the keyboard.
+#define MOUSE_BTN_EVENT(native_code, code) \
+        if(mouse.usButtonFlags & RI_MOUSE_##native_code##_DOWN) \
+            sendButtonEvent(MouseButtonCode::code, true); \
+        else if(mouse.usButtonFlags & RI_MOUSE_##native_code##_UP) \
+            sendButtonEvent(MouseButtonCode::code, false) \
 /**/
-        MOUSE_BTN_EVENT(LEFT);
-        MOUSE_BTN_EVENT(MIDDLE);
-        MOUSE_BTN_EVENT(RIGHT);
-        // ignore other buttons
+        MOUSE_BTN_EVENT(LEFT_BUTTON, LEFT);
+        MOUSE_BTN_EVENT(MIDDLE_BUTTON, MIDDLE);
+        MOUSE_BTN_EVENT(RIGHT_BUTTON, RIGHT);
+        MOUSE_BTN_EVENT(BUTTON_4, BUTTON_4);
+        MOUSE_BTN_EVENT(BUTTON_5, BUTTON_5);
 #undef MOUSE_BTN_EVENT
 
         // process scrolling
         if(mouse.usButtonFlags & RI_MOUSE_WHEEL)
-        {
-            MouseWheelEvent e;
-            e.mouse = this;
-            e.distance = static_cast<short>(mouse.usButtonData);
-            for(auto &&h : mMouseEventListeners)
-            {
-                h->onMouseWheelScroll(e);
-            }
-        }
+            sendWheelEvent({ 0, static_cast<short>(mouse.usButtonData) });
+        // horizontal scrolling, which seems to be undocumented.
+        // discovered here: https://stackoverflow.com/questions/7942307/horizontal-mouse-wheel-messages-from-windows-raw-input
+        if(mouse.usButtonFlags & RI_MOUSE_HWHEEL)
+            sendWheelEvent({ static_cast<short>(mouse.usButtonData), 0 });
     }
 }
 
