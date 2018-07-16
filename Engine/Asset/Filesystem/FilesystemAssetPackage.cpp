@@ -44,7 +44,7 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
 	// not in cache, create a child as proxy and return it.
     // the asset won't be loaded until load() is invoked on it.
     {
-        return createChild<FilesystemAsset>(normalized.string());
+        return addChild<FilesystemAsset>(normalized.string());
     }
 }
 

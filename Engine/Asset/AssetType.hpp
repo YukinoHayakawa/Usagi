@@ -4,7 +4,7 @@ namespace usagi
 {
 enum class AssetType
 {
-    UNKNOWN,
+    UNINITIALIZED,
     PACKAGE,
     // contains sub-assets
     DIRECTORY,

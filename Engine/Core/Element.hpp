@@ -71,7 +71,7 @@ class Element : Noncopyable
 
     /**
      * \brief Invoked before adding a child. If false is returned, the addition
-     * is aborted and a std::logic_error is thrown by createChild().
+     * is aborted and a std::logic_error is thrown by addChild().
      * \param child 
      * \return 
      */
@@ -96,7 +96,7 @@ public:
     Element * parent() const { return mParent; }
 
     template <typename ElementType = Element, typename... Args>
-    ElementType * createChild(Args && ...args)
+    ElementType * addChild(Args && ...args)
     {
         static_assert(std::is_base_of_v<Element, ElementType>,
 			"ElementType is not derived from Element.");

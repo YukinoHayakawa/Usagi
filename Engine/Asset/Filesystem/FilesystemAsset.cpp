@@ -2,6 +2,8 @@
 
 #include <fstream>
 
+#include <loguru.hpp>
+
 #include <Usagi/Engine/Graphics/Shader/SpirvBinary.hpp>
 
 #include "FilesystemAssetPackage.hpp"
@@ -14,15 +16,26 @@ usagi::FilesystemAsset::FilesystemAsset(Element *parent, std::string name)
 void usagi::FilesystemAsset::load()
 {
     const auto full_path =
-		static_cast<FilesystemAssetPackage*>(parent())->rootPath() / name();
+        static_cast<FilesystemAssetPackage*>(parent())->rootPath() / name();
     const auto ext = full_path.extension();
     std::ifstream in { full_path, std::ios::binary };
-    in.exceptions(std::ios::badbit);
+    in.exceptions(std::ios::badbit | std::ios::failbit);
+
+    if(!in)
+    {
+        LOG_S(ERROR) << "Failed to open " << full_path;
+        throw std::runtime_error("Failed to open file.");
+    }
 
     if(ext == ".vert")
+    {
         mPayload = SpirvBinary::fromGlslSourceStream(in, ShaderStage::VERTEX);
-	else if(ext == ".frag")
-		mPayload = SpirvBinary::fromGlslSourceStream(in, ShaderStage::FRAGMENT);
-	else
-        throw std::runtime_error("Unsupported file format.");
+        mType = AssetType::VERTEX_SHADER;
+    }
+    else if(ext == ".frag")
+    {
+        mPayload = SpirvBinary::fromGlslSourceStream(in, ShaderStage::FRAGMENT);
+        mType = AssetType::FRAGMENT_SHADER;
+    }
+    else { throw std::runtime_error("Unsupported file format."); }
 }

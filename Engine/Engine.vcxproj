@@ -82,7 +82,7 @@
     </ClCompile>
     <Link />
     <Lib>
-      <AdditionalDependencies>glslangd.lib;SPIRVd.lib;HLSLd.lib;OSDependentd.lib;OGLCompilerd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glslangd.lib;SPIRVd.lib;HLSLd.lib;OSDependentd.lib;OGLCompilerd.lib;glslang-default-resource-limitsd.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -119,58 +119,49 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>glslang.lib;SPIRV.lib;HLSL.lib;OSDependent.lib;OGLCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glslang.lib;SPIRV.lib;HLSL.lib;OSDependent.lib;OGLCompiler.lib;glslang-default-resource-limits.lib;spirv-cross-core.lib;spirv-cross-cpp.lib;spirv-cross-glsl.lib;spirv-cross-hlsl.lib;spirv-cross-reflect.lib;spirv-cross-util.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Asset\AssetPackage.cpp" />
+    <ClCompile Include="Asset\AssetRoot.cpp" />
+    <ClCompile Include="Asset\Filesystem\FilesystemAsset.cpp" />
+    <ClCompile Include="Asset\Filesystem\FilesystemAssetPackage.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGraphicsCommandList.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipeline.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipelineCompiler.cpp" />
-    <ClCompile Include="Graphics\GpuCommandPool.cpp" />
-    <ClCompile Include="Graphics\RenderableComponent.cpp" />
-    <ClCompile Include="GUI\ImGuiSubsystem.cpp" />
+    <ClCompile Include="Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Utility\File.cpp" />
-    <ClInclude Include="Asset\AssetImporter.hpp" />
-    <ClInclude Include="Asset\AssimpAssetImporter.hpp" />
+    <ClInclude Include="Asset\Asset.hpp" />
+    <ClInclude Include="Asset\AssetRoot.hpp" />
+    <ClInclude Include="Asset\AssetType.hpp" />
     <ClInclude Include="Asset\AssetPackage.hpp" />
+    <ClInclude Include="Asset\Filesystem\FilesystemAsset.hpp" />
+    <ClInclude Include="Asset\Filesystem\FilesystemAssetPackage.hpp" />
+    <ClInclude Include="Core\Event\Library\Component\ComponentEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Component\PostComponentRemovalEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Element\ChildElementAddedEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Element\ChildElementRemovedEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Element\ElementCreatedEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Element\ChildElementEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Element\PreElementRemovalEvent.hpp" />
     <ClInclude Include="Core\Math.hpp" />
     <ClInclude Include="Game\ConstrainedSubsystem.hpp" />
     <ClInclude Include="Game\Game.hpp" />
     <ClInclude Include="Game\Subsystem.hpp" />
-    <ClInclude Include="Core\Event\Library\RemoveComponentEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Component\PreComponentRemovalEvent.hpp" />
     <ClInclude Include="Core\Component.hpp" />
-    <ClInclude Include="Core\Event\Library\AddComponentEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Component\ComponentAddedEvent.hpp" />
     <ClInclude Include="Core\Event\Event.hpp" />
     <ClInclude Include="Core\Element.hpp" />
-    <ClInclude Include="Core\Event\EventTypeTag.hpp" />
-    <ClInclude Include="Core\Event\TaggedEvent.hpp" />
-    <ClCompile Include="Asset\AssetImporter.cpp" />
-    <ClCompile Include="Asset\AssimpAssetImporter.cpp" />
     <ClCompile Include="Core\Event\Event.cpp" />
     <ClCompile Include="Core\Element.cpp" />
     <ClCompile Include="Game\Game.cpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGpuBuffer.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGraphicsCommandList.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGpuDevice.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipeline.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipelineCompiler.hpp" />
-    <ClInclude Include="Extension\Win32\Win32Window.hpp" />
-    <ClInclude Include="Extension\Win32\WindowsHeader.hpp" />
-    <ClInclude Include="Graphics\GpuDataFormat.hpp" />
-    <ClInclude Include="Graphics\GpuCommandPool.hpp" />
-    <ClInclude Include="Graphics\GpuBuffer.hpp" />
-    <ClInclude Include="Graphics\GraphicsCommandList.hpp" />
-    <ClInclude Include="Graphics\GpuDevice.hpp" />
-    <ClInclude Include="Graphics\GraphicsPipeline.hpp" />
-    <ClInclude Include="Graphics\GraphicsPipelineCompiler.hpp" />
-    <ClInclude Include="Graphics\GraphicsImageLayout.hpp" />
-    <ClInclude Include="Graphics\GraphicsIndexType.hpp" />
-    <ClInclude Include="Graphics\PipelineCreateInfo.hpp" />
-    <ClInclude Include="Graphics\RenderableComponent.hpp" />
+    <ClInclude Include="Graphics\Enum\GpuBufferFormat.hpp" />
+    <ClInclude Include="Graphics\Enum\GpuDataFormat.hpp" />
+    <ClInclude Include="Graphics\Enum\GpuImageLayout.hpp" />
+    <ClInclude Include="Graphics\Enum\GraphicsImageLayout.hpp" />
+    <ClInclude Include="Graphics\Enum\GraphicsIndexType.hpp" />
     <ClInclude Include="Graphics\Shader\ShaderStage.hpp" />
     <ClInclude Include="Graphics\Shader\SpirvBinary.hpp" />
-    <ClInclude Include="GUI\ImGuiSubsystem.hpp" />
     <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
     <ClInclude Include="Runtime\HID\Keyboard\Keyboard.hpp" />
     <ClInclude Include="Runtime\HID\Keyboard\KeyCode.hpp" />
@@ -181,6 +172,7 @@
     <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
+    <ClInclude Include="Utility\EnumTranslator.hpp" />
     <ClInclude Include="Utility\File.hpp" />
     <ClInclude Include="Utility\Flag.hpp" />
     <ClInclude Include="Utility\Iterator.h" />
@@ -192,13 +184,13 @@
     <ClInclude Include="Utility\TypeCast.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Extension\Win32\Win32Window.cpp" />
-    <ClCompile Include="Graphics\GraphicsCommandList.cpp" />
-    <ClCompile Include="Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\HID\Keyboard\Keyboard.cpp" />
     <ClCompile Include="Runtime\HID\Keyboard\KeyCode.cpp" />
     <ClCompile Include="Runtime\HID\Mouse\Mouse.cpp" />
     <ClCompile Include="Runtime\HID\Mouse\MouseButtonCode.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Asset\Asset.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

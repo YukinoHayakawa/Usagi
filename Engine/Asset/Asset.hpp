@@ -14,6 +14,8 @@ class Asset : public Element
 {
     bool acceptChild(Element *child) override;
 
+    void checkLoaded() const;
+
 protected:
     const boost::uuids::uuid mUuid;
     std::any mPayload;
@@ -41,13 +43,15 @@ public:
     template <typename AssetT>
     std::shared_ptr<AssetT> as()
     {
+        checkLoaded();
         return std::any_cast<std::shared_ptr<AssetT>>(mPayload);
     }
 
 	template <typename AssetT, typename DerivedAssetT>
 	std::shared_ptr<DerivedAssetT> as(const std::string &name)
 	{
-		return dynamic_pointer_cast_throw<DerivedAssetT>(as<AssetT>(name));
+        checkLoaded();
+        return dynamic_pointer_cast_throw<DerivedAssetT>(as<AssetT>(name));
 	}
 };
 }
