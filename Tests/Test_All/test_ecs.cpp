@@ -9,6 +9,7 @@
 #include <Usagi/Engine/Core/Event/Event.hpp>
 #include <Usagi/Engine/Game/Game.hpp>
 #include <Usagi/Engine/Game/ConstrainedSubsystem.hpp>
+#include <Usagi/Engine/Utility/TypeCast.hpp>
 
 using namespace usagi;
 
@@ -55,10 +56,10 @@ public:
         }
     }
 
-    void updateRegistry(Element *entity) override
+    void updateRegistry(Element *element) override
     {
-        if(handles(entity))
-            mEntity = entity;
+        if(handles(element))
+            mEntity = element;
     }
 
     std::unique_ptr<PhysicalComponent> createPhysicalComponent() const
@@ -101,7 +102,7 @@ TEST(ECSTest, EventBubblingTest)
     //     c
 
     Game game;
-    auto r = game.rootEntity();
+    auto r = game.rootElement();
     auto a = r->addChild();
     auto b = r->addChild();
     auto c = a->addChild();
@@ -134,7 +135,7 @@ TEST(ECSTest, EventBubblingTest)
 TEST(ECSTest, EventCancelTest)
 {
     Game game;
-    auto r = game.rootEntity();
+    auto r = game.rootElement();
     bool a = false, b = false, c = false;
     r->addEventListener<TestEvent>(
         [&](auto &&e) {
@@ -159,7 +160,7 @@ TEST(ECSTest, EventCancelTest)
 TEST(ECSTest, ComponentIdentityTest)
 {
     Game game;
-    auto r = game.rootEntity();
+    auto r = game.rootElement();
     r->addComponent<PhysicalComponent>();
     EXPECT_TRUE(r->hasComponent<PhysicalComponent>());
     EXPECT_FALSE(r->hasComponent<PositionComponent>());
@@ -189,7 +190,7 @@ TEST(ECSTest, ComponentSystemInteractionTest)
         info.subsystem = std::make_unique<PhysicsSubsystem>();
         EXPECT_NO_THROW(game.addSubsystem(std::move(info)));
     }
-    auto r = game.rootEntity();
+    auto r = game.rootElement();
     r->addComponent<PositionComponent>();
     r->addComponent<PhysicalComponent>();
     EXPECT_FLOAT_EQ(
@@ -220,7 +221,7 @@ TEST(ECSTest, PolymorphicComponentTest)
         EXPECT_NO_THROW(phy = static_cast<PhysicsSubsystem*>(
             game.addSubsystem(std::move(info))));
     }
-    auto r = game.rootEntity();
+    auto r = game.rootElement();
     r->addComponent(phy->createPhysicalComponent());
     EXPECT_NO_THROW(r->getComponent<PhysicalComponent>());
     AdvancedPhysicalComponent *c = nullptr;
@@ -230,4 +231,27 @@ TEST(ECSTest, PolymorphicComponentTest)
     EXPECT_FLOAT_EQ((c->acceleration - Eigen::Vector3f(5, 6, 7)).norm(), 0.f);
 }
 
-#include "../GTestMain.hpp"
+namespace
+{
+class StrictElement : public Element
+{
+public:
+	StrictElement(Element *parent)
+		: Element { parent }
+	{
+	}
+
+private:
+    bool acceptChild(Element *child) override
+    {
+        return is_instance_of<StrictElement>(child);
+    }
+};
+}
+
+TEST(ECSTest, ChildRejectionTest)
+{
+    StrictElement e { nullptr };
+    EXPECT_THROW(e.addChild(), std::logic_error);
+    EXPECT_NO_THROW(e.addChild<StrictElement>());
+}
