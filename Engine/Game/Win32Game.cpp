@@ -12,8 +12,10 @@ void usagi::Game::initializeDevices()
         Vector2u32 { 1920, 1080 }
     );
     mWindow = window;
-    mKeyboard = window;
-    mMouse = window;
+    // dummy deleters are used because the mouse and keyboard are managed
+    // by the window
+    mKeyboard = std::shared_ptr<Keyboard> { window->keyboard(), [](auto) { } };
+    mMouse = std::shared_ptr<Mouse> { window->mouse(), [](auto) { } };
 
     // setup event listeners
     mKeyboard->addEventListener(this);

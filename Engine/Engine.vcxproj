@@ -128,6 +128,11 @@
     <ClCompile Include="Asset\Filesystem\FilesystemAsset.cpp" />
     <ClCompile Include="Asset\Filesystem\FilesystemAssetPackage.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
+    <ClCompile Include="Extension\Win32\WGLContext.cpp" />
+    <ClCompile Include="Extension\Win32\Win32Keyboard.cpp" />
+    <ClCompile Include="Extension\Win32\Win32Mouse.cpp" />
+    <ClCompile Include="Extension\Win32\Win32Window.cpp" />
+    <ClCompile Include="Game\Win32Game.cpp" />
     <ClCompile Include="Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClInclude Include="Asset\Asset.hpp" />
@@ -144,6 +149,11 @@
     <ClInclude Include="Core\Event\Library\Element\ChildElementEvent.hpp" />
     <ClInclude Include="Core\Event\Library\Element\PreElementRemovalEvent.hpp" />
     <ClInclude Include="Core\Math.hpp" />
+    <ClInclude Include="Extension\Win32\WGLContext.hpp" />
+    <ClInclude Include="Extension\Win32\Win32Keyboard.hpp" />
+    <ClInclude Include="Extension\Win32\Win32Mouse.hpp" />
+    <ClInclude Include="Extension\Win32\Win32Window.hpp" />
+    <ClInclude Include="Extension\Win32\WindowsHeader.hpp" />
     <ClInclude Include="Game\ConstrainedSubsystem.hpp" />
     <ClInclude Include="Game\Game.hpp" />
     <ClInclude Include="Game\Subsystem.hpp" />
@@ -169,6 +179,7 @@
     <ClInclude Include="Runtime\HID\Mouse\Mouse.hpp" />
     <ClInclude Include="Runtime\HID\Mouse\MouseButtonCode.hpp" />
     <ClInclude Include="Runtime\HID\Mouse\MouseEventListener.hpp" />
+    <ClInclude Include="Core\Event\Library\Input\MouseMoveEvent.hpp" />
     <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />

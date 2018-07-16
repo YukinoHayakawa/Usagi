@@ -8,10 +8,16 @@
 using namespace usagi;
 
 class InputHandler
-    : public KeyEventListener
-    , public MouseEventListener
+    : public KeyEventListener, public MouseEventListener
 {
+    Game *mGame;
+
 public:
+    explicit InputHandler(Game *game)
+        : mGame { game }
+    {
+    }
+
     void onMouseMove(const MousePositionEvent &e) override
     {
         LOG_F(INFO, "Mouse moved:   %f, %f",
@@ -38,6 +44,20 @@ public:
         LOG_F(INFO, "Key:           %s=%d, repeated=%d",
             to_string(e.key_code), e.pressed, e.repeated
         );
+        switch(e.key_code)
+        {
+            case KeyCode::ESCAPE:
+                mGame->window()->close();
+                break;
+            case KeyCode::I:
+                if(e.pressed)
+                    mGame->mouse()->setImmersiveMode(
+                        !mGame->mouse()->isImmersiveMode()
+                    );
+                break;
+            default:
+                break;
+        }
     }
 };
 
@@ -45,13 +65,11 @@ int main(int argc, char *argv[])
 {
     Game game;
     game.initializeDevices();
-    InputHandler handler;
+
+    InputHandler handler { &game };
     game.keyboard()->addEventListener(&handler);
     game.mouse()->addEventListener(&handler);
 
     const auto window = game.window();
-    while(window->isOpen())
-    {
-        window->processEvents();
-    }
+    while(window->isOpen()) { window->processEvents(); }
 }
