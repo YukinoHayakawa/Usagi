@@ -1,21 +1,16 @@
 ﻿#pragma once
 
-#include <vector>
+#include <Usagi/Engine/Runtime/HID/EventEmitter.hpp>
+
+#include "KeyEventListener.hpp"
 
 namespace usagi
 {
 enum class KeyCode;
 
-class Keyboard
+class Keyboard : public EventEmitter<KeyEventListener>
 {
-protected:
-    std::vector<class KeyEventListener*> mKeyEventListeners;
-
 public:
-    virtual ~Keyboard() = default;
-
-    void addEventListener(KeyEventListener *listener);
-
     virtual bool isKeyPressed(KeyCode key) = 0;
 };
 }

@@ -210,11 +210,11 @@
     <ClInclude Include="Graphics\TransferCommandList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Runtime\HID\EventEmitter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Runtime\HID\Keyboard\Keyboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\HID\Keyboard\KeyCode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

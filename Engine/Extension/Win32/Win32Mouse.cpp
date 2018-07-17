@@ -21,10 +21,9 @@ void usagi::Win32Mouse::sendButtonEvent(MouseButtonCode button, bool pressed)
     e.mouse = this;
     e.button = button;
     e.pressed = pressed;
-    for(auto &&h : mMouseEventListeners)
-    {
+    forEachListener([&](auto h) {
         h->onMouseButtonStateChange(e);
-    }
+    });
 }
 
 void usagi::Win32Mouse::sendWheelEvent(const Vector2f &distance)
@@ -32,10 +31,9 @@ void usagi::Win32Mouse::sendWheelEvent(const Vector2f &distance)
     MouseWheelEvent e;
     e.mouse = this;
     e.distance = distance;
-    for(auto &&h : mMouseEventListeners)
-    {
+    forEachListener([&](auto h) {
         h->onMouseWheelScroll(e);
-    }
+    });
 }
 
 void usagi::Win32Mouse::recaptureCursor()
@@ -79,10 +77,9 @@ void usagi::Win32Mouse::processMouseInput(const RAWINPUT *raw)
         MousePositionEvent e;
         e.mouse = this;
         e.distance = { mouse.lLastX, mouse.lLastY };
-        for(auto &&h : mMouseEventListeners)
-        {
+        forEachListener([&](auto h) {
             h->onMouseMove(e);
-        }
+        });
     }
     // proces mouse buttons & scrolling
     if(mouse.usButtonFlags)

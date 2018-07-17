@@ -124,7 +124,7 @@ void usagi::Win32Window::registerRawInputDevices() const
     Rid[1].hwndTarget = mWindowHandle;
 
     // note that this registration affects the entire application
-    if(RegisterRawInputDevices(Rid, 2, sizeof(Rid[0])) == FALSE)
+    if(RegisterRawInputDevices(Rid, 2, sizeof(RAWINPUTDEVICE)) == FALSE)
     {
         //registration failed. Call GetLastError for the cause of the error
         throw std::runtime_error("RegisterRawInputDevices() failed");

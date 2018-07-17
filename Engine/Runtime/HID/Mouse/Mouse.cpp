@@ -1,11 +1,6 @@
 ﻿#include "Mouse.hpp"
 
-void usagi::Mouse::addEventListener(MouseEventListener *listener)
-{
-    mMouseEventListeners.push_back(listener);
-}
-
-void usagi::Mouse::setImmersiveMode(bool enable)
+void usagi::Mouse::setImmersiveMode(const bool enable)
 {
     if(enable == isImmersiveMode())
         return;

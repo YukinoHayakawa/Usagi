@@ -229,7 +229,9 @@ void usagi::Win32Keyboard::sendKeyEvent(
     e.key_code = key;
     e.pressed = pressed;
     e.repeated = repeated;
-    for(auto &&h : mKeyEventListeners) { h->onKeyStateChange(e); }
+    forEachListener([&](auto h) {
+        h->onKeyStateChange(e);
+    });
 }
 
 void usagi::Win32Keyboard::processKeyboardInput(RAWINPUT *raw)

@@ -80,6 +80,16 @@ class Element : Noncopyable
         return true;
     }
 
+protected:
+    template <typename Func>
+    void forEachChild(Func f)
+    {
+        for(auto &&c : mChildren)
+        {
+            f(c.get());
+        }
+    }
+
 public:
     explicit Element(Element *parent, std::string name = { });
     virtual ~Element();
