@@ -44,7 +44,8 @@ class Win32Window : public Window
     LRESULT handleWindowMessage(
         HWND hWnd, UINT message, WPARAM wParam,LPARAM lParam);
 
-    std::unique_ptr<BYTE[]> getRawInputBuffer(LPARAM lParam) const;
+    std::vector<BYTE> mRawInputBuffer;
+    void fillRawInputBuffer(LPARAM lParam);
 
     Win32Keyboard mKeyboard;
     Win32Mouse mMouse;

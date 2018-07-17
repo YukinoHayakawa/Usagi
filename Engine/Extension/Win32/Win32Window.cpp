@@ -256,8 +256,7 @@ LRESULT usagi::Win32Window::windowMessageDispatcher(HWND hWnd, UINT message,
     return window->handleWindowMessage(hWnd, message, wParam, lParam);
 }
 
-std::unique_ptr<BYTE[]> usagi::Win32Window::getRawInputBuffer(
-    LPARAM lParam) const
+void usagi::Win32Window::fillRawInputBuffer(LPARAM lParam)
 {
     UINT dwSize;
 
@@ -269,11 +268,11 @@ std::unique_ptr<BYTE[]> usagi::Win32Window::getRawInputBuffer(
         &dwSize,
         sizeof(RAWINPUTHEADER)
     );
-    std::unique_ptr<BYTE[]> lpb(new BYTE[dwSize]);
+    mRawInputBuffer.resize(dwSize);
     if(GetRawInputData(
         reinterpret_cast<HRAWINPUT>(lParam),
         RID_INPUT,
-        lpb.get(),
+        mRawInputBuffer.data(),
         &dwSize,
         sizeof(RAWINPUTHEADER)
     ) != dwSize)
@@ -282,8 +281,6 @@ std::unique_ptr<BYTE[]> usagi::Win32Window::getRawInputBuffer(
             "GetRawInputData does not return correct size!"
         );
     }
-
-    return std::move(lpb);
 }
 
 LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
@@ -294,8 +291,9 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
         // unbuffered raw input data
         case WM_INPUT:
         {
-            auto lpb = getRawInputBuffer(lParam);
-            const auto raw = reinterpret_cast<RAWINPUT*>(lpb.get());
+            fillRawInputBuffer(lParam);
+            const auto raw = reinterpret_cast<RAWINPUT*>(
+                mRawInputBuffer.data());
 
             switch(raw->header.dwType)
             {
