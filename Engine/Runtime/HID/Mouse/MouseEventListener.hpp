@@ -13,18 +13,18 @@ struct MouseEvent
 
 struct MousePositionEvent : MouseEvent
 {
-    Vector2f distance = Vector2f::Zero();
+    Vector2f distance;
 };
 
 struct MouseButtonEvent : MouseEvent
 {
-    MouseButtonCode button = MouseButtonCode::UNKNOWN;
-    bool pressed = false;
+    MouseButtonCode button;
+    bool pressed;
 };
 
 struct MouseWheelEvent : MouseEvent
 {
-    Vector2f distance = Vector2f::Zero();
+    Vector2f distance;
 };
 
 class MouseEventListener

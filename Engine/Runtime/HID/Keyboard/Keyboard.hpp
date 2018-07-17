@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Engine/Runtime/HID/EventEmitter.hpp>
+#include <Usagi/Engine/Runtime/EventEmitter.hpp>
 
 #include "KeyEventListener.hpp"
 

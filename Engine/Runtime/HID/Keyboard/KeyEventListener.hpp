@@ -9,9 +9,9 @@ class Keyboard;
 struct KeyEvent
 {
     class Keyboard *keyboard = nullptr;
-    KeyCode key_code = KeyCode::UNKNOWN;
-    bool pressed = false;
-    bool repeated = false;
+    KeyCode key_code;
+    bool pressed;
+    bool repeated;
 };
 
 class KeyEventListener

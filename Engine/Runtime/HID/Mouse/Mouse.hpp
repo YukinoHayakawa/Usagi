@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <Usagi/Engine/Core/Math.hpp>
-#include <Usagi/Engine/Runtime/HID/EventEmitter.hpp>
+#include <Usagi/Engine/Runtime/EventEmitter.hpp>
 
 #include "MouseButtonCode.hpp"
 

@@ -187,7 +187,7 @@
     <ClInclude Include="Graphics\Shader\SpirvBinary.hpp" />
     <ClInclude Include="Graphics\TransferCommandList.hpp" />
     <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
-    <ClInclude Include="Runtime\HID\EventEmitter.hpp" />
+    <ClInclude Include="Runtime\EventEmitter.hpp" />
     <ClInclude Include="Runtime\HID\Keyboard\Keyboard.hpp" />
     <ClInclude Include="Runtime\HID\Keyboard\KeyCode.hpp" />
     <ClInclude Include="Runtime\HID\Keyboard\KeyEventListener.hpp" />
@@ -196,6 +196,7 @@
     <ClInclude Include="Runtime\HID\Mouse\MouseEventListener.hpp" />
     <ClInclude Include="Core\Event\Library\Input\MouseMoveEvent.hpp" />
     <ClInclude Include="Runtime\Window\Window.hpp" />
+    <ClInclude Include="Runtime\Window\WindowEventListener.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
     <ClInclude Include="Utility\EnumTranslator.hpp" />

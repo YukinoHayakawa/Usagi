@@ -210,7 +210,10 @@
     <ClInclude Include="Graphics\TransferCommandList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\HID\EventEmitter.hpp">
+    <ClInclude Include="Runtime\EventEmitter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Window\WindowEventListener.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

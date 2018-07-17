@@ -3,6 +3,8 @@
 #include <Usagi/Engine/Runtime/HID/Keyboard/KeyCode.hpp>
 #include <Usagi/Engine/Runtime/HID/Keyboard/KeyEventListener.hpp>
 
+#include "Win32Window.hpp"
+
 usagi::KeyCode usagi::Win32Keyboard::translate(const RAWKEYBOARD *keyboard)
 {
     switch(keyboard->VKey)
@@ -264,6 +266,23 @@ void usagi::Win32Keyboard::clearKeyPressedStates()
         sendKeyEvent(*iter, false, false);
         iter = mKeyPressed.erase(iter);
     }
+}
+
+void usagi::Win32Keyboard::onWindowFocusChanged(const WindowFocusEvent &e)
+{
+    if(!e.focused)
+        clearKeyPressedStates();
+}
+
+usagi::Win32Keyboard::Win32Keyboard(Win32Window *window)
+    : mWindow { window }
+{
+    mWindow->addEventListener(this);
+}
+
+usagi::Win32Keyboard::~Win32Keyboard()
+{
+    mWindow->removeEventListener(this);
 }
 
 bool usagi::Win32Keyboard::isKeyPressed(KeyCode key)

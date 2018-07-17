@@ -39,16 +39,16 @@ void usagi::Win32Window::ensureWindowSubsystemInitialized()
     SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 }
 
-RECT usagi::Win32Window::getClientScreenRect() const
+RECT usagi::Win32Window::clientScreenRect() const
 {
     // Get the window client area.
     RECT rc;
-    GetClientRect(mWindowHandle, &rc);
+    GetClientRect(mHandle, &rc);
 
     POINT pt = { rc.left, rc.top };
     POINT pt2 = { rc.right, rc.bottom };
-    ClientToScreen(mWindowHandle, &pt);
-    ClientToScreen(mWindowHandle, &pt2);
+    ClientToScreen(mHandle, &pt);
+    ClientToScreen(mHandle, &pt2);
 
     rc.left = pt.x;
     rc.top = pt.y;
@@ -58,43 +58,49 @@ RECT usagi::Win32Window::getClientScreenRect() const
     return rc;
 }
 
-void usagi::Win32Window::createWindowHandle(
-    const std::string &title, int width, int height)
+RECT usagi::Win32Window::getWindowRect() const
 {
-    auto windowTitleWide = string::toWideVector(title);
-    // todo update after resizing
-    mWindowSize = { width, height };
+    RECT window_rect;
+    window_rect.left = mPosition.x();
+    window_rect.top = mPosition.y();
+    window_rect.right = window_rect.left + mSize.x();
+    window_rect.bottom = window_rect.top + mSize.y();
+    AdjustWindowRectEx(&window_rect, WINDOW_STYLE, FALSE, WINDOW_STYLE_EX);
+    window_rect.right -= window_rect.left;
+    window_rect.bottom -= window_rect.top;
+    return window_rect;
+}
 
-    static constexpr DWORD window_style = WS_OVERLAPPEDWINDOW;
-    static constexpr DWORD window_style_ex = WS_EX_ACCEPTFILES;
+void usagi::Win32Window::createWindowHandle(
+    const std::string &title,
+    const Vector2i &position,
+    const Vector2u32 &size)
+{
+    auto window_title_wide = string::toWideVector(title);
 
-    RECT window_rect { };
-    window_rect.bottom = height;
-    window_rect.right = width;
-    AdjustWindowRectEx(&window_rect, window_style, FALSE, window_style_ex);
+    const auto window_rect = getWindowRect();
 
-    mWindowHandle = CreateWindowEx(
-        window_style_ex,
+    mHandle = CreateWindowEx(
+        WINDOW_STYLE_EX,
         WINDOW_CLASS_NAME,
-        &windowTitleWide[0],
-        window_style,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        window_rect.right - window_rect.left, // width
-        window_rect.bottom - window_rect.top, // height
+        &window_title_wide[0],
+        WINDOW_STYLE,
+        window_rect.left, window_rect.top,
+        window_rect.right, window_rect.bottom,
         nullptr,
         nullptr,
         mProcessInstanceHandle,
         nullptr
     );
 
-    if(!mWindowHandle)
+    if(!mHandle)
     {
-        throw std::runtime_error("mWindowHandle() failed");
+        throw std::runtime_error("mHandle() failed");
     }
 
     // associate the class instance with the window so they can be identified 
     // in WindowProc
-    SetWindowLongPtr(mWindowHandle, GWLP_USERDATA,
+    SetWindowLongPtr(mHandle, GWLP_USERDATA,
         reinterpret_cast<LONG_PTR>(this));
 }
 
@@ -108,7 +114,7 @@ void usagi::Win32Window::registerRawInputDevices() const
     Rid[0].usUsage = 0x02;
     // receives device add/remove messages
     Rid[0].dwFlags = RIDEV_DEVNOTIFY;
-    Rid[0].hwndTarget = mWindowHandle;
+    Rid[0].hwndTarget = mHandle;
 
     // adds HID keyboard, RIDEV_NOLEGACY is not used to allow the system
     // process hotkeys like print screen. note that alt+f4 is not handled
@@ -121,7 +127,7 @@ void usagi::Win32Window::registerRawInputDevices() const
     // the fancy window-choosing popup, and we still receive key events when
     // switching window, so it is not used here.
     Rid[1].dwFlags = RIDEV_DEVNOTIFY;
-    Rid[1].hwndTarget = mWindowHandle;
+    Rid[1].hwndTarget = mHandle;
 
     // note that this registration affects the entire application
     if(RegisterRawInputDevices(Rid, 2, sizeof(RAWINPUTDEVICE)) == FALSE)
@@ -132,28 +138,33 @@ void usagi::Win32Window::registerRawInputDevices() const
 }
 
 usagi::Win32Window::Win32Window(
-    const std::string &title, const Vector2u32 &size)
-    : mMouse { this }
+    const std::string &title,
+    const Vector2i &position,
+    const Vector2u32 &size)
+    : mPosition { position }
+    , mSize { size }
+    , mKeyboard { this }
+    , mMouse { this }
 {
     ensureWindowSubsystemInitialized();
-    createWindowHandle(title, size.x(), size.y());
+    createWindowHandle(title, position, size);
     registerRawInputDevices();
     Win32Window::show(true);
 }
 
 HDC usagi::Win32Window::deviceContext() const
 {
-    return GetDC(mWindowHandle);
+    return GetDC(mHandle);
 }
 
 void usagi::Win32Window::show(bool show)
 {
-    ShowWindow(mWindowHandle, show ? SW_SHOWNORMAL : SW_HIDE);
+    ShowWindow(mHandle, show ? SW_SHOWNORMAL : SW_HIDE);
 }
 
-bool usagi::Win32Window::isFocused() const
+bool usagi::Win32Window::focused() const
 {
-    return mWindowActive;
+    return mFocused;
 }
 
 void usagi::Win32Window::processEvents()
@@ -167,9 +178,52 @@ void usagi::Win32Window::processEvents()
     }
 }
 
-usagi::Vector2f usagi::Win32Window::size() const
+usagi::Vector2u32 usagi::Win32Window::size() const
 {
-    return mWindowSize.cast<float>();
+    return mSize;
+}
+
+void usagi::Win32Window::updateWindowPosition() const
+{
+    const auto window_rect = getWindowRect();
+    SetWindowPos(mHandle, nullptr,
+        window_rect.left, window_rect.top, window_rect.right,
+        window_rect.bottom,
+        0
+    );
+}
+
+void usagi::Win32Window::setSize(const Vector2u32 &size)
+{
+    mSize = size;
+    updateWindowPosition();
+    WindowSizeEvent e;
+    e.window = this;
+    e.size = size;
+    forEachListener([&](auto h) {
+        h->onWindowResizeBegin(e);
+        h->onWindowResized(e);
+        h->onWindowResizeEnd(e);
+    });
+}
+
+usagi::Vector2i usagi::Win32Window::position() const
+{
+    return mPosition;
+}
+
+void usagi::Win32Window::setPosition(const Vector2i &position)
+{
+    mPosition = position;
+    updateWindowPosition();
+    WindowPositionEvent e;
+    e.window = this;
+    e.position = position;
+    forEachListener([&](auto h) {
+        h->onWindowMoveBegin(e);
+        h->onWindowMoved(e);
+        h->onWindowMoveEnd(e);
+    });
 }
 
 bool usagi::Win32Window::isOpen() const
@@ -179,13 +233,13 @@ bool usagi::Win32Window::isOpen() const
 
 void usagi::Win32Window::close()
 {
-    DestroyWindow(mWindowHandle);
+    DestroyWindow(mHandle);
 }
 
 void usagi::Win32Window::setTitle(const std::string &title)
 {
     std::wstring wtitle { title.begin(), title.end() };
-    SetWindowText(mWindowHandle, wtitle.c_str());
+    SetWindowText(mHandle, wtitle.c_str());
 }
 
 LRESULT usagi::Win32Window::windowMessageDispatcher(HWND hWnd, UINT message,
@@ -262,32 +316,72 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
         // window management
         case WM_ACTIVATEAPP:
         {
-            // window being activated
-            if((mWindowActive = (wParam == TRUE)))
-            {
-                mMouse.recaptureCursor();
-            }
-            // window being deactivated
-            else
-            {
-                mKeyboard.clearKeyPressedStates();
-                break;
-            }
+            WindowFocusEvent e;
+            e.window = this;
+            e.focused = mFocused = (wParam == TRUE);
+            forEachListener([&](auto h) {
+                h->onWindowFocusChanged(e);
+            });
             break;
         }
-        // todo: sent resize/move events
+        // resizing & moving
+        case WM_ENTERSIZEMOVE:
+        {
+            WindowSizeEvent e;
+            e.window = this;
+            e.size = size();
+            WindowPositionEvent e2;
+            e2.window = this;
+            e2.position = position();
+            forEachListener([&](auto h) {
+                h->onWindowResizeBegin(e);
+                h->onWindowMoveBegin(e2);
+            });
+            break;
+        }
+        case WM_EXITSIZEMOVE:
+        {
+            WindowSizeEvent e;
+            e.window = this;
+            e.size = size();
+            WindowPositionEvent e2;
+            e2.window = this;
+            e2.position = position();
+            forEachListener([&](auto h) {
+                h->onWindowResizeEnd(e);
+                h->onWindowMoveEnd(e2);
+            });
+            break;
+        }
         case WM_SIZE:
+        {
+            WindowSizeEvent e;
+            e.window = this;
+            mSize = e.size = { LOWORD(lParam), HIWORD(lParam) };
+            forEachListener([&](auto h) {
+                h->onWindowResized(e);
+            });
+            break;
+        }
         case WM_MOVE:
         {
-            mMouse.recaptureCursor();
+            WindowPositionEvent e;
+            e.window = this;
+            // note that window position is signed
+            auto x = static_cast<short>(LOWORD(lParam));
+            auto y = static_cast<short>(HIWORD(lParam));
+            mPosition = e.position = { x, y };
+            forEachListener([&](auto h) {
+                h->onWindowMoved(e);
+            });
             break;
         }
-        // ignore any key events (RawInput is used instead)
+        // these legacy messages are preserved to make non-client area work
+        // properly.
         case WM_SYSKEYDOWN:
         case WM_SYSKEYUP:
         case WM_KEYDOWN:
         case WM_KEYUP:
-        // ignore mouse events (RawInput is used instead)
         case WM_MOUSEMOVE:
         case WM_LBUTTONDBLCLK:
         case WM_LBUTTONDOWN:
@@ -310,13 +404,14 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
         }
         case WM_CLOSE:
         {
-            DestroyWindow(mWindowHandle);
+            DestroyWindow(mHandle);
             break;
         }
         case WM_DESTROY:
         {
             mClosed = true;
-            PostQuitMessage(0);
+            // todo: support multiple windows
+            // PostQuitMessage(0);
             break;
         }
         default:
@@ -329,7 +424,7 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
 
 HWND usagi::Win32Window::handle() const
 {
-    return mWindowHandle;
+    return mHandle;
 }
 
 HINSTANCE usagi::Win32Window::processInstanceHandle()

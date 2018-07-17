@@ -9,6 +9,7 @@ void usagi::Game::initializeInput()
     // todo: window params
     const auto window = std::make_shared<Win32Window>(
         "Usagi",
+        Vector2i { 100, 100 },
         Vector2u32 { 1920, 1080 }
     );
     mWindow = window;

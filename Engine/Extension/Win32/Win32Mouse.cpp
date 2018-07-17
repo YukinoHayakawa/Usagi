@@ -43,9 +43,9 @@ void usagi::Win32Mouse::recaptureCursor()
 
 void usagi::Win32Mouse::confineCursorInClientArea() const
 {
-    if(!mWindow->isFocused()) return;
+    if(!mWindow->focused()) return;
 
-    const auto client_rect = mWindow->getClientScreenRect();
+    const auto client_rect = mWindow->clientScreenRect();
     ClipCursor(&client_rect);
 }
 
@@ -112,9 +112,41 @@ void usagi::Win32Mouse::processMouseInput(const RAWINPUT *raw)
     }
 }
 
+void usagi::Win32Mouse::onWindowFocusChanged(const WindowFocusEvent &e)
+{
+    if(e.focused)
+    {
+        recaptureCursor();
+        if(!mShowMouseCursor)
+            ShowCursor(false);
+    }
+    else if(mMouseCursorCaptured) // temporarily release the cursor
+    {
+        ClipCursor(nullptr);
+        if(!mShowMouseCursor)
+            ShowCursor(true);
+    }
+}
+
+void usagi::Win32Mouse::onWindowMoveEnd(const WindowPositionEvent &e)
+{
+    recaptureCursor();
+}
+
+void usagi::Win32Mouse::onWindowResizeEnd(const WindowSizeEvent &e)
+{
+    recaptureCursor();
+}
+
 usagi::Win32Mouse::Win32Mouse(Win32Window *window)
     : mWindow { window }
 {
+    mWindow->addEventListener(this);
+}
+
+usagi::Win32Mouse::~Win32Mouse()
+{
+    mWindow->removeEventListener(this);
 }
 
 usagi::Vector2f usagi::Win32Mouse::getCursorPositionInWindow()
@@ -127,7 +159,7 @@ usagi::Vector2f usagi::Win32Mouse::getCursorPositionInWindow()
 
 void usagi::Win32Mouse::centerCursor()
 {
-    const auto rect = mWindow->getClientScreenRect();
+    const auto rect = mWindow->clientScreenRect();
     Vector2i cursor{
         (rect.left + rect.right) / 2,
         (rect.top + rect.bottom) / 2

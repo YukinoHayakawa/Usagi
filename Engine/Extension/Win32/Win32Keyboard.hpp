@@ -3,14 +3,18 @@
 #include <set>
 
 #include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
+#include <Usagi/Engine/Runtime/Window/WindowEventListener.hpp>
 
 #include "WindowsHeader.hpp"
 
 namespace usagi
 {
-class Win32Keyboard : public Keyboard
+class Win32Keyboard
+    : public Keyboard
+    , public WindowEventListener
 {
     friend class Win32Window;
+    Win32Window *mWindow;
 
     std::set<KeyCode> mKeyPressed;
 
@@ -20,7 +24,12 @@ class Win32Keyboard : public Keyboard
     void processKeyboardInput(RAWINPUT *raw);
     void clearKeyPressedStates();
 
+    void onWindowFocusChanged(const WindowFocusEvent &e) override;
+
 public:
+    explicit Win32Keyboard(Win32Window *window);
+    ~Win32Keyboard();
+
     bool isKeyPressed(KeyCode key) override;
 };
 }
