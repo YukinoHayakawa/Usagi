@@ -4,6 +4,7 @@
 
 #include <Usagi/Engine/Core/Event/Library/Component/ComponentAddedEvent.hpp>
 #include <Usagi/Engine/Core/Event/Library/Input/MouseMoveEvent.hpp>
+#include <Usagi/Engine/Runtime/Platform.hpp>
 #include <Usagi/Engine/Graphics/GpuDevice.hpp>
 #include <Usagi/Engine/Asset/AssetRoot.hpp>
 
@@ -24,6 +25,8 @@ usagi::Game::Game()
 
     mRootElement.setName("ElementRoot");
     mAssetRoot = mRootElement.addChild<AssetRoot>();
+
+    initializePlatform();
 }
 
 usagi::Game::~Game()
@@ -94,6 +97,7 @@ void usagi::Game::onKeyStateChange(const KeyEvent &e)
 
 void usagi::Game::update(const std::chrono::seconds &dt)
 {
+    mPlatform->processEvents();
     for(auto &&s : mSubsystems)
     {
         if(s.enabled)

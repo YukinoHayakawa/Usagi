@@ -1,43 +1,8 @@
-﻿#include <Usagi/Engine/Utility/String.hpp>
+﻿#include "Win32Window.hpp"
 
-// include dirty windows headers at last
-#include "Win32Window.hpp"
-#include <ShellScalingAPI.h>
-#pragma comment(lib, "Shcore.lib")
+#include <Usagi/Engine/Utility/String.hpp>
 
-const wchar_t usagi::Win32Window::WINDOW_CLASS_NAME[] =
-    L"UsagiWin32WindowWrapper";
-HINSTANCE usagi::Win32Window::mProcessInstanceHandle = nullptr;
-
-void usagi::Win32Window::ensureWindowSubsystemInitialized()
-{
-    if(mProcessInstanceHandle)
-        return;
-
-    // get the process handle, all windows created using this class get
-    // dispatched to the same place.
-    mProcessInstanceHandle = GetModuleHandle(nullptr);
-
-    WNDCLASSEX wcex { };
-
-    wcex.cbSize = sizeof(WNDCLASSEX);
-    // CS_OWNDC is required to create OpenGL context
-    wcex.style = CS_OWNDC;
-    wcex.lpfnWndProc = &windowMessageDispatcher;
-    wcex.hInstance = mProcessInstanceHandle;
-    // hInstance must be null to use predefined cursors
-    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    // we print the background on our own
-    wcex.hbrBackground = nullptr;
-    wcex.lpszClassName = WINDOW_CLASS_NAME;
-
-    if(!RegisterClassEx(&wcex))
-    {
-        throw std::runtime_error("RegisterClassEx() failed!");
-    }
-
-    SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
-}
+#include "Win32Platform.hpp"
 
 RECT usagi::Win32Window::clientScreenRect() const
 {
@@ -71,10 +36,13 @@ RECT usagi::Win32Window::getWindowRect() const
     return window_rect;
 }
 
-void usagi::Win32Window::createWindowHandle(
+usagi::Win32Window::Win32Window(
+    Win32Platform *platform,
     const std::string &title,
-    const Vector2i &position,
-    const Vector2u32 &size)
+    Vector2i position,
+    Vector2u32 size)
+    : mPosition { std::move(position) }
+    , mSize { std::move(size) }
 {
     auto window_title_wide = string::toWideVector(title);
 
@@ -82,73 +50,26 @@ void usagi::Win32Window::createWindowHandle(
 
     mHandle = CreateWindowEx(
         WINDOW_STYLE_EX,
-        WINDOW_CLASS_NAME,
+        Win32Platform::WINDOW_CLASS_NAME,
         &window_title_wide[0],
         WINDOW_STYLE,
         window_rect.left, window_rect.top,
         window_rect.right, window_rect.bottom,
         nullptr,
         nullptr,
-        mProcessInstanceHandle,
+        platform->processInstanceHandle(),
         nullptr
     );
 
     if(!mHandle)
     {
-        throw std::runtime_error("mHandle() failed");
+        throw std::runtime_error("CreateWindowEx() failed");
     }
 
     // associate the class instance with the window so they can be identified 
     // in WindowProc
-    SetWindowLongPtr(mHandle, GWLP_USERDATA,
-        reinterpret_cast<LONG_PTR>(this));
-}
+    SetWindowLongPtr(mHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
-void usagi::Win32Window::registerRawInputDevices() const
-{
-    RAWINPUTDEVICE Rid[2];
-
-    // adds HID mouse, RIDEV_NOLEGACY is not used because we need the system
-    // to process non-client area.
-    Rid[0].usUsagePage = 0x01;
-    Rid[0].usUsage = 0x02;
-    // receives device add/remove messages
-    Rid[0].dwFlags = RIDEV_DEVNOTIFY;
-    Rid[0].hwndTarget = mHandle;
-
-    // adds HID keyboard, RIDEV_NOLEGACY is not used to allow the system
-    // process hotkeys like print screen. note that alt+f4 is not handled
-    // if related key messages not passed to DefWindowProc(). generally,
-    // RIDEV_NOLEGACY should only be used when having a single fullscreen
-    // window.
-    Rid[1].usUsagePage = 0x01;
-    Rid[1].usUsage = 0x06;
-    // interestingly, RIDEV_NOHOTKEYS will prevent the explorer from using
-    // the fancy window-choosing popup, and we still receive key events when
-    // switching window, so it is not used here.
-    Rid[1].dwFlags = RIDEV_DEVNOTIFY;
-    Rid[1].hwndTarget = mHandle;
-
-    // note that this registration affects the entire application
-    if(RegisterRawInputDevices(Rid, 2, sizeof(RAWINPUTDEVICE)) == FALSE)
-    {
-        //registration failed. Call GetLastError for the cause of the error
-        throw std::runtime_error("RegisterRawInputDevices() failed");
-    }
-}
-
-usagi::Win32Window::Win32Window(
-    const std::string &title,
-    const Vector2i &position,
-    const Vector2u32 &size)
-    : mPosition { position }
-    , mSize { size }
-    , mKeyboard { this }
-    , mMouse { this }
-{
-    ensureWindowSubsystemInitialized();
-    createWindowHandle(title, position, size);
-    registerRawInputDevices();
     Win32Window::show(true);
 }
 
@@ -165,17 +86,6 @@ void usagi::Win32Window::show(bool show)
 bool usagi::Win32Window::focused() const
 {
     return mFocused;
-}
-
-void usagi::Win32Window::processEvents()
-{
-    MSG msg;
-    // hwnd should be nullptr or the loop won't end when close the window
-    while(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
 }
 
 usagi::Vector2u32 usagi::Win32Window::size() const
@@ -242,81 +152,20 @@ void usagi::Win32Window::setTitle(const std::string &title)
     SetWindowText(mHandle, wtitle.c_str());
 }
 
-LRESULT usagi::Win32Window::windowMessageDispatcher(HWND hWnd, UINT message,
-    WPARAM wParam, LPARAM lParam)
-{
-    auto window = reinterpret_cast<Win32Window*>(GetWindowLongPtr(hWnd,
-        GWLP_USERDATA));
-    // during window creation some misc messages are sent, we just pass them
-    // to the system procedure.
-    if(!window)
-    {
-        return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-    return window->handleWindowMessage(hWnd, message, wParam, lParam);
-}
-
-void usagi::Win32Window::fillRawInputBuffer(LPARAM lParam)
-{
-    UINT dwSize;
-
-    // fetch raw input data
-    GetRawInputData(
-        reinterpret_cast<HRAWINPUT>(lParam),
-        RID_INPUT,
-        nullptr,
-        &dwSize,
-        sizeof(RAWINPUTHEADER)
-    );
-    mRawInputBuffer.resize(dwSize);
-    if(GetRawInputData(
-        reinterpret_cast<HRAWINPUT>(lParam),
-        RID_INPUT,
-        mRawInputBuffer.data(),
-        &dwSize,
-        sizeof(RAWINPUTHEADER)
-    ) != dwSize)
-    {
-        throw std::runtime_error(
-            "GetRawInputData does not return correct size!"
-        );
-    }
-}
-
 LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam)
 {
+    assert(hWnd == mHandle);
+
     switch(message)
     {
-        // unbuffered raw input data
-        case WM_INPUT:
+        // window focus change
+        case WM_ACTIVATE:
         {
-            fillRawInputBuffer(lParam);
-            const auto raw = reinterpret_cast<RAWINPUT*>(
-                mRawInputBuffer.data());
-
-            switch(raw->header.dwType)
-            {
-                case RIM_TYPEKEYBOARD:
-                {
-                    mKeyboard.processKeyboardInput(raw);
-                    break;
-                }
-                case RIM_TYPEMOUSE:
-                {
-                    mMouse.processMouseInput(raw);
-                    break;
-                }
-                default: break;
-            }
-            break;
-        }
-        // window management
-        case WM_ACTIVATEAPP:
-        {
+            const auto active = LOWORD(wParam) != WA_INACTIVE;
             WindowFocusEvent e;
             e.window = this;
-            e.focused = mFocused = (wParam == TRUE);
+            e.focused = mFocused = active;
             forEachListener([&](auto h) {
                 h->onWindowFocusChanged(e);
             });
@@ -408,8 +257,6 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
         case WM_DESTROY:
         {
             mClosed = true;
-            // todo: support multiple windows
-            // PostQuitMessage(0);
             break;
         }
         default:
@@ -423,9 +270,4 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
 HWND usagi::Win32Window::handle() const
 {
     return mHandle;
-}
-
-HINSTANCE usagi::Win32Window::processInstanceHandle()
-{
-    return mProcessInstanceHandle;
 }

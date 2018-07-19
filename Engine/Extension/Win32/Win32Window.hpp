@@ -2,7 +2,7 @@
 
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 
-#include "WindowsHeader.hpp"
+#include "Win32.hpp"
 #include "Win32Keyboard.hpp"
 #include "Win32Mouse.hpp"
 
@@ -12,16 +12,7 @@ enum class MouseButtonCode;
 
 class Win32Window : public Window
 {
-    static const wchar_t WINDOW_CLASS_NAME[];
-    static HINSTANCE mProcessInstanceHandle;
-
-    static void ensureWindowSubsystemInitialized();
-
-    void createWindowHandle(
-        const std::string &title,
-        const Vector2i &position,
-        const Vector2u32 &size);
-    void registerRawInputDevices() const;
+    friend class Win32Platform;
 
     HWND mHandle = nullptr;
     Vector2i mPosition;
@@ -39,28 +30,22 @@ class Win32Window : public Window
     RECT getWindowRect() const;
     void updateWindowPosition() const;
 
-    static LRESULT CALLBACK windowMessageDispatcher(
-        HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     LRESULT handleWindowMessage(
         HWND hWnd, UINT message, WPARAM wParam,LPARAM lParam);
-
-    std::vector<BYTE> mRawInputBuffer;
-    void fillRawInputBuffer(LPARAM lParam);
-
-    Win32Keyboard mKeyboard;
-    Win32Mouse mMouse;
 
 public:
     /**
      * \brief Create an empty window.
+     * \param platform
      * \param title
      * \param position 
      * \param size 
      */
     Win32Window(
+        Win32Platform *platform,
         const std::string &title,
-        const Vector2i &position,
-        const Vector2u32 &size);
+        Vector2i position,
+        Vector2u32 size);
 
     Vector2i position() const override;
     void setPosition(const Vector2i &position) override;
@@ -76,16 +61,8 @@ public:
     bool isOpen() const override;
     void close() override;
 
-    void processEvents() override;
-
-    // devices
-
-    Mouse * mouse() { return &mMouse; }
-    Keyboard * keyboard() { return &mKeyboard; }
-
     // Win32 helpers
 
-    static HINSTANCE processInstanceHandle();
     HDC deviceContext() const;
     HWND handle() const;
     RECT clientScreenRect() const;

@@ -3,16 +3,19 @@
 #include <Usagi/Engine/Runtime/HID/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/Window/WindowEventListener.hpp>
 
-#include "WindowsHeader.hpp"
+#include "Win32.hpp"
+#include "Win32RawInputDevice.hpp"
 
 namespace usagi
 {
+class Win32Platform;
+
 class Win32Mouse
     : public Mouse
+    , public Win32RawInputDevice
     , public WindowEventListener
 {
-    friend class Win32Window;
-    Win32Window *mWindow = nullptr;
+    friend class Win32Platform;
 
     bool mMouseCursorCaptured = false;
 
@@ -29,18 +32,24 @@ class Win32Mouse
     void sendWheelEvent(const Vector2f &distance);
 
     void recaptureCursor();
-    void confineCursorInClientArea() const;
-    void processMouseInput(const RAWINPUT *raw);
+
+    /**
+     * \brief Restrict the mouse cursor inside the client area of active window.
+     */
+    static void confineCursorInClientArea();
 
     void onWindowFocusChanged(const WindowFocusEvent &e) override;
     void onWindowMoveEnd(const WindowPositionEvent &e) override;
     void onWindowResizeEnd(const WindowSizeEvent &e) override;
 
-public:
-    explicit Win32Mouse(Win32Window *window);
-    ~Win32Mouse();
+    void handleRawInput(RAWINPUT *raw) override;
 
-    Vector2f getCursorPositionInWindow() override;
+public:
+    Win32Mouse(HANDLE device_handle, std::string name);
+
+    std::string name() const override;
+
+    Vector2f cursorPositionInActiveWindow() override;
     void centerCursor() override;
     void showCursor(bool show) override;
     bool isButtonPressed(MouseButtonCode button) const override;

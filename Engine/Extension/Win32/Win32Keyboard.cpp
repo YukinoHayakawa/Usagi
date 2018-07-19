@@ -4,6 +4,7 @@
 #include <Usagi/Engine/Runtime/HID/Keyboard/KeyEventListener.hpp>
 
 #include "Win32Window.hpp"
+#include "Win32Platform.hpp"
 
 usagi::KeyCode usagi::Win32Keyboard::translate(const RAWKEYBOARD *keyboard)
 {
@@ -236,8 +237,12 @@ void usagi::Win32Keyboard::sendKeyEvent(
     });
 }
 
-void usagi::Win32Keyboard::processKeyboardInput(RAWINPUT *raw)
+void usagi::Win32Keyboard::handleRawInput(RAWINPUT *raw)
 {
+    checkDevice(raw, RIM_TYPEKEYBOARD);
+
+    if(!Win32Platform::getActiveWindow()) return;
+
     auto &kb = raw->data.keyboard;
 
     const auto key = translate(&kb);
@@ -274,15 +279,14 @@ void usagi::Win32Keyboard::onWindowFocusChanged(const WindowFocusEvent &e)
         clearKeyPressedStates();
 }
 
-usagi::Win32Keyboard::Win32Keyboard(Win32Window *window)
-    : mWindow { window }
+usagi::Win32Keyboard::Win32Keyboard(HANDLE device_handle, std::string name)
+    : Win32RawInputDevice { device_handle, std::move(name) }
 {
-    mWindow->addEventListener(this);
 }
 
-usagi::Win32Keyboard::~Win32Keyboard()
+std::string usagi::Win32Keyboard::name() const
 {
-    mWindow->removeEventListener(this);
+    return mName;
 }
 
 bool usagi::Win32Keyboard::isKeyPressed(KeyCode key)

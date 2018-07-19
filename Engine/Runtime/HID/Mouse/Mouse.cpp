@@ -6,8 +6,8 @@ void usagi::Mouse::setImmersiveMode(const bool enable)
         return;
     if(enable)
     {
-        captureCursor();
         showCursor(false);
+        captureCursor();
     }
     else
     {

@@ -37,7 +37,5 @@ public:
     virtual bool focused() const = 0;
     virtual bool isOpen() const = 0;
     virtual void close() = 0;
-
-    virtual void processEvents() = 0;
 };
 }

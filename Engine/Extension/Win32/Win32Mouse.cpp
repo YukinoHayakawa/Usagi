@@ -3,6 +3,7 @@
 #include <Usagi/Engine/Runtime/HID/Mouse/MouseEventListener.hpp>
 
 #include "Win32Window.hpp"
+#include "Win32Platform.hpp"
 
 void usagi::Win32Mouse::sendButtonEvent(MouseButtonCode button, bool pressed)
 {
@@ -41,16 +42,21 @@ void usagi::Win32Mouse::recaptureCursor()
     if(mMouseCursorCaptured) captureCursor();
 }
 
-void usagi::Win32Mouse::confineCursorInClientArea() const
+void usagi::Win32Mouse::confineCursorInClientArea()
 {
-    if(!mWindow->focused()) return;
-
-    const auto client_rect = mWindow->clientScreenRect();
+    const auto client_rect =
+        Win32Platform::getActiveWindow()->clientScreenRect();
     ClipCursor(&client_rect);
 }
 
-void usagi::Win32Mouse::processMouseInput(const RAWINPUT *raw)
+void usagi::Win32Mouse::handleRawInput(RAWINPUT *raw)
 {
+    checkDevice(raw, RIM_TYPEMOUSE);
+
+    // ignore the message if no window is active.
+    const auto window = Win32Platform::getActiveWindow();
+    if(!window) return;
+
     auto &mouse = raw->data.mouse;
 
     // only receive relative movement. note that the mouse driver typically
@@ -58,14 +64,14 @@ void usagi::Win32Mouse::processMouseInput(const RAWINPUT *raw)
     // see https://stackoverflow.com/questions/14113303/raw-input-device-rawmouse-usage
     if(mouse.usFlags != MOUSE_MOVE_RELATIVE) return;
 
-    // when in GUI mode, only receive events inside the window rect
+    // when in GUI mode, only processes events inside the window rect
     // todo since we use raw input, we receive the mouse messages even if the
     // part of window is covered, in which case the user might perform
     // undesired actions.
     if(!isImmersiveMode())
     {
-        const auto win_size = mWindow->size();
-        const auto cursor = getCursorPositionInWindow();
+        const auto win_size = window->size();
+        const auto cursor = cursorPositionInActiveWindow();
         if(cursor.x() < 0 || cursor.y() < 0 ||
             cursor.x() >= win_size.x() || cursor.y() >= win_size.y())
             return;
@@ -112,17 +118,28 @@ void usagi::Win32Mouse::processMouseInput(const RAWINPUT *raw)
     }
 }
 
+usagi::Win32Mouse::Win32Mouse(
+    HANDLE device_handle,
+    std::string name)
+    : Win32RawInputDevice { device_handle, std::move(name) }
+{
+}
+
 void usagi::Win32Mouse::onWindowFocusChanged(const WindowFocusEvent &e)
 {
+    // note that Windows uses a counter to decide whether to show the cursor,
+    // so the amount of show/hide operations must match.
+    // See: https://blogs.msdn.microsoft.com/oldnewthing/20091217-00/?p=15643
     if(e.focused)
     {
         recaptureCursor();
         if(!mShowMouseCursor)
             ShowCursor(false);
     }
-    else if(mMouseCursorCaptured) // temporarily release the cursor
+    else
     {
-        ClipCursor(nullptr);
+        if(mMouseCursorCaptured) // temporarily release the cursor
+            ClipCursor(nullptr);
         if(!mShowMouseCursor)
             ShowCursor(true);
     }
@@ -138,33 +155,34 @@ void usagi::Win32Mouse::onWindowResizeEnd(const WindowSizeEvent &e)
     recaptureCursor();
 }
 
-usagi::Win32Mouse::Win32Mouse(Win32Window *window)
-    : mWindow { window }
+std::string usagi::Win32Mouse::name() const
 {
-    mWindow->addEventListener(this);
+    return mName;
 }
 
-usagi::Win32Mouse::~Win32Mouse()
+usagi::Vector2f usagi::Win32Mouse::cursorPositionInActiveWindow()
 {
-    mWindow->removeEventListener(this);
-}
-
-usagi::Vector2f usagi::Win32Mouse::getCursorPositionInWindow()
-{
-    POINT pt;
-    GetCursorPos(&pt);
-    ScreenToClient(mWindow->handle(), &pt);
-    return { pt.x, pt.y };
+    if(const auto wnd = Win32Platform::getActiveWindow())
+    {
+        POINT pt;
+        GetCursorPos(&pt);
+        ScreenToClient(wnd->handle(), &pt);
+        return { pt.x, pt.y };
+    }
+    return Vector2f::Zero();
 }
 
 void usagi::Win32Mouse::centerCursor()
 {
-    const auto rect = mWindow->clientScreenRect();
-    Vector2i cursor{
-        (rect.left + rect.right) / 2,
-        (rect.top + rect.bottom) / 2
-    };
-    SetCursorPos(cursor.x(), cursor.y());
+    if(const auto wnd = Win32Platform::getActiveWindow())
+    {
+        const auto rect = wnd->clientScreenRect();
+        Vector2i cursor{
+            (rect.left + rect.right) / 2,
+            (rect.top + rect.bottom) / 2
+        };
+        SetCursorPos(cursor.x(), cursor.y());
+    }
 }
 
 void usagi::Win32Mouse::showCursor(bool show)

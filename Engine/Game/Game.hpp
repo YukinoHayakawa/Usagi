@@ -11,6 +11,7 @@
 
 namespace usagi
 {
+class Platform;
 class Keyboard;
 class Mouse;
 class Asset;
@@ -31,6 +32,7 @@ class Game
     , public KeyEventListener
     , public MouseEventListener
 {
+    std::shared_ptr<Platform> mPlatform;
     std::shared_ptr<Window> mWindow;
     std::shared_ptr<Keyboard> mKeyboard;
     std::shared_ptr<Mouse> mMouse;
@@ -52,6 +54,8 @@ class Game
     void onMouseWheelScroll(const MouseWheelEvent &e) override;
     void onKeyStateChange(const KeyEvent &e) override;
 
+    void initializePlatform();
+
 public:
     Game();
     ~Game();
@@ -59,9 +63,7 @@ public:
     void initializeInput();
     void initializeGraphics();
 
-	Window * window() const { return mWindow.get(); }
-    Mouse * mouse() const { return mMouse.get(); }
-    Keyboard * keyboard() const { return mKeyboard.get(); }
+    Platform * platform() const { return mPlatform.get(); }
 	GpuDevice * gpuDevice() const { return mGpuDevice.get(); }
 
     /**

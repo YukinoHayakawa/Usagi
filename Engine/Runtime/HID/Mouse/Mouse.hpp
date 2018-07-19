@@ -2,21 +2,29 @@
 
 #include <Usagi/Engine/Core/Math.hpp>
 #include <Usagi/Engine/Runtime/EventEmitter.hpp>
+#include <Usagi/Engine/Runtime/HID/HID.hpp>
 
 #include "MouseButtonCode.hpp"
 
 namespace usagi
 {
-class Mouse : public EventEmitter<class MouseEventListener>
+class Mouse
+    : public HID
+    , public EventEmitter<class MouseEventListener>
 {
     bool mImmersiveMode = false;
 
 public:
-    virtual Vector2f getCursorPositionInWindow() = 0;
+    /**
+     * \brief Get the cursor position relative to the top-left corner of
+     * the focused window. If no window is focused, (0, 0) is returned.
+     * \return 
+     */
+    virtual Vector2f cursorPositionInActiveWindow() = 0;
 
     /**
      * \brief Immersive mode allows continuous movement of the mouse without
-     * boundaries, which is suitable for gaming controls.
+     * boundaries inside the active window.
      * 
      * When enabled, the mouse cursor is hidden and the cursor can freely move
      * as if on an infinitely large surface, and a continuous sequence of mouse
@@ -34,7 +42,7 @@ public:
 
     /**
      * \brief Put the mouse cursor at the center of the rendering area of the
-     * window.
+     * focused window.
      */
     virtual void centerCursor() = 0;
     /**

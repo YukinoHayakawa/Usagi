@@ -1,31 +1,37 @@
 ﻿#include <loguru.hpp>
 
 #include <Usagi/Engine/Game/Game.hpp>
+#include <Usagi/Engine/Runtime/Platform.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Runtime/HID/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
 
 using namespace usagi;
+using namespace std::chrono_literals;
 
-class InputHandler
+class MainLoop
     : public KeyEventListener
     , public MouseEventListener
     , public WindowEventListener
 {
-    Game *mGame;
-    Mouse *mMouse = mGame->mouse();
-    Keyboard *mKeyboard = mGame->keyboard();
-    Window *mWindow = mGame->window();
+    Game mGame;
+    std::shared_ptr<Window> mWindow = mGame.platform()->createWindow(
+        "Usagi",
+        Vector2i { 100, 100 },
+        Vector2u32 { 1920, 1080 }
+    );
+    std::shared_ptr<Mouse> mMouse = mGame.platform()->virtualMouse();
+    std::shared_ptr<Keyboard> mKeyboard = mGame.platform()->virtualKeyboard();
 
 public:
-    explicit InputHandler(Game *game)
-        : mGame { game }
+    MainLoop()
     {
+        mGame.initializeInput();
         mKeyboard->addEventListener(this);
         mWindow->addEventListener(this);
     }
 
-    ~InputHandler()
+    ~MainLoop()
     {
         mMouse->removeEventListener(this);
         mKeyboard->removeEventListener(this);
@@ -153,15 +159,18 @@ public:
     {
         LOG_F(INFO, "Window resize end");
     }
+
+    void mainLoop()
+    {
+        while(mWindow->isOpen())
+        {
+            mGame.update(0s);
+        }
+    }
 };
 
 int main(int argc, char *argv[])
 {
-    Game game;
-    game.initializeInput();
-
-    InputHandler handler { &game };
-
-    const auto window = game.window();
-    while(window->isOpen()) { window->processEvents(); }
+    MainLoop app;
+    app.mainLoop();
 }

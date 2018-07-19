@@ -5,30 +5,32 @@
 #include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
 #include <Usagi/Engine/Runtime/Window/WindowEventListener.hpp>
 
-#include "WindowsHeader.hpp"
+#include "Win32.hpp"
+#include "Win32RawInputDevice.hpp"
 
 namespace usagi
 {
 class Win32Keyboard
     : public Keyboard
+    , public Win32RawInputDevice
     , public WindowEventListener
 {
-    friend class Win32Window;
-    Win32Window *mWindow;
+    friend class Win32Platform;
 
     std::set<KeyCode> mKeyPressed;
 
+    void handleRawInput(RAWINPUT *data) override;
     static KeyCode translate(const RAWKEYBOARD *keyboard);
     void sendKeyEvent(KeyCode key, bool pressed, bool repeated);
 
-    void processKeyboardInput(RAWINPUT *raw);
     void clearKeyPressedStates();
 
     void onWindowFocusChanged(const WindowFocusEvent &e) override;
 
 public:
-    explicit Win32Keyboard(Win32Window *window);
-    ~Win32Keyboard();
+    Win32Keyboard(HANDLE device_handle, std::string name);
+
+    std::string name() const override;
 
     bool isKeyPressed(KeyCode key) override;
 };

@@ -6,9 +6,13 @@ namespace usagi
 {
 class Keyboard;
 
-struct KeyEvent
+struct KeyboardEvent
 {
-    class Keyboard *keyboard = nullptr;
+    Keyboard *keyboard = nullptr;
+};
+
+struct KeyEvent : KeyboardEvent
+{
     KeyCode key_code;
     bool pressed;
     bool repeated;
