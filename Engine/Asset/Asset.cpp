@@ -1,6 +1,6 @@
 ﻿#include "Asset.hpp"
 
-#include <loguru.hpp>
+#include <Usagi/Engine/Core/Logging.hpp>
 
 bool usagi::Asset::acceptChild(Element *child)
 {
@@ -11,7 +11,7 @@ bool usagi::Asset::acceptChild(Element *child)
 void usagi::Asset::checkLoaded() const
 {
     if(!loaded())
-        ABORT_F("Asset is not loaded!");
+        LOG(critical, "Asset is not loaded!");
 }
 
 usagi::Asset::Asset(Element *parent, std::string name, boost::uuids::uuid uuid)

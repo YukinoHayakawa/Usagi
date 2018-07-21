@@ -9,8 +9,7 @@
 #include <glslang/SPIRV/GlslangToSpv.h>
 #include <glslang/SPIRV/disassemble.h>
 
-#include <loguru.hpp>
-
+#include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Utility/RAIIHelper.hpp>
 #include <Usagi/Engine/Utility/File.hpp>
 
@@ -93,7 +92,7 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
     const std::string &glsl_source_code,
     const ShaderStage stage)
 {
-    LOG_F(INFO, "Compiling %s shader...", to_string(stage));
+    LOG(info, "Compiling {} shader...", to_string(stage));
 
     using namespace glslang;
     using namespace spv;
@@ -132,24 +131,24 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
         shader.parse(&resources, default_version, false, messages, includer);
 
     if(shader.getInfoLog()[0])
-        LOG_F(INFO, "Compiler output:\n%s", shader.getInfoLog());
+        LOG(info, "Compiler output:\n{}", shader.getInfoLog());
     if(shader.getInfoDebugLog()[0]) 
-        LOG_F(INFO, "Compiler debug output:\n%s", shader.getInfoDebugLog());
+        LOG(info, "Compiler debug output:\n{}", shader.getInfoDebugLog());
 
     program.addShader(&shader);
 
     const auto link_succeeded = program.link(messages) && program.mapIO();
 
     if(program.getInfoLog()[0])
-        LOG_F(INFO, "Linker output:\n%s", program.getInfoLog());
+        LOG(info, "Linker output:\n{}", program.getInfoLog());
 	if(program.getInfoDebugLog()[0])
-        LOG_F(INFO, "Linker debug output:\n%s", program.getInfoDebugLog());
+        LOG(info, "Linker debug output:\n{}", program.getInfoDebugLog());
 
     if(!compilation_suceeded || !link_succeeded)
         throw std::runtime_error("Shader compilation failed.");
 
     program.buildReflection();
-	LOG_F(INFO, "Reflection database:");
+	LOG(info, "Reflection database:");
 	program.dumpReflection();
 
     // Genearte SPIR-V code
@@ -163,7 +162,7 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
 
     GlslangToSpv(*program.getIntermediate(glslang_stage), spirv, &logger,
         &spv_options);
-	LOG_F(INFO, "Disassembly:");
+	LOG(info, "Disassembly:");
     Disassemble(std::cout, spirv);
 
     return std::make_shared<SpirvBinary>(std::move(spirv));

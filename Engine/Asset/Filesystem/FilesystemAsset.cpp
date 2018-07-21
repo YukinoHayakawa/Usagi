@@ -2,8 +2,7 @@
 
 #include <fstream>
 
-#include <loguru.hpp>
-
+#include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Graphics/Shader/SpirvBinary.hpp>
 
 #include "FilesystemAssetPackage.hpp"
@@ -23,7 +22,7 @@ void usagi::FilesystemAsset::load()
 
     if(!in)
     {
-        LOG_S(ERROR) << "Failed to open " << full_path;
+        LOG(error, "Failed to open {}", full_path);
         throw std::runtime_error("Failed to open file.");
     }
 

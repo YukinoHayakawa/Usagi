@@ -14,7 +14,7 @@ class Win32Mouse;
 class Win32Window;
 
 /**
- * \brief Talking with Win32 messaging mechanism and devices.
+ * \brief Talking with Win32 messaging mechanism and discover devices.
  * One application can have at most one instance.
  */
 class Win32Platform : public Platform
@@ -50,9 +50,17 @@ class Win32Platform : public Platform
         WPARAM wParam,
         LPARAM lParam);
 
+    // maps device object name to friendly name or driver desc for the user
+    // to identify the devices.
+    // the device object names are obtained by querying the symbolic link
+    // target of device path.
+    static std::map<std::wstring, std::string> mDeviceNames;
+
+
 public:
     Win32Platform();
     ~Win32Platform();
+    static void updateDeviceNames();
 
     std::shared_ptr<Window> createWindow(
         const std::string &title,
@@ -61,8 +69,9 @@ public:
 
     void processEvents() override;
 
-    std::shared_ptr<Keyboard> virtualKeyboard() override;
-    std::shared_ptr<Mouse> virtualMouse() override;
+    std::shared_ptr<Keyboard> virtualKeyboard() const override;
+    std::shared_ptr<Mouse> virtualMouse() const override;
+    const std::vector<std::shared_ptr<Gamepad>> & gamepads() const override;
 
     // Win32
 

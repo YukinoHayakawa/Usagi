@@ -4,12 +4,14 @@
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 
+#include "DeviceEventListener.hpp"
+
 namespace usagi
 {
-class HID : Noncopyable
+class Device : Noncopyable
 {
 public:
-    virtual ~HID() = default;
+    virtual ~Device() = default;
 
     virtual std::string name() const = 0;
 };

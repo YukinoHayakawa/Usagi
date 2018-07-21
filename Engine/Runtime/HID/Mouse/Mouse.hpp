@@ -2,14 +2,14 @@
 
 #include <Usagi/Engine/Core/Math.hpp>
 #include <Usagi/Engine/Runtime/EventEmitter.hpp>
-#include <Usagi/Engine/Runtime/HID/HID.hpp>
+#include <Usagi/Engine/Runtime/HID/Device.hpp>
 
 #include "MouseButtonCode.hpp"
 
 namespace usagi
 {
 class Mouse
-    : public HID
+    : public Device
     , public EventEmitter<class MouseEventListener>
 {
     bool mImmersiveMode = false;

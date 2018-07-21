@@ -1,8 +1,9 @@
 ﻿#include "AssetRoot.hpp"
 
-#include <loguru.hpp>
 #include <boost/uuid/string_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
+
+#include <Usagi/Engine/Core/Logging.hpp>
 
 #include "AssetPackage.hpp"
 #include "Asset.hpp"
@@ -20,9 +21,7 @@ bool usagi::AssetRoot::acceptChild(Element *child)
 usagi::Asset * usagi::AssetRoot::findAssetByUuid(
     const boost::uuids::uuid &uuid) const
 {
-    LOG_F(INFO, "Searching asset by UUID: %s",
-        boost::uuids::to_string(uuid).c_str()
-    );
+    LOG(info, "Searching asset by UUID: {}", boost::uuids::to_string(uuid));
     for(auto iter = childrenBegin(); iter != childrenEnd(); ++iter)
     {
         auto pkg = static_cast<AssetPackage*>(iter->get());
@@ -42,10 +41,7 @@ usagi::Asset * usagi::AssetRoot::findAssetByString(
         const std::string package_name { string.c_str() };
         const std::string path { string.c_str() + colon_pos + 1};
 
-        LOG_F(INFO, "Searching asset in package %s: %s",
-            package_name.c_str(),
-            path.c_str()
-        );
+        LOG(info, "Searching asset in package {}: {}", package_name, path);
         if(const auto pkg = findChildByName(package_name))
         {
             return static_cast<AssetPackage*>(pkg)->findByString(path);
@@ -53,7 +49,7 @@ usagi::Asset * usagi::AssetRoot::findAssetByString(
         return nullptr;
     }
 
-    LOG_F(INFO, "Searching asset in all packages: %s",string.c_str());
+    LOG(info, "Searching asset in all packages: {}", string);
     // search each package linearly
     for(auto iter = childrenBegin(); iter != childrenEnd(); ++iter)
     {
@@ -65,10 +61,9 @@ usagi::Asset * usagi::AssetRoot::findAssetByString(
         }
         catch(const std::exception &e)
         {
-            LOG_F(INFO,
+            LOG(error,
                 "An exception was thrown while searching package %s: %s",
-                pkg->name().c_str(),
-                e.what()
+                pkg->name(), e.what()
             );
         }
     }

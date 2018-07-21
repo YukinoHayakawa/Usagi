@@ -204,9 +204,6 @@
     <ClInclude Include="Extension\Win32\Win32RawInputDevice.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Win32\Win32RawInputDeviceEnumerator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Extension\Win32\Win32.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -237,7 +234,31 @@
     <ClInclude Include="Runtime\HID\Mouse\MouseEventListener.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\HID\HID.hpp">
+    <ClInclude Include="Extension\Win32\Win32Gamepad.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\HID\DeviceEventListener.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\HID\Device.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\PlatformEventListener.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\HID\DeviceType.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Win32\ntos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Logging.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Win32\Win32Helper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Win32\Win32MacroFix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -306,9 +327,6 @@
     <ClCompile Include="Extension\Win32\Win32RawInputDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\Win32\Win32RawInputDeviceEnumerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\HID\Gamepad\GamepadButtonCode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -319,6 +337,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\HID\Mouse\MouseButtonCode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Win32\Win32Gamepad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Win32\Win32Helper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\String.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

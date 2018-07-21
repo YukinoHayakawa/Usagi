@@ -3,7 +3,7 @@
 #include <Usagi/Engine/Game/Game.hpp>
 
 #include <Usagi/Engine/Extension/Win32/Win32Platform.hpp>
-#include <Usagi/Engine/Extension/Win32/Win32RawInputDeviceEnumerator.hpp>
+#include <Usagi/Engine/Extension/Win32/Win32RawInputDevice.hpp>
 
 void usagi::Game::initializePlatform()
 {
@@ -12,7 +12,7 @@ void usagi::Game::initializePlatform()
 
 void usagi::Game::initializeInput()
 {
-    Win32RawInputDeviceEnumerator::enumerateDevices();
+    Win32RawInputDevice::enumerateDevices();
 }
 
 #endif

@@ -1,10 +1,11 @@
-﻿#include <loguru.hpp>
-
+﻿#include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Game/Game.hpp>
 #include <Usagi/Engine/Runtime/Platform.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Runtime/HID/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
+#include <Usagi/Engine/Extension/Win32/Win32Platform.hpp>
+#include <Usagi/Engine/Extension/Win32/Win32Helper.hpp>
 
 using namespace usagi;
 using namespace std::chrono_literals;
@@ -40,28 +41,28 @@ public:
 
     void onMouseMove(const MousePositionEvent &e) override
     {
-        LOG_F(INFO, "Mouse moved:       %f, %f",
+        LOG(info, "Mouse moved:       %f, %f",
             e.distance.x(), e.distance.y()
         );
     }
 
     void onMouseButtonStateChange(const MouseButtonEvent &e) override
     {
-        LOG_F(INFO, "Mouse button:      %s=%d",
+        LOG(info, "Mouse button:      %s=%d",
             to_string(e.button), e.pressed
         );
     }
 
     void onMouseWheelScroll(const MouseWheelEvent &e) override
     {
-        LOG_F(INFO, "Mouse wheel:       %f, %f",
+        LOG(info, "Mouse wheel:       %f, %f",
             e.distance.x(), e.distance.y()
         );
     }
 
     void onKeyStateChange(const KeyEvent &e) override
     {
-        LOG_F(INFO, "Key:               %s=%d, repeated=%d",
+        LOG(info, "Key:               %s=%d, repeated=%d",
             to_string(e.key_code), e.pressed, e.repeated
         );
         switch(e.key_code)
@@ -82,11 +83,11 @@ public:
                     if(mMouse->hasEventListener(this))
                     {
                         mMouse->removeEventListener(this);
-                        LOG_F(INFO, "Mouse listener removed");
+                        LOG(info, "Mouse listener removed");
                     } else
                     {
                         mMouse->addEventListener(this);
-                        LOG_F(INFO, "Mouse listener added");
+                        LOG(info, "Mouse listener added");
                     }
                 }
                 break;
@@ -121,43 +122,43 @@ public:
 
     void onWindowFocusChanged(const WindowFocusEvent &e) override
     {
-        LOG_F(INFO, "Window focus:      %d",
+        LOG(info, "Window focus:      %d",
             e.focused
         );
     }
 
     void onWindowMoveBegin(const WindowPositionEvent &e) override
     {
-        LOG_F(INFO, "Window move begin");
+        LOG(info, "Window move begin");
     }
 
     void onWindowMoved(const WindowPositionEvent &e) override
     {
-        LOG_F(INFO, "Window position:   %d, %d",
+        LOG(info, "Window position:   %d, %d",
             e.position.x(), e.position.y()
         );
     }
 
     void onWindowMoveEnd(const WindowPositionEvent &e) override
     {
-        LOG_F(INFO, "Window move end");
+        LOG(info, "Window move end");
     }
 
     void onWindowResizeBegin(const WindowSizeEvent &e) override
     {
-        LOG_F(INFO, "Window resize begin");
+        LOG(info, "Window resize begin");
     }
 
     void onWindowResized(const WindowSizeEvent &e) override
     {
-        LOG_F(INFO, "Window size:       %u, %u",
+        LOG(info, "Window size:       %u, %u",
             e.size.x(), e.size.y()
         );
     }
 
     void onWindowResizeEnd(const WindowSizeEvent &e) override
     {
-        LOG_F(INFO, "Window resize end");
+        LOG(info, "Window resize end");
     }
 
     void mainLoop()
@@ -171,6 +172,8 @@ public:
 
 int main(int argc, char *argv[])
 {
+    win32::patchConsole();
+    Win32Platform::updateDeviceNames();
     MainLoop app;
     app.mainLoop();
 }

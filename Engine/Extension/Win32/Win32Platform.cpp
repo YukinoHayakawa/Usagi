@@ -1,14 +1,22 @@
-﻿#include "Win32Platform.hpp"
-
-#include <ShellScalingAPI.h>
+﻿#include <ShellScalingAPI.h>
 #pragma comment(lib, "Shcore.lib")
+#include <SetupAPI.h>
+#pragma comment(lib, "SetupAPI.lib")
+
+// some Windows macros are undefined by our header
+#include "Win32Platform.hpp"
+
+#include <Usagi/Engine/Core/Logging.hpp>
 
 #include "Win32Window.hpp"
 #include "Win32Mouse.hpp"
 #include "Win32Keyboard.hpp"
+#include "Win32Helper.hpp"
+#include <Usagi/Engine/Utility/String.hpp>
 
 const wchar_t usagi::Win32Platform::WINDOW_CLASS_NAME[] = L"UsagiRenderWindow";
 usagi::Win32Platform *usagi::Win32Platform::mInstance = nullptr;
+std::map<std::wstring, std::string> usagi::Win32Platform::mDeviceNames;
 
 void usagi::Win32Platform::registerWindowClass()
 {
@@ -151,6 +159,27 @@ LRESULT usagi::Win32Platform::handleWindowMessage(
                     mVirtualMouse->handleRawInput(raw);
                     break;
 
+                case RIM_TYPEHID:
+                {
+                    static std::vector<CHAR> last;
+                    std::vector<CHAR> state {
+                        raw->data.hid.bRawData,
+                        raw->data.hid.bRawData + raw->data.hid.dwSizeHid };
+
+                    if(state != last)
+                    {
+                        if(raw->data.hid.dwSizeHid > 80) break;
+
+                        for(DWORD i = 0; i < raw->data.hid.dwSizeHid; i++)
+                        {
+                            printf("%02X ", raw->data.hid.bRawData[i]);
+                        }
+                        printf("\n");
+                        fflush(stdout);
+                    }
+                    last = state;
+                    break;
+                }
                 default:
                     break;
             }
@@ -172,7 +201,10 @@ LRESULT usagi::Win32Platform::handleWindowMessage(
         }
         // todo: handles device addition/removal
         case WM_INPUT_DEVICE_CHANGE:
+        {
+            
             break;
+        }
         // always hook the virtual keyboard and mouse to the active window.
         case WM_ACTIVATE:
         {
@@ -279,12 +311,127 @@ void usagi::Win32Platform::processEvents()
     }
 }
 
-std::shared_ptr<usagi::Keyboard> usagi::Win32Platform::virtualKeyboard()
+std::shared_ptr<usagi::Keyboard> usagi::Win32Platform::virtualKeyboard() const
 {
     return mVirtualKeyboard;
 }
 
-std::shared_ptr<usagi::Mouse> usagi::Win32Platform::virtualMouse()
+std::shared_ptr<usagi::Mouse> usagi::Win32Platform::virtualMouse() const
 {
     return mVirtualMouse;
+}
+
+const std::vector<std::shared_ptr<usagi::Gamepad>> & usagi::Win32Platform::
+    gamepads() const
+{
+    return { };
+}
+
+// Some links:
+// Querying kernel objects & following symbolic links:
+// http://blogs.microsoft.co.il/pavely/2014/02/05/creating-a-winobj-like-tool/
+// https://github.com/hfiref0x/WinObjEx64 (also where I get ntos.h)
+// About undocumented Nt fuctions:
+// http://undocumented.ntinternals.net/
+
+// Source: Using SetupDi to enumerate devices
+// http://samscode.blogspot.com/2009/08/setupdi-how-to-enumerate-devices-using.html
+namespace
+{
+std::wstring getDeviceRegistryProperty(
+    __in HDEVINFO hDevInfo,
+    __in SP_DEVINFO_DATA DeviceInfoData,
+    __in DWORD Property
+)
+{
+    DWORD        data_t;
+    std::wstring buffer;
+    DWORD        buffer_size = 0;
+
+    // Call function with null to begin with, 
+    // then use the returned buffer size (doubled)
+    // to Alloc the buffer. Keep calling until
+    // success or an unknown failure.
+    //
+    // Double the returned buffersize to correct
+    // for underlying legacy CM functions that 
+    // return an incorrect buffersize value on 
+    // DBCS/MBCS systems.
+    while(!SetupDiGetDeviceRegistryProperty(
+        hDevInfo,
+        &DeviceInfoData,
+        Property,
+        &data_t,
+        reinterpret_cast<PBYTE>(buffer.data()),
+        buffer_size,
+        &buffer_size))
+    {
+        if(ERROR_INSUFFICIENT_BUFFER == GetLastError())
+        {
+            // Double the size to avoid problems on 
+            // W2k MBCS systems per KB 888609. 
+            buffer.resize(buffer_size * 2 / sizeof(std::wstring::value_type));
+        }
+        else
+        {
+            break;
+        }
+    }
+    // remove extra zeros
+    const auto trim_pos = buffer.find(L'\0');
+    if(trim_pos != std::string::npos)
+        buffer.resize(trim_pos);
+    return buffer;
+}
+}
+
+void usagi::Win32Platform::updateDeviceNames()
+{
+    // Create a HDEVINFO with all present devices.
+    const auto dev_info = SetupDiGetClassDevs(
+        nullptr, // GUID
+        nullptr, // Enumerator (HID?)
+        nullptr,
+        DIGCF_PRESENT | DIGCF_ALLCLASSES // find all connected devices
+    );
+
+    if(dev_info == INVALID_HANDLE_VALUE)
+    {
+        throw std::runtime_error("SetupDiGetClassDevs() failed.");
+    }
+
+    mDeviceNames.clear();
+
+    // Enumerate through all devices in Set.
+    SP_DEVINFO_DATA device_info_data;
+    device_info_data.cbSize = sizeof(SP_DEVINFO_DATA);
+    
+    for(DWORD i = 0; SetupDiEnumDeviceInfo(dev_info, i, &device_info_data); i++)
+    {
+        DWORD buffersize = 0;
+
+        const auto device_obj = getDeviceRegistryProperty(
+            dev_info, device_info_data, SPDRP_PHYSICAL_DEVICE_OBJECT_NAME);
+
+        if(device_obj.empty()) continue;
+
+        auto name = getDeviceRegistryProperty(
+            dev_info, device_info_data, SPDRP_FRIENDLYNAME);
+        if(name.empty())
+            name = getDeviceRegistryProperty(
+                dev_info, device_info_data, SPDRP_DEVICEDESC);
+
+        LOG(info, "{:24}: {}", ws2s(device_obj), ws2s(name));
+    }
+
+    const auto last_error = GetLastError();
+    if(NO_ERROR != last_error && ERROR_NO_MORE_ITEMS != last_error)
+    {
+        LOG(error, "Error occured while enumerating devices: {}",
+            win32::getErrorMessage(last_error)
+        );
+    }
+
+    // Cleanup
+    SetupDiDestroyDeviceInfoList(dev_info);
 }

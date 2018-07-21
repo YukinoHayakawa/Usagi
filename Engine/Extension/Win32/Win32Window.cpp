@@ -44,7 +44,7 @@ usagi::Win32Window::Win32Window(
     : mPosition { std::move(position) }
     , mSize { std::move(size) }
 {
-    auto window_title_wide = string::toWideVector(title);
+    auto window_title_wide = s2ws(title);
 
     const auto window_rect = getWindowRect();
 
