@@ -11,6 +11,7 @@ class RAIIHelper : Noncopyable
     std::function<void()> mCreate, mRelease;
 
 public:
+    // todo: template params
 	RAIIHelper(std::function<void()> create, std::function<void()> release)
 		: mCreate { std::move(create) }
 		, mRelease { std::move(release) }

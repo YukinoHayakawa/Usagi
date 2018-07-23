@@ -241,7 +241,7 @@ void usagi::Win32Keyboard::handleRawInput(RAWINPUT *raw)
 {
     checkDevice(raw, RIM_TYPEKEYBOARD);
 
-    if(!Win32Platform::getActiveWindow()) return;
+    if(!Win32Platform::activeWindow()) return;
 
     auto &kb = raw->data.keyboard;
 

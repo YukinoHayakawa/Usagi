@@ -131,7 +131,6 @@
     <ClCompile Include="Extension\Vulkan\VulkanExtensions.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanGpuDevice.cpp" />
     <ClCompile Include="Extension\Win32\Win32Helper.cpp" />
-    <ClCompile Include="Extension\Win32\Win32DeviceEnumerator.cpp" />
     <ClCompile Include="Extension\Win32\Win32Gamepad.cpp" />
     <ClCompile Include="Extension\Win32\Win32Keyboard.cpp" />
     <ClCompile Include="Extension\Win32\Win32Mouse.cpp" />
@@ -163,7 +162,6 @@
     <ClInclude Include="Extension\Vulkan\VulkanGpuBuffer.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanGpuDevice.hpp" />
     <ClInclude Include="Extension\Win32\ntos.h" />
-    <ClInclude Include="Extension\Win32\Win32DeviceEnumerator.hpp" />
     <ClInclude Include="Extension\Win32\Win32Gamepad.hpp" />
     <ClInclude Include="Extension\Win32\Win32Helper.hpp" />
     <ClInclude Include="Extension\Win32\Win32Keyboard.hpp" />

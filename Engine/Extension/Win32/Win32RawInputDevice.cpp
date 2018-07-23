@@ -36,6 +36,7 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
     enumerateDevices()
 {
     LOG(info, "Enumerating raw input devices");
+    LOG(info, "--------------------------------");
 
     Win32RawInputDeviceEnumeration devices;
 
@@ -54,7 +55,8 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
 
     for(auto &&device : raw_input_device_list)
     {
-        // get device path as kernal object
+        // get DOS device path
+        // https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats#dos-device-paths
         UINT size;
         std::wstring path = L"<Error getting device path>";
         if(GetRawInputDeviceInfoW(device.hDevice, RIDI_DEVICENAME,
@@ -72,7 +74,29 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
             &info, &size);
 
         LOG(info, "Path               : {}", ws2s(path));
-        //LOG(info, "Friendly Name:          %ls", device_name.c_str());
+
+        try
+        {
+            if(path.length() > 4)
+            {
+                // translate from Win32 namespace to NT namespace
+                // https://docs.microsoft.com/en-us/windows/desktop/fileio/naming-a-file#namespaces
+                // https://superuser.com/questions/884347/win32-and-the-global-namespace
+                path = L"\\GLOBAL??" + path.substr(3);
+                const auto dev_obj_name =
+                    ws2s(win32::resolveNtSymbolicLink(path));
+                LOG(info, "Name               : {}",
+                    Win32Platform::deviceFriendlyName(dev_obj_name));
+            }
+            else
+            {
+                LOG(info, "Name               : <Invalid device path>");
+            }
+        }
+        catch(const std::exception &e)
+        {
+            LOG(info, "Name               : <{}>", e.what());
+        }
 
         switch(info.dwType)
         {
@@ -106,6 +130,8 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
                 break;
             }
         }
+
+        LOG(info, "--------------------------------");
     }
 
     return devices;

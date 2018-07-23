@@ -45,7 +45,7 @@ void usagi::Win32Mouse::recaptureCursor()
 void usagi::Win32Mouse::confineCursorInClientArea()
 {
     const auto client_rect =
-        Win32Platform::getActiveWindow()->clientScreenRect();
+        Win32Platform::activeWindow()->clientScreenRect();
     ClipCursor(&client_rect);
 }
 
@@ -54,7 +54,7 @@ void usagi::Win32Mouse::handleRawInput(RAWINPUT *raw)
     checkDevice(raw, RIM_TYPEMOUSE);
 
     // ignore the message if no window is active.
-    const auto window = Win32Platform::getActiveWindow();
+    const auto window = Win32Platform::activeWindow();
     if(!window) return;
 
     auto &mouse = raw->data.mouse;
@@ -162,7 +162,7 @@ std::string usagi::Win32Mouse::name() const
 
 usagi::Vector2f usagi::Win32Mouse::cursorPositionInActiveWindow()
 {
-    if(const auto wnd = Win32Platform::getActiveWindow())
+    if(const auto wnd = Win32Platform::activeWindow())
     {
         POINT pt;
         GetCursorPos(&pt);
@@ -174,7 +174,7 @@ usagi::Vector2f usagi::Win32Mouse::cursorPositionInActiveWindow()
 
 void usagi::Win32Mouse::centerCursor()
 {
-    if(const auto wnd = Win32Platform::getActiveWindow())
+    if(const auto wnd = Win32Platform::activeWindow())
     {
         const auto rect = wnd->clientScreenRect();
         Vector2i cursor{

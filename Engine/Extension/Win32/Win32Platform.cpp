@@ -105,7 +105,7 @@ usagi::Win32Window * usagi::Win32Platform::windowFromHandle(HWND handle)
         GetWindowLongPtrW(handle, GWLP_USERDATA));
 }
 
-usagi::Win32Window * usagi::Win32Platform::getActiveWindow()
+usagi::Win32Window * usagi::Win32Platform::activeWindow()
 {
     // some interesting posts:
     // Eventually, nothing is special any more
@@ -113,6 +113,15 @@ usagi::Win32Window * usagi::Win32Platform::getActiveWindow()
     const auto hwnd = GetActiveWindow();
 
     return windowFromHandle(hwnd);
+}
+
+std::string usagi::Win32Platform::deviceFriendlyName(
+    const std::string &device_object_name)
+{
+    const auto iter = mDeviceNames.find(device_object_name);
+    if(iter != mDeviceNames.end())
+        return iter->second;
+    return { };
 }
 
 void usagi::Win32Platform::createVirtualDevices()
@@ -284,6 +293,7 @@ usagi::Win32Platform::Win32Platform()
     SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
     registerRawInputDevices();
     createVirtualDevices();
+    updateDeviceNames();
 }
 
 usagi::Win32Platform::~Win32Platform()

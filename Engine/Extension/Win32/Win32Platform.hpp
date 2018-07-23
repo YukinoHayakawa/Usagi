@@ -92,6 +92,9 @@ public:
      * is not owned by our process, nullptr is returned.
      * \return 
      */
-    static Win32Window * getActiveWindow();
+    static Win32Window * activeWindow();
+
+    static std::string deviceFriendlyName(
+        const std::string &device_object_name);
 };
 }

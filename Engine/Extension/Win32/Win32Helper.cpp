@@ -4,12 +4,24 @@
 
 #include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Utility/String.hpp>
+#include <Usagi/Engine/Utility/RAIIHelper.hpp>
+
+#pragma warning(disable: 4005) // macro redefinition
+
+#include "Win32.hpp"
+extern "C"
+{
+#   define DEVICE_TYPE DWORD
+    typedef _Return_type_success_(return >= 0) LONG NTSTATUS;
+    typedef NTSTATUS *PNTSTATUS;
+#   include "ntos.h"
+}
 
 // https://docs.microsoft.com/en-us/windows/desktop/Debug/retrieving-the-last-error-code
-std::string usagi::win32::getErrorMessage(DWORD error_code)
+std::string usagi::win32::getErrorMessage(const DWORD error_code)
 {
     // Retrieve the system error message for the given error code
-    WCHAR *lpMsgBuf = nullptr;
+    WCHAR *msg_buf = nullptr;
 
     const auto num_char = FormatMessageW(
         FORMAT_MESSAGE_ALLOCATE_BUFFER |
@@ -18,7 +30,7 @@ std::string usagi::win32::getErrorMessage(DWORD error_code)
         nullptr,
         error_code,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        reinterpret_cast<LPWSTR>(&lpMsgBuf),
+        reinterpret_cast<LPWSTR>(&msg_buf),
         0,
         nullptr
     );
@@ -28,15 +40,53 @@ std::string usagi::win32::getErrorMessage(DWORD error_code)
         LOG(warn, "FormatMessage() failed: {}", GetLastError());
     }
 
-    const std::wstring msg { lpMsgBuf, num_char };
-    LocalFree(lpMsgBuf);
+    const std::wstring msg { msg_buf, num_char };
+    LocalFree(msg_buf);
 
     return ws2s(msg);
 }
 
+// http://blogs.microsoft.co.il/pavely/2014/02/05/creating-a-winobj-like-tool/
 std::wstring usagi::win32::resolveNtSymbolicLink(const std::wstring &link)
 {
-    return { };
+    // Specify object path
+    UNICODE_STRING      object_name;
+    OBJECT_ATTRIBUTES   object_attributes;
+    // this function does not allocate any memory
+    // http://www.osronline.com/ShowThread.cfm?link=197211
+    RtlInitUnicodeString(&object_name, link.c_str());
+    InitializeObjectAttributes(
+        &object_attributes, &object_name, OBJ_CASE_INSENSITIVE, nullptr, nullptr
+    );
+
+    // Open object
+    HANDLE      link_handle = nullptr;
+    NTSTATUS    status;
+    RAIIHelper  nt_handle {
+        [&]() {
+            status = NtOpenSymbolicLinkObject(
+               &link_handle, SYMBOLIC_LINK_QUERY, &object_attributes);
+            if(!NT_SUCCESS(status) || (link_handle == nullptr)) {
+               throw std::runtime_error("NtOpenSymbolicLinkObject() failed.");
+            }
+        },
+        [&]() {
+            NtClose(link_handle);
+        }
+    };
+
+    // Query link target
+    WCHAR           target_buffer[256] = { 0 };
+    UNICODE_STRING  target;
+    RtlInitUnicodeString(&target, target_buffer);
+    target.MaximumLength = sizeof(target_buffer);
+
+    status = NtQuerySymbolicLinkObject(link_handle, &target, nullptr);
+    if(!NT_SUCCESS(status) || (link_handle == nullptr)) {
+        throw std::runtime_error("NtQuerySymbolicLinkObject() failed.");
+    }
+
+    return { target_buffer };
 }
 
 // patch the console to allow UTF-8 I/O
@@ -46,7 +96,7 @@ namespace
 class ConsoleStreamBufWin32 : public std::streambuf
 {
 public:
-    ConsoleStreamBufWin32(DWORD handleId, bool isInput);
+    ConsoleStreamBufWin32(DWORD handle_id, bool is_input);
 
 protected:
     // std::basic_streambuf
@@ -56,16 +106,18 @@ protected:
     int_type overflow(int_type c) override;
 
 private:
-    HANDLE const m_handle;
-    bool const m_isInput;
-    std::string m_buffer;
+    HANDLE const mHandle; // NOLINT(misc-misplaced-const)
+    bool const mIsInput;
+    std::string mBuffer;
 };
 
-ConsoleStreamBufWin32::ConsoleStreamBufWin32(DWORD handleId, bool isInput)
-    : m_handle(::GetStdHandle(handleId))
-    , m_isInput(isInput)
+ConsoleStreamBufWin32::ConsoleStreamBufWin32(
+    const DWORD handle_id,
+    const bool is_input
+)   : mHandle(GetStdHandle(handle_id))
+    , mIsInput(is_input)
 {
-    if(m_isInput) { setg(0, 0, 0); }
+    if(mIsInput) { setg(nullptr, nullptr, nullptr); }
 }
 
 std::streambuf * ConsoleStreamBufWin32::setbuf(
@@ -74,41 +126,41 @@ std::streambuf * ConsoleStreamBufWin32::setbuf(
 
 int ConsoleStreamBufWin32::sync()
 {
-    if(m_isInput)
+    if(mIsInput)
     {
-        ::FlushConsoleInputBuffer(m_handle);
-        setg(0, 0, 0);
+        FlushConsoleInputBuffer(mHandle);
+        setg(nullptr, nullptr, nullptr);
     }
     else
     {
-        if(m_buffer.empty()) { return 0; }
+        if(mBuffer.empty()) { return 0; }
 
-        const auto wide_buffer = usagi::s2ws(m_buffer);
-        DWORD writtenSize;
-        ::WriteConsoleW(m_handle, wide_buffer.c_str(),
-            static_cast<DWORD>(wide_buffer.size()), &writtenSize, nullptr);
+        const auto wide_buffer = usagi::s2ws(mBuffer);
+        DWORD written_size;
+        WriteConsoleW(mHandle, wide_buffer.c_str(),
+            static_cast<DWORD>(wide_buffer.size()), &written_size, nullptr);
     }
 
-    m_buffer.clear();
+    mBuffer.clear();
 
     return 0;
 }
 
 ConsoleStreamBufWin32::int_type ConsoleStreamBufWin32::underflow()
 {
-    if(!m_isInput) { return traits_type::eof(); }
+    if(!mIsInput) { return traits_type::eof(); }
 
     if(gptr() >= egptr())
     {
         wchar_t wide_buffer[128];
         DWORD read_size;
-        if(!::ReadConsoleW(m_handle, wide_buffer, ARRAYSIZE(wide_buffer) - 1,
+        if(!ReadConsoleW(mHandle, wide_buffer, ARRAYSIZE(wide_buffer) - 1,
             &read_size, nullptr)) { return traits_type::eof(); }
 
         wide_buffer[read_size] = L'\0';
-        m_buffer = usagi::ws2s(wide_buffer);
+        mBuffer = usagi::ws2s(wide_buffer);
 
-        setg(&m_buffer[0], &m_buffer[0], &m_buffer[0] + m_buffer.size());
+        setg(&mBuffer[0], &mBuffer[0], &mBuffer[0] + mBuffer.size());
 
         if(gptr() >= egptr()) { return traits_type::eof(); }
     }
@@ -118,18 +170,18 @@ ConsoleStreamBufWin32::int_type ConsoleStreamBufWin32::underflow()
 
 ConsoleStreamBufWin32::int_type ConsoleStreamBufWin32::overflow(int_type c)
 {
-    if(m_isInput) { return traits_type::eof(); }
+    if(mIsInput) { return traits_type::eof(); }
 
-    m_buffer += traits_type::to_char_type(c);
+    mBuffer += traits_type::to_char_type(c);
     return traits_type::not_eof(c);
 }
 
 template<typename StreamT>
-void fixStdStream(DWORD handleId, bool isInput, StreamT& stream)
+void fixStdStream(const DWORD handle_id, const bool is_input, StreamT& stream)
 {
-    if(GetFileType(GetStdHandle(handleId)) == FILE_TYPE_CHAR)
+    if(GetFileType(GetStdHandle(handle_id)) == FILE_TYPE_CHAR)
     {
-        stream.rdbuf(new ConsoleStreamBufWin32(handleId, isInput));
+        stream.rdbuf(new ConsoleStreamBufWin32(handle_id, is_input));
     }
 }
 }

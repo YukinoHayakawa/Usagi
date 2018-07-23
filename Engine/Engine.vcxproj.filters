@@ -54,9 +54,6 @@
     <ClInclude Include="Utility\File.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\RAIIHelper.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Math.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -192,9 +189,6 @@
     <ClInclude Include="Runtime\Window\WindowEventListener.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Win32\Win32DeviceEnumerator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Platform.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -261,6 +255,9 @@
     <ClInclude Include="Extension\Win32\Win32MacroFix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\RAIIHelper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utility\File.cpp">
@@ -316,9 +313,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Vulkan\VulkanGpuDevice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Win32\Win32DeviceEnumerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Win32\Win32Platform.cpp">
