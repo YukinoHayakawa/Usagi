@@ -5,6 +5,7 @@
 #include <Usagi/Engine/Runtime/Platform.hpp>
 
 #include "Win32.hpp"
+#include "Win32RawInputDevice.hpp"
 
 namespace usagi
 {
@@ -32,24 +33,6 @@ class Win32Platform : public Platform
      */
     static Win32Window * windowFromHandle(HWND handle);
 
-    std::shared_ptr<Win32Keyboard> mVirtualKeyboard;
-    std::shared_ptr<Win32Mouse> mVirtualMouse;
-
-    void createVirtualDevices();
-
-    std::map<HANDLE, std::weak_ptr<Win32RawInputDevice>> mRawInputDevices;
-
-    std::vector<BYTE> mRawInputBuffer;
-    void fillRawInputBuffer(LPARAM lParam);
-
-    static Win32Platform *mInstance;
-
-    LRESULT CALLBACK handleWindowMessage(
-        HWND hWnd,
-        UINT message,
-        WPARAM wParam,
-        LPARAM lParam);
-
     // maps device object name to friendly name or driver desc for the user
     // to identify the devices.
     // the device object names are obtained by querying the symbolic link
@@ -59,6 +42,26 @@ class Win32Platform : public Platform
     static std::map<std::string, std::string> mDeviceNames;
 
     static void updateDeviceNames();
+
+    Win32RawInputDeviceEnumeration mDeviceEnumeration;
+
+    std::shared_ptr<Win32Keyboard> mVirtualKeyboard;
+    std::shared_ptr<Win32Mouse> mVirtualMouse;
+
+    void createVirtualDevices();
+
+    std::map<HANDLE, std::weak_ptr<Win32RawInputDevice>> mRawInputDevices;
+    std::vector<BYTE> mRawInputBuffer;
+
+    void fillRawInputBuffer(LPARAM lParam);
+
+    static Win32Platform *mInstance;
+
+    LRESULT CALLBACK handleWindowMessage(
+        HWND hWnd,
+        UINT message,
+        WPARAM wParam,
+        LPARAM lParam);
 
 public:
     Win32Platform();
@@ -73,7 +76,7 @@ public:
 
     std::shared_ptr<Keyboard> virtualKeyboard() const override;
     std::shared_ptr<Mouse> virtualMouse() const override;
-    const std::vector<std::shared_ptr<Gamepad>> & gamepads() const override;
+    std::vector<std::shared_ptr<Gamepad>> gamepads() const override;
 
     // Win32
 

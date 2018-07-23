@@ -45,8 +45,10 @@ public:
     Win32RawInputDevice(HANDLE device_handle, std::string name);
     virtual ~Win32RawInputDevice() = default;
 
-    virtual void handleRawInput(RAWINPUT *data);
+    virtual void handleRawInput(RAWINPUT *data) = 0;
 
     static Win32RawInputDeviceEnumeration enumerateDevices();
+
+    HANDLE deviceHandle() const { return mDeviceHandle; }
 };
 }

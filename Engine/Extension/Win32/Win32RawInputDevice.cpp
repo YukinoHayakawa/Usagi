@@ -28,10 +28,6 @@ usagi::Win32RawInputDevice::Win32RawInputDevice(
 {
 }
 
-void usagi::Win32RawInputDevice::handleRawInput(RAWINPUT *data)
-{
-}
-
 usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
     enumerateDevices()
 {

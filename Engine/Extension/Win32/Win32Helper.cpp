@@ -9,13 +9,10 @@
 #pragma warning(disable: 4005) // macro redefinition
 
 #include "Win32.hpp"
-extern "C"
-{
-#   define DEVICE_TYPE DWORD
-    typedef _Return_type_success_(return >= 0) LONG NTSTATUS;
-    typedef NTSTATUS *PNTSTATUS;
-#   include "ntos.h"
-}
+#define DEVICE_TYPE DWORD
+typedef _Return_type_success_(return >= 0) LONG NTSTATUS;
+typedef NTSTATUS *PNTSTATUS;
+#include "ntos.h"
 
 // https://docs.microsoft.com/en-us/windows/desktop/Debug/retrieving-the-last-error-code
 std::string usagi::win32::getErrorMessage(const DWORD error_code)
@@ -37,7 +34,7 @@ std::string usagi::win32::getErrorMessage(const DWORD error_code)
 
     if(num_char == 0)
     {
-        LOG(warn, "FormatMessage() failed: {}", GetLastError());
+        LOG(error, "FormatMessage() failed: {}", GetLastError());
     }
 
     const std::wstring msg { msg_buf, num_char };
@@ -181,6 +178,7 @@ void fixStdStream(const DWORD handle_id, const bool is_input, StreamT& stream)
 {
     if(GetFileType(GetStdHandle(handle_id)) == FILE_TYPE_CHAR)
     {
+        // todo: possible memory leak
         stream.rdbuf(new ConsoleStreamBufWin32(handle_id, is_input));
     }
 }
@@ -188,7 +186,12 @@ void fixStdStream(const DWORD handle_id, const bool is_input, StreamT& stream)
 
 void usagi::win32::patchConsole()
 {
+    static bool patched = false;
+    if(patched) return;
+
     fixStdStream(STD_INPUT_HANDLE, true, std::cin);
     fixStdStream(STD_OUTPUT_HANDLE, false, std::cout);
     fixStdStream(STD_ERROR_HANDLE, false, std::cerr);
+
+    patched = true;
 }

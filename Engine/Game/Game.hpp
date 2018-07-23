@@ -60,7 +60,6 @@ public:
     Game();
     ~Game();
 
-    void initializeInput();
     void initializeGraphics();
 
     Platform * platform() const { return mPlatform.get(); }

@@ -7,11 +7,13 @@
 #include "Win32Platform.hpp"
 
 #include <Usagi/Engine/Core/Logging.hpp>
+#include <Usagi/Engine/Utility/RAIIHelper.hpp>
 #include <Usagi/Engine/Utility/String.hpp>
 
 #include "Win32Window.hpp"
 #include "Win32Mouse.hpp"
 #include "Win32Keyboard.hpp"
+#include "Win32Gamepad.hpp"
 #include "Win32Helper.hpp"
 
 const wchar_t usagi::Win32Platform::WINDOW_CLASS_NAME[] = L"UsagiRenderWindow";
@@ -169,27 +171,6 @@ LRESULT usagi::Win32Platform::handleWindowMessage(
                     mVirtualMouse->handleRawInput(raw);
                     break;
 
-                case RIM_TYPEHID:
-                {
-                    static std::vector<CHAR> last;
-                    std::vector<CHAR> state {
-                        raw->data.hid.bRawData,
-                        raw->data.hid.bRawData + raw->data.hid.dwSizeHid };
-
-                    if(state != last)
-                    {
-                        if(raw->data.hid.dwSizeHid > 80) break;
-
-                        for(DWORD i = 0; i < raw->data.hid.dwSizeHid; i++)
-                        {
-                            printf("%02X ", raw->data.hid.bRawData[i]);
-                        }
-                        printf("\n");
-                        fflush(stdout);
-                    }
-                    last = state;
-                    break;
-                }
                 default:
                     break;
             }
@@ -200,9 +181,11 @@ LRESULT usagi::Win32Platform::handleWindowMessage(
             {
                 if(const auto dev = iter->second.lock())
                 {
-                    dev->handleRawInput(raw);
+                    // ignore the message if the device is not used
+                    if(dev.use_count() > 1)
+                        dev->handleRawInput(raw);
                 }
-                else // the devices is not used anymore
+                else // the devices is removed
                 {
                     mRawInputDevices.erase(iter);
                 }
@@ -289,11 +272,22 @@ usagi::Win32Platform::Win32Platform()
 
     mInstance = this;
 
-    registerWindowClass();
+    win32::patchConsole();
     SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+    registerWindowClass();
     registerRawInputDevices();
+
     createVirtualDevices();
     updateDeviceNames();
+
+    mDeviceEnumeration = Win32RawInputDevice::enumerateDevices();
+
+    for(auto &&d : mDeviceEnumeration.keyboards)
+        mRawInputDevices[d->deviceHandle()] = d;
+    for(auto &&d : mDeviceEnumeration.mice)
+        mRawInputDevices[d->deviceHandle()] = d;
+    for(auto &&d : mDeviceEnumeration.gamepads)
+        mRawInputDevices[d->deviceHandle()] = d;
 }
 
 usagi::Win32Platform::~Win32Platform()
@@ -332,10 +326,17 @@ std::shared_ptr<usagi::Mouse> usagi::Win32Platform::virtualMouse() const
     return mVirtualMouse;
 }
 
-const std::vector<std::shared_ptr<usagi::Gamepad>> & usagi::Win32Platform::
+std::vector<std::shared_ptr<usagi::Gamepad>> usagi::Win32Platform::
     gamepads() const
 {
-    return { };
+    std::vector<std::shared_ptr<Gamepad>> ret;
+    ret.reserve(mDeviceEnumeration.gamepads.size());
+    std::copy(
+        mDeviceEnumeration.gamepads.begin(),
+        mDeviceEnumeration.gamepads.end(),
+        std::back_inserter(ret)
+    );
+    return ret;
 }
 
 // Some links:
@@ -388,7 +389,7 @@ std::wstring getDeviceRegistryProperty(
             break;
         }
     }
-    // remove extra zeros
+    // trim trailing zeros
     const auto trim_pos = buffer.find(L'\0');
     if(trim_pos != std::string::npos)
         buffer.resize(trim_pos);
@@ -398,18 +399,25 @@ std::wstring getDeviceRegistryProperty(
 
 void usagi::Win32Platform::updateDeviceNames()
 {
-    // Create a HDEVINFO with all present devices.
-    const auto dev_info = SetupDiGetClassDevsW(
-        nullptr, // GUID
-        nullptr, // Enumerator (HID?)
-        nullptr,
-        DIGCF_PRESENT | DIGCF_ALLCLASSES // find all connected devices
-    );
+    LOG(info, "Enumerating devices:");
 
-    if(dev_info == INVALID_HANDLE_VALUE)
-    {
-        throw win32::Win32Exception("SetupDiGetClassDevs() failed.");
-    }
+    // Create a HDEVINFO with all present devices.
+    HDEVINFO dev_info;
+    RAIIHelper dev_info_raii {
+        [&]() {
+            dev_info = SetupDiGetClassDevsW(
+                nullptr, // GUID
+                nullptr, // Enumerator (HID?)
+                nullptr,
+                DIGCF_PRESENT | DIGCF_ALLCLASSES // find all connected devices
+            );
+            if(dev_info == INVALID_HANDLE_VALUE)
+                throw win32::Win32Exception("SetupDiGetClassDevs() failed.");
+        },
+        [&]() {
+            SetupDiDestroyDeviceInfoList(dev_info);
+        }
+    };
 
     mDeviceNames.clear();
 
@@ -419,8 +427,6 @@ void usagi::Win32Platform::updateDeviceNames()
 
     for(DWORD i = 0; SetupDiEnumDeviceInfo(dev_info, i, &device_info_data); i++)
     {
-        DWORD buffersize = 0;
-
         const auto device_obj = ws2s(getDeviceRegistryProperty(
             dev_info, device_info_data, SPDRP_PHYSICAL_DEVICE_OBJECT_NAME));
 
@@ -443,7 +449,4 @@ void usagi::Win32Platform::updateDeviceNames()
             win32::getErrorMessage(last_error)
         );
     }
-
-    // Cleanup
-    SetupDiDestroyDeviceInfoList(dev_info);
 }

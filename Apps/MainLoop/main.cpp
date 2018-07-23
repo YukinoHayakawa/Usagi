@@ -4,8 +4,6 @@
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Runtime/HID/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
-#include <Usagi/Engine/Extension/Win32/Win32Platform.hpp>
-#include <Usagi/Engine/Extension/Win32/Win32Helper.hpp>
 
 using namespace usagi;
 using namespace std::chrono_literals;
@@ -14,6 +12,7 @@ class MainLoop
     : public KeyEventListener
     , public MouseEventListener
     , public WindowEventListener
+    , public GamepadEventListener
 {
     Game mGame;
     std::shared_ptr<Window> mWindow = mGame.platform()->createWindow(
@@ -23,13 +22,20 @@ class MainLoop
     );
     std::shared_ptr<Mouse> mMouse = mGame.platform()->virtualMouse();
     std::shared_ptr<Keyboard> mKeyboard = mGame.platform()->virtualKeyboard();
+    std::shared_ptr<Gamepad> mGamepad;
 
 public:
     MainLoop()
     {
-        mGame.initializeInput();
         mKeyboard->addEventListener(this);
         mWindow->addEventListener(this);
+
+        const auto gamepads = mGame.platform()->gamepads();
+        if(!gamepads.empty())
+        {
+            mGamepad = gamepads.front();
+            mGamepad->addEventListener(this);
+        }
     }
 
     ~MainLoop()
@@ -161,6 +167,13 @@ public:
         LOG(info, "Window resize end");
     }
 
+    void onButtonStateChange(const GamepadButtonEvent &e) override
+    {
+        LOG(info, "Gamepad button:    {}={}",
+            to_string(e.code), e.pressed
+        );
+    }
+
     void mainLoop()
     {
         while(mWindow->isOpen())
@@ -172,8 +185,6 @@ public:
 
 int main(int argc, char *argv[])
 {
-    win32::patchConsole();
-    //Win32Platform::updateDeviceNames();
     MainLoop app;
     app.mainLoop();
 }

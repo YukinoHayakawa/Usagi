@@ -19,6 +19,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #pragma comment(lib, "ntdll.lib")
 
 #pragma warning(push)
@@ -7921,3 +7925,7 @@ VOID NTAPI RtlApplicationVerifierStop(
 #endif
 
 #pragma warning(pop)
+
+#ifdef __cplusplus
+}
+#endif
