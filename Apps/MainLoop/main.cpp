@@ -17,7 +17,7 @@ class MainLoop
 {
     Game mGame;
     std::shared_ptr<Window> mWindow = mGame.platform()->createWindow(
-        "Usagi",
+        u8"\U0001F430 - Event Handling Test",
         Vector2i { 100, 100 },
         Vector2u32 { 1920, 1080 }
     );
@@ -41,28 +41,28 @@ public:
 
     void onMouseMove(const MousePositionEvent &e) override
     {
-        LOG(info, "Mouse moved:       %f, %f",
-            e.distance.x(), e.distance.y()
+        LOG(info, "Mouse moved:       {}",
+            e.distance.transpose()
         );
     }
 
     void onMouseButtonStateChange(const MouseButtonEvent &e) override
     {
-        LOG(info, "Mouse button:      %s=%d",
+        LOG(info, "Mouse button:      {}={}",
             to_string(e.button), e.pressed
         );
     }
 
     void onMouseWheelScroll(const MouseWheelEvent &e) override
     {
-        LOG(info, "Mouse wheel:       %f, %f",
-            e.distance.x(), e.distance.y()
+        LOG(info, "Mouse wheel:       {}",
+            e.distance.transpose()
         );
     }
 
     void onKeyStateChange(const KeyEvent &e) override
     {
-        LOG(info, "Key:               %s=%d, repeated=%d",
+        LOG(info, "Key:               {}={}, repeated={}",
             to_string(e.key_code), e.pressed, e.repeated
         );
         switch(e.key_code)
@@ -122,7 +122,7 @@ public:
 
     void onWindowFocusChanged(const WindowFocusEvent &e) override
     {
-        LOG(info, "Window focus:      %d",
+        LOG(info, "Window focus:      {}",
             e.focused
         );
     }
@@ -134,8 +134,8 @@ public:
 
     void onWindowMoved(const WindowPositionEvent &e) override
     {
-        LOG(info, "Window position:   %d, %d",
-            e.position.x(), e.position.y()
+        LOG(info, "Window position:   {}",
+            e.position.transpose()
         );
     }
 
@@ -151,8 +151,8 @@ public:
 
     void onWindowResized(const WindowSizeEvent &e) override
     {
-        LOG(info, "Window size:       %u, %u",
-            e.size.x(), e.size.y()
+        LOG(info, "Window size:       {}",
+            e.size.transpose()
         );
     }
 
@@ -173,7 +173,7 @@ public:
 int main(int argc, char *argv[])
 {
     win32::patchConsole();
-    Win32Platform::updateDeviceNames();
+    //Win32Platform::updateDeviceNames();
     MainLoop app;
     app.mainLoop();
 }
