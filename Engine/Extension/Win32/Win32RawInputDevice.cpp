@@ -9,6 +9,7 @@
 #include "Win32Mouse.hpp"
 #include "Win32Gamepad.hpp"
 #include "Win32Keyboard.hpp"
+#include "Win32Helper.hpp"
 
 void usagi::Win32RawInputDevice::checkDevice(RAWINPUT *raw, DWORD type) const
 {
@@ -44,11 +45,11 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
         UINT num_devices;
         if(GetRawInputDeviceList(
             nullptr, &num_devices, sizeof(RAWINPUTDEVICELIST)) != 0)
-            throw std::runtime_error("Could not get raw input device amount.");
+            throw win32::Win32Exception("GetRawInputDeviceList() failed.");
         raw_input_device_list.resize(num_devices);
         if(GetRawInputDeviceList(raw_input_device_list.data(), &num_devices,
             sizeof(RAWINPUTDEVICELIST)) == static_cast<unsigned>(-1))
-            throw std::runtime_error("Could not get raw input device list.");
+            throw win32::Win32Exception("GetRawInputDeviceList() failed.");
     }
 
     for(auto &&device : raw_input_device_list)
@@ -56,21 +57,21 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
         // get device path as kernal object
         UINT size;
         std::wstring path = L"<Error getting device path>";
-        if(GetRawInputDeviceInfo(device.hDevice, RIDI_DEVICENAME,
+        if(GetRawInputDeviceInfoW(device.hDevice, RIDI_DEVICENAME,
             nullptr, &size) == 0)
         {
             path.resize(size, L'\0');
-            GetRawInputDeviceInfo(device.hDevice, RIDI_DEVICENAME,
+            GetRawInputDeviceInfoW(device.hDevice, RIDI_DEVICENAME,
                 path.data(), &size);
         }
 
         // get device info
         RID_DEVICE_INFO info { sizeof(RID_DEVICE_INFO) };
         size = info.cbSize;
-        GetRawInputDeviceInfo(device.hDevice, RIDI_DEVICEINFO,
+        GetRawInputDeviceInfoW(device.hDevice, RIDI_DEVICEINFO,
             &info, &size);
 
-        LOG(info, "Path:              %ls", ws2s(path));
+        LOG(info, "Path               : {}", ws2s(path));
         //LOG(info, "Friendly Name:          %ls", device_name.c_str());
 
         switch(info.dwType)
@@ -94,26 +95,6 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
                 {
                     devices.gamepads.push_back(createGamepad(
                         device.hDevice, info.hid));
-                    HANDLE hid_device = CreateFile(path.c_str(), GENERIC_READ | GENERIC_WRITE,
-                        FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                        OPEN_EXISTING, 0, NULL);
-                    auto i = GetLastError();
-                    assert(hid_device != INVALID_HANDLE_VALUE);
-                    uint8_t buf[32];
-                    DWORD bytes_written;
-                    ReadFile(hid_device, buf, 32, &bytes_written, nullptr);
-                    i = GetLastError();
-                    memset(buf, 0, sizeof(buf));
-                    buf[0] = 0x05;
-                    buf[1] = 0xFF;
-                    buf[4] = 255;  // 0-255
-                    buf[5] = 255;   // 0-255
-                    buf[6] = 0;         // 0-255
-                    buf[7] = 255;       // 0-255
-                    buf[8] = 0;        // 0-255
-                    WriteFile(hid_device, buf, sizeof(buf), &bytes_written, NULL);
-                    i = GetLastError();
-                    assert(bytes_written == 32);
 
                 }
 

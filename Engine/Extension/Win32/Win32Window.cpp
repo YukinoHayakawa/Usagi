@@ -3,6 +3,7 @@
 #include <Usagi/Engine/Utility/String.hpp>
 
 #include "Win32Platform.hpp"
+#include "Win32Helper.hpp"
 
 RECT usagi::Win32Window::clientScreenRect() const
 {
@@ -48,10 +49,10 @@ usagi::Win32Window::Win32Window(
 
     const auto window_rect = getWindowRect();
 
-    mHandle = CreateWindowEx(
+    mHandle = CreateWindowExW(
         WINDOW_STYLE_EX,
         Win32Platform::WINDOW_CLASS_NAME,
-        &window_title_wide[0],
+        window_title_wide.c_str(),
         WINDOW_STYLE,
         window_rect.left, window_rect.top,
         window_rect.right, window_rect.bottom,
@@ -63,12 +64,12 @@ usagi::Win32Window::Win32Window(
 
     if(!mHandle)
     {
-        throw std::runtime_error("CreateWindowEx() failed");
+        throw win32::Win32Exception("CreateWindowEx() failed");
     }
 
     // associate the class instance with the window so they can be identified 
     // in WindowProc
-    SetWindowLongPtr(mHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    SetWindowLongPtrW(mHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
     Win32Window::show(true);
 }
@@ -148,8 +149,7 @@ void usagi::Win32Window::close()
 
 void usagi::Win32Window::setTitle(const std::string &title)
 {
-    std::wstring wtitle { title.begin(), title.end() };
-    SetWindowText(mHandle, wtitle.c_str());
+    SetWindowTextW(mHandle, s2ws(title).c_str());
 }
 
 LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
@@ -261,7 +261,7 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
         }
         default:
         {
-            return DefWindowProc(hWnd, message, wParam, lParam);
+            return DefWindowProcW(hWnd, message, wParam, lParam);
         }
     }
     return 0;

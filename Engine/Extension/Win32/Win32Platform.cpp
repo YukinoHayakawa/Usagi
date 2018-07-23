@@ -7,43 +7,44 @@
 #include "Win32Platform.hpp"
 
 #include <Usagi/Engine/Core/Logging.hpp>
+#include <Usagi/Engine/Utility/String.hpp>
 
 #include "Win32Window.hpp"
 #include "Win32Mouse.hpp"
 #include "Win32Keyboard.hpp"
 #include "Win32Helper.hpp"
-#include <Usagi/Engine/Utility/String.hpp>
 
 const wchar_t usagi::Win32Platform::WINDOW_CLASS_NAME[] = L"UsagiRenderWindow";
 usagi::Win32Platform *usagi::Win32Platform::mInstance = nullptr;
-std::map<std::wstring, std::string> usagi::Win32Platform::mDeviceNames;
+std::map<std::string, std::string> usagi::Win32Platform::mDeviceNames;
 
 void usagi::Win32Platform::registerWindowClass()
 {
     // get the process handle, all windows created using this class will have
     // their messages dispatched to our handler
-    mProcessInstanceHandle = GetModuleHandle(nullptr);
+    mProcessInstanceHandle = GetModuleHandleW(nullptr);
 
-    WNDCLASSEX wcex { sizeof(WNDCLASSEX) };
+    WNDCLASSEXW wcex { };
+    wcex.cbSize = sizeof(WNDCLASSEXW);
     // CS_OWNDC is required to create OpenGL context
     wcex.style = CS_OWNDC;
     wcex.lpfnWndProc = &windowMessageDispatcher;
     wcex.hInstance = mProcessInstanceHandle;
     // hInstance param must be null to use predefined cursors
-    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
     // we print the background using graphics API like Vulkan/OpenGL/DirectX
     wcex.hbrBackground = nullptr;
     wcex.lpszClassName = WINDOW_CLASS_NAME;
 
-    if(!RegisterClassEx(&wcex))
+    if(!RegisterClassExW(&wcex))
     {
-        throw std::runtime_error("RegisterClassEx() failed!");
+        throw win32::Win32Exception("RegisterClassEx() failed!");
     }
 }
 
 void usagi::Win32Platform::unregisterWindowClass()
 {
-    UnregisterClass(WINDOW_CLASS_NAME, mProcessInstanceHandle);
+    UnregisterClassW(WINDOW_CLASS_NAME, mProcessInstanceHandle);
 }
 
 void usagi::Win32Platform::registerRawInputDevices()
@@ -89,19 +90,19 @@ void usagi::Win32Platform::registerRawInputDevices()
         sizeof(RAWINPUTDEVICE)) == FALSE)
     {
         //registration failed. Call GetLastError for the cause of the error
-        throw std::runtime_error("RegisterRawInputDevices() failed");
+        throw win32::Win32Exception("RegisterRawInputDevices() failed");
     }
 }
 
 usagi::Win32Window * usagi::Win32Platform::windowFromHandle(HWND handle)
 {
     // make sure the windows is created by our class
-    if(GetWindowLongPtr(handle, GWLP_WNDPROC) != 
+    if(GetWindowLongPtrW(handle, GWLP_WNDPROC) != 
         reinterpret_cast<LONG_PTR>(&Win32Platform::windowMessageDispatcher))
         return nullptr;
 
     return reinterpret_cast<Win32Window*>(
-        GetWindowLongPtr(handle, GWLP_USERDATA));
+        GetWindowLongPtrW(handle, GWLP_USERDATA));
 }
 
 usagi::Win32Window * usagi::Win32Platform::getActiveWindow()
@@ -241,7 +242,7 @@ LRESULT usagi::Win32Platform::handleWindowMessage(
             }
         }
     }
-    return DefWindowProc(hWnd, message, wParam, lParam);
+    return DefWindowProcW(hWnd, message, wParam, lParam);
 }
 
 void usagi::Win32Platform::fillRawInputBuffer(LPARAM lParam)
@@ -265,7 +266,7 @@ void usagi::Win32Platform::fillRawInputBuffer(LPARAM lParam)
         sizeof(RAWINPUTHEADER)
     ) != dwSize)
     {
-        throw std::runtime_error(
+        throw win32::Win32Exception(
             "GetRawInputData does not return correct size!"
         );
     }
@@ -304,10 +305,10 @@ void usagi::Win32Platform::processEvents()
 {
     MSG msg;
     // hwnd should be nullptr or the loop won't end when close the window
-    while(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+    while(PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&msg);
-        DispatchMessage(&msg);
+        DispatchMessageW(&msg);
     }
 }
 
@@ -357,7 +358,7 @@ std::wstring getDeviceRegistryProperty(
     // for underlying legacy CM functions that 
     // return an incorrect buffersize value on 
     // DBCS/MBCS systems.
-    while(!SetupDiGetDeviceRegistryProperty(
+    while(!SetupDiGetDeviceRegistryPropertyW(
         hDevInfo,
         &DeviceInfoData,
         Property,
@@ -388,7 +389,7 @@ std::wstring getDeviceRegistryProperty(
 void usagi::Win32Platform::updateDeviceNames()
 {
     // Create a HDEVINFO with all present devices.
-    const auto dev_info = SetupDiGetClassDevs(
+    const auto dev_info = SetupDiGetClassDevsW(
         nullptr, // GUID
         nullptr, // Enumerator (HID?)
         nullptr,
@@ -397,7 +398,7 @@ void usagi::Win32Platform::updateDeviceNames()
 
     if(dev_info == INVALID_HANDLE_VALUE)
     {
-        throw std::runtime_error("SetupDiGetClassDevs() failed.");
+        throw win32::Win32Exception("SetupDiGetClassDevs() failed.");
     }
 
     mDeviceNames.clear();
@@ -405,23 +406,24 @@ void usagi::Win32Platform::updateDeviceNames()
     // Enumerate through all devices in Set.
     SP_DEVINFO_DATA device_info_data;
     device_info_data.cbSize = sizeof(SP_DEVINFO_DATA);
-    
+
     for(DWORD i = 0; SetupDiEnumDeviceInfo(dev_info, i, &device_info_data); i++)
     {
         DWORD buffersize = 0;
 
-        const auto device_obj = getDeviceRegistryProperty(
-            dev_info, device_info_data, SPDRP_PHYSICAL_DEVICE_OBJECT_NAME);
+        const auto device_obj = ws2s(getDeviceRegistryProperty(
+            dev_info, device_info_data, SPDRP_PHYSICAL_DEVICE_OBJECT_NAME));
 
         if(device_obj.empty()) continue;
 
-        auto name = getDeviceRegistryProperty(
-            dev_info, device_info_data, SPDRP_FRIENDLYNAME);
+        auto name = ws2s(getDeviceRegistryProperty(
+            dev_info, device_info_data, SPDRP_FRIENDLYNAME));
         if(name.empty())
-            name = getDeviceRegistryProperty(
-                dev_info, device_info_data, SPDRP_DEVICEDESC);
+            name = ws2s(getDeviceRegistryProperty(
+                dev_info, device_info_data, SPDRP_DEVICEDESC));
 
-        LOG(info, "{:24}: {}", ws2s(device_obj), ws2s(name));
+        LOG(info, "{:24}: {}", device_obj, name);
+        mDeviceNames.insert({ device_obj, name });
     }
 
     const auto last_error = GetLastError();

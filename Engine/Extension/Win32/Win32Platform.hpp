@@ -54,13 +54,15 @@ class Win32Platform : public Platform
     // to identify the devices.
     // the device object names are obtained by querying the symbolic link
     // target of device path.
-    static std::map<std::wstring, std::string> mDeviceNames;
+    // strings are stored in UTF-8 encoding.
+    // <device object name, friendly name>
+    static std::map<std::string, std::string> mDeviceNames;
 
+    static void updateDeviceNames();
 
 public:
     Win32Platform();
     ~Win32Platform();
-    static void updateDeviceNames();
 
     std::shared_ptr<Window> createWindow(
         const std::string &title,
