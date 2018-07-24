@@ -31,7 +31,7 @@ usagi::Win32RawInputDevice::Win32RawInputDevice(
 usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
     enumerateDevices()
 {
-    LOG(info, "Enumerating raw input devices");
+    LOG(info, "Raw input devices");
     LOG(info, "--------------------------------");
 
     Win32RawInputDeviceEnumeration devices;
@@ -110,6 +110,12 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
             }
             case RIM_TYPEHID:
             {
+                LOG(info, "Device Type        : HID");
+                LOG(info, "Vendor Id          : {}", info.hid.dwVendorId);
+                LOG(info, "Product Id         : {}", info.hid.dwProductId);
+                LOG(info, "Version No         : {}", info.hid.dwVersionNumber);
+                LOG(info, "Usage Page         : {}", info.hid.usUsagePage);
+                LOG(info, "Usage              : {}", info.hid.usUsage);
                 // gamepad
                 if(info.hid.usUsagePage == 0x01 && info.hid.usUsage == 0x05)
                 {
@@ -172,13 +178,6 @@ std::shared_ptr<usagi::Win32Gamepad> usagi::Win32RawInputDevice::createGamepad(
     HANDLE handle,
     const RID_DEVICE_INFO_HID &info)
 {
-    LOG(info, "Device Type        : HID");
-    LOG(info, "Vendor Id          : {}", info.dwVendorId);
-    LOG(info, "Product Id         : {}", info.dwProductId);
-    LOG(info, "Version No         : {}", info.dwVersionNumber);
-    LOG(info, "Usage Page         : {}", info.usUsagePage);
-    LOG(info, "Usage              : {}", info.usUsage);
-
     return std::make_shared<Win32Gamepad>(
         handle, deviceNameFromHandle(handle));
 }

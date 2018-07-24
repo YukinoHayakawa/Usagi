@@ -399,7 +399,8 @@ std::wstring getDeviceRegistryProperty(
 
 void usagi::Win32Platform::updateDeviceNames()
 {
-    LOG(info, "Enumerating devices:");
+    LOG(info, "Connected devices");
+    LOG(info, "--------------------------------");
 
     // Create a HDEVINFO with all present devices.
     HDEVINFO dev_info;
@@ -449,4 +450,5 @@ void usagi::Win32Platform::updateDeviceNames()
             win32::getErrorMessage(last_error)
         );
     }
+    LOG(info, "--------------------------------");
 }

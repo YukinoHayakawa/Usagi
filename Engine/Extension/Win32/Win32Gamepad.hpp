@@ -15,7 +15,7 @@ class Win32Gamepad
     std::vector<char> mPreparsedData;
     HIDP_CAPS mCaps { };
     std::vector<HIDP_BUTTON_CAPS> mButtonCaps;
-    std::vector<HIDP_VALUE_CAPS>  mValueCaps;
+    std::vector<HIDP_VALUE_CAPS> mValueCaps;
 
     std::vector<bool> mLastButtons, mButtons;
     std::vector<USAGE> mButtonUsages;
