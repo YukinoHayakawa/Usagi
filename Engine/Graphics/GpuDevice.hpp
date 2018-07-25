@@ -6,6 +6,8 @@
 
 namespace usagi
 {
+class SwapChain;
+class Window;
 class GraphicsPipelineCompiler;
 class GpuImage;
 
@@ -23,6 +25,8 @@ public:
 
     std::uint64_t currentFrameIndex() const { return mCurrentFrameIndex; }
     virtual GpuImage * swapChainImage() = 0;
+
+    virtual std::shared_ptr<SwapChain> createSwapChain(Window *window) = 0;
 
     virtual std::unique_ptr<GraphicsPipelineCompiler> createPipelineCompiler()
         = 0;

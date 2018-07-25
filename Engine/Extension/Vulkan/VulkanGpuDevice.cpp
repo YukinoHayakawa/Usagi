@@ -1,6 +1,6 @@
 #include "VulkanGpuDevice.hpp"
 
-#include <loguru.hpp>
+#include <Usagi/Engine/Core/Logging.hpp>
 
 VkBool32 usagi::VulkanGpuDevice::debugLayerCallbackDispatcher(
     VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT obj_type,
@@ -30,19 +30,19 @@ bool usagi::VulkanGpuDevice::debugLayerCallback(
 {
     if(flags & vk::DebugReportFlagBitsEXT::eInformation)
     {
-        LOG_F(INFO, msg);
+        LOG(info, msg);
     }
     if(flags & vk::DebugReportFlagBitsEXT::eWarning)
     {
-        LOG_F(WARNING, msg);
+        LOG(warn, msg);
     }
     if(flags & vk::DebugReportFlagBitsEXT::ePerformanceWarning)
     {
-        LOG_F(WARNING, "(Perf) %s", msg);
+        LOG(warn, "(Perf) {}", msg);
     }
     if(flags & vk::DebugReportFlagBitsEXT::eError)
     {
-        LOG_F(ERROR, msg);
+        LOG(error, msg);
     }
     if(flags & vk::DebugReportFlagBitsEXT::eDebug)
     {
@@ -53,7 +53,8 @@ bool usagi::VulkanGpuDevice::debugLayerCallback(
 
 void usagi::VulkanGpuDevice::createInstance()
 {
-    LOG_F(INFO, "Creating Vulkan intance");
+    LOG(info, "Creating Vulkan intance");
+    LOG(info, "--------------------------------");
 
     vk::ApplicationInfo application_info;
     application_info.setPApplicationName("UsagiEngine");
@@ -64,19 +65,23 @@ void usagi::VulkanGpuDevice::createInstance()
 
     // Extensions
     {
-        LOG_SCOPE_F(INFO, "Available instance extensions");
+        LOG(info, "Available instance extensions");
+        LOG(info, "--------------------------------");
         for(auto &&ext : vk::enumerateInstanceExtensionProperties())
         {
-            LOG_F(INFO, ext.extensionName);
+            LOG(info, ext.extensionName);
         }
+        LOG(info, "--------------------------------");
     }
     // Validation layers
     {
-        LOG_SCOPE_F(INFO, "Available validation layers");
+        LOG(info, "Available validation layers");
+        LOG(info, "--------------------------------");
         for(auto &&layer : vk::enumerateInstanceLayerProperties())
         {
-            LOG_F(INFO, "Name:        %s", layer.layerName);
-            LOG_F(INFO, "Description: %s", layer.description);
+            LOG(info, "Name       : {}", layer.layerName);
+            LOG(info, "Description: {}", layer.description);
+            LOG(info, "--------------------------------");
         }
     }
 
@@ -98,13 +103,13 @@ void usagi::VulkanGpuDevice::createInstance()
 
     // todo: enumerate layers first
     // todo: disable in release
-    const std::vector<const char*> validationLayers
+    const std::vector<const char*> validation_layers
     {
         "VK_LAYER_LUNARG_standard_validation"
     };
     instance_create_info.setEnabledLayerCount(
-        static_cast<uint32_t>(validationLayers.size()));
-    instance_create_info.setPpEnabledLayerNames(validationLayers.data());
+        static_cast<uint32_t>(validation_layers.size()));
+    instance_create_info.setPpEnabledLayerNames(validation_layers.data());
 
     mInstance = vk::createInstanceUnique(instance_create_info);
 }
@@ -129,17 +134,19 @@ void usagi::VulkanGpuDevice::createDebugReport()
 void usagi::VulkanGpuDevice::selectPhysicalDevice()
 {
     {
-        LOG_SCOPE_F(INFO, "Available physical devices");
+        LOG(info, "Available physical devices");
+        LOG(info, "--------------------------------");
         auto physical_devices = mInstance->enumeratePhysicalDevices();
         for(auto &&dev : physical_devices)
         {
             const auto prop = dev.getProperties();
-            LOG_S(INFO) << "Device Name:    " << prop.deviceName;
-            LOG_S(INFO) << "Device Type:    " << to_string(prop.deviceType);
-            LOG_S(INFO) << "Device ID:      " << prop.deviceID;
-            LOG_S(INFO) << "API Version:    " << prop.apiVersion;
-            LOG_S(INFO) << "Driver Version: " << prop.vendorID;
-            LOG_S(INFO) << "Vendor ID:      " << prop.vendorID;
+            LOG(info, "Device Name   : {}", prop.deviceName);
+            LOG(info, "Device Type   : {}", to_string(prop.deviceType));
+            LOG(info, "Device ID     : {}", prop.deviceID);
+            LOG(info, "API Version   : {}", prop.apiVersion);
+            LOG(info, "Driver Version: {}", prop.vendorID);
+            LOG(info, "Vendor ID     : {}", prop.vendorID);
+            LOG(info, "--------------------------------");
             // todo: select device based on features and score them / let the
             // user choose
             if(!mPhysicalDevice)
@@ -150,8 +157,25 @@ void usagi::VulkanGpuDevice::selectPhysicalDevice()
     }
     if(!mPhysicalDevice)
         throw std::runtime_error("No available GPU supporting Vulkan.");
-    LOG_S(INFO) << "Using physical device: "
-        << mPhysicalDevice.getProperties().deviceName;
+    LOG(info, "Using physical device: {}", 
+        mPhysicalDevice.getProperties().deviceName);
+}
+
+void usagi::VulkanGpuDevice::createDeviceAndQueues()
+{
+    LOG(info, "Creating logical device");
+
+    vk::DeviceCreateInfo device_create_info;
+
+    // todo: check device capacity
+    const std::vector<const char *> device_extensions
+    {
+        "VK_KHR_swapchain",
+    };
+    device_create_info.setEnabledExtensionCount(device_extensions.size());
+    device_create_info.setPpEnabledExtensionNames(device_extensions.data());
+
+    mDevice = mPhysicalDevice.createDeviceUnique(device_create_info);
 }
 
 usagi::VulkanGpuDevice::VulkanGpuDevice()
@@ -159,6 +183,7 @@ usagi::VulkanGpuDevice::VulkanGpuDevice()
     createInstance();
     createDebugReport();
     selectPhysicalDevice();
+    createDeviceAndQueues();
 }
 
 usagi::GpuImage * usagi::VulkanGpuDevice::swapChainImage()
@@ -174,5 +199,10 @@ std::unique_ptr<usagi::GraphicsPipelineCompiler> usagi::VulkanGpuDevice::
 
 vk::Device usagi::VulkanGpuDevice::device()
 {
-    throw 0;
+    return mDevice.get();
+}
+
+vk::PhysicalDevice usagi::VulkanGpuDevice::physicalDevice()
+{
+    return mPhysicalDevice;
 }

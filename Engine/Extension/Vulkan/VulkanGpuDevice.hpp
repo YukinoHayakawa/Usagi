@@ -37,6 +37,7 @@ class VulkanGpuDevice : public GpuDevice
     void createInstance();
     void createDebugReport();
     void selectPhysicalDevice();
+    void createDeviceAndQueues();
 
 public:
     VulkanGpuDevice();
@@ -44,6 +45,9 @@ public:
     GpuImage * swapChainImage() override;
     std::unique_ptr<GraphicsPipelineCompiler> createPipelineCompiler() override;
 
+    std::shared_ptr<SwapChain> createSwapChain(Window *window) override;
+
     vk::Device device();
+    vk::PhysicalDevice physicalDevice();
 };
 }

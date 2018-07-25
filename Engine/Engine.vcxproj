@@ -130,6 +130,8 @@
     <ClCompile Include="Core\Logging.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanExtensions.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanGpuDevice.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanSwapChain.cpp" />
+    <ClCompile Include="Extension\Vulkan\WSI\VulkanWin32WSI.cpp" />
     <ClCompile Include="Extension\Win32\Win32Helper.cpp" />
     <ClCompile Include="Extension\Win32\Win32Gamepad.cpp" />
     <ClCompile Include="Extension\Win32\Win32Keyboard.cpp" />
@@ -161,6 +163,7 @@
     <ClInclude Include="Core\Math.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanGpuBuffer.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanGpuDevice.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanSwapChain.hpp" />
     <ClInclude Include="Extension\Win32\ntos.h" />
     <ClInclude Include="Extension\Win32\Win32Gamepad.hpp" />
     <ClInclude Include="Extension\Win32\Win32Helper.hpp" />
@@ -194,8 +197,10 @@
     <ClInclude Include="Graphics\GraphicsPipeline.hpp" />
     <ClInclude Include="Graphics\GraphicsPipelineCompiler.hpp" />
     <ClInclude Include="Graphics\PipelineCreateInfo.hpp" />
+    <ClInclude Include="Graphics\RenderWindow.hpp" />
     <ClInclude Include="Graphics\Shader\ShaderStage.hpp" />
     <ClInclude Include="Graphics\Shader\SpirvBinary.hpp" />
+    <ClInclude Include="Graphics\SwapChain.hpp" />
     <ClInclude Include="Graphics\TransferCommandList.hpp" />
     <ClInclude Include="Runtime\GraphicsInterface\GraphicsInterface.hpp" />
     <ClInclude Include="Runtime\EventEmitter.hpp" />
