@@ -389,10 +389,8 @@ std::wstring getDeviceRegistryProperty(
             break;
         }
     }
-    // trim trailing zeros
-    const auto trim_pos = buffer.find(L'\0');
-    if(trim_pos != std::string::npos)
-        buffer.resize(trim_pos);
+    // Trim trailing zeros resulted from the oversized buffer.
+    buffer.erase(std::find(buffer.begin(), buffer.end(), L'\0'), buffer.end());
     return buffer;
 }
 }

@@ -31,7 +31,17 @@ public:
      */
     virtual void setSize(const Vector2u32 &size) = 0;
     
-    virtual void setTitle(const std::string &title) = 0;
+    /**
+     * \brief Get window title encoded using UTF-8.
+     * \return 
+     */
+    virtual std::string title() const = 0;
+
+    /**
+     * \brief 
+     * \param title New window title encoded using UTF-8.
+     */
+    virtual void setTitle(std::string title) = 0;
 
     virtual void show(bool show) = 0;
     virtual bool focused() const = 0;

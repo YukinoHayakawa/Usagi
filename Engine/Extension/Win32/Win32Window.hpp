@@ -14,6 +14,7 @@ class Win32Window : public Window
 {
     friend class Win32Platform;
 
+    std::string mTitle;
     HWND mHandle = nullptr;
     Vector2i mPosition;
     Vector2u32 mSize;
@@ -43,7 +44,7 @@ public:
      */
     Win32Window(
         Win32Platform *platform,
-        const std::string &title,
+        std::string title,
         Vector2i position,
         Vector2u32 size);
 
@@ -53,7 +54,8 @@ public:
     Vector2u32 size() const override;
     void setSize(const Vector2u32 &size) override;
 
-    void setTitle(const std::string &title) override;
+    std::string title() const override;
+    void setTitle(std::string title) override;
 
     void show(bool show) override;
     bool focused() const override;

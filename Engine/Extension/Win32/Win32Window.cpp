@@ -39,13 +39,14 @@ RECT usagi::Win32Window::getWindowRect() const
 
 usagi::Win32Window::Win32Window(
     Win32Platform *platform,
-    const std::string &title,
+    std::string title,
     Vector2i position,
     Vector2u32 size)
-    : mPosition { std::move(position) }
+    : mTitle { std::move(title) }
+    , mPosition { std::move(position) }
     , mSize { std::move(size) }
 {
-    auto window_title_wide = s2ws(title);
+    auto window_title_wide = s2ws(mTitle);
 
     const auto window_rect = getWindowRect();
 
@@ -118,6 +119,18 @@ void usagi::Win32Window::setSize(const Vector2u32 &size)
     });
 }
 
+std::string usagi::Win32Window::title() const
+{
+    // Don't use GetWindowText(), it may cause deadlock.
+    return mTitle;
+}
+
+void usagi::Win32Window::setTitle(std::string title)
+{
+    mTitle = std::move(title);
+    SetWindowTextW(mHandle, s2ws(mTitle).c_str());
+}
+
 usagi::Vector2i usagi::Win32Window::position() const
 {
     return mPosition;
@@ -145,11 +158,6 @@ bool usagi::Win32Window::isOpen() const
 void usagi::Win32Window::close()
 {
     DestroyWindow(mHandle);
-}
-
-void usagi::Win32Window::setTitle(const std::string &title)
-{
-    SetWindowTextW(mHandle, s2ws(title).c_str());
 }
 
 LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
