@@ -2,10 +2,9 @@
 
 #include <set>
 
-#include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
+#include <Usagi/Engine/Runtime/Input/Keyboard/Keyboard.hpp>
 #include <Usagi/Engine/Runtime/Window/WindowEventListener.hpp>
 
-#include "Win32.hpp"
 #include "Win32RawInputDevice.hpp"
 
 namespace usagi
@@ -15,7 +14,7 @@ class Win32Keyboard
     , public Win32RawInputDevice
     , public WindowEventListener
 {
-    friend class Win32Platform;
+    friend class Win32InputManager;
 
     std::set<KeyCode> mKeyPressed;
 
@@ -25,6 +24,7 @@ class Win32Keyboard
 
     void clearKeyPressedStates();
 
+    // todo remove
     void onWindowFocusChanged(const WindowFocusEvent &e) override;
 
 public:

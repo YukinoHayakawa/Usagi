@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include <Usagi/Engine/Runtime/HID/Gamepad/Gamepad.hpp>
+#include <Usagi/Engine/Runtime/Input/Gamepad/Gamepad.hpp>
 
 #include "Win32RawInputDevice.hpp"
-
 #include <hidsdi.h>
+#include "../Win32MacroFix.hpp"
 
 namespace usagi
 {

@@ -1,9 +1,8 @@
 ﻿#pragma once
 
-#include <Usagi/Engine/Runtime/HID/Mouse/Mouse.hpp>
+#include <Usagi/Engine/Runtime/Input/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/Window/WindowEventListener.hpp>
 
-#include "Win32.hpp"
 #include "Win32RawInputDevice.hpp"
 
 namespace usagi
@@ -15,7 +14,7 @@ class Win32Mouse
     , public Win32RawInputDevice
     , public WindowEventListener
 {
-    friend class Win32Platform;
+    friend class Win32InputManager;
 
     bool mMouseCursorCaptured = false;
 
@@ -38,6 +37,7 @@ class Win32Mouse
      */
     static void confineCursorInClientArea();
 
+    // todo remove
     void onWindowFocusChanged(const WindowFocusEvent &e) override;
     void onWindowMoveEnd(const WindowPositionEvent &e) override;
     void onWindowResizeEnd(const WindowSizeEvent &e) override;

@@ -1,9 +1,14 @@
 ﻿#include <Usagi/Engine/Core/Logging.hpp>
-#include <Usagi/Engine/Game/Game.hpp>
-#include <Usagi/Engine/Runtime/Platform.hpp>
+#include <Usagi/Engine/Runtime/Runtime.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
-#include <Usagi/Engine/Runtime/HID/Mouse/Mouse.hpp>
-#include <Usagi/Engine/Runtime/HID/Keyboard/Keyboard.hpp>
+#include <Usagi/Engine/Runtime/Window/WindowManager.hpp>
+#include <Usagi/Engine/Runtime/Input/Mouse/Mouse.hpp>
+#include <Usagi/Engine/Runtime/Input/Mouse/MouseEventListener.hpp>
+#include <Usagi/Engine/Runtime/Input/Keyboard/Keyboard.hpp>
+#include <Usagi/Engine/Runtime/Input/Keyboard/KeyEventListener.hpp>
+#include <Usagi/Engine/Runtime/Input/Gamepad/Gamepad.hpp>
+#include <Usagi/Engine/Runtime/Input/Gamepad/GamepadEventListener.hpp>
+#include <Usagi/Engine/Runtime/Input/InputManager.hpp>
 
 using namespace usagi;
 using namespace std::chrono_literals;
@@ -14,23 +19,31 @@ class MainLoop
     , public WindowEventListener
     , public GamepadEventListener
 {
-    Game mGame;
-    std::shared_ptr<Window> mWindow = mGame.platform()->createWindow(
-        u8"\U0001F430 - Event Handling Test",
-        Vector2i { 100, 100 },
-        Vector2u32 { 1920, 1080 }
-    );
-    std::shared_ptr<Mouse> mMouse = mGame.platform()->virtualMouse();
-    std::shared_ptr<Keyboard> mKeyboard = mGame.platform()->virtualKeyboard();
+    Runtime mRuntime;
+    std::shared_ptr<Window> mWindow;
+    std::shared_ptr<Mouse> mMouse;
+    std::shared_ptr<Keyboard> mKeyboard;
     std::shared_ptr<Gamepad> mGamepad;
 
 public:
     MainLoop()
     {
-        mKeyboard->addEventListener(this);
+        mRuntime.initWindow();
+        mRuntime.initInput();
+
+        mWindow = mRuntime.windowManager()->createWindow(
+            u8"\U0001F430 - Event Handling Test",
+            Vector2i { 100, 100 },
+            Vector2u32 { 1920, 1080 }
+        );
         mWindow->addEventListener(this);
 
-        const auto gamepads = mGame.platform()->gamepads();
+        const auto input_manager = mRuntime.inputManager();
+        mMouse = input_manager->virtualMouse();
+        mKeyboard = input_manager->virtualKeyboard();
+        mKeyboard->addEventListener(this);
+
+        const auto gamepads = input_manager->gamepads();
         if(!gamepads.empty())
         {
             mGamepad = gamepads.front();
@@ -178,7 +191,8 @@ public:
     {
         while(mWindow->isOpen())
         {
-            mGame.update(0s);
+            mRuntime.windowManager()->processEvents();
+            mRuntime.inputManager()->processEvents();
         }
     }
 };

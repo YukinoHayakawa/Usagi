@@ -3,6 +3,7 @@
 #include <string>
 
 #include "Win32.hpp"
+#include "Win32MacroFix.hpp"
 
 namespace usagi::win32
 {

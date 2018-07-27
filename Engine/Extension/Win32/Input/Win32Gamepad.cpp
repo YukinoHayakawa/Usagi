@@ -4,7 +4,7 @@
 
 #include <Usagi/Engine/Core/Logging.hpp>
 
-#include "Win32Helper.hpp"
+#include "../Win32Helper.hpp"
 
 // https://www.codeproject.com/Articles/185522/Using-the-Raw-Input-API-to-Process-Joystick-Input
 usagi::Win32Gamepad::Win32Gamepad(HANDLE device_handle, std::string name)

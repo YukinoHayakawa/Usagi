@@ -5,11 +5,11 @@
 #include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Utility/String.hpp>
 
-#include "Win32Platform.hpp"
+#include "../Win32Helper.hpp"
+#include "Win32InputManager.hpp"
 #include "Win32Mouse.hpp"
 #include "Win32Gamepad.hpp"
 #include "Win32Keyboard.hpp"
-#include "Win32Helper.hpp"
 
 void usagi::Win32RawInputDevice::checkDevice(RAWINPUT *raw, DWORD type) const
 {
@@ -82,7 +82,7 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
                 const auto dev_obj_name =
                     ws2s(win32::resolveNtSymbolicLink(path));
                 LOG(info, "Name               : {}",
-                    Win32Platform::deviceFriendlyName(dev_obj_name));
+                    Win32InputManager::deviceFriendlyName(dev_obj_name));
             }
             else
             {

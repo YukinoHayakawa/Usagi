@@ -1,10 +1,7 @@
 ﻿#include "Win32Keyboard.hpp"
 
-#include <Usagi/Engine/Runtime/HID/Keyboard/KeyCode.hpp>
-#include <Usagi/Engine/Runtime/HID/Keyboard/KeyEventListener.hpp>
-
-#include "Win32Window.hpp"
-#include "Win32Platform.hpp"
+#include <Usagi/Engine/Runtime/Input/Keyboard/KeyCode.hpp>
+#include <Usagi/Engine/Runtime/Input/Keyboard/KeyEventListener.hpp>
 
 usagi::KeyCode usagi::Win32Keyboard::translate(const RAWKEYBOARD *keyboard)
 {
@@ -241,7 +238,8 @@ void usagi::Win32Keyboard::handleRawInput(RAWINPUT *raw)
 {
     checkDevice(raw, RIM_TYPEKEYBOARD);
 
-    if(!Win32Platform::activeWindow()) return;
+    // todo
+    //if(!Win32Platform::activeWindow()) return;
 
     auto &kb = raw->data.keyboard;
 

@@ -5,7 +5,8 @@
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 
-#include "Win32.hpp"
+#include "../Win32.hpp"
+#include "../Win32MacroFix.hpp"
 
 namespace usagi
 {

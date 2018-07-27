@@ -2,9 +2,7 @@
 
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 
-#include "Win32.hpp"
-#include "Win32Keyboard.hpp"
-#include "Win32Mouse.hpp"
+#include "../Win32.hpp"
 
 namespace usagi
 {
@@ -12,7 +10,7 @@ enum class MouseButtonCode;
 
 class Win32Window : public Window
 {
-    friend class Win32Platform;
+    friend class Win32WindowManager;
 
     std::string mTitle;
     HWND mHandle = nullptr;
@@ -32,18 +30,18 @@ class Win32Window : public Window
     void updateWindowPosition() const;
 
     LRESULT handleWindowMessage(
-        HWND hWnd, UINT message, WPARAM wParam,LPARAM lParam);
+        HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 public:
     /**
      * \brief Create an empty window.
-     * \param platform
+     * \param manager
      * \param title
      * \param position 
      * \param size 
      */
     Win32Window(
-        Win32Platform *platform,
+        Win32WindowManager *manager,
         std::string title,
         Vector2i position,
         Vector2u32 size);

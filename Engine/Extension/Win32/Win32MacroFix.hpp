@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+// Include after including Windows headers
+
 #ifdef DELETE
 #   undef DELETE
 #endif

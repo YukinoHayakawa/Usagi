@@ -1,9 +1,10 @@
 ﻿#include "Win32Window.hpp"
 
 #include <Usagi/Engine/Utility/String.hpp>
+#include <Usagi/Engine/Core/Logging.hpp>
 
-#include "Win32Platform.hpp"
-#include "Win32Helper.hpp"
+#include "../Win32Helper.hpp"
+#include "Win32WindowManager.hpp"
 
 RECT usagi::Win32Window::clientScreenRect() const
 {
@@ -38,7 +39,7 @@ RECT usagi::Win32Window::getWindowRect() const
 }
 
 usagi::Win32Window::Win32Window(
-    Win32Platform *platform,
+    Win32WindowManager *manager,
     std::string title,
     Vector2i position,
     Vector2u32 size)
@@ -46,20 +47,22 @@ usagi::Win32Window::Win32Window(
     , mPosition { std::move(position) }
     , mSize { std::move(size) }
 {
+    LOG(info, "Creating window: {}", title);
+
     auto window_title_wide = s2ws(mTitle);
 
     const auto window_rect = getWindowRect();
 
     mHandle = CreateWindowExW(
         WINDOW_STYLE_EX,
-        Win32Platform::WINDOW_CLASS_NAME,
+        manager->WINDOW_CLASS_NAME,
         window_title_wide.c_str(),
         WINDOW_STYLE,
         window_rect.left, window_rect.top,
         window_rect.right, window_rect.bottom,
         nullptr,
         nullptr,
-        platform->processInstanceHandle(),
+        manager->processInstanceHandle(),
         nullptr
     );
 
