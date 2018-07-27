@@ -2,7 +2,7 @@
 
 #include <Usagi/Engine/Asset/Filesystem/FilesystemAssetPackage.hpp>
 #include <Usagi/Engine/Asset/Asset.hpp>
-#include <Usagi/Engine/Graphics/Shader/SpirvBinary.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Shader/SpirvBinary.hpp>
 #include <Usagi/Engine/Game/Game.hpp>
 #include <Usagi/Engine/Asset/AssetRoot.hpp>
 

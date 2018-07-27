@@ -2,7 +2,7 @@
 
 #include <Usagi/Engine/Runtime/Runtime.hpp>
 
-#include <Usagi/Engine/Graphics/GpuDevice.hpp>
+#include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
 #include <Usagi/Engine/Extension/Win32/Win32Helper.hpp>
 #include <Usagi/Engine/Extension/Win32/Window/Win32WindowManager.hpp>
 #include <Usagi/Engine/Extension/Win32/Input/Win32InputManager.hpp>
@@ -19,7 +19,9 @@ usagi::Runtime::~Runtime()
 
 void usagi::Runtime::initGpu()
 {
-
+    if(mGpu)
+        throw std::runtime_error("GPU device is already created.");
+    mGpu = std::make_unique<VulkanGpuDevice>();
 }
 
 void usagi::Runtime::initInput()

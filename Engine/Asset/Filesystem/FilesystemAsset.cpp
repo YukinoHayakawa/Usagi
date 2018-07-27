@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include <Usagi/Engine/Core/Logging.hpp>
-#include <Usagi/Engine/Graphics/Shader/SpirvBinary.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Shader/SpirvBinary.hpp>
 
 #include "FilesystemAssetPackage.hpp"
 

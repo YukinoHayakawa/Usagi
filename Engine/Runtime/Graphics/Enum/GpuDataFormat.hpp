@@ -7,6 +7,8 @@ namespace usagi
  */
 enum class GpuDataFormat
 {
+    R8G8B8A8_UNORM,
+
     R32_SFLOAT,
     R32G32_SFLOAT,
     R32G32B32_SFLOAT,

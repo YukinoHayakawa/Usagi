@@ -4,7 +4,7 @@
 #include <Usagi/Engine/Core/Math.hpp>
 
 #include "Shader/ShaderStage.hpp"
-#include "GraphicsIndexType.hpp"
+#include "Enum/GraphicsIndexType.hpp"
 
 namespace usagi
 {

@@ -1,36 +1,36 @@
-﻿#include <Usagi/Engine/Game/Game.hpp>
-#include <Usagi/Engine/Runtime/Platform.hpp>
+﻿#include <Usagi/Engine/Runtime/Runtime.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
-#include <Usagi/Engine/Graphics/SwapChain.hpp>
-#include <Usagi/Engine/Graphics/GpuDevice.hpp>
+#include <Usagi/Engine/Runtime/Graphics/SwapChain.hpp>
+#include <Usagi/Engine/Runtime/Graphics/GpuDevice.hpp>
+#include <Usagi/Engine/Runtime/Window/WindowManager.hpp>
 
 using namespace usagi;
-using namespace std::chrono_literals;
 
 class HelloTriangle
 {
-    Game mGame;
+    Runtime mRuntime;
     std::shared_ptr<Window> mWindow;
     std::shared_ptr<SwapChain> mSwapChain;
 
 public:
     HelloTriangle()
     {
-        mGame.initializeGraphics();
+        mRuntime.initWindow();
+        mRuntime.initGpu();
 
-        mWindow = mGame.platform()->createWindow(
+        mWindow = mRuntime.windowManager()->createWindow(
             u8"\U0001F430 - Hello Triangle",
             Vector2i{ 100, 100 },
             Vector2u32{ 1920, 1080 }
         );
-        mSwapChain = mGame.gpuDevice()->createSwapChain(mWindow.get());
+        mSwapChain = mRuntime.gpu()->createSwapChain(mWindow.get());
     }
 
     void mainLoop()
     {
         while(mWindow->isOpen())
         {
-            mGame.update(0s);
+            mRuntime.windowManager()->processEvents();
         }
     }
 };
