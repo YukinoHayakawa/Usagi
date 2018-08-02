@@ -9,13 +9,8 @@
 #include "Asset.hpp"
 
 usagi::AssetRoot::AssetRoot(Element *parent)
-    : Element { parent, "AssetRoot" }
+    : ElementTreeNode { parent, "AssetRoot" }
 {
-}
-
-bool usagi::AssetRoot::acceptChild(Element *child)
-{
-    return is_instance_of<AssetPackage>(child);
 }
 
 usagi::Asset * usagi::AssetRoot::findAssetByUuid(
@@ -24,7 +19,7 @@ usagi::Asset * usagi::AssetRoot::findAssetByUuid(
     LOG(info, "Searching asset by UUID: {}", boost::uuids::to_string(uuid));
     for(auto iter = childrenBegin(); iter != childrenEnd(); ++iter)
     {
-        auto pkg = static_cast<AssetPackage*>(iter->get());
+        auto pkg = iter->get();
         if(const auto asset = pkg->findByUuid(uuid))
             return asset;
     }
@@ -37,14 +32,15 @@ usagi::Asset * usagi::AssetRoot::findAssetByString(
     const auto colon_pos = string.find_first_of(':');
     if(colon_pos != std::string::npos) // package name is specified
     {
-        string[colon_pos] = 0; // sperate package name and path
+        string[colon_pos] = 0; // separate package name and path
+        // c_str is essential to the correct segmentation by the \0.
         const std::string package_name { string.c_str() };
         const std::string path { string.c_str() + colon_pos + 1};
 
         LOG(info, "Searching asset in package {}: {}", package_name, path);
         if(const auto pkg = findChildByName(package_name))
         {
-            return static_cast<AssetPackage*>(pkg)->findByString(path);
+            return pkg->findByString(path);
         }
         return nullptr;
     }

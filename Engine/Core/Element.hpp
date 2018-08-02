@@ -8,11 +8,15 @@
 #include <typeindex>
 #include <any>
 #include <type_traits>
+#include <algorithm>
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
+#include <Usagi/Engine/Utility/TypeCast.hpp>
 
 #include "Event/Library/Element/ElementCreatedEvent.hpp"
 #include "Event/Library/Element/ChildElementAddedEvent.hpp"
+#include "Event/Library/Element/PreElementRemovalEvent.hpp"
+#include "Event/Library/Element/ChildElementRemovedEvent.hpp"
 #include "Event/Library/Component/PreComponentRemovalEvent.hpp"
 #include "Event/Library/Component/PostComponentRemovalEvent.hpp"
 
@@ -26,13 +30,12 @@ class Component;
  * or logical. Entities are organized in a tree in logical sense. The
  * interaction with entity and the game world is carried out by components
  * and subsystems. Inter-entity communication is performed by event system.
+ * 
+ * Contains component and event logics.
  */
 class Element : Noncopyable
 {
-	Element *mParent = nullptr;
     std::string mName;
-	using ChildrenArray = std::vector<std::unique_ptr<Element>>;
-	ChildrenArray mChildren;
 
 	using ComponentMap = std::unordered_map<
 		std::type_index, std::unique_ptr<Component>
@@ -63,9 +66,9 @@ class Element : Noncopyable
 		{
 			std::any_cast<EventHandler<EventT>&>(i->second)(e);
 		}
-		if(!e.canceled() && e.bubbling() && mParent)
+		if(!e.canceled() && e.bubbling() && parent())
 		{
-			mParent->handleEvent(e, type);
+            parent()->handleEvent(e, type);
 		}
 	}
 
@@ -75,23 +78,11 @@ class Element : Noncopyable
      * \param child 
      * \return 
      */
-    virtual bool acceptChild(Element *child)
-    {
-        return true;
-    }
-
-protected:
-    template <typename Func>
-    void forEachChild(Func f)
-    {
-        for(auto &&c : mChildren)
-        {
-            f(c.get());
-        }
-    }
+    virtual bool acceptChild(Element *child) = 0;
+    virtual void pushChild(std::unique_ptr<Element> child) = 0;
 
 public:
-    explicit Element(Element *parent, std::string name = { });
+    explicit Element(std::string name);
     virtual ~Element();
 
     // move operations change the parent links so prohibit them.
@@ -103,7 +94,7 @@ public:
 
     // Entity Hierarchy
 
-    Element * parent() const { return mParent; }
+    virtual Element * parent() const = 0;
 
     template <typename ElementType = Element, typename... Args>
     ElementType * addChild(Args && ...args)
@@ -119,24 +110,12 @@ public:
         if(!acceptChild(c.get()))
             throw std::logic_error("Child element is rejected by parent.");
 		const auto r = c.get();
-		mChildren.push_back(std::move(c));
+        pushChild(std::move(c));
         fireEvent<ChildElementAddedEvent>(r);
 		return r;
     }
 
-    void removeChild(Element *child);
-
-    ChildrenArray::const_iterator childrenBegin() const
-    {
-        return mChildren.begin();
-    }
-
-    ChildrenArray::const_iterator childrenEnd() const
-    {
-        return mChildren.end();
-    }
-
-    Element * findChildByName(const std::string &name) const;
+    virtual void removeChild(Element *child) = 0;
 
     // Component
 
@@ -194,6 +173,96 @@ public:
     void addEventListener(EventHandler<EventBaseT> handler)
     {
         mEventHandlers.insert({ typeid(EventBaseT), std::move(handler) });
+    }
+};
+
+/**
+ * \brief Implements polymorphic parent pointer, enforces the parent
+ * and children types.
+ * This should be used as the base of concrete Element types.
+ * 
+ * Contains element hierarchy logics.
+ * \tparam ParentT 
+ */
+template <typename ParentT, typename ChildT>
+class ElementTreeNode : public Element
+{
+    ParentT *mParent;
+    using ChildrenArray = std::vector<std::unique_ptr<ChildT>>;
+    ChildrenArray mChildren;
+
+    bool acceptChild(Element *child) override
+    {
+        return is_instance_of<ChildT>(child);
+    }
+
+protected:
+    void pushChild(std::unique_ptr<Element> child) override
+    {
+        // type check
+        auto &p = dynamic_cast<ChildT&>(*child.get());
+
+        // transfer ownership
+        std::unique_ptr<ChildT> c {
+            static_cast<ChildT*>(child.release())
+        };
+
+        mChildren.push_back(std::move(c));
+    }
+
+public:
+    explicit ElementTreeNode(Element *parent, std::string name = { })
+        : Element(std::move(name))
+        , mParent(&dynamic_cast<ParentT&>(*parent))
+    {
+    }
+
+    ParentT * parent() const override
+    {
+        return mParent;
+    }
+
+    ChildT * findChildByName(const std::string &name) const
+    {
+        const auto iter = std::find_if(
+            childrenBegin(), childrenEnd(),
+            [&](auto &&c) { return c->name() == name; }
+        );
+        return iter == childrenEnd() ? nullptr : iter->get();
+    }
+
+    void removeChild(Element *child) override
+    {
+        const auto iter = std::find_if(
+            mChildren.begin(), mChildren.end(),
+            [=](auto &&c) { return c.get() == child; }
+        );
+        if(iter == mChildren.end())
+            throw std::runtime_error("Cannot find specified child.");
+        auto p = iter->get();
+        p->template fireEvent<PreElementRemovalEvent>();
+        mChildren.erase(iter);
+        fireEvent<ChildElementRemovedEvent>();
+    }
+
+protected:
+    typename ChildrenArray::const_iterator childrenBegin() const
+    {
+        return mChildren.begin();
+    }
+
+    typename ChildrenArray::const_iterator childrenEnd() const
+    {
+        return mChildren.end();
+    }
+
+    template <typename Func>
+    void forEachChild(Func f)
+    {
+        for(auto &&c : mChildren)
+        {
+            f(c.get());
+        }
     }
 };
 }

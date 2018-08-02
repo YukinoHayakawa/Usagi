@@ -7,7 +7,9 @@
 
 #include "FilesystemAssetPackage.hpp"
 
-usagi::FilesystemAsset::FilesystemAsset(Element *parent, std::string name)
+usagi::FilesystemAsset::FilesystemAsset(
+    Element *parent,
+    std::string name)
     : Asset { parent, std::move(name) }
 {
 }

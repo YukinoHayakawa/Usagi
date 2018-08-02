@@ -4,6 +4,8 @@
 
 namespace usagi
 {
+class FilesystemAssetPackage;
+
 class FilesystemAsset : public Asset
 {
     AssetType mType = AssetType::UNINITIALIZED;

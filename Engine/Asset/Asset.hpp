@@ -10,10 +10,8 @@
 
 namespace usagi
 {
-class Asset : public Element
+class Asset : public ElementTreeNode<Element, Asset>
 {
-    bool acceptChild(Element *child) override;
-
     void checkLoaded() const;
 
 protected:
