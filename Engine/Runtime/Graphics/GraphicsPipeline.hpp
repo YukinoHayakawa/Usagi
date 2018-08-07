@@ -4,11 +4,11 @@
 
 namespace usagi
 {
+class RenderPass;
+
 class GraphicsPipeline : Noncopyable
 {
 public:
     virtual ~GraphicsPipeline() = default;
-
-
 };
 }

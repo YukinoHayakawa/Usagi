@@ -4,35 +4,27 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <Usagi/Engine/Graphics/GraphicsPipelineCompiler.hpp>
-#include <spirv_cross.hpp>
+#include <Usagi/Engine/Runtime/Graphics/GraphicsPipelineCompiler.hpp>
 
 namespace usagi
 {
+class VulkanRenderPass;
 class VulkanGpuDevice;
 
 class VulkanGraphicsPipelineCompiler final : public GraphicsPipelineCompiler
 {
-    static vk::Format translateSourceFormat(GpuDataFormat native_data);
-    static vk::VertexInputRate translateVertexInputRate(
-        VertexBufferBindingInfo::InputRate rate);
-    static vk::PrimitiveTopology translateTopology(
-        InputAssemblyState::PrimitiveTopology topology);
-    static vk::CullModeFlags translateCullMode(
-        RasterizationState::FaceCullingMode face_culling_mode);
-    static vk::FrontFace translateFrontFace(
-        RasterizationState::FrontFace front_face);
-    static vk::PolygonMode translatePolygonMode(
-        RasterizationState::PolygonMode polygon_mode);
-    static vk::BlendOp translateBlendOp(
-        ColorBlendState::BlendingOperation blending_operation);
-    static vk::BlendFactor translateColorBlendFactor(
-        ColorBlendState::BlendingFactor blending_factor);
-
     VulkanGpuDevice *mDevice = nullptr;
 
-    SpirvBinary *mVertexShader = nullptr;
-    SpirvBinary *mFragmentShader = nullptr;
+    struct ShaderInfo
+    {
+        std::string entry_point = "main";
+        std::shared_ptr<SpirvBinary> binary = nullptr;
+        vk::UniqueShaderModule module;
+    };
+    using ShaderMap = std::map<ShaderStage, ShaderInfo>;
+    ShaderMap mShaders;
+
+	vk::UniqueShaderModule createShaderModule(const SpirvBinary *binary) const;
 
     vk::PipelineInputAssemblyStateCreateInfo mInputAssemblyStateCreateInfo;
 	vk::PipelineViewportStateCreateInfo mViewportStateCreateInfo;
@@ -41,12 +33,12 @@ class VulkanGraphicsPipelineCompiler final : public GraphicsPipelineCompiler
     vk::PipelineDepthStencilStateCreateInfo mDepthStencilStateCreateInfo;
     vk::PipelineColorBlendAttachmentState mColorBlendAttachmentState;
     vk::PipelineColorBlendStateCreateInfo mColorBlendStateCreateInfo;
-
-    // obtained from shader reflection
-
-    vk::UniquePipelineLayout mPipelineLayout;
+    std::shared_ptr<VulkanRenderPass> mRenderPass;
 
     vk::GraphicsPipelineCreateInfo mPipelineCreateInfo;
+
+    struct Context;
+    struct ReflectionHelper;
 
     using VertexInputBindingArray = std::vector<
         vk::VertexInputBindingDescription>;
@@ -54,37 +46,40 @@ class VulkanGraphicsPipelineCompiler final : public GraphicsPipelineCompiler
 
     using VertexAttributeNameMap = std::map<std::string,
         vk::VertexInputAttributeDescription>;
+    // merge into the index array below before compilation
     VertexAttributeNameMap mVertexAttributeNameMap;
 
-    using VertexAttributeArray = std::vector<
+    using VertexAttributeLocationArray = std::vector<
         vk::VertexInputAttributeDescription>;
-    VertexAttributeArray mVertexAttributeIndexArray;
+    VertexAttributeLocationArray mVertexAttributeLocationArray;
 
-    /**
-	 * \brief Gathers pipeline layout and vertex input information.
-	 */
-	void reflectShaders();
-
-	static std::uint32_t getPushConstantSize(
-		const spirv_cross::Compiler &compiler,
-		spirv_cross::ShaderResources res);
+	void setupShaderStages();
+    void setupVertexInput();
+    void setupDynamicStates();
 
 public:
+    explicit VulkanGraphicsPipelineCompiler(VulkanGpuDevice *device);
 
-    VulkanGraphicsPipelineCompiler();
-
-    void setVertexShader(SpirvBinary *shader) override;
-    void setFragmentShader(SpirvBinary *shader) override;
+    void setRenderPass(std::shared_ptr<RenderPass> render_pass) override;
+    
+    void setShader(
+        ShaderStage stage,
+        std::shared_ptr<SpirvBinary> shader) override;
 
     void setVertexBufferBinding(
-        uint32_t binding_index,
-        VertexBufferBindingInfo &info) override;
+        std::uint32_t binding_index,
+        std::uint32_t stride,
+        VertexInputRate input_rate) override;
     void setVertexAttribute(
         std::string attr_name,
-        const VertexAttribute &info) override;
+        std::uint32_t binding_index,
+        std::uint32_t offset,
+        GpuDataFormat source_format) override;
     void setVertexAttribute(
-        uint32_t attr_location,
-        const VertexAttribute &info) override;
+        std::uint32_t attr_location,
+        std::uint32_t binding_index,
+        std::uint32_t offset,
+        GpuDataFormat source_format) override;
 
     void setInputAssemblyState(const InputAssemblyState &state) override;
     void setRasterizationState(const RasterizationState &state) override;

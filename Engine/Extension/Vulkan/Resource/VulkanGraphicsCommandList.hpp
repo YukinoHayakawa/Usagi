@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <Usagi/Engine/Graphics/GraphicsCommandList.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
 
 namespace usagi
 {
@@ -10,20 +10,23 @@ class VulkanGraphicsPipeline;
 
 class VulkanGraphicsCommandList : public GraphicsCommandList
 {
-    // Provided by VulkanGraphicsSubsystem
     vk::RenderPassBeginInfo mRenderPassBeginInfo;
-    vk::CommandBuffer mCommandBuffer;
+    vk::UniqueCommandBuffer mCommandBuffer;
     VulkanGraphicsPipeline *mCurrentPipeline = nullptr;
 
-    static vk::IndexType translateIndexType(GraphicsIndexType type);
-
 public:
-    explicit VulkanGraphicsCommandList(vk::CommandBuffer vk_command_buffer);
+    explicit VulkanGraphicsCommandList(
+        vk::UniqueCommandBuffer vk_command_buffer);
 
-    void startRecording() override;
-    void finishRecording() override;
+    void beginRecording() override;
+    void endRecording() override;
 
-    void bindPipeline(GraphicsPipeline *pipeline) override;
+    void clearColorImage(GpuImage *image, Color4f color) override;
+
+    void beginRendering(
+        GraphicsPipeline *pipeline,
+        Framebuffer *framebuffer) override;
+    void endRendering() override;
 
     void setViewport(
         std::uint32_t index,
