@@ -60,23 +60,23 @@ bool usagi::VulkanGpuDevice::debugLayerCallback(
 {
     if(flags & vk::DebugReportFlagBitsEXT::eInformation)
     {
-        LOG(info, msg);
+        LOG(info, "Vulkan: {}", msg);
     }
     if(flags & vk::DebugReportFlagBitsEXT::eWarning)
     {
-        LOG(warn, msg);
+        LOG(warn, "Vulkan: {}", msg);
     }
     if(flags & vk::DebugReportFlagBitsEXT::ePerformanceWarning)
     {
-        LOG(warn, "(Perf) {}", msg);
+        LOG(warn, "Vulkan: (Perf) {}", msg);
     }
     if(flags & vk::DebugReportFlagBitsEXT::eError)
     {
-        LOG(error, msg);
+        LOG(error, "Vulkan: {}", msg);
     }
     if(flags & vk::DebugReportFlagBitsEXT::eDebug)
     {
-        //LOG(DEBUG) << msg;
+        LOG(debug, "Vulkan: {}", msg);
     }
     return false;
 }
@@ -122,7 +122,7 @@ void usagi::VulkanGpuDevice::createInstance()
     {
         // application window
         "VK_KHR_surface",
-        // todo remove OS dependency
+        // todo remove OS dependency, move to VulkanWin32WSI
         "VK_KHR_win32_surface",
         // provide feedback from validation layer
         "VK_EXT_debug_report",
@@ -207,7 +207,7 @@ void usagi::VulkanGpuDevice::createDeviceAndQueues()
         vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eTransfer);
     checkQueuePresentationCapacity(graphics_queue_index);
 
-    LOG(info, "Using queue family {} as the primary queue.",
+    LOG(info, "Getting a queue from queue family {}.",
         graphics_queue_index);
 
     vk::DeviceCreateInfo device_create_info;

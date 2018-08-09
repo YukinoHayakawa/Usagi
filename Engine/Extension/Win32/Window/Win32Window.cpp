@@ -47,7 +47,7 @@ usagi::Win32Window::Win32Window(
     , mPosition { std::move(position) }
     , mSize { std::move(size) }
 {
-    LOG(info, "Creating window: {}", title);
+    LOG(info, "Creating window: {}", mTitle);
 
     auto window_title_wide = s2ws(mTitle);
 
@@ -71,7 +71,7 @@ usagi::Win32Window::Win32Window(
         throw win32::Win32Exception("CreateWindowEx() failed");
     }
 
-    // associate the class instance with the window so they can be identified 
+    // associate the class instance with the window so they can be identified
     // in WindowProc
     SetWindowLongPtrW(mHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 

@@ -3,7 +3,6 @@
 #include <vulkan/vulkan.hpp>
 
 #include <Usagi/Engine/Runtime/Graphics/Swapchain.hpp>
-#include <Usagi/Engine/Utility/RotateCounter.hpp>
 
 #include "VulkanSwapchainImage.hpp"
 
@@ -27,9 +26,6 @@ class VulkanSwapchain final : public Swapchain
     uint32_t mCurrentImageIndex = INVALID_IMAGE_INDEX;
     std::vector<std::shared_ptr<VulkanSwapchainImage>> mSwapchainImages;
 
-    RotateCounter<std::size_t> mSemaphoreIndex;
-    std::vector<std::shared_ptr<GpuSemaphore>> mAvailableSemaphores;
-
     static vk::SurfaceFormatKHR selectSurfaceFormat(
         const std::vector<vk::SurfaceFormatKHR> &surface_formats,
         vk::Format preferred_image_format);
@@ -41,7 +37,6 @@ class VulkanSwapchain final : public Swapchain
 
     void createSwapchain(vk::Format image_format);
     void getSwapchainImages();
-    void createSemaphores();
 
 public:
     VulkanSwapchain(
@@ -53,11 +48,11 @@ public:
     GpuBufferFormat format() const override;
     Vector2u32 size() const override;
 
-    void acquireNextImage() override;
+    std::shared_ptr<GpuSemaphore> acquireNextImage() override;
     GpuImage * currentImage() override;
-    std::shared_ptr<GpuSemaphore> currentImageAvailableSemaphore() override;
 
-    void present(std::initializer_list<std::shared_ptr<GpuSemaphore>> wait_semaphores) override;
+    void present(std::initializer_list<std::shared_ptr<GpuSemaphore>>
+        wait_semaphores) override;
 
     void present(const std::vector<vk::Semaphore> &wait_semaphores);
 };

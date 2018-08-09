@@ -8,7 +8,7 @@ usagi::VulkanGpuCommandPool::VulkanGpuCommandPool(VulkanGpuDevice *device)
     : mDevice { device }
 {
     vk::CommandPoolCreateInfo info;
-    
+
     info.setQueueFamilyIndex(mDevice->graphicsQueueFamily());
     // our command lists are freed immediately after each frame.
     info.setFlags(vk::CommandPoolCreateFlagBits::eTransient);
@@ -25,7 +25,7 @@ std::shared_ptr<usagi::GraphicsCommandList> usagi::VulkanGpuCommandPool::
     info.setCommandPool(mPool.get());
     info.setLevel(vk::CommandBufferLevel::ePrimary);
 
-    return std::make_shared<VulkanGraphicsCommandList>(std::move(
+    return std::make_shared<VulkanGraphicsCommandList>(mDevice, std::move(
         mDevice->device().allocateCommandBuffersUnique(info).front()
     ));
 }

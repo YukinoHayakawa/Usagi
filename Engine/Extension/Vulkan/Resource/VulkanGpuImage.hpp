@@ -11,13 +11,26 @@ namespace usagi
 class VulkanGpuImage : public GpuImage
 {
     VulkanGpuImageView mFullView;
+    vk::ImageLayout mLayout;
 
 public:
-    explicit VulkanGpuImage(vk::UniqueImageView full_view);
+    VulkanGpuImage(
+        vk::UniqueImageView full_view,
+        vk::Format format,
+        vk::ImageLayout layout);
 
     virtual vk::Image image() const = 0;
-    virtual vk::ImageLayout layout() const = 0;
 
     VulkanGpuImageView * fullView() override;
+
+    vk::ImageLayout layout() const
+    {
+        return mLayout;
+    }
+
+    void setLayout(const vk::ImageLayout layout)
+    {
+        mLayout = layout;
+    }
 };
 }

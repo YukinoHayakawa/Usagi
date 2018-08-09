@@ -8,24 +8,35 @@
 
 namespace usagi
 {
+class VulkanGpuDevice;
 class VulkanGraphicsPipeline;
 
 class VulkanGraphicsCommandList
     : public GraphicsCommandList
     , public VulkanBatchResource
 {
+    VulkanGpuDevice *mDevice;
     vk::RenderPassBeginInfo mRenderPassBeginInfo;
     vk::UniqueCommandBuffer mCommandBuffer;
     VulkanGraphicsPipeline *mCurrentPipeline = nullptr;
     std::vector<std::shared_ptr<VulkanBatchResource>> mResources;
 
 public:
-    explicit VulkanGraphicsCommandList(
+    VulkanGraphicsCommandList(
+        VulkanGpuDevice *device,
         vk::UniqueCommandBuffer vk_command_buffer);
 
     void beginRecording() override;
     void endRecording() override;
 
+    void transitionImage(
+        GpuImage *image,
+        GpuImageLayout from,
+        GpuImageLayout to,
+        GraphicsPipelineStage src_stage,
+        GraphicsPipelineStage dest_stage,
+        GpuAccess src_access,
+        GpuAccess dest_access) override;
     void clearColorImage(GpuImage *image, Color4f color) override;
 
     void beginRendering(

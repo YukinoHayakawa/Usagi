@@ -20,45 +20,41 @@ usagi::VulkanSwapchain::VulkanSwapchain(
 {
 }
 
-void usagi::VulkanSwapchain::acquireNextImage()
+std::shared_ptr<usagi::GpuSemaphore> usagi::VulkanSwapchain::acquireNextImage()
 {
+    auto sem = mDevice->createSemaphore();
+    const auto vk_sem = static_cast<VulkanSemaphore&>(*sem).semaphore();
+
     const auto result = mDevice->device().acquireNextImageKHR(
         mSwapchain.get(),
         UINT64_MAX,
-        static_cast<VulkanSemaphore&>(
-            *mAvailableSemaphores[mSemaphoreIndex++]).semaphore(),
+        vk_sem,
         nullptr,
         &mCurrentImageIndex
     );
     switch(result)
     {
-        case vk::Result::eSuccess: return;
+        case vk::Result::eSuccess: break;
 
         case vk::Result::eErrorOutOfDateKHR:
             LOG(info, "Swapchain is out-of-date, recreating");
-            goto recreate;
+            createSwapchain(mFormat.format);
+            return acquireNextImage();
 
         case vk::Result::eSuboptimalKHR:
             LOG(info, "Suboptimal swapchain, recreating");
-            goto recreate;
+            createSwapchain(mFormat.format);
+            return acquireNextImage();
 
         default: throw std::runtime_error("acquireNextImageKHR() failed.");
     }
 
-recreate:
-    createSwapchain(mFormat.format);
-    acquireNextImage();
+    return sem;
 }
 
 usagi::GpuImage * usagi::VulkanSwapchain::currentImage()
 {
     return mSwapchainImages[mCurrentImageIndex].get();
-}
-
-std::shared_ptr<usagi::GpuSemaphore> usagi::VulkanSwapchain::
-    currentImageAvailableSemaphore()
-{
-    return mAvailableSemaphores[mSemaphoreIndex];
 }
 
 void usagi::VulkanSwapchain::present(
@@ -235,7 +231,9 @@ void usagi::VulkanSwapchain::createSwapchain(vk::Format image_format)
     // Ensures non-blocking vkAcquireNextImageKHR() in mailbox mode.
     // See 3.6.12 of http://vulkan-spec-chunked.ahcox.com/apes03.html
     // todo: mailbox not available on my R9 290X
-    create_info.setMinImageCount(surface_capabilities.minImageCount + 1);
+    create_info.setMinImageCount(std::max(
+        surface_capabilities.minImageCount + 1, 3u
+    ));
     create_info.setPresentMode(selectPresentMode(surface_present_modes));
 
     create_info.setImageArrayLayers(1);
@@ -255,7 +253,6 @@ void usagi::VulkanSwapchain::createSwapchain(vk::Format image_format)
     mSize = { create_info.imageExtent.width, create_info.imageExtent.height };
 
     getSwapchainImages();
-    createSemaphores();
 }
 
 void usagi::VulkanSwapchain::getSwapchainImages()
@@ -272,23 +269,18 @@ void usagi::VulkanSwapchain::getSwapchainImages()
         info.setViewType(vk::ImageViewType::e2D);
         info.setFormat(mFormat.format);
         info.setComponents(VkComponentMapping { });
+        vk::ImageSubresourceRange subresource_range;
+        subresource_range.setAspectMask(vk::ImageAspectFlagBits::eColor);
+        subresource_range.setBaseArrayLayer(0);
+        subresource_range.setLayerCount(1);
+        subresource_range.setBaseMipLevel(0);
+        subresource_range.setLevelCount(1);
+        info.setSubresourceRange(subresource_range);
         mSwapchainImages.push_back(std::make_shared<VulkanSwapchainImage>(
             vk_image,
-            mDevice->device().createImageViewUnique(info)
+            mDevice->device().createImageViewUnique(info),
+            mFormat.format
         ));
     }
     mCurrentImageIndex = INVALID_IMAGE_INDEX;
-}
-
-void usagi::VulkanSwapchain::createSemaphores()
-{
-    mAvailableSemaphores.clear();
-    mAvailableSemaphores.reserve(mSwapchainImages.size());
-
-    for(std::size_t i = 0; i < mSwapchainImages.size(); ++i)
-    {
-        mAvailableSemaphores.push_back(mDevice->createSemaphore());
-    }
-
-    mSemaphoreIndex.reset(mSwapchainImages.size());
 }

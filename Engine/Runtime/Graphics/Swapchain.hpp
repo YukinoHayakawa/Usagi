@@ -27,9 +27,13 @@ public:
     virtual GpuBufferFormat format() const = 0;
     virtual Vector2u32 size() const = 0;
 
-    virtual void acquireNextImage() = 0;
+    /**
+     * \brief A semaphore signaled when the image becomes available.
+     * Must not be destroyed until signaled.
+     * \return
+     */
+    virtual std::shared_ptr<GpuSemaphore> acquireNextImage() = 0;
     virtual GpuImage * currentImage() = 0;
-    virtual std::shared_ptr<GpuSemaphore> currentImageAvailableSemaphore() = 0;
 
     virtual void present(
         std::initializer_list<std::shared_ptr<GpuSemaphore>> wait_semaphores

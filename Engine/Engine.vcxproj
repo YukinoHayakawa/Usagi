@@ -214,6 +214,7 @@
     <ClInclude Include="Core\Element.hpp" />
     <ClCompile Include="Core\Event\Event.cpp" />
     <ClCompile Include="Core\Element.cpp" />
+    <ClInclude Include="Runtime\Graphics\Enum\GpuAccess.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuBufferFormat.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuImageLayout.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GraphicsImageLayout.hpp" />

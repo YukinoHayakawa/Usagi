@@ -4,6 +4,7 @@
 
 namespace usagi
 {
+enum class GpuAccess;
 enum class GraphicsPipelineStage;
 enum class GpuBufferFormat;
 enum class GraphicsIndexType;
@@ -35,4 +36,5 @@ vk::ImageLayout translate(GpuImageLayout layout);
 vk::IndexType translate(GraphicsIndexType type);
 vk::SampleCountFlagBits translateSampleCount(std::uint32_t sample_count);
 vk::PipelineStageFlagBits translate(GraphicsPipelineStage stage);
+vk::AccessFlagBits translate(GpuAccess access);
 }

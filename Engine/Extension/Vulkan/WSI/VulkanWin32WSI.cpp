@@ -22,9 +22,11 @@ std::shared_ptr<usagi::Swapchain> usagi::VulkanGpuDevice::createSwapchain(
         GetWindowLongPtrW(win32_window.handle(), GWLP_HINSTANCE)));
     surface_create_info.setHwnd(win32_window.handle());
 
-    return std::make_shared<VulkanSwapchain>(this, window,
-        mInstance->createWin32SurfaceKHRUnique(surface_create_info)
-    );
+    auto surface = mInstance->createWin32SurfaceKHRUnique(surface_create_info);
+    assert(mPhysicalDevice.getSurfaceSupportKHR(
+        mGraphicsQueueFamilyIndex, surface.get()
+    ));
+    return std::make_shared<VulkanSwapchain>(this, window,std::move(surface));
 }
 
 void usagi::VulkanGpuDevice::checkQueuePresentationCapacity(

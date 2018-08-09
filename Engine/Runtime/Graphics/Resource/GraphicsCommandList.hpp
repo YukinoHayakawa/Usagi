@@ -2,9 +2,11 @@
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 #include <Usagi/Engine/Core/Math.hpp>
-
-#include "../Shader/ShaderStage.hpp"
-#include "../Enum/GraphicsIndexType.hpp"
+#include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Enum/GpuImageLayout.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Enum/GpuAccess.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Shader/ShaderStage.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
 
 namespace usagi
 {
@@ -24,7 +26,18 @@ public:
     // Setup commands
     // Cannot be used between beginRender() and endRender().
 
+    // todo: demo purpose only. too complicated.
+    virtual void transitionImage(
+        GpuImage *image,
+        GpuImageLayout from,
+        GpuImageLayout to,
+        GraphicsPipelineStage src_stage,
+        GraphicsPipelineStage dest_stage,
+        GpuAccess src_access,
+        GpuAccess dest_access
+    ) = 0;
     virtual void clearColorImage(GpuImage *image, Color4f color) = 0;
+
     //... copy buffer
 
     // Graphics commands

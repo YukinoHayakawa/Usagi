@@ -1,6 +1,7 @@
 ﻿#include "VulkanGraphicsCommandList.hpp"
 
 #include <Usagi/Engine/Utility/TypeCast.hpp>
+#include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
 
 #include "../VulkanGraphicsPipeline.hpp"
 #include "../VulkanEnumTranslation.hpp"
@@ -9,8 +10,10 @@
 #include "VulkanFramebuffer.hpp"
 
 usagi::VulkanGraphicsCommandList::VulkanGraphicsCommandList(
+    VulkanGpuDevice *device,
     vk::UniqueCommandBuffer vk_command_buffer)
-    : mCommandBuffer { std::move(vk_command_buffer) }
+    : mDevice(device)
+    , mCommandBuffer(std::move(vk_command_buffer))
 {
 }
 
@@ -28,16 +31,58 @@ void usagi::VulkanGraphicsCommandList::endRecording()
     mCommandBuffer->end();
 }
 
+void usagi::VulkanGraphicsCommandList::transitionImage(
+    GpuImage *image,
+    GpuImageLayout from,
+    GpuImageLayout to,
+    GraphicsPipelineStage src_stage,
+    GraphicsPipelineStage dest_stage,
+    GpuAccess src_access,
+    GpuAccess dest_access)
+{
+    auto &vk_image = dynamic_cast_ref<VulkanGpuImage>(image);
+
+    vk::ImageMemoryBarrier barrier;
+    barrier.setImage(vk_image.image());
+    barrier.setOldLayout(translate(from));
+    const auto new_layout = translate(to);
+    barrier.setNewLayout(new_layout);
+    barrier.setSrcQueueFamilyIndex(mDevice->graphicsQueueFamily());
+    barrier.setDstQueueFamilyIndex(mDevice->graphicsQueueFamily());
+    barrier.setSrcAccessMask(translate(src_access));
+    barrier.setDstAccessMask(translate(dest_access));
+    vk::ImageSubresourceRange subresource_range;
+    subresource_range.setAspectMask(vk::ImageAspectFlagBits::eColor);
+    subresource_range.setBaseArrayLayer(0);
+    subresource_range.setLayerCount(1);
+    subresource_range.setBaseMipLevel(0);
+    subresource_range.setLevelCount(1);
+    barrier.setSubresourceRange(subresource_range);
+
+    mCommandBuffer->pipelineBarrier(
+        translate(src_stage), translate(dest_stage),
+        { }, { }, { }, { barrier }
+    );
+    vk_image.setLayout(new_layout);
+}
+
 void usagi::VulkanGraphicsCommandList::clearColorImage(
     GpuImage *image, Color4f color)
 {
     auto &vk_image = dynamic_cast_ref<VulkanGpuImage>(image);
+    // todo: depending on image format, float/uint/int should be used
     const vk::ClearColorValue color_value { std::array<float, 4> {
         color.x(), color.y(), color.z(), color.w()
     }};
+    vk::ImageSubresourceRange subresource_range;
+    subresource_range.setAspectMask(vk::ImageAspectFlagBits::eColor);
+    subresource_range.setBaseArrayLayer(0);
+    subresource_range.setLayerCount(1);
+    subresource_range.setBaseMipLevel(0);
+    subresource_range.setLevelCount(1);
     mCommandBuffer->clearColorImage(
         vk_image.image(), vk_image.layout(),
-        color_value, {}
+        color_value, { subresource_range }
     );
 }
 
