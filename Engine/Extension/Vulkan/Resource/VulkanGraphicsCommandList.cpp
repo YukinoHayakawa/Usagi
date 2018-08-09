@@ -1,5 +1,7 @@
 ﻿#include "VulkanGraphicsCommandList.hpp"
 
+#include <Usagi/Engine/Utility/TypeCast.hpp>
+
 #include "../VulkanGraphicsPipeline.hpp"
 #include "../VulkanEnumTranslation.hpp"
 #include "VulkanGpuBuffer.hpp"
@@ -29,8 +31,8 @@ void usagi::VulkanGraphicsCommandList::endRecording()
 void usagi::VulkanGraphicsCommandList::clearColorImage(
     GpuImage *image, Color4f color)
 {
-    auto &vk_image = dynamic_cast<VulkanGpuImage&>(*image);
-    const vk::ClearColorValue color_value { std::array<float, 4> { 
+    auto &vk_image = dynamic_cast_ref<VulkanGpuImage>(image);
+    const vk::ClearColorValue color_value { std::array<float, 4> {
         color.x(), color.y(), color.z(), color.w()
     }};
     mCommandBuffer->clearColorImage(
@@ -43,8 +45,8 @@ void usagi::VulkanGraphicsCommandList::beginRendering(
     GraphicsPipeline *pipeline,
     Framebuffer *framebuffer)
 {
-    auto &vk_framebuffer = dynamic_cast<VulkanFramebuffer&>(*framebuffer);
-    auto &vk_pipeline = dynamic_cast<VulkanGraphicsPipeline&>(*pipeline);
+    auto &vk_framebuffer = dynamic_cast_ref<VulkanFramebuffer>(framebuffer);
+    auto &vk_pipeline = dynamic_cast_ref<VulkanGraphicsPipeline>(pipeline);
 
     vk::RenderPassBeginInfo begin_info;
     // todo support clear values
@@ -118,7 +120,7 @@ void usagi::VulkanGraphicsCommandList::bindIndexBuffer(
 	const std::size_t offset,
 	const GraphicsIndexType type)
 {
-	auto &vk_buffer = dynamic_cast<VulkanGpuBuffer&>(*buffer);
+	auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer);
 
     mCommandBuffer->bindIndexBuffer(
 		vk_buffer.buffer(), offset,
@@ -131,7 +133,7 @@ void usagi::VulkanGraphicsCommandList::bindVertexBuffer(
 	GpuBuffer *buffer,
 	const std::size_t offset)
 {
-	auto &vk_buffer = dynamic_cast<VulkanGpuBuffer&>(*buffer);
+	auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer);
 
 	vk::Buffer buffers[] = { vk_buffer.buffer() };
     vk::DeviceSize sizes[] = { offset };

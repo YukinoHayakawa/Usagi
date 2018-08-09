@@ -2,7 +2,7 @@
 
 #include <Usagi/Engine/Core/Math.hpp>
 #include <Usagi/Engine/Runtime/EventEmitter.hpp>
-#include <Usagi/Engine/Runtime/HID/Device.hpp>
+#include <Usagi/Engine/Runtime/Input/Device.hpp>
 
 #include "GamepadButtonCode.hpp"
 #include "GamepadEventListener.hpp"

@@ -132,7 +132,7 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
 
     if(shader.getInfoLog()[0])
         LOG(info, "Compiler output:\n{}", shader.getInfoLog());
-    if(shader.getInfoDebugLog()[0]) 
+    if(shader.getInfoDebugLog()[0])
         LOG(info, "Compiler debug output:\n{}", shader.getInfoDebugLog());
 
     program.addShader(&shader);

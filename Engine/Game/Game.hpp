@@ -6,19 +6,12 @@
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 #include <Usagi/Engine/Core/Element.hpp>
-#include <Usagi/Engine/Runtime/HID/Mouse/MouseEventListener.hpp>
-#include <Usagi/Engine/Runtime/HID/Keyboard/KeyEventListener.hpp>
 
 namespace usagi
 {
-class Platform;
-class Keyboard;
-class Mouse;
-class Asset;
-class AssetRoot;
+class Runtime;
 class Subsystem;
-class Window;
-class GpuDevice;
+class AssetRoot;
 
 struct SubsystemInfo
 {
@@ -27,61 +20,56 @@ struct SubsystemInfo
     bool enabled = true;
 };
 
-class Game
-    : Noncopyable
-    , public KeyEventListener
-    , public MouseEventListener
+class Game : Noncopyable
 {
-    std::shared_ptr<Platform> mPlatform;
-    std::shared_ptr<Window> mWindow;
-    std::shared_ptr<Keyboard> mKeyboard;
-    std::shared_ptr<Mouse> mMouse;
-    std::unique_ptr<GpuDevice> mGpuDevice;
-
+    // Multiple Game may use the same runtime.
+    Runtime* mRuntime = nullptr;
     std::vector<SubsystemInfo> mSubsystems;
     Element mRootElement { nullptr };
-    AssetRoot *mAssetRoot = nullptr;
+    AssetRoot* mAssetRoot = nullptr;
 
     std::vector<SubsystemInfo>::iterator findSubsystemByName(
-        const std::string &subsystem_name);
+        const std::string& subsystem_name);
 
     void setSubsystemEnabled(
-        const std::string &subsystem_name,
+        const std::string& subsystem_name,
         bool enabled);
 
-    void onMouseMove(const MousePositionEvent &e) override;
-    void onMouseButtonStateChange(const MouseButtonEvent &e) override;
-    void onMouseWheelScroll(const MouseWheelEvent &e) override;
-    void onKeyStateChange(const KeyEvent &e) override;
-
-    void initializePlatform();
+    Subsystem* addSubsystemPtr(
+        std::string name,
+        std::unique_ptr<Subsystem> subsystem);
 
 public:
-    Game();
+    explicit Game(Runtime *runtime);
     ~Game();
 
-    void initializeGraphics();
+    // moving will change AssetRoot address.
+    Game & operator=(const Game &other) = delete;
+    Game & operator=(Game &&other) noexcept = delete;
 
-    Platform * platform() const { return mPlatform.get(); }
-	GpuDevice * gpuDevice() const { return mGpuDevice.get(); }
+    template <typename SubsystemT>
+    SubsystemT * addSubsystem(
+        std::string name,
+        std::unique_ptr<SubsystemT> subsystem)
+    {
+        return static_cast<SubsystemT*>(addSubsystemPtr(
+            std::move(name),
+            unique_pointer_cast<Subsystem>(subsystem)
+        ));
+    }
 
-    /**
-     * \brief
-     * \param subsystem 
-     */
-    Subsystem * addSubsystem(SubsystemInfo subsystem);
+    void enableSubsystem(const std::string& subsystem_name);
+    void disableSubsystem(const std::string& subsystem_name);
 
-    void enableSubsystem(const std::string &subsystem_name);
-    void disableSubsystem(const std::string &subsystem_name);
-
-    Element * rootElement() { return &mRootElement; }
-    AssetRoot * assets() const { return mAssetRoot; }
+    Runtime * runtime() const { return mRuntime; }
+    Element* rootElement() { return &mRootElement; }
+    AssetRoot* assets() const { return mAssetRoot; }
 
     /**
     * \brief Invoke update methods on each enabled subsystem by the order
     * of their registration.
     * \param dt The elapsed time from last frame.
     */
-    void update(const std::chrono::seconds &dt);
+    void update(const std::chrono::seconds& dt);
 };
 }

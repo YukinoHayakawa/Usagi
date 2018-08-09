@@ -11,14 +11,9 @@
 #include <algorithm>
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
-#include <Usagi/Engine/Utility/TypeCast.hpp>
 
 #include "Event/Library/Element/ElementCreatedEvent.hpp"
 #include "Event/Library/Element/ChildElementAddedEvent.hpp"
-#include "Event/Library/Element/PreElementRemovalEvent.hpp"
-#include "Event/Library/Element/ChildElementRemovedEvent.hpp"
-#include "Event/Library/Component/PreComponentRemovalEvent.hpp"
-#include "Event/Library/Component/PostComponentRemovalEvent.hpp"
 
 namespace usagi
 {
@@ -30,11 +25,15 @@ class Component;
  * or logical. Entities are organized in a tree in logical sense. The
  * interaction with entity and the game world is carried out by components
  * and subsystems. Inter-entity communication is performed by event system.
- * 
+ *
  * Contains component and event logics.
  */
 class Element : Noncopyable
 {
+    Element *mParent;
+    using ChildrenArray = std::vector<std::unique_ptr<Element>>;
+    ChildrenArray mChildren;
+
     std::string mName;
 
 	using ComponentMap = std::unordered_map<
@@ -48,13 +47,25 @@ class Element : Noncopyable
 	);
 
 	template <typename CompBaseT>
-	ComponentMap::iterator findComponent()
+	ComponentMap::iterator getComponentIter(bool throws = true)
 	{
 		auto iter = mComponents.find(typeid(CompBaseT));
-		if(iter == mComponents.end())
-			throw std::runtime_error("Element has no such component.");
+        if(iter == mComponents.end() && throws)
+            throw std::runtime_error("Element has no such component.");
         return iter;
 	}
+
+    template <typename CompBaseT, typename CompCastT = CompBaseT>
+    CompCastT * castComponent(ComponentMap::iterator iter)
+    {
+        auto iter = getComponentIter<CompBaseT>();
+        if constexpr(std::is_same_v<CompBaseT, CompCastT>)
+            return static_cast<CompCastT*>(iter->second.get());
+        else
+            return dynamic_cast<CompCastT*>(iter->second.get());
+    }
+
+    ComponentMap::iterator eraseComponent(ComponentMap::iterator i);
 
 	std::multimap<std::type_index, std::any> mEventHandlers;
 
@@ -75,14 +86,16 @@ class Element : Noncopyable
     /**
      * \brief Invoked before adding a child. If false is returned, the addition
      * is aborted and a std::logic_error is thrown by addChild().
-     * \param child 
-     * \return 
+     * \param child
+     * \return
      */
-    virtual bool acceptChild(Element *child) = 0;
-    virtual void pushChild(std::unique_ptr<Element> child) = 0;
+    virtual bool acceptChild(Element *child)
+	{
+	    return true;
+	}
 
 public:
-    explicit Element(std::string name);
+    Element(Element *parent, std::string name = { });
     virtual ~Element();
 
     // move operations change the parent links so prohibit them.
@@ -94,7 +107,7 @@ public:
 
     // Entity Hierarchy
 
-    virtual Element * parent() const = 0;
+    Element * parent() const { return mParent; }
 
     template <typename ElementType = Element, typename... Args>
     ElementType * addChild(Args && ...args)
@@ -110,12 +123,21 @@ public:
         if(!acceptChild(c.get()))
             throw std::logic_error("Child element is rejected by parent.");
 		const auto r = c.get();
-        pushChild(std::move(c));
+        mChildren.push_back(std::move(c));
         fireEvent<ChildElementAddedEvent>(r);
 		return r;
     }
 
-    virtual void removeChild(Element *child) = 0;
+    Element * findChildByName(const std::string &name) const
+    {
+        const auto iter = std::find_if(
+            childrenBegin(), childrenEnd(),
+            [&](auto &&c) { return c->name() == name; }
+        );
+        return iter == childrenEnd() ? nullptr : iter->get();
+    }
+
+    void removeChild(Element *child);
 
     // Component
 
@@ -133,12 +155,25 @@ public:
     template <typename CompBaseT, typename CompCastT = CompBaseT>
 	CompCastT * getComponent()
     {
-        auto iter = findComponent<CompBaseT>();
+        auto iter = getComponentIter<CompBaseT>();
         if constexpr(std::is_same_v<CompBaseT, CompCastT>)
             return static_cast<CompCastT*>(iter->second.get());
 		else
             return dynamic_cast<CompCastT*>(iter->second.get());
     }
+
+    template <typename CompBaseT, typename CompCastT = CompBaseT>
+    CompCastT * findComponent()
+    {
+        auto iter = mComponents.find(typeid(CompBaseT));
+        if(iter == mComponents.end())
+            return nullptr;
+        if constexpr(std::is_same_v<CompBaseT, CompCastT>)
+            return static_cast<CompCastT*>(iter->second.get());
+        else
+            return dynamic_cast<CompCastT*>(iter->second.get());
+    }
+
 
     template <typename CompT>
     bool hasComponent()
@@ -150,10 +185,7 @@ public:
     template <typename CompBaseT>
     void removeComponent()
     {
-		auto comp = findComponent<CompBaseT>()->second.get();
-        fireEvent<PreComponentRemovalEvent>(comp->getBaseTypeInfo(), comp);
-        mComponents.erase(comp);
-        fireEvent<PostComponentRemovalEvent>(comp->getBaseTypeInfo());
+        eraseComponent(getComponentIter<CompBaseT>());
     }
 
     // Event Handling
@@ -174,84 +206,20 @@ public:
     {
         mEventHandlers.insert({ typeid(EventBaseT), std::move(handler) });
     }
-};
 
-/**
- * \brief Implements polymorphic parent pointer, enforces the parent
- * and children types.
- * This should be used as the base of concrete Element types.
- * 
- * Contains element hierarchy logics.
- * \tparam ParentT 
- */
-template <typename ParentT, typename ChildT>
-class ElementTreeNode : public Element
-{
-    ParentT *mParent;
-    using ChildrenArray = std::vector<std::unique_ptr<ChildT>>;
-    ChildrenArray mChildren;
-
-    bool acceptChild(Element *child) override
+    template <typename ElementT>
+    bool is() const
     {
-        return is_instance_of<ChildT>(child);
+        return dynamic_cast<ElementT*>(this) != nullptr;
     }
 
 protected:
-    void pushChild(std::unique_ptr<Element> child) override
-    {
-        // type check
-        auto &p = dynamic_cast<ChildT&>(*child.get());
-
-        // transfer ownership
-        std::unique_ptr<ChildT> c {
-            static_cast<ChildT*>(child.release())
-        };
-
-        mChildren.push_back(std::move(c));
-    }
-
-public:
-    explicit ElementTreeNode(Element *parent, std::string name = { })
-        : Element(std::move(name))
-        , mParent(&dynamic_cast<ParentT&>(*parent))
-    {
-    }
-
-    ParentT * parent() const override
-    {
-        return mParent;
-    }
-
-    ChildT * findChildByName(const std::string &name) const
-    {
-        const auto iter = std::find_if(
-            childrenBegin(), childrenEnd(),
-            [&](auto &&c) { return c->name() == name; }
-        );
-        return iter == childrenEnd() ? nullptr : iter->get();
-    }
-
-    void removeChild(Element *child) override
-    {
-        const auto iter = std::find_if(
-            mChildren.begin(), mChildren.end(),
-            [=](auto &&c) { return c.get() == child; }
-        );
-        if(iter == mChildren.end())
-            throw std::runtime_error("Cannot find specified child.");
-        auto p = iter->get();
-        p->template fireEvent<PreElementRemovalEvent>();
-        mChildren.erase(iter);
-        fireEvent<ChildElementRemovedEvent>();
-    }
-
-protected:
-    typename ChildrenArray::const_iterator childrenBegin() const
+    ChildrenArray::const_iterator childrenBegin() const
     {
         return mChildren.begin();
     }
 
-    typename ChildrenArray::const_iterator childrenEnd() const
+    ChildrenArray::const_iterator childrenEnd() const
     {
         return mChildren.end();
     }

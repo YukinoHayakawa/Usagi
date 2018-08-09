@@ -9,7 +9,12 @@ void usagi::Asset::checkLoaded() const
 }
 
 usagi::Asset::Asset(Element *parent, std::string name, boost::uuids::uuid uuid)
-    : ElementTreeNode { parent, std::move(name) }
+    : Element { parent, std::move(name) }
     , mUuid { uuid }
 {
+}
+
+usagi::AssetType usagi::Asset::assetType()
+{
+    return AssetType::DIRECTORY;
 }

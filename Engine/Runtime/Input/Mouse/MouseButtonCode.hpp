@@ -4,13 +4,11 @@ namespace usagi
 {
 enum class MouseButtonCode
 {
-    UNKNOWN,
-
     LEFT,
     RIGHT,
     MIDDLE,
 
-    // BUTTON 1-3 are alises to LEFT/MIDDLE/RIGHT
+    // note: BUTTON 1-3 are aliases to LEFT/MIDDLE/RIGHT in Windows
 
     BUTTON_4,
     BUTTON_5,

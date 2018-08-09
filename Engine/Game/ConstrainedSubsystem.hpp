@@ -10,7 +10,7 @@ template <typename... RequiredComponents>
 class ConstrainedSubsystem : public Subsystem
 {
 public:
-    bool handles(Element *element) override
+    bool processable(Element *element) override
     {
         return (... && element->hasComponent<RequiredComponents>());
     }

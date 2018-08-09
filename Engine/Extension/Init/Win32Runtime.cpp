@@ -19,22 +19,19 @@ usagi::Runtime::~Runtime()
 
 void usagi::Runtime::initGpu()
 {
-    if(mGpu)
-        throw std::runtime_error("GPU device is already created.");
+    if(mGpu) return;
     mGpu = std::make_unique<VulkanGpuDevice>();
 }
 
 void usagi::Runtime::initInput()
 {
-    if(mInputManager)
-        throw std::runtime_error("Input system is already initialized.");
+    if(mInputManager) return;
     mInputManager = std::make_unique<Win32InputManager>();
 }
 
 void usagi::Runtime::initWindow()
 {
-    if(mWindowManager)
-        throw std::runtime_error("Windowing system is already initialized.");
+    if(mWindowManager) return;
     mWindowManager = std::make_unique<Win32WindowManager>();
 }
 

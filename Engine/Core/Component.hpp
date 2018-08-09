@@ -20,7 +20,7 @@ public:
      * returns the base type of the component. One entity can only have one
      * component of a specific base type such as GraphicsComponent.
      * This method can be implemented in the base type as final.
-     * \return 
+     * \return
      */
     virtual const std::type_info & getBaseTypeInfo() = 0;
 };

@@ -9,7 +9,7 @@
 #include "Asset.hpp"
 
 usagi::AssetRoot::AssetRoot(Element *parent)
-    : ElementTreeNode { parent, "AssetRoot" }
+    : Element { parent, "AssetRoot" }
 {
 }
 
@@ -19,7 +19,7 @@ usagi::Asset * usagi::AssetRoot::findAssetByUuid(
     LOG(info, "Searching asset by UUID: {}", boost::uuids::to_string(uuid));
     for(auto iter = childrenBegin(); iter != childrenEnd(); ++iter)
     {
-        auto pkg = iter->get();
+        auto pkg = static_cast<AssetPackage*>(iter->get());
         if(const auto asset = pkg->findByUuid(uuid))
             return asset;
     }
@@ -38,7 +38,8 @@ usagi::Asset * usagi::AssetRoot::findAssetByString(
         const std::string path { string.c_str() + colon_pos + 1};
 
         LOG(info, "Searching asset in package {}: {}", package_name, path);
-        if(const auto pkg = findChildByName(package_name))
+        if(const auto pkg =
+            static_cast<AssetPackage*>(findChildByName(package_name)))
         {
             return pkg->findByString(path);
         }
@@ -64,6 +65,11 @@ usagi::Asset * usagi::AssetRoot::findAssetByString(
         }
     }
     return nullptr;
+}
+
+bool usagi::AssetRoot::acceptChild(Element *child)
+{
+    return is_instance_of<AssetPackage>(child);
 }
 
 usagi::Asset * usagi::AssetRoot::findAsset(std::string locator) const

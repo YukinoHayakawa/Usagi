@@ -10,7 +10,7 @@
 
 namespace usagi
 {
-class Asset : public ElementTreeNode<Element, Asset>
+class Asset : public Element
 {
     void checkLoaded() const;
 
@@ -26,7 +26,7 @@ public:
 	);
 
     boost::uuids::uuid uuid() const { return mUuid; }
-    virtual AssetType assetType() { return AssetType::DIRECTORY; }
+    virtual AssetType assetType();
 
     virtual bool loaded() const { return mPayload.has_value(); }
     virtual void load() { }
@@ -35,8 +35,8 @@ public:
     /**
      * \brief Cast payload to stored type. AssetT must match the resource
      * type exactly, same as typically the base type of the resource.
-     * \tparam AssetT 
-     * \return 
+     * \tparam AssetT
+     * \return
      */
     template <typename AssetT>
     std::shared_ptr<AssetT> as()
@@ -46,10 +46,10 @@ public:
     }
 
 	template <typename AssetT, typename DerivedAssetT>
-	std::shared_ptr<DerivedAssetT> as(const std::string &name)
+	std::shared_ptr<DerivedAssetT> as()
 	{
         checkLoaded();
-        return dynamic_pointer_cast_throw<DerivedAssetT>(as<AssetT>(name));
+        return dynamic_pointer_cast_throw<DerivedAssetT>(as<AssetT>());
 	}
 };
 }

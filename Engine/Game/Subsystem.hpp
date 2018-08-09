@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-#include <chrono>
-
+#include <Usagi/Engine/Core/Time.hpp>
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 
 namespace usagi
@@ -15,15 +14,15 @@ public:
 
     /**
      * \brief Update the state of subsystem based on provided time step.
-     * \param dt 
+     * \param dt
      */
-    virtual void update(const std::chrono::seconds &dt) = 0;
+    virtual void update(const TimeDuration &dt) = 0;
 
     /**
      * \brief Returns whether the entity will be processed by the subsystem.
-     * \param element 
+     * \param element
      */
-    virtual bool handles(Element *element) = 0;
+    virtual bool processable(Element *element) = 0;
 
     /**
     * \brief Check whether the entity has relevant components. If it has,

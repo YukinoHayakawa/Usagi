@@ -13,6 +13,8 @@ class FilesystemAssetPackage : public AssetPackage
 
     Asset * findByFilesystemPath(const std::filesystem::path &relative_path);
 
+    bool acceptChild(Element *child) override;
+
 public:
     FilesystemAssetPackage(
         Element *parent,

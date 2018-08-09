@@ -23,4 +23,16 @@ bool is_instance_of(T *ptr)
     static_assert(std::is_polymorphic_v<RealT>, "T is not polymorphic.");
     return dynamic_cast<const Instance*>(ptr) != nullptr;
 }
+
+template <typename Target, typename Source>
+std::unique_ptr<Target> unique_pointer_cast(std::unique_ptr<Source> ptr)
+{
+    return std::unique_ptr<Target> { static_cast<Target*>(ptr.release()) };
+}
+
+template <typename DerivedT, typename PtrT>
+DerivedT & dynamic_cast_ref(const PtrT &ptr)
+{
+    return dynamic_cast<DerivedT&>(*ptr);
+}
 }

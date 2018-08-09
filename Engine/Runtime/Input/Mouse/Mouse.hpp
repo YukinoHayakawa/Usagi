@@ -2,7 +2,7 @@
 
 #include <Usagi/Engine/Core/Math.hpp>
 #include <Usagi/Engine/Runtime/EventEmitter.hpp>
-#include <Usagi/Engine/Runtime/HID/Device.hpp>
+#include <Usagi/Engine/Runtime/Input/Device.hpp>
 
 #include "MouseButtonCode.hpp"
 
@@ -20,6 +20,7 @@ public:
      * the focused window. If no window is focused, (0, 0) is returned.
      * \return 
      */
+    // todo: cursor in window pos? window::screenpostowindowpos(mouse.pos)?
     virtual Vector2f cursorPositionInActiveWindow() = 0;
 
     /**

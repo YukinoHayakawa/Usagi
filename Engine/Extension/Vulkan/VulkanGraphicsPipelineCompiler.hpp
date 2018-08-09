@@ -61,7 +61,7 @@ public:
     explicit VulkanGraphicsPipelineCompiler(VulkanGpuDevice *device);
 
     void setRenderPass(std::shared_ptr<RenderPass> render_pass) override;
-    
+
     void setShader(
         ShaderStage stage,
         std::shared_ptr<SpirvBinary> shader) override;
@@ -74,12 +74,12 @@ public:
         std::string attr_name,
         std::uint32_t binding_index,
         std::uint32_t offset,
-        GpuDataFormat source_format) override;
+        GpuBufferFormat source_format) override;
     void setVertexAttribute(
         std::uint32_t attr_location,
         std::uint32_t binding_index,
         std::uint32_t offset,
-        GpuDataFormat source_format) override;
+        GpuBufferFormat source_format) override;
 
     void setInputAssemblyState(const InputAssemblyState &state) override;
     void setRasterizationState(const RasterizationState &state) override;

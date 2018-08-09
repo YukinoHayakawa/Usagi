@@ -1,9 +1,8 @@
 ﻿#include "VulkanGraphicsPipelineCompiler.hpp"
 
-#include <loguru.hpp>
-
 #include <Usagi/Engine/Runtime/Graphics/Shader/SpirvBinary.hpp>
 #include <Usagi/Engine/Utility/TypeCast.hpp>
+#include <Usagi/Engine/Core/Logging.hpp>
 
 #include "VulkanGpuDevice.hpp"
 #include "VulkanGraphicsPipeline.hpp"
@@ -24,15 +23,20 @@ vk::UniqueShaderModule usagi::VulkanGraphicsPipelineCompiler::
 
 void usagi::VulkanGraphicsPipelineCompiler::setupShaderStages()
 {
-	LOG_IF_F(ERROR, mShaders.count(ShaderStage::VERTEX) == 0,
-		"Pipeline does not contain vertex stage.");
-	LOG_IF_F(WARNING, mShaders.count(ShaderStage::FRAGMENT) == 0,
-		"Pipeline does not contain fragment stage.");
+	if(mShaders.count(ShaderStage::VERTEX) == 0)
+	{
+        LOG(error, "Pipeline does not contain vertex stage.");
+        return;
+	}
+    if(mShaders.count(ShaderStage::FRAGMENT) == 0)
+    {
+        LOG(warn, "Pipeline does not contain fragment stage.");
+    }
 
     std::vector<vk::PipelineShaderStageCreateInfo> create_infos;
     for(auto &&shader : mShaders)
     {
-        LOG_SCOPE_F(INFO, "Adding %s stage", to_string(shader.first));
+        LOG(info, "Adding {} stage", to_string(shader.first));
 
         vk::PipelineShaderStageCreateInfo info;
         info.setStage(translate(shader.first));
@@ -133,8 +137,8 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
         const auto member_size =
             compiler.get_declared_struct_member_size(type, i);
 
-        LOG_F(INFO, "%s: offset=%zu, size=%zu",
-            member_name.c_str(), member_offset, member_size);
+        LOG(info, "{}: offset={}, size={}",
+            member_name, member_offset, member_size);
 
         VulkanPushConstantField field;
         field.size = static_cast<uint32_t>(member_size);
@@ -165,7 +169,7 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
 
     void reflectPushConstantRanges()
     {
-        LOG_SCOPE_F(INFO, "Push constant range allocations (offset=%zu):",
+        LOG(info, "Push constant range allocations (offset={}):",
             ctx.push_constant_offset
         );
 
@@ -183,15 +187,15 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
 
     void reflectVertexInputAttributes()
     {
-        LOG_SCOPE_F(INFO, "Vertex input attribtues:");
+        LOG(info, "Vertex input attribtues:");
 
         for(auto &&resource : resources.stage_inputs)
         {
             const auto location = compiler.get_decoration(
                 resource.id, spv::DecorationLocation);
 
-            LOG_F(INFO, "%s: location=%u",
-                resource.name.c_str(), location);
+            LOG(info, "{}: location={}",
+                resource.name, location);
 
             // normalize to location-based indexing
             const auto it = p->mVertexAttributeNameMap.find(resource.name);
@@ -225,7 +229,7 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
 
     void reflectDescriptorSets()
     {
-        LOG_SCOPE_F(INFO, "Descriptor set layouts:");
+        LOG(info, "Descriptor set layouts:");
 
         // todo: others resource types
 
@@ -257,18 +261,18 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
 std::shared_ptr<usagi::GraphicsPipeline> usagi::VulkanGraphicsPipelineCompiler::
     compile()
 {
-	LOG_F(INFO, "Compiling graphics pipeline...");
+	LOG(info, "Compiling graphics pipeline...");
 
 	setupShaderStages();
 	setupDynamicStates();
 
-	LOG_SCOPE_F(INFO, "Generating pipeline layout...");
+	LOG(info, "Generating pipeline layout...");
 
     Context ctx;
 
 	for(auto &&shader : mShaders)
 	{
-        LOG_SCOPE_F(INFO, "Reflecting %s shader", to_string(shader.first));
+        LOG(info, "Reflecting {} shader", to_string(shader.first));
 
         ReflectionHelper helper { ctx, this, shader };
         if(shader.first == ShaderStage::VERTEX)
@@ -319,7 +323,7 @@ std::shared_ptr<usagi::GraphicsPipeline> usagi::VulkanGraphicsPipelineCompiler::
 	    std::move(ctx.desc_set_layouts),
 	    std::move(ctx.push_constant_field_map)
     );
-}   
+}
 
 usagi::VulkanGraphicsPipelineCompiler::VulkanGraphicsPipelineCompiler(
     VulkanGpuDevice *device)
@@ -390,7 +394,7 @@ void usagi::VulkanGraphicsPipelineCompiler::setVertexAttribute(
     std::string attr_name,
     std::uint32_t binding_index,
     std::uint32_t offset,
-    GpuDataFormat source_format)
+    GpuBufferFormat source_format)
 {
     vk::VertexInputAttributeDescription vulkan_attr;
     // Deferred to compilation when shader reflection is available.
@@ -405,7 +409,7 @@ void usagi::VulkanGraphicsPipelineCompiler::setVertexAttribute(
     std::uint32_t attr_location,
     std::uint32_t binding_index,
     std::uint32_t offset,
-    GpuDataFormat source_format)
+    GpuBufferFormat source_format)
 {
     vk::VertexInputAttributeDescription vulkan_attr;
     vulkan_attr.setLocation(attr_location);

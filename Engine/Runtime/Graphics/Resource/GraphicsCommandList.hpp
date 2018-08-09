@@ -3,25 +3,37 @@
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 #include <Usagi/Engine/Core/Math.hpp>
 
-#include "Shader/ShaderStage.hpp"
-#include "Enum/GraphicsIndexType.hpp"
+#include "../Shader/ShaderStage.hpp"
+#include "../Enum/GraphicsIndexType.hpp"
 
 namespace usagi
 {
 class GraphicsPipeline;
+class GpuImage;
 class GpuBuffer;
+class Framebuffer;
 
 class GraphicsCommandList : Noncopyable
 {
 public:
     virtual ~GraphicsCommandList() = default;
 
-    virtual void startRecording() = 0;
-    virtual void finishRecording() = 0;
+    virtual void beginRecording() = 0;
+    virtual void endRecording() = 0;
 
-	virtual void bindPipeline(
-        GraphicsPipeline *pipeline
-	) = 0;
+    // Setup commands
+    // Cannot be used between beginRender() and endRender().
+
+    virtual void clearColorImage(GpuImage *image, Color4f color) = 0;
+    //... copy buffer
+
+    // Graphics commands
+
+    // <-- in attachments, & clear values & renderpass
+    virtual void beginRendering(
+        GraphicsPipeline *pipeline,
+        Framebuffer *framebuffer) = 0;
+    virtual void endRendering() = 0;
 
     // Dynamic States
 
@@ -29,7 +41,7 @@ public:
      * \brief
      * \param index
      * \param origin Upper-left corner
-     * \param size 
+     * \param size
      */
     virtual void setViewport(
         std::uint32_t index,
@@ -57,7 +69,7 @@ public:
      * of the active pipeline.
      * \param data The source buffer to be read from, containing the data
      * for writing into the variable.
-     * \param size A validation field for preventing overreading the source
+     * \param size A validation field for preventing over-reading the source
      * buffer. This must equal to the size of variable declared in the shaders.
      */
     virtual void setConstant(
@@ -86,9 +98,9 @@ public:
      * \param index_count Number of indices for reading vertices of each
      * instance
      * \param instance_count Number of instances
-     * \param first_index 
+     * \param first_index
      * \param vertex_offset A value added to each index
-     * \param first_instance 
+     * \param first_instance
      */
     virtual void drawIndexedInstanced(
         std::uint32_t index_count,

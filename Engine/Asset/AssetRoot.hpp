@@ -11,11 +11,13 @@ namespace usagi
 class AssetPackage;
 class AssetPath;
 
-class AssetRoot : public ElementTreeNode<Element, AssetPackage>
+class AssetRoot : public Element
 {
     Asset * findAsset(std::string locator) const;
     Asset * findAssetByUuid(const boost::uuids::uuid &uuid) const;
     Asset * findAssetByString(std::string string) const;
+
+    bool acceptChild(Element *child) override;
 
 public:
     explicit AssetRoot(Element *parent);

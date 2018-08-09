@@ -12,10 +12,10 @@ class Noncopyable
 {
 public:
     Noncopyable() = default;
-    ~Noncopyable() = default;
+    ~Noncopyable() noexcept = default;
     Noncopyable(const Noncopyable &other) = delete;
-    Noncopyable(Noncopyable &&other) = default;
+    Noncopyable(Noncopyable &&other) noexcept = default;
     Noncopyable & operator=(const Noncopyable &other) = delete;
-    Noncopyable & operator=(Noncopyable &&other) = default;
+    Noncopyable & operator=(Noncopyable &&other) noexcept = default;
 };
 }

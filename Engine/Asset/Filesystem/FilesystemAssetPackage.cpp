@@ -48,6 +48,11 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
     }
 }
 
+bool usagi::FilesystemAssetPackage::acceptChild(Element *child)
+{
+    return is_instance_of<FilesystemAsset>(child);
+}
+
 usagi::FilesystemAssetPackage::FilesystemAssetPackage(
     Element *parent,
     std::string name,

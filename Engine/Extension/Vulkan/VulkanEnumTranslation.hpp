@@ -1,0 +1,38 @@
+﻿#pragma once
+
+#include <vulkan/vulkan.hpp>
+
+namespace usagi
+{
+enum class GraphicsPipelineStage;
+enum class GpuBufferFormat;
+enum class GraphicsIndexType;
+enum class GpuImageLayout;
+enum class GpuAttachmentStoreOp;
+enum class GpuAttachmentLoadOp;
+enum class VertexInputRate;
+enum class PrimitiveTopology;
+enum class FaceCullingMode;
+enum class FrontFace;
+enum class PolygonMode;
+enum class BlendingOperation;
+enum class BlendingFactor;
+enum class ShaderStage;
+
+vk::ShaderStageFlagBits translate(ShaderStage stage);
+vk::Format translate(GpuBufferFormat format);
+GpuBufferFormat fromVulkan(vk::Format format);
+vk::VertexInputRate translate(VertexInputRate rate);
+vk::PrimitiveTopology translate(PrimitiveTopology topology);
+vk::CullModeFlags translate(FaceCullingMode face_culling_mode);
+vk::FrontFace translate(FrontFace front_face);
+vk::PolygonMode translate(PolygonMode polygon_mode);
+vk::BlendOp translate(BlendingOperation blending_operation);
+vk::BlendFactor translate(BlendingFactor blending_factor);
+vk::AttachmentLoadOp translate(GpuAttachmentLoadOp op);
+vk::AttachmentStoreOp translate(GpuAttachmentStoreOp op);
+vk::ImageLayout translate(GpuImageLayout layout);
+vk::IndexType translate(GraphicsIndexType type);
+vk::SampleCountFlagBits translateSampleCount(std::uint32_t sample_count);
+vk::PipelineStageFlagBits translate(GraphicsPipelineStage stage);
+}

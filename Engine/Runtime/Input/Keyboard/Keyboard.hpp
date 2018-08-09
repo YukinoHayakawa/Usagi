@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <Usagi/Engine/Runtime/EventEmitter.hpp>
-#include <Usagi/Engine/Runtime/HID/Device.hpp>
+#include <Usagi/Engine/Runtime/Input/Device.hpp>
 
 #include "KeyEventListener.hpp"
 

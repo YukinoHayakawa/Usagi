@@ -12,6 +12,7 @@ usagi::FilesystemAsset::FilesystemAsset(
     std::string name)
     : Asset { parent, std::move(name) }
 {
+    assert(is_instance_of<FilesystemAssetPackage>(parent));
 }
 
 void usagi::FilesystemAsset::load()

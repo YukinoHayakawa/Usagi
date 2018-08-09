@@ -4,15 +4,20 @@
 
 #include <Usagi/Engine/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
 
+#include "VulkanBatchResource.hpp"
+
 namespace usagi
 {
 class VulkanGraphicsPipeline;
 
-class VulkanGraphicsCommandList : public GraphicsCommandList
+class VulkanGraphicsCommandList
+    : public GraphicsCommandList
+    , public VulkanBatchResource
 {
     vk::RenderPassBeginInfo mRenderPassBeginInfo;
     vk::UniqueCommandBuffer mCommandBuffer;
     VulkanGraphicsPipeline *mCurrentPipeline = nullptr;
+    std::vector<std::shared_ptr<VulkanBatchResource>> mResources;
 
 public:
     explicit VulkanGraphicsCommandList(
@@ -60,5 +65,10 @@ public:
         std::uint32_t first_index,
         std::int32_t vertex_offset,
         std::uint32_t first_instance) override;
+
+    vk::CommandBuffer commandBuffer() const
+    {
+        return mCommandBuffer.get();
+    }
 };
 }

@@ -19,7 +19,7 @@ class Element;
  *   An event handler at the root receive this event and let each subsystem
  *   to inspect the entity and record it if it is of interest.
  * - Delayed event
- *   A handler can hold a timed event and resend it when appropriate. 
+ *   A handler can hold a timed event and resend it when appropriate.
  */
 class Event : Noncopyable
 {

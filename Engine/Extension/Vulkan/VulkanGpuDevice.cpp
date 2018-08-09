@@ -1,13 +1,43 @@
 #include "VulkanGpuDevice.hpp"
 
+#include <algorithm>
+
 #include <Usagi/Engine/Core/Logging.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageView.hpp>
+#include <Usagi/Engine/Utility/Flag.hpp>
+#include <Usagi/Engine/Utility/TypeCast.hpp>
+
+#include "Resource/VulkanFramebuffer.hpp"
+#include "Resource/VulkanGpuCommandPool.hpp"
+#include "Resource/VulkanGpuImageView.hpp"
+#include "Resource/VulkanGraphicsCommandList.hpp"
+#include "Resource/VulkanSemaphore.hpp"
+#include "VulkanGraphicsPipelineCompiler.hpp"
+#include "VulkanHelper.hpp"
+#include "VulkanRenderPass.hpp"
+#include "VulkanEnumTranslation.hpp"
+
+uint32_t usagi::VulkanGpuDevice::selectQueue(
+    std::vector<vk::QueueFamilyProperties> &queue_family,
+    const vk::QueueFlags &queue_flags)
+{
+    for(auto iter = queue_family.begin(); iter != queue_family.end(); ++iter)
+    {
+        if(utility::matchAllFlags(iter->queueFlags, queue_flags))
+        {
+            return static_cast<uint32_t>(iter - queue_family.begin());
+        }
+    }
+    throw std::runtime_error(
+        "Could not find a queue family with required flags.");
+}
 
 VkBool32 usagi::VulkanGpuDevice::debugLayerCallbackDispatcher(
     VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT obj_type,
     uint64_t obj, size_t location, int32_t code,
     const char *layer_prefix, const char *msg, void *user_data)
 {
-    auto device = reinterpret_cast<VulkanGpuDevice*>(user_data);
+    const auto device = reinterpret_cast<VulkanGpuDevice*>(user_data);
     return device->debugLayerCallback(
         static_cast<vk::DebugReportFlagBitsEXT>(flags),
         static_cast<vk::DebugReportObjectTypeEXT>(obj_type),
@@ -26,7 +56,7 @@ bool usagi::VulkanGpuDevice::debugLayerCallback(
     std::size_t location,
     std::int32_t code,
     const char *layer_prefix,
-    const char *msg)
+    const char *msg) const
 {
     if(flags & vk::DebugReportFlagBitsEXT::eInformation)
     {
@@ -111,7 +141,7 @@ void usagi::VulkanGpuDevice::createInstance()
         static_cast<uint32_t>(validation_layers.size()));
     instance_create_info.setPpEnabledLayerNames(validation_layers.data());
 
-    mInstance = vk::createInstanceUnique(instance_create_info);
+    mInstance = createInstanceUnique(instance_create_info);
 }
 
 void usagi::VulkanGpuDevice::createDebugReport()
@@ -157,25 +187,52 @@ void usagi::VulkanGpuDevice::selectPhysicalDevice()
     }
     if(!mPhysicalDevice)
         throw std::runtime_error("No available GPU supporting Vulkan.");
-    LOG(info, "Using physical device: {}", 
+    LOG(info, "Using physical device: {}",
         mPhysicalDevice.getProperties().deviceName);
 }
 
 void usagi::VulkanGpuDevice::createDeviceAndQueues()
 {
-    LOG(info, "Creating logical device");
+    LOG(info, "Creating device and queues");
+
+    auto queue_families = mPhysicalDevice.getQueueFamilyProperties();
+    LOG(info, "Supported queue families:");
+    for(std::size_t i = 0; i < queue_families.size(); ++i)
+    {
+        auto &qf = queue_families[i];
+        LOG(info, "#{}: {} * {}", i, to_string(qf.queueFlags), qf.queueCount);
+    }
+
+    const auto graphics_queue_index = selectQueue(queue_families,
+        vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eTransfer);
+    checkQueuePresentationCapacity(graphics_queue_index);
+
+    LOG(info, "Using queue family {} as the primary queue.",
+        graphics_queue_index);
 
     vk::DeviceCreateInfo device_create_info;
+
+    vk::DeviceQueueCreateInfo queue_create_info[1];
+    float queue_priority = 1;
+    queue_create_info[0].setQueueFamilyIndex(graphics_queue_index);
+    queue_create_info[0].setQueueCount(1);
+    queue_create_info[0].setPQueuePriorities(&queue_priority);
+    device_create_info.setQueueCreateInfoCount(1);
+    device_create_info.setPQueueCreateInfos(queue_create_info);
 
     // todo: check device capacity
     const std::vector<const char *> device_extensions
     {
         "VK_KHR_swapchain",
     };
-    device_create_info.setEnabledExtensionCount(device_extensions.size());
+    device_create_info.setEnabledExtensionCount(static_cast<uint32_t>(
+        device_extensions.size()));
     device_create_info.setPpEnabledExtensionNames(device_extensions.data());
 
     mDevice = mPhysicalDevice.createDeviceUnique(device_create_info);
+
+    mGraphicsQueue = mDevice->getQueue(graphics_queue_index, 0);
+    mGraphicsQueueFamilyIndex = graphics_queue_index;
 }
 
 usagi::VulkanGpuDevice::VulkanGpuDevice()
@@ -186,23 +243,149 @@ usagi::VulkanGpuDevice::VulkanGpuDevice()
     createDeviceAndQueues();
 }
 
-usagi::GpuImage * usagi::VulkanGpuDevice::swapChainImage()
+usagi::VulkanGpuDevice::~VulkanGpuDevice()
 {
-    throw 0;
+    // Wait till all operations are completed so it is safe to release the
+    // resources.
+    mDevice->waitIdle();
 }
 
 std::unique_ptr<usagi::GraphicsPipelineCompiler> usagi::VulkanGpuDevice::
     createPipelineCompiler()
 {
-    throw 0;
+    return std::make_unique<VulkanGraphicsPipelineCompiler>(this);
 }
 
-vk::Device usagi::VulkanGpuDevice::device()
+std::unique_ptr<usagi::GpuCommandPool>
+    usagi::VulkanGpuDevice::createCommandPool()
+{
+    return std::make_unique<VulkanGpuCommandPool>(this);
+}
+
+std::shared_ptr<usagi::RenderPass> usagi::VulkanGpuDevice::createRenderPass(
+    const RenderPassCreateInfo &info)
+{
+    return std::make_shared<VulkanRenderPass>(this, info);
+}
+
+std::shared_ptr<usagi::Framebuffer> usagi::VulkanGpuDevice::createFramebuffer(
+    const RenderPassCreateInfo &info,
+    const Vector2u32 &size,
+    std::initializer_list<GpuImageView *> views)
+{
+    auto render_pass {
+        std::make_shared<VulkanRenderPass>(this, info)
+    };
+
+    const auto vk_views = vulkan::transformObjects(views,
+        [&](auto v) {
+            return dynamic_cast_ref<VulkanGpuImageView>(v).view();
+        }
+    );
+    vk::FramebufferCreateInfo fb_info;
+    fb_info.setRenderPass(render_pass->renderPass());
+    fb_info.setAttachmentCount(static_cast<uint32_t>(vk_views.size()));
+    fb_info.setPAttachments(vk_views.data());
+    fb_info.setWidth(size.x());
+    fb_info.setHeight(size.y());
+    fb_info.setLayers(1);
+
+    return std::make_shared<VulkanFramebuffer>(
+        std::move(render_pass),
+        mDevice->createFramebufferUnique(fb_info),
+        size);
+}
+
+// todo sem pool
+std::shared_ptr<usagi::GpuSemaphore> usagi::VulkanGpuDevice::createSemaphore()
+{
+    auto sem = mDevice->createSemaphoreUnique(vk::SemaphoreCreateInfo { });
+    return std::make_unique<VulkanSemaphore>(std::move(sem));
+}
+
+void usagi::VulkanGpuDevice::submitGraphicsJobs(
+    std::vector<std::shared_ptr<GraphicsCommandList>> jobs,
+    std::initializer_list<std::shared_ptr<GpuSemaphore>> wait_semaphores,
+    std::initializer_list<GraphicsPipelineStage> wait_stages,
+    std::initializer_list<std::shared_ptr<GpuSemaphore>> signal_semaphores)
+{
+    const auto vk_jobs = vulkan::transformObjects(jobs, [&](auto &&j) {
+        return dynamic_cast_ref<VulkanGraphicsCommandList>(j).commandBuffer();
+    });
+    const auto vk_wait_sems = vulkan::transformObjects(wait_semaphores,
+        [&](auto &&s) {
+            return dynamic_cast_ref<VulkanSemaphore>(s).semaphore();
+        }
+    );
+    const auto vk_wait_stages = vulkan::transformObjects(wait_stages,
+        [&](auto &&s) {
+            // todo wait on multiple stages
+            return vk::PipelineStageFlags(translate(s));
+        }
+    );
+    const auto vk_signal_sems = vulkan::transformObjects(signal_semaphores,
+        [&](auto &&s) {
+            return dynamic_cast_ref<VulkanSemaphore>(s).semaphore();
+        }
+    );
+
+    BatchResourceList batch_resources;
+    batch_resources.fence = mDevice->createFenceUnique(vk::FenceCreateInfo { });
+
+    vk::SubmitInfo info;
+    info.setCommandBufferCount(static_cast<uint32_t>(vk_jobs.size()));
+    info.setPCommandBuffers(vk_jobs.data());
+    info.setWaitSemaphoreCount(static_cast<uint32_t>(vk_wait_sems.size()));
+    info.setPWaitSemaphores(vk_wait_sems.data());
+    info.setSignalSemaphoreCount(static_cast<uint32_t>(vk_signal_sems.size()));
+    info.setPSignalSemaphores(vk_signal_sems.data());
+    info.setPWaitDstStageMask(vk_wait_stages.data());
+
+    const auto cast_append = [&](auto &&container) {
+        std::transform(
+            container.begin(), container.end(),
+            std::back_inserter(batch_resources.resources),
+            [&](auto &&j) {
+                return dynamic_pointer_cast_throw<VulkanBatchResource>(j);
+            }
+        );
+    };
+    cast_append(jobs);
+    cast_append(wait_semaphores);
+    cast_append(signal_semaphores);
+
+    mGraphicsQueue.submit({ info }, batch_resources.fence.get());
+
+    mBatchResourceLists.push_back(std::move(batch_resources));
+}
+
+void usagi::VulkanGpuDevice::reclaimResources()
+{
+    for(auto i = mBatchResourceLists.begin(); i != mBatchResourceLists.end();)
+    {
+        if(mDevice->getFenceStatus(i->fence.get()) == vk::Result::eSuccess)
+            i = mBatchResourceLists.erase(i);
+        else
+            ++i;
+    }
+}
+
+uint32_t usagi::VulkanGpuDevice::graphicsQueueFamily() const
+{
+    return mGraphicsQueueFamilyIndex;
+}
+
+vk::Queue usagi::VulkanGpuDevice::presentQueue() const
+{
+    return mGraphicsQueue;
+}
+
+vk::Device usagi::VulkanGpuDevice::device() const
 {
     return mDevice.get();
 }
 
-vk::PhysicalDevice usagi::VulkanGpuDevice::physicalDevice()
+vk::PhysicalDevice usagi::VulkanGpuDevice::physicalDevice() const
 {
     return mPhysicalDevice;
 }

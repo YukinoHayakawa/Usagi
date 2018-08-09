@@ -7,7 +7,7 @@
 
 #include "PipelineCreateInfo.hpp"
 #include "Shader/ShaderStage.hpp"
-#include "Enum/GpuDataFormat.hpp"
+#include "Enum/GpuBufferFormat.hpp"
 
 namespace usagi
 {
@@ -42,12 +42,12 @@ public:
         std::string attr_name,
         std::uint32_t binding_index,
         std::uint32_t offset,
-        GpuDataFormat source_format) = 0;
+        GpuBufferFormat source_format) = 0;
     virtual void setVertexAttribute(
         std::uint32_t attr_location,
         std::uint32_t binding_index,
         std::uint32_t offset,
-        GpuDataFormat source_format) = 0;
+        GpuBufferFormat source_format) = 0;
 
     virtual void setInputAssemblyState(const InputAssemblyState &state) = 0;
     virtual void setRasterizationState(const RasterizationState &state) = 0;

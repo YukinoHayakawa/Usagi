@@ -5,24 +5,32 @@
 #include "../VulkanGpuDevice.hpp"
 
 #include <Usagi/Engine/Core/Logging.hpp>
-#include <Usagi/Engine/Extension/Win32/Win32Window.hpp>
-#include <Usagi/Engine/Extension/Vulkan/VulkanSwapChain.hpp>
+#include <Usagi/Engine/Utility/TypeCast.hpp>
+#include <Usagi/Engine/Extension/Win32/Window/Win32Window.hpp>
 
-std::shared_ptr<usagi::SwapChain> usagi::VulkanGpuDevice::createSwapChain(
+#include "VulkanSwapchain.hpp"
+
+std::shared_ptr<usagi::Swapchain> usagi::VulkanGpuDevice::createSwapchain(
     Window *window)
 {
-    auto &win32_window = dynamic_cast<Win32Window&>(*window);
+    auto &win32_window = dynamic_cast_ref<Win32Window>(window);
 
-    LOG(info, "Creating Win32Surface for window \"{}\"", win32_window.title());
+    LOG(info, "Creating Win32Surface for window: {}", win32_window.title());
 
     vk::Win32SurfaceCreateInfoKHR surface_create_info;
     surface_create_info.setHinstance(reinterpret_cast<HINSTANCE>(
         GetWindowLongPtrW(win32_window.handle(), GWLP_HINSTANCE)));
     surface_create_info.setHwnd(win32_window.handle());
 
-    return std::make_shared<VulkanSwapChain>(this,
+    return std::make_shared<VulkanSwapchain>(this, window,
         mInstance->createWin32SurfaceKHRUnique(surface_create_info)
     );
+}
+
+void usagi::VulkanGpuDevice::checkQueuePresentationCapacity(
+    const uint32_t queue_family_index) const
+{
+    assert(mPhysicalDevice.getWin32PresentationSupportKHR(queue_family_index));
 }
 
 #endif
