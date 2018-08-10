@@ -60,7 +60,7 @@ bool usagi::VulkanGpuDevice::debugLayerCallback(
 {
     if(flags & vk::DebugReportFlagBitsEXT::eInformation)
     {
-        LOG(info, "Vulkan: {}", msg);
+        // LOG(info, "Vulkan: {}", msg);
     }
     if(flags & vk::DebugReportFlagBitsEXT::eWarning)
     {
@@ -368,6 +368,11 @@ void usagi::VulkanGpuDevice::reclaimResources()
         else
             ++i;
     }
+}
+
+void usagi::VulkanGpuDevice::waitIdle()
+{
+    mDevice->waitIdle();
 }
 
 uint32_t usagi::VulkanGpuDevice::graphicsQueueFamily() const

@@ -26,7 +26,7 @@ std::shared_ptr<usagi::Swapchain> usagi::VulkanGpuDevice::createSwapchain(
     assert(mPhysicalDevice.getSurfaceSupportKHR(
         mGraphicsQueueFamilyIndex, surface.get()
     ));
-    return std::make_shared<VulkanSwapchain>(this, window,std::move(surface));
+    return std::make_shared<VulkanSwapchain>(this, std::move(surface));
 }
 
 void usagi::VulkanGpuDevice::checkQueuePresentationCapacity(

@@ -55,7 +55,7 @@ usagi::Win32Window::Win32Window(
 
     mHandle = CreateWindowExW(
         WINDOW_STYLE_EX,
-        manager->WINDOW_CLASS_NAME,
+        Win32WindowManager::WINDOW_CLASS_NAME,
         window_title_wide.c_str(),
         WINDOW_STYLE,
         window_rect.left, window_rect.top,
@@ -71,11 +71,14 @@ usagi::Win32Window::Win32Window(
         throw win32::Win32Exception("CreateWindowEx() failed");
     }
 
-    // associate the class instance with the window so they can be identified
-    // in WindowProc
-    SetWindowLongPtrW(mHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    Win32WindowManager::mWindows.insert({ mHandle, this });
 
     Win32Window::show(true);
+}
+
+usagi::Win32Window::~Win32Window()
+{
+    Win32WindowManager::mWindows.erase(mHandle);
 }
 
 HDC usagi::Win32Window::deviceContext() const
@@ -188,9 +191,11 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
             WindowSizeEvent e;
             e.window = this;
             e.size = size();
+            e.sequence = mResizing = true;
             WindowPositionEvent e2;
             e2.window = this;
             e2.position = position();
+            e2.sequence = mMoving = true;
             forEachListener([&](auto h) {
                 h->onWindowResizeBegin(e);
                 h->onWindowMoveBegin(e2);
@@ -202,22 +207,40 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
             WindowSizeEvent e;
             e.window = this;
             e.size = size();
+            e.sequence = true;
             WindowPositionEvent e2;
             e2.window = this;
             e2.position = position();
+            e2.sequence = true;
             forEachListener([&](auto h) {
                 h->onWindowResizeEnd(e);
                 h->onWindowMoveEnd(e2);
             });
+            mResizing = mMoving = false;
             break;
         }
         case WM_SIZE:
         {
             WindowSizeEvent e;
             e.window = this;
-            mSize = e.size = { LOWORD(lParam), HIWORD(lParam) };
+            e.size = {
+                LOWORD(lParam) < 0 ? 0 : LOWORD(lParam),
+                HIWORD(lParam) < 0 ? 0 : HIWORD(lParam)
+            };
+            if(mSize == e.size) break;
+            mSize = e.size;
+            e.sequence = mResizing;
             forEachListener([&](auto h) {
-                h->onWindowResized(e);
+                if(!e.sequence)
+                {
+                    h->onWindowResizeBegin(e);
+                    h->onWindowResized(e);
+                    h->onWindowResizeEnd(e);
+                }
+                else
+                {
+                    h->onWindowResized(e);
+                }
             });
             break;
         }
@@ -228,9 +251,21 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
             // note that window position is signed
             auto x = static_cast<short>(LOWORD(lParam));
             auto y = static_cast<short>(HIWORD(lParam));
-            mPosition = e.position = { x, y };
+            e.position = { x, y };
+            if(mPosition == e.position) break;
+            mPosition = e.position;
+            e.sequence = mMoving;
             forEachListener([&](auto h) {
-                h->onWindowMoved(e);
+                if(!e.sequence)
+                {
+                    h->onWindowMoveBegin(e);
+                    h->onWindowMoved(e);
+                    h->onWindowMoveEnd(e);
+                }
+                else
+                {
+                    h->onWindowMoved(e);
+                }
             });
             break;
         }

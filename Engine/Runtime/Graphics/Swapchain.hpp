@@ -17,7 +17,22 @@ class Swapchain : Noncopyable
 public:
     virtual ~Swapchain() = default;
 
-    virtual void create(GpuBufferFormat format) = 0;
+    /**
+     * \brief Create the swapchain with a preferret format. If it is not
+     * supported by the device, a fallback format may be used, which can
+     * be queried using format(). If the swapchain is already created, it
+     * will be recreated.
+     * \param size
+     * \param format
+     */
+    virtual void create(const Vector2u32 &size, GpuBufferFormat format) = 0;
+
+    /**
+     * \brief Recreate the swapchain with the same format and different
+     * resolution.
+     * \param size
+     */
+    virtual void resize(const Vector2u32 &size) = 0;
 
     /**
      * \brief If desired format is not available, swapchain may fallback to

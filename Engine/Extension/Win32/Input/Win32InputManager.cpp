@@ -126,14 +126,14 @@ std::wstring getDeviceRegistryProperty(
     std::wstring buffer;
     DWORD        buffer_size = 0;
 
-    // Call function with null to begin with, 
+    // Call function with null to begin with,
     // then use the returned buffer size (doubled)
     // to Alloc the buffer. Keep calling until
     // success or an unknown failure.
     //
     // Double the returned buffersize to correct
-    // for underlying legacy CM functions that 
-    // return an incorrect buffersize value on 
+    // for underlying legacy CM functions that
+    // return an incorrect buffersize value on
     // DBCS/MBCS systems.
     while(!SetupDiGetDeviceRegistryPropertyW(
         hDevInfo,
@@ -146,8 +146,8 @@ std::wstring getDeviceRegistryProperty(
     {
         if(ERROR_INSUFFICIENT_BUFFER == GetLastError())
         {
-            // Double the size to avoid problems on 
-            // W2k MBCS systems per KB 888609. 
+            // Double the size to avoid problems on
+            // W2k MBCS systems per KB 888609.
             buffer.resize(buffer_size * 2 / sizeof(std::wstring::value_type));
         }
         else
@@ -341,7 +341,7 @@ LRESULT CALLBACK usagi::Win32InputManager::inputMessageHandler(
         // todo: handles device addition/removal
         case WM_INPUT_DEVICE_CHANGE:
         {
-            
+
             break;
         }
         default:

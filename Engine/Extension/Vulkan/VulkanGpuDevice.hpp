@@ -81,6 +81,7 @@ public:
     ) override;
 
     void reclaimResources() override;
+    void waitIdle() override;
 
     vk::Device device() const;
     vk::PhysicalDevice physicalDevice() const;

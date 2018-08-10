@@ -50,5 +50,6 @@ public:
      * \brief Release resources used by previous jobs.
      */
     virtual void reclaimResources() = 0;
+    virtual void waitIdle() = 0;
 };
 }

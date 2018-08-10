@@ -8,13 +8,11 @@
 
 namespace usagi
 {
-class Window;
 class VulkanGpuDevice;
 
 class VulkanSwapchain final : public Swapchain
 {
     VulkanGpuDevice *mDevice;
-    Window *mWindow;
 
     vk::UniqueSurfaceKHR mSurface;
     vk::SurfaceFormatKHR mFormat;
@@ -30,21 +28,23 @@ class VulkanSwapchain final : public Swapchain
         const std::vector<vk::SurfaceFormatKHR> &surface_formats,
         vk::Format preferred_image_format);
     vk::Extent2D selectSurfaceExtent(
+        const Vector2u32 &size,
         const vk::SurfaceCapabilitiesKHR &surface_capabilities) const;
     static vk::PresentModeKHR selectPresentMode(
         const std::vector<vk::PresentModeKHR> &present_modes);
     std::uint32_t selectPresentationQueueFamily() const;
 
-    void createSwapchain(vk::Format image_format);
+    void createSwapchain(const Vector2u32 &size, vk::Format image_format);
     void getSwapchainImages();
 
 public:
     VulkanSwapchain(
         VulkanGpuDevice *device,
-        Window *window,
         vk::UniqueSurfaceKHR vk_surface_khr);
 
-    void create(GpuBufferFormat format) override;
+    void create(const Vector2u32 &size, GpuBufferFormat format) override;
+    void resize(const Vector2u32 &size) override;
+
     GpuBufferFormat format() const override;
     Vector2u32 size() const override;
 

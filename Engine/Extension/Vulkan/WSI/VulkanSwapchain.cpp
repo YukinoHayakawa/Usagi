@@ -11,10 +11,8 @@
 
 usagi::VulkanSwapchain::VulkanSwapchain(
     VulkanGpuDevice *    device,
-    Window *             window,
     vk::UniqueSurfaceKHR vk_surface_khr)
     : mDevice { device }
-    , mWindow { window }
     , mSurface { std::move(vk_surface_khr) }
     , mFormat { vk::Format::eUndefined, vk::ColorSpaceKHR::eSrgbNonlinear }
 {
@@ -25,9 +23,10 @@ std::shared_ptr<usagi::GpuSemaphore> usagi::VulkanSwapchain::acquireNextImage()
     auto sem = mDevice->createSemaphore();
     const auto vk_sem = static_cast<VulkanSemaphore&>(*sem).semaphore();
 
+    // todo sometimes hangs when debugging with RenderDoc
     const auto result = mDevice->device().acquireNextImageKHR(
         mSwapchain.get(),
-        UINT64_MAX,
+        1000000000u, // 1s
         vk_sem,
         nullptr,
         &mCurrentImageIndex
@@ -38,12 +37,12 @@ std::shared_ptr<usagi::GpuSemaphore> usagi::VulkanSwapchain::acquireNextImage()
 
         case vk::Result::eErrorOutOfDateKHR:
             LOG(info, "Swapchain is out-of-date, recreating");
-            createSwapchain(mFormat.format);
+            createSwapchain(mSize, mFormat.format);
             return acquireNextImage();
 
         case vk::Result::eSuboptimalKHR:
             LOG(info, "Suboptimal swapchain, recreating");
-            createSwapchain(mFormat.format);
+            createSwapchain(mSize, mFormat.format);
             return acquireNextImage();
 
         default: throw std::runtime_error("acquireNextImageKHR() failed.");
@@ -129,6 +128,7 @@ vk::SurfaceFormatKHR usagi::VulkanSwapchain::selectSurfaceFormat(
 }
 
 vk::Extent2D usagi::VulkanSwapchain::selectSurfaceExtent(
+    const Vector2u32 &size,
     const vk::SurfaceCapabilitiesKHR &surface_capabilities) const
 {
     // currentExtent is the current width and height of the surface, or
@@ -137,8 +137,7 @@ vk::Extent2D usagi::VulkanSwapchain::selectSurfaceExtent(
     // targeting the surface.
     if(surface_capabilities.currentExtent.width == 0xFFFFFFFF)
     {
-        const auto   window_size       = mWindow->size();
-        vk::Extent2D swap_chain_extent = { window_size.x(), window_size.y() };
+        vk::Extent2D swap_chain_extent = { size.x(), size.y() };
         swap_chain_extent.width        = std::clamp(swap_chain_extent.width,
             surface_capabilities.minImageExtent.width,
             surface_capabilities.maxImageExtent.width
@@ -180,9 +179,17 @@ std::uint32_t usagi::VulkanSwapchain::selectPresentationQueueFamily() const
     throw std::runtime_error("No queue family supporting WSI was found.");
 }
 
-void usagi::VulkanSwapchain::create(GpuBufferFormat format)
+void usagi::VulkanSwapchain::create(
+    const Vector2u32 &size,
+    GpuBufferFormat format)
 {
-    createSwapchain(translate(format));
+    createSwapchain(size, translate(format));
+}
+
+void usagi::VulkanSwapchain::resize(const Vector2u32 &size)
+{
+    if(mSize != size)
+        createSwapchain(size, mFormat.format);
 }
 
 usagi::GpuBufferFormat usagi::VulkanSwapchain::format() const
@@ -195,14 +202,18 @@ usagi::Vector2u32 usagi::VulkanSwapchain::size() const
     return mSize;
 }
 
-void usagi::VulkanSwapchain::createSwapchain(vk::Format image_format)
+void usagi::VulkanSwapchain::createSwapchain(
+    const Vector2u32 &size,
+    vk::Format image_format)
 {
+    assert(size.x() > 0 && size.y() > 0);
+
     // Ensure that no operation involving the swapchain images is outstanding.
     // Since acquireNextImage() and drawing operations aren't parallel,
     // as long as the device is idle, it won't happen.
     mDevice->device().waitIdle();
 
-    LOG(info, "Creating swapchain for window: {}", mWindow->title());
+    LOG(info, "Creating swapchain");
 
     // todo: query using vkGetPhysicalDeviceWin32PresentationSupportKHR
     // mPresentationQueueFamilyIndex = selectPresentationQueueFamily();
@@ -224,15 +235,17 @@ void usagi::VulkanSwapchain::createSwapchain(vk::Format image_format)
     LOG(info, "Surface colorspace: {}", to_string(vk_format.colorSpace));
     create_info.setImageFormat(vk_format.format);
     create_info.setImageColorSpace(vk_format.colorSpace);
-    create_info.setImageExtent(selectSurfaceExtent(surface_capabilities));
+    create_info.setImageExtent(selectSurfaceExtent(size, surface_capabilities));
     LOG(info, "Surface extent: {}x{}",
         create_info.imageExtent.width, create_info.imageExtent.height);
 
     // Ensures non-blocking vkAcquireNextImageKHR() in mailbox mode.
     // See 3.6.12 of http://vulkan-spec-chunked.ahcox.com/apes03.html
     // todo: mailbox not available on my R9 290X
-    create_info.setMinImageCount(std::max(
-        surface_capabilities.minImageCount + 1, 3u
+    create_info.setMinImageCount(std::clamp(
+        3u,
+        surface_capabilities.minImageCount + 1,
+        surface_capabilities.maxImageCount
     ));
     create_info.setPresentMode(selectPresentMode(surface_present_modes));
 

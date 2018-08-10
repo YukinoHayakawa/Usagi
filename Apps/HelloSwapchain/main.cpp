@@ -14,6 +14,7 @@ using namespace usagi;
 
 class HelloSwapchain
     : public KeyEventListener
+    , public WindowEventListener
 {
     Runtime mRuntime;
     std::shared_ptr<Window> mWindow;
@@ -31,13 +32,16 @@ public:
             Vector2i { 100, 100 },
             Vector2u32 { 1920, 1080 }
         );
+        mWindow->addEventListener(this);
 
         // Setting up graphics
         mRuntime.initGpu();
 
         mSwapChain = mRuntime.gpu()->createSwapchain(mWindow.get());
-        mSwapChain->create(GpuBufferFormat::R8G8B8A8_UNORM);
+        mSwapChain->create(mWindow->size(), GpuBufferFormat::R8G8B8A8_UNORM);
 
+        // todo pool is released before command buffers on shutdown
+        // use sharedptr in tree like structures
         mCommandPool = mRuntime.gpu()->createCommandPool();
 
         // Setting up input
@@ -57,13 +61,20 @@ public:
         }
     }
 
+    void onWindowResizeEnd(const WindowSizeEvent &e) override
+    {
+        if(e.size.x() != 0 && e.size.y() != 0)
+            mSwapChain->resize(e.size);
+    }
+
     void mainLoop()
     {
+        auto gpu = mRuntime.gpu();
+
         while(mWindow->isOpen())
         {
-            auto gpu = mRuntime.gpu();
-
             mRuntime.windowManager()->processEvents();
+            mRuntime.inputManager()->processEvents();
             mSwapChain->acquireNextImage();
 
             auto cmd_list = mCommandPool->allocateGraphicsCommandList();
@@ -99,6 +110,8 @@ public:
 
             gpu->reclaimResources();
         }
+        gpu->waitIdle();
+        gpu->reclaimResources();
     }
 };
 

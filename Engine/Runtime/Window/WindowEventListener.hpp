@@ -17,11 +17,13 @@ struct WindowFocusEvent : WindowEvent
 struct WindowPositionEvent : WindowEvent
 {
     Vector2i position;
+    bool sequence;
 };
 
 struct WindowSizeEvent : WindowEvent
 {
     Vector2u32 size;
+    bool sequence;
 };
 
 class WindowEventListener
@@ -31,22 +33,29 @@ public:
 
     /**
      * \brief Fired when the window is activated/deactivated.
-     * \param e 
+     * \param e
      */
     virtual void onWindowFocusChanged(const WindowFocusEvent &e)
     {
     }
 
     /**
-     * \brief Fired when the window begun to move. If window.setPosition()
-     * is called, the listener will receive a sequence of events of MoveBegin,
-     * Moved, and MoveEnd.
-     * \param e 
+     * \brief Fired when the user begin to move a window. Between
+     * onWindowMoveBegin and onWindowMoveEnd events there may be zero or more
+     * onWindowMoved events depending on the actual window movement.
+     * e.sequence will be set to true in these events.
+     * \param e
      */
     virtual void onWindowMoveBegin(const WindowPositionEvent &e)
     {
     }
 
+    /**
+     * \brief If triggered by window.setPosition or maximize, a sequence of
+     * onWindowMoveBegin, onWindowMoved, and onWindowMoveEnd
+     * events will be triggered with e.sequence set to false.
+     * \param e
+     */
     virtual void onWindowMoved(const WindowPositionEvent &e)
     {
     }
@@ -56,15 +65,17 @@ public:
     }
 
     /**
-     * \brief Fired when the window begun to resize. If window.setSize()
-     * is called, the listener will receive a sequence of events of ResizeBegin,
-     * Resized, and ResizeEnd.
-     * \param e 
+     * \brief Similar to onWindowMoveBegin.
+     * \param e
      */
     virtual void onWindowResizeBegin(const WindowSizeEvent &e)
     {
     }
 
+    /**
+     * \brief Similar to onWindowMoved
+     * \param e
+     */
     virtual void onWindowResized(const WindowSizeEvent &e)
     {
     }

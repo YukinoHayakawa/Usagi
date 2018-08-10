@@ -11,6 +11,8 @@
 #include "Win32Window.hpp"
 #include "../Win32Helper.hpp"
 
+std::map<HWND, usagi::Win32Window *> usagi::Win32WindowManager::mWindows;
+
 void usagi::Win32WindowManager::registerWindowClass()
 {
     // get the process handle, all windows created using this class will have
@@ -43,13 +45,19 @@ void usagi::Win32WindowManager::unregisterWindowClass()
 
 usagi::Win32Window * usagi::Win32WindowManager::windowFromHandle(HWND handle)
 {
-    // make sure the windows is created by our class
-    if(GetWindowLongPtrW(handle, GWLP_WNDPROC) != reinterpret_cast<LONG_PTR>(
-        &Win32WindowManager::windowMessageDispatcher))
-        return nullptr;
+    const auto i = mWindows.find(handle);
+    if(i != mWindows.end())
+        return i->second;
+    return nullptr;
 
-    return reinterpret_cast<Win32Window*>(
-        GetWindowLongPtrW(handle, GWLP_USERDATA));
+    // vulkan swapchain somehow changed the wndproc
+    // make sure the windows is created by our class
+    //if(GetWindowLongPtrW(handle, GWLP_WNDPROC) != reinterpret_cast<LONG_PTR>(
+    //    &Win32WindowManager::windowMessageDispatcher))
+    //    return nullptr;
+
+    //return reinterpret_cast<Win32Window*>(
+    //    GetWindowLongPtrW(handle, GWLP_USERDATA));
 }
 
 usagi::Win32WindowManager::Win32WindowManager()

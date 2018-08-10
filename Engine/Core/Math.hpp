@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+// Requires _SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING
+// Requires _SILENCE_CXX17_ADAPTOR_TYPEDEFS_DEPRECATION_WARNING
 #include <eigen3/Eigen/Core>
 
 namespace usagi

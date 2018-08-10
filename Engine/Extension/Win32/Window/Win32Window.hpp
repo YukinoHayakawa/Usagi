@@ -18,13 +18,16 @@ class Win32Window : public Window
     Vector2u32 mSize;
     bool mFocused = false;
     bool mClosed = false;
+    bool mResizing = false;
+    bool mMoving = false;
+
     static constexpr DWORD WINDOW_STYLE = WS_OVERLAPPEDWINDOW;
     static constexpr DWORD WINDOW_STYLE_EX = WS_EX_ACCEPTFILES;
 
     /**
      * \brief Right and bottom are used as width and height for the convenience
      * of setting the window position.
-     * \return 
+     * \return
      */
     RECT getWindowRect() const;
     void updateWindowPosition() const;
@@ -37,14 +40,15 @@ public:
      * \brief Create an empty window.
      * \param manager
      * \param title
-     * \param position 
-     * \param size 
+     * \param position
+     * \param size
      */
     Win32Window(
         Win32WindowManager *manager,
         std::string title,
         Vector2i position,
         Vector2u32 size);
+    ~Win32Window() override;
 
     Vector2i position() const override;
     void setPosition(const Vector2i &position) override;
