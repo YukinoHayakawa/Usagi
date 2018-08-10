@@ -256,10 +256,10 @@ std::unique_ptr<usagi::GraphicsPipelineCompiler> usagi::VulkanGpuDevice::
     return std::make_unique<VulkanGraphicsPipelineCompiler>(this);
 }
 
-std::unique_ptr<usagi::GpuCommandPool>
+std::shared_ptr<usagi::GpuCommandPool>
     usagi::VulkanGpuDevice::createCommandPool()
 {
-    return std::make_unique<VulkanGpuCommandPool>(this);
+    return std::make_shared<VulkanGpuCommandPool>(this);
 }
 
 std::shared_ptr<usagi::RenderPass> usagi::VulkanGpuDevice::createRenderPass(

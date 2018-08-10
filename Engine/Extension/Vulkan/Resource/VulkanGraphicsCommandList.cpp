@@ -8,11 +8,12 @@
 #include "VulkanGpuBuffer.hpp"
 #include "VulkanGpuImage.hpp"
 #include "VulkanFramebuffer.hpp"
+#include "VulkanGpuCommandPool.hpp"
 
 usagi::VulkanGraphicsCommandList::VulkanGraphicsCommandList(
-    VulkanGpuDevice *device,
+    std::shared_ptr<VulkanGpuCommandPool> pool,
     vk::UniqueCommandBuffer vk_command_buffer)
-    : mDevice(device)
+    : mPool(std::move(pool))
     , mCommandBuffer(std::move(vk_command_buffer))
 {
 }
@@ -47,8 +48,9 @@ void usagi::VulkanGraphicsCommandList::transitionImage(
     barrier.setOldLayout(translate(from));
     const auto new_layout = translate(to);
     barrier.setNewLayout(new_layout);
-    barrier.setSrcQueueFamilyIndex(mDevice->graphicsQueueFamily());
-    barrier.setDstQueueFamilyIndex(mDevice->graphicsQueueFamily());
+    const auto queue_family_index = mPool->device()->graphicsQueueFamily();
+    barrier.setSrcQueueFamilyIndex(queue_family_index);
+    barrier.setDstQueueFamilyIndex(queue_family_index);
     barrier.setSrcAccessMask(translate(src_access));
     barrier.setDstAccessMask(translate(dest_access));
     vk::ImageSubresourceRange subresource_range;

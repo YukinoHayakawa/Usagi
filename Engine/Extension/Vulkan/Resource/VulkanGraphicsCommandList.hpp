@@ -8,14 +8,16 @@
 
 namespace usagi
 {
-class VulkanGpuDevice;
+class VulkanGpuCommandPool;
 class VulkanGraphicsPipeline;
 
 class VulkanGraphicsCommandList
     : public GraphicsCommandList
     , public VulkanBatchResource
 {
-    VulkanGpuDevice *mDevice;
+    // this shared_ptr is used to ensure that the pool won't be freed before
+    // command lists.
+    std::shared_ptr<VulkanGpuCommandPool> mPool;
     vk::RenderPassBeginInfo mRenderPassBeginInfo;
     vk::UniqueCommandBuffer mCommandBuffer;
     VulkanGraphicsPipeline *mCurrentPipeline = nullptr;
@@ -23,7 +25,7 @@ class VulkanGraphicsCommandList
 
 public:
     VulkanGraphicsCommandList(
-        VulkanGpuDevice *device,
+        std::shared_ptr<VulkanGpuCommandPool> pool,
         vk::UniqueCommandBuffer vk_command_buffer);
 
     void beginRecording() override;

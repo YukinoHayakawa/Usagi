@@ -25,7 +25,8 @@ std::shared_ptr<usagi::GraphicsCommandList> usagi::VulkanGpuCommandPool::
     info.setCommandPool(mPool.get());
     info.setLevel(vk::CommandBufferLevel::ePrimary);
 
-    return std::make_shared<VulkanGraphicsCommandList>(mDevice, std::move(
-        mDevice->device().allocateCommandBuffersUnique(info).front()
-    ));
+    return std::make_shared<VulkanGraphicsCommandList>(
+        shared_from_this(),
+        std::move(mDevice->device().allocateCommandBuffersUnique(info).front())
+    );
 }

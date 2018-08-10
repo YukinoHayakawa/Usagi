@@ -64,7 +64,7 @@ public:
 
     std::unique_ptr<GraphicsPipelineCompiler> createPipelineCompiler() override;
     std::shared_ptr<Swapchain> createSwapchain(Window *window) override;
-    std::unique_ptr<GpuCommandPool> createCommandPool() override;
+    std::shared_ptr<GpuCommandPool> createCommandPool() override;
     std::shared_ptr<RenderPass> createRenderPass(
         const RenderPassCreateInfo &info) override;
     std::shared_ptr<Framebuffer> createFramebuffer(

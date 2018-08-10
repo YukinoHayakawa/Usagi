@@ -1,14 +1,14 @@
-﻿#include <Usagi/Engine/Runtime/Runtime.hpp>
-#include <Usagi/Engine/Runtime/Window/Window.hpp>
-#include <Usagi/Engine/Runtime/Graphics/Swapchain.hpp>
-#include <Usagi/Engine/Runtime/Graphics/GpuDevice.hpp>
-#include <Usagi/Engine/Runtime/Window/WindowManager.hpp>
-#include <Usagi/Engine/Runtime/Input/Keyboard/KeyEventListener.hpp>
+﻿#include <Usagi/Engine/Runtime/Graphics/GpuDevice.hpp>
+#include <Usagi/Engine/Runtime/Graphics/RenderPassCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuCommandPool.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
-#include <Usagi/Engine/Runtime/Graphics/RenderPassCreateInfo.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Swapchain.hpp>
 #include <Usagi/Engine/Runtime/Input/InputManager.hpp>
 #include <Usagi/Engine/Runtime/Input/Keyboard/Keyboard.hpp>
+#include <Usagi/Engine/Runtime/Input/Keyboard/KeyEventListener.hpp>
+#include <Usagi/Engine/Runtime/Runtime.hpp>
+#include <Usagi/Engine/Runtime/Window/Window.hpp>
+#include <Usagi/Engine/Runtime/Window/WindowManager.hpp>
 
 using namespace usagi;
 
@@ -110,8 +110,6 @@ public:
 
             gpu->reclaimResources();
         }
-        gpu->waitIdle();
-        gpu->reclaimResources();
     }
 };
 

@@ -27,7 +27,7 @@ public:
     virtual ~GpuDevice() = default;
 
     virtual std::shared_ptr<Swapchain> createSwapchain(Window *window) = 0;
-    virtual std::unique_ptr<GpuCommandPool> createCommandPool() = 0;
+    virtual std::shared_ptr<GpuCommandPool> createCommandPool() = 0;
     virtual std::unique_ptr<GraphicsPipelineCompiler>
         createPipelineCompiler() = 0;
     virtual std::shared_ptr<RenderPass> createRenderPass(
