@@ -55,16 +55,6 @@ class Element : Noncopyable
         return iter;
 	}
 
-    template <typename CompBaseT, typename CompCastT = CompBaseT>
-    CompCastT * castComponent(ComponentMap::iterator iter)
-    {
-        auto iter = getComponentIter<CompBaseT>();
-        if constexpr(std::is_same_v<CompBaseT, CompCastT>)
-            return static_cast<CompCastT*>(iter->second.get());
-        else
-            return dynamic_cast<CompCastT*>(iter->second.get());
-    }
-
     ComponentMap::iterator eraseComponent(ComponentMap::iterator i);
 
 	std::multimap<std::type_index, std::any> mEventHandlers;
