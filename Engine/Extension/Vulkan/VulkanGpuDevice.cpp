@@ -8,14 +8,16 @@
 #include <Usagi/Engine/Utility/TypeCast.hpp>
 
 #include "Resource/VulkanFramebuffer.hpp"
+#include "Resource/VulkanGpuBuffer.hpp"
 #include "Resource/VulkanGpuCommandPool.hpp"
 #include "Resource/VulkanGpuImageView.hpp"
 #include "Resource/VulkanGraphicsCommandList.hpp"
+#include "Resource/VulkanMemoryPool.hpp"
 #include "Resource/VulkanSemaphore.hpp"
+#include "VulkanEnumTranslation.hpp"
 #include "VulkanGraphicsPipelineCompiler.hpp"
 #include "VulkanHelper.hpp"
 #include "VulkanRenderPass.hpp"
-#include "VulkanEnumTranslation.hpp"
 
 uint32_t usagi::VulkanGpuDevice::selectQueue(
     std::vector<vk::QueueFamilyProperties> &queue_family,
@@ -235,12 +237,25 @@ void usagi::VulkanGpuDevice::createDeviceAndQueues()
     mGraphicsQueueFamilyIndex = graphics_queue_index;
 }
 
+void usagi::VulkanGpuDevice::createMemoryPools()
+{
+    mDynamicMemoryPool = std::make_unique<VulkanMemoryPool>(
+        this,
+        1024 * 1024 * 512, // 512MiB  todo from config
+        vk::MemoryPropertyFlagBits::eHostVisible,
+        vk::BufferUsageFlagBits::eVertexBuffer |
+        vk::BufferUsageFlagBits::eIndexBuffer |
+        vk::BufferUsageFlagBits::eUniformBuffer
+    );
+}
+
 usagi::VulkanGpuDevice::VulkanGpuDevice()
 {
     createInstance();
     createDebugReport();
     selectPhysicalDevice();
     createDeviceAndQueues();
+    createMemoryPools();
 }
 
 usagi::VulkanGpuDevice::~VulkanGpuDevice()
@@ -301,6 +316,11 @@ std::shared_ptr<usagi::GpuSemaphore> usagi::VulkanGpuDevice::createSemaphore()
 {
     auto sem = mDevice->createSemaphoreUnique(vk::SemaphoreCreateInfo { });
     return std::make_unique<VulkanSemaphore>(std::move(sem));
+}
+
+std::shared_ptr<usagi::GpuBuffer> usagi::VulkanGpuDevice::createBuffer()
+{
+    return std::make_shared<VulkanGpuBuffer>(mDynamicMemoryPool.get());
 }
 
 void usagi::VulkanGpuDevice::submitGraphicsJobs(

@@ -130,10 +130,13 @@
     <ClCompile Include="Core\Logging.cpp" />
     <ClCompile Include="Extension\ImGui\ImGuiInputListener.cpp" />
     <ClCompile Include="Extension\ImGui\ImGuiSubsystem.cpp" />
+    <ClCompile Include="Extension\Vulkan\Resource\VulkanBufferAllocation.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanFramebuffer.cpp" />
+    <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuBuffer.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuCommandPool.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuImage.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuImageView.cpp" />
+    <ClCompile Include="Extension\Vulkan\Resource\VulkanMemoryPool.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanEnumTranslation.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanExtensions.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanGpuDevice.cpp" />
@@ -156,6 +159,8 @@
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
+    <ClCompile Include="Runtime\Memory\BitmapMemoryAllocator.cpp" />
+    <ClCompile Include="Runtime\Memory\detail\MemoryBitmap.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClCompile Include="Utility\String.cpp" />
     <ClInclude Include="Asset\Asset.hpp" />
@@ -177,11 +182,13 @@
     <ClInclude Include="Extension\ImGui\ImGuiComponent.hpp" />
     <ClInclude Include="Extension\ImGui\ImGuiSubsystem.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\VulkanBatchResource.hpp" />
+    <ClInclude Include="Extension\Vulkan\Resource\VulkanBufferAllocation.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\VulkanFramebuffer.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\VulkanGpuCommandPool.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\VulkanGpuBuffer.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\VulkanGpuImage.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\VulkanGpuImageView.hpp" />
+    <ClInclude Include="Extension\Vulkan\Resource\VulkanMemoryPool.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanEnumTranslation.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanGpuDevice.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\VulkanGraphicsCommandList.hpp" />
@@ -253,6 +260,8 @@
     <ClInclude Include="Runtime\Input\Mouse\MouseEventListener.hpp" />
     <ClInclude Include="Core\Event\Library\Input\MouseMoveEvent.hpp" />
     <ClInclude Include="Runtime\Input\InputManager.hpp" />
+    <ClInclude Include="Runtime\Memory\BitmapMemoryAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\detail\MemoryBitmap.hpp" />
     <ClInclude Include="Runtime\Runtime.hpp" />
     <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Runtime\Window\WindowEventListener.hpp" />
@@ -261,7 +270,7 @@
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
     <ClInclude Include="Utility\File.hpp" />
     <ClInclude Include="Utility\Flag.hpp" />
-    <ClInclude Include="Utility\Iterator.h" />
+    <ClInclude Include="Utility\Iterator.hpp" />
     <ClInclude Include="Utility\Math.hpp" />
     <ClInclude Include="Utility\Noncopyable.hpp" />
     <ClInclude Include="Utility\RotateCounter.hpp" />

@@ -1,24 +1,23 @@
 #include <cassert>
 #include <algorithm>
 
-#include <Usagi/Engine/Utility/CyclicContainerAdaptor.hpp>
-#include <Usagi/Engine/Utility/Iterator.h>
+#include <Usagi/Engine/Utility/Iterator.hpp>
 
-#include "Bitmap.hpp"
+#include "MemoryBitmap.hpp"
 
-namespace yuki::memory::detail
+namespace usagi::detail
 {
-Bitmap::Bitmap(std::size_t num_blocks)
+MemoryBitmap::MemoryBitmap(std::size_t num_blocks)
 {
     reset(num_blocks);
 }
 
-void Bitmap::reset(std::size_t num_blocks)
+void MemoryBitmap::reset(std::size_t num_blocks)
 {
     mBitmap = { num_blocks, Block::FREE };
 }
 
-std::vector<Bitmap::Block>::iterator Bitmap::
+std::vector<MemoryBitmap::Block>::iterator MemoryBitmap::
 determineScanningBegin(const std::size_t start_block)
 {
     auto start_iter = mBitmap.begin() + start_block;
@@ -28,7 +27,9 @@ determineScanningBegin(const std::size_t start_block)
     return start_iter;
 }
 
-std::size_t Bitmap::allocate(std::size_t num_blocks, std::size_t start_block)
+std::size_t MemoryBitmap::allocate(
+    std::size_t num_blocks,
+    std::size_t start_block)
 {
     assert(start_block < mBitmap.size());
 
@@ -41,8 +42,8 @@ std::size_t Bitmap::allocate(std::size_t num_blocks, std::size_t start_block)
     // space not found, wrap to begin
     if(alloc_begin == mBitmap.end())
     {
-        alloc_begin = utility::findFirstConsecutive(mBitmap.begin(), scan_begin,
-            Block::FREE, num_blocks);
+        alloc_begin = utility::findFirstConsecutive(
+            mBitmap.begin(), scan_begin, Block::FREE, num_blocks);
         if(alloc_begin == scan_begin)
             throw std::bad_alloc();
     }
@@ -54,7 +55,7 @@ std::size_t Bitmap::allocate(std::size_t num_blocks, std::size_t start_block)
     return alloc_begin_index;
 }
 
-void Bitmap::deallocate(const std::size_t start_block)
+void MemoryBitmap::deallocate(const std::size_t start_block)
 {
     assert(start_block < mBitmap.size());
 
@@ -71,7 +72,7 @@ void Bitmap::deallocate(const std::size_t start_block)
     }
 }
 
-std::size_t Bitmap::blockCount() const
+std::size_t MemoryBitmap::blockCount() const
 {
     return mBitmap.size();
 }

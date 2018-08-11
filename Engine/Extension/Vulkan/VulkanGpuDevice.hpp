@@ -8,6 +8,7 @@
 
 namespace usagi
 {
+class VulkanMemoryPool;
 class VulkanBatchResource;
 
 class VulkanGpuDevice : public GpuDevice
@@ -58,6 +59,12 @@ class VulkanGpuDevice : public GpuDevice
     void selectPhysicalDevice();
     void createDeviceAndQueues();
 
+    // Buffer Management
+
+    std::unique_ptr<VulkanMemoryPool> mDynamicMemoryPool;
+
+    void createMemoryPools();
+
 public:
     VulkanGpuDevice();
     ~VulkanGpuDevice();
@@ -72,6 +79,7 @@ public:
         const Vector2u32 &size,
         std::initializer_list<GpuImageView *> views) override;
     std::shared_ptr<GpuSemaphore> createSemaphore() override;
+    std::shared_ptr<GpuBuffer> createBuffer() override;
 
     void submitGraphicsJobs(
         std::vector<std::shared_ptr<GraphicsCommandList>> jobs,

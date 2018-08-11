@@ -1,11 +1,11 @@
-﻿#include "BitmapAllocator.hpp"
+﻿#include "BitmapMemoryAllocator.hpp"
 
 #include <Usagi/Engine/Utility/BitHack.hpp>
 #include <Usagi/Engine/Utility/Rounding.hpp>
 
-namespace yuki::memory
+namespace usagi
 {
-BitmapAllocator::BitmapAllocator(void *base,
+BitmapMemoryAllocator::BitmapMemoryAllocator(void *base,
     const std::size_t total_size,
     const std::size_t block_size, const std::size_t max_alignment)
     : mBase { static_cast<char*>(base) }
@@ -35,7 +35,7 @@ BitmapAllocator::BitmapAllocator(void *base,
     mAllocation.reset(total_size / block_size);
 }
 
-void * BitmapAllocator::allocate(const std::size_t num_bytes,
+void * BitmapMemoryAllocator::allocate(const std::size_t num_bytes,
     const std::size_t alignment)
 {
     if(num_bytes == 0)
@@ -47,8 +47,8 @@ void * BitmapAllocator::allocate(const std::size_t num_bytes,
     if(!utility::isPowerOfTwoOrZero(alignment))
         throw std::invalid_argument("alignment must be power-of-two or zero");
 
-    const std::size_t alloc_unit = utility::calculateSpanningPages(num_bytes,
-        mBlockSize);
+    const auto alloc_unit = utility::calculateSpanningPages(
+        num_bytes, mBlockSize);
 
     std::size_t allocation;
     {
@@ -59,7 +59,7 @@ void * BitmapAllocator::allocate(const std::size_t num_bytes,
     return mBase + allocation * mBlockSize;
 }
 
-void BitmapAllocator::deallocate(void *pointer)
+void BitmapMemoryAllocator::deallocate(void *pointer)
 {
     const std::size_t offset = static_cast<char*>(pointer) - mBase;
     const std::size_t block = offset / mBlockSize;

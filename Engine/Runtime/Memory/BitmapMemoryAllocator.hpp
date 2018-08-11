@@ -1,26 +1,27 @@
 ﻿#pragma once
 
 #include <mutex>
-#include <boost/noncopyable.hpp>
 
-#include "detail/Bitmap.hpp"
+#include <Usagi/Engine/Utility/Noncopyable.hpp>
 
-namespace yuki::memory
+#include "detail/MemoryBitmap.hpp"
+
+namespace usagi
 {
 /**
  * \brief A thread-safe bitmap allocator for managing remote memory.
  * todo: max_alignment really needed?
  */
-class BitmapAllocator : boost::noncopyable
+class BitmapMemoryAllocator : Noncopyable
 {
     char *const mBase = nullptr;
     const std::size_t mTotalSize = 0, mBlockSize = 0, mMaxAlignment = 0;
-    detail::Bitmap mAllocation;
+    detail::MemoryBitmap mAllocation;
     std::mutex mBitmapLock;
 
 public:
     /**
-     * \brief 
+     * \brief
      * \param base The starting address of the memory region. It must be
      * aligned to max_alignment, and can be nullptr to allocate based on
      * offsets.
@@ -32,11 +33,18 @@ public:
      * \param max_alignment The maximum alignment size allowed. Must be power
      * of two. It can be zero if no alignment is needed.
      */
-    BitmapAllocator(void *base, std::size_t total_size, std::size_t block_size,
+    BitmapMemoryAllocator(
+        void *base,
+        std::size_t total_size,
+        std::size_t block_size,
         std::size_t max_alignment);
 
     std::size_t managedSize() const { return mTotalSize; }
-    std::size_t usableSize() const { return mBlockSize * mAllocation.blockCount(); }
+
+    std::size_t usableSize() const
+    {
+        return mBlockSize * mAllocation.blockCount();
+    }
 
     void * allocate(std::size_t num_bytes, std::size_t alignment = 0);
     void deallocate(void *pointer);

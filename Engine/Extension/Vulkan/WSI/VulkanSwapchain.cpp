@@ -281,7 +281,7 @@ void usagi::VulkanSwapchain::getSwapchainImages()
         info.setImage(vk_image);
         info.setViewType(vk::ImageViewType::e2D);
         info.setFormat(mFormat.format);
-        info.setComponents(VkComponentMapping { });
+        info.setComponents(vk::ComponentMapping { });
         vk::ImageSubresourceRange subresource_range;
         subresource_range.setAspectMask(vk::ImageAspectFlagBits::eColor);
         subresource_range.setBaseArrayLayer(0);

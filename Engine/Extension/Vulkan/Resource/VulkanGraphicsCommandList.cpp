@@ -9,6 +9,8 @@
 #include "VulkanGpuImage.hpp"
 #include "VulkanFramebuffer.hpp"
 #include "VulkanGpuCommandPool.hpp"
+#include "VulkanBufferAllocation.hpp"
+#include "VulkanMemoryPool.hpp"
 
 usagi::VulkanGraphicsCommandList::VulkanGraphicsCommandList(
     std::shared_ptr<VulkanGpuCommandPool> pool,
@@ -168,11 +170,14 @@ void usagi::VulkanGraphicsCommandList::bindIndexBuffer(
 	const GraphicsIndexType type)
 {
 	auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer);
+    auto allocation = vk_buffer.allocation();
 
     mCommandBuffer->bindIndexBuffer(
-		vk_buffer.buffer(), offset,
+        allocation->pool()->buffer(), allocation->offset() + offset,
         translate(type)
 	);
+
+    mResources.push_back(std::move(allocation));
 }
 
 void usagi::VulkanGraphicsCommandList::bindVertexBuffer(
@@ -181,11 +186,14 @@ void usagi::VulkanGraphicsCommandList::bindVertexBuffer(
 	const std::size_t offset)
 {
 	auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer);
+    auto allocation = vk_buffer.allocation();
 
-	vk::Buffer buffers[] = { vk_buffer.buffer() };
-    vk::DeviceSize sizes[] = { offset };
+	vk::Buffer buffers[] = { allocation->pool()->buffer() };
+    vk::DeviceSize sizes[] = { allocation->offset() + offset };
 
     mCommandBuffer->bindVertexBuffers(binding_index, 1, buffers, sizes);
+
+    mResources.push_back(std::move(allocation));
 }
 
 void usagi::VulkanGraphicsCommandList::drawIndexedInstanced(

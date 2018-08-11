@@ -8,6 +8,7 @@
 
 namespace usagi
 {
+class GpuBuffer;
 class GpuImageView;
 class Framebuffer;
 struct RenderPassCreateInfo;
@@ -38,6 +39,12 @@ public:
         const Vector2u32 &size,
         std::initializer_list<GpuImageView*> views) = 0;
     virtual std::shared_ptr<GpuSemaphore> createSemaphore() = 0;
+
+    /**
+     * \brief Memory is not allocated until GpuBuffer::allocate() is called.
+     * \return
+     */
+    virtual std::shared_ptr<GpuBuffer> createBuffer() = 0;
 
     virtual void submitGraphicsJobs(
         std::vector<std::shared_ptr<GraphicsCommandList>> jobs,
