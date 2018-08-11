@@ -5,9 +5,9 @@
 #include <Usagi/Engine/Core/Logging.hpp>
 
 #include "VulkanGpuDevice.hpp"
-#include "VulkanGraphicsPipeline.hpp"
 #include "VulkanEnumTranslation.hpp"
 #include "VulkanRenderPass.hpp"
+#include "Resource/VulkanGraphicsPipeline.hpp"
 
 using namespace spirv_cross;
 
@@ -16,13 +16,15 @@ vk::UniqueShaderModule usagi::VulkanGraphicsPipelineCompiler::
 {
     auto &bytecodes = binary->bytecodes();
 	vk::ShaderModuleCreateInfo create_info;
-	create_info.setCodeSize(bytecodes.size());
+	create_info.setCodeSize(bytecodes.size() * sizeof(SpirvBinary::Bytecode));
 	create_info.setPCode(bytecodes.data());
 	return mDevice->device().createShaderModuleUnique(create_info);
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setupShaderStages()
 {
+    mShaderStageCreateInfos.clear();
+
 	if(mShaders.count(ShaderStage::VERTEX) == 0)
 	{
         LOG(error, "Pipeline does not contain vertex stage.");
@@ -33,7 +35,6 @@ void usagi::VulkanGraphicsPipelineCompiler::setupShaderStages()
         LOG(warn, "Pipeline does not contain fragment stage.");
     }
 
-    std::vector<vk::PipelineShaderStageCreateInfo> create_infos;
     for(auto &&shader : mShaders)
     {
         LOG(info, "Adding {} stage", to_string(shader.first));
@@ -46,39 +47,37 @@ void usagi::VulkanGraphicsPipelineCompiler::setupShaderStages()
         info.setModule(shader.second.module.get());
         info.setPName(shader.second.entry_point.c_str());
 
-        create_infos.push_back(info);
+        mShaderStageCreateInfos.push_back(info);
     }
     mPipelineCreateInfo.setStageCount(
-        static_cast<uint32_t>(create_infos.size()));
-    mPipelineCreateInfo.setPStages(create_infos.data());
+        static_cast<uint32_t>(mShaderStageCreateInfos.size()));
+    mPipelineCreateInfo.setPStages(mShaderStageCreateInfos.data());
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setupVertexInput()
 {
-    vk::PipelineVertexInputStateCreateInfo create_info;
-    create_info.setVertexBindingDescriptionCount(
+    mVertexInputStateCreateInfo.setVertexBindingDescriptionCount(
         static_cast<uint32_t>(mVertexInputBindings.size()));
-    create_info.setPVertexBindingDescriptions(
+    mVertexInputStateCreateInfo.setPVertexBindingDescriptions(
         mVertexInputBindings.data());
-    create_info.setVertexAttributeDescriptionCount(
+    mVertexInputStateCreateInfo.setVertexAttributeDescriptionCount(
         static_cast<uint32_t>(mVertexAttributeLocationArray.size()));
-    create_info.setPVertexAttributeDescriptions(
+    mVertexInputStateCreateInfo.setPVertexAttributeDescriptions(
         mVertexAttributeLocationArray.data());
-    mPipelineCreateInfo.setPVertexInputState(&create_info);
+    mPipelineCreateInfo.setPVertexInputState(&mVertexInputStateCreateInfo);
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setupDynamicStates()
 {
     // Viewport and scissor should be set after binding the pipeline
-	std::array<vk::DynamicState, 2> dynamic_state{
+    mDynamicStates = {
 		vk::DynamicState::eViewport,
 		vk::DynamicState::eScissor,
 	};
-	vk::PipelineDynamicStateCreateInfo dynamic_state_create_info;
-	dynamic_state_create_info.dynamicStateCount =
-        static_cast<uint32_t>(dynamic_state.size());
-	dynamic_state_create_info.pDynamicStates = dynamic_state.data();
-	mPipelineCreateInfo.pDynamicState = &dynamic_state_create_info;
+	mDynamicStateCreateInfo.dynamicStateCount =
+        static_cast<uint32_t>(mDynamicStates.size());
+	mDynamicStateCreateInfo.pDynamicStates = mDynamicStates.data();
+	mPipelineCreateInfo.pDynamicState = &mDynamicStateCreateInfo;
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setRenderPass(
@@ -176,10 +175,14 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
         for(const auto &resource : resources.push_constant_buffers)
             push_constant_size += reflectBufferPushConstants(resource);
 
+        if(push_constant_size == 0) return;
+
         vk::PushConstantRange range;
         range.setOffset(static_cast<uint32_t>(ctx.push_constant_offset));
         range.setSize(static_cast<uint32_t>(push_constant_size));
-        range.setStageFlags(translate(shader.first));
+        // todo
+        // range.setStageFlags(translate(shader.first));
+        range.setStageFlags(vk::ShaderStageFlagBits::eAll);
         ctx.push_constants.push_back(range);
 
         ctx.push_constant_offset += push_constant_size;

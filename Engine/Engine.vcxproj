@@ -128,6 +128,7 @@
     <ClCompile Include="Asset\Filesystem\FilesystemAsset.cpp" />
     <ClCompile Include="Asset\Filesystem\FilesystemAssetPackage.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
+    <ClCompile Include="Extension\ImGui\ImGuiImpl.cpp" />
     <ClCompile Include="Extension\ImGui\ImGuiInputListener.cpp" />
     <ClCompile Include="Extension\ImGui\ImGuiSubsystem.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanBufferAllocation.cpp" />
@@ -141,7 +142,7 @@
     <ClCompile Include="Extension\Vulkan\VulkanExtensions.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanGpuDevice.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanGraphicsCommandList.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipeline.cpp" />
+    <ClCompile Include="Extension\Vulkan\Resource\VulkanGraphicsPipeline.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipelineCompiler.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanRenderPass.cpp" />
     <ClCompile Include="Extension\Vulkan\WSI\VulkanSwapchain.cpp" />
@@ -192,7 +193,7 @@
     <ClInclude Include="Extension\Vulkan\VulkanEnumTranslation.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanGpuDevice.hpp" />
     <ClInclude Include="Extension\Vulkan\Resource\VulkanGraphicsCommandList.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipeline.hpp" />
+    <ClInclude Include="Extension\Vulkan\Resource\VulkanGraphicsPipeline.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipelineCompiler.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanHelper.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanRenderPass.hpp" />

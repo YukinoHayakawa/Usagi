@@ -4,11 +4,15 @@
 
 #include <Usagi/Engine/Runtime/Graphics/Resource/Framebuffer.hpp>
 
+#include "VulkanBatchResource.hpp"
+
 namespace usagi
 {
 class VulkanRenderPass;
 
-class VulkanFramebuffer : public Framebuffer
+class VulkanFramebuffer
+    : public Framebuffer
+    , public VulkanBatchResource
 {
     std::shared_ptr<VulkanRenderPass> mRenderPass;
     vk::UniqueFramebuffer mFramebuffer;

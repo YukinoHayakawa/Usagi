@@ -5,7 +5,6 @@
 #include <functional>
 
 #include <Usagi/Engine/Game/Subsystem.hpp>
-#include <chrono>
 
 namespace usagi
 {
@@ -25,16 +24,15 @@ class RenderableSubsystem : public Subsystem
 
 public:
     /**
-     * \brief 
-     * \param dt 
-     * \param framebuffer 
+     * \brief
+     * \param dt
+     * \param framebuffer
      * \param cmd_out Command list receiver, should be thread-safe.
      */
     virtual void update(
         const TimeDuration &dt,
-        Framebuffer *framebuffer,
+        std::shared_ptr<Framebuffer> framebuffer,
         const std::function<void(std::shared_ptr<GraphicsCommandList>)> &cmd_out
     ) = 0;
 };
 }
- 

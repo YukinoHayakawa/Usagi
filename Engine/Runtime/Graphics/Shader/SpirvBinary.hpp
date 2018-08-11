@@ -16,8 +16,11 @@ namespace usagi
  */
 class SpirvBinary
 {
+public:
 	// SPIR-V binary is 32-bit
     using Bytecode = std::uint32_t;
+
+private:
     std::vector<Bytecode> mBytecodes;
     spirv_cross::Compiler mReflectionCompiler;
 

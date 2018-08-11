@@ -7,6 +7,8 @@
 #include <Usagi/Engine/Runtime/Graphics/GraphicsPipeline.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Shader/ShaderStage.hpp>
 
+#include "VulkanBatchResource.hpp"
+
 namespace usagi
 {
 class VulkanRenderPass;
@@ -16,7 +18,9 @@ struct VulkanPushConstantField
 	std::uint32_t offset = 0, size = 0;
 };
 
-class VulkanGraphicsPipeline : public GraphicsPipeline
+class VulkanGraphicsPipeline
+    : public GraphicsPipeline
+    , public VulkanBatchResource
 {
 public:
 	using DescriptorSetLayoutMap =

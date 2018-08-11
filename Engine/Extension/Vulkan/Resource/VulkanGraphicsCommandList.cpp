@@ -2,15 +2,15 @@
 
 #include <Usagi/Engine/Utility/TypeCast.hpp>
 #include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
+#include <Usagi/Engine/Extension/Vulkan/VulkanEnumTranslation.hpp>
 
-#include "../VulkanGraphicsPipeline.hpp"
-#include "../VulkanEnumTranslation.hpp"
 #include "VulkanGpuBuffer.hpp"
 #include "VulkanGpuImage.hpp"
 #include "VulkanFramebuffer.hpp"
 #include "VulkanGpuCommandPool.hpp"
 #include "VulkanBufferAllocation.hpp"
 #include "VulkanMemoryPool.hpp"
+#include "VulkanGraphicsPipeline.hpp"
 
 usagi::VulkanGraphicsCommandList::VulkanGraphicsCommandList(
     std::shared_ptr<VulkanGpuCommandPool> pool,
@@ -91,29 +91,33 @@ void usagi::VulkanGraphicsCommandList::clearColorImage(
 }
 
 void usagi::VulkanGraphicsCommandList::beginRendering(
-    GraphicsPipeline *pipeline,
-    Framebuffer *framebuffer)
+    std::shared_ptr<GraphicsPipeline> pipeline,
+    std::shared_ptr<Framebuffer> framebuffer)
 {
-    auto &vk_framebuffer = dynamic_cast_ref<VulkanFramebuffer>(framebuffer);
-    auto &vk_pipeline = dynamic_cast_ref<VulkanGraphicsPipeline>(pipeline);
+    auto vk_framebuffer =
+        dynamic_pointer_cast_throw<VulkanFramebuffer>(framebuffer);
+    auto vk_pipeline =
+        dynamic_pointer_cast_throw<VulkanGraphicsPipeline>(pipeline);
 
     vk::RenderPassBeginInfo begin_info;
     // todo support clear values
-    const auto s = vk_framebuffer.size();
+    const auto s = vk_framebuffer->size();
     begin_info.renderArea.extent.width = s.x();
     begin_info.renderArea.extent.height = s.y();
-    begin_info.setFramebuffer(vk_framebuffer.framebuffer());
-    begin_info.setRenderPass(vk_pipeline.renderPass());
+    begin_info.setFramebuffer(vk_framebuffer->framebuffer());
+    begin_info.setRenderPass(vk_pipeline->renderPass());
 
     // assuming that only one render pass is used
-    mCommandBuffer->beginRenderPass(mRenderPassBeginInfo,
-        vk::SubpassContents::eInline);
+    mCommandBuffer->beginRenderPass(begin_info, vk::SubpassContents::eInline);
 
     mCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics,
-        vk_pipeline.pipeline());
+        vk_pipeline->pipeline());
 
-    mCurrentPipeline = &vk_pipeline;
-};
+    mCurrentPipeline = vk_pipeline;
+
+    mResources.push_back(std::move(vk_framebuffer));
+    mResources.push_back(std::move(vk_pipeline));
+}
 
 void usagi::VulkanGraphicsCommandList::endRendering()
 {

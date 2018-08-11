@@ -44,8 +44,8 @@ public:
 
     // <-- in attachments, & clear values & renderpass
     virtual void beginRendering(
-        GraphicsPipeline *pipeline,
-        Framebuffer *framebuffer) = 0;
+        std::shared_ptr<GraphicsPipeline> pipeline,
+        std::shared_ptr<Framebuffer> framebuffer) = 0;
     virtual void endRendering() = 0;
 
     // Dynamic States

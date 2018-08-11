@@ -1,6 +1,6 @@
 ﻿#include "VulkanGraphicsPipeline.hpp"
 
-#include "VulkanRenderPass.hpp"
+#include <Usagi/Engine/Extension/Vulkan/VulkanRenderPass.hpp>
 
 vk::RenderPass usagi::VulkanGraphicsPipeline::renderPass() const
 {

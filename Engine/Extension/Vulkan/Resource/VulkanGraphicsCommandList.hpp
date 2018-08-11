@@ -18,9 +18,8 @@ class VulkanGraphicsCommandList
     // this shared_ptr is used to ensure that the pool won't be freed before
     // command lists.
     std::shared_ptr<VulkanGpuCommandPool> mPool;
-    vk::RenderPassBeginInfo mRenderPassBeginInfo;
     vk::UniqueCommandBuffer mCommandBuffer;
-    VulkanGraphicsPipeline *mCurrentPipeline = nullptr;
+    std::shared_ptr<VulkanGraphicsPipeline> mCurrentPipeline;
     std::vector<std::shared_ptr<VulkanBatchResource>> mResources;
 
 public:
@@ -42,8 +41,8 @@ public:
     void clearColorImage(GpuImage *image, Color4f color) override;
 
     void beginRendering(
-        GraphicsPipeline *pipeline,
-        Framebuffer *framebuffer) override;
+        std::shared_ptr<GraphicsPipeline> pipeline,
+        std::shared_ptr<Framebuffer> framebuffer) override;
     void endRendering() override;
 
     void setViewport(

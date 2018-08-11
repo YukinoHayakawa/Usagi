@@ -26,6 +26,10 @@ class VulkanGraphicsPipelineCompiler final : public GraphicsPipelineCompiler
 
 	vk::UniqueShaderModule createShaderModule(const SpirvBinary *binary) const;
 
+    std::vector<vk::PipelineShaderStageCreateInfo> mShaderStageCreateInfos;
+    vk::PipelineVertexInputStateCreateInfo mVertexInputStateCreateInfo;
+    std::vector<vk::DynamicState> mDynamicStates;
+    vk::PipelineDynamicStateCreateInfo mDynamicStateCreateInfo;
     vk::PipelineInputAssemblyStateCreateInfo mInputAssemblyStateCreateInfo;
 	vk::PipelineViewportStateCreateInfo mViewportStateCreateInfo;
     vk::PipelineRasterizationStateCreateInfo mRasterizationStateCreateInfo;

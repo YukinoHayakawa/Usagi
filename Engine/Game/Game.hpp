@@ -6,6 +6,7 @@
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 #include <Usagi/Engine/Core/Element.hpp>
+#include <Usagi/Engine/Utility/TypeCast.hpp>
 
 namespace usagi
 {
@@ -54,7 +55,7 @@ public:
     {
         return static_cast<SubsystemT*>(addSubsystemPtr(
             std::move(name),
-            unique_pointer_cast<Subsystem>(subsystem)
+            unique_pointer_cast<Subsystem>(std::move(subsystem))
         ));
     }
 
@@ -62,8 +63,8 @@ public:
     void disableSubsystem(const std::string& subsystem_name);
 
     Runtime * runtime() const { return mRuntime; }
-    Element* rootElement() { return &mRootElement; }
-    AssetRoot* assets() const { return mAssetRoot; }
+    Element * rootElement() { return &mRootElement; }
+    AssetRoot * assets() const { return mAssetRoot; }
 
     /**
     * \brief Invoke update methods on each enabled subsystem by the order
