@@ -336,9 +336,6 @@
     <ClInclude Include="Extension\Vulkan\Resource\VulkanSemaphore.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Graphics\Enum\GpuAccess.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Extension\Vulkan\Resource\VulkanBufferAllocation.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -451,9 +448,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Vulkan\Resource\VulkanGraphicsCommandList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Vulkan\VulkanRenderPass.cpp">

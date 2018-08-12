@@ -13,12 +13,12 @@
 using namespace usagi;
 
 class HelloSwapchain
-    : public KeyEventListener
-    , public WindowEventListener
+    : public KeyEventListener,
+    public WindowEventListener
 {
     Runtime mRuntime;
     std::shared_ptr<Window> mWindow;
-    std::shared_ptr<Swapchain> mSwapChain;
+    std::shared_ptr<Swapchain> mSwapchain;
     std::shared_ptr<GpuCommandPool> mCommandPool;
     Color4f mFillColor = Color4f::Random();
 
@@ -37,8 +37,8 @@ public:
         // Setting up graphics
         mRuntime.initGpu();
 
-        mSwapChain = mRuntime.gpu()->createSwapchain(mWindow.get());
-        mSwapChain->create(mWindow->size(), GpuBufferFormat::R8G8B8A8_UNORM);
+        mSwapchain = mRuntime.gpu()->createSwapchain(mWindow.get());
+        mSwapchain->create(mWindow->size(), GpuBufferFormat::R8G8B8A8_UNORM);
 
         // todo pool is released before command buffers on shutdown
         // use sharedptr in tree like structures
@@ -64,7 +64,7 @@ public:
     void onWindowResizeEnd(const WindowSizeEvent &e) override
     {
         if(e.size.x() != 0 && e.size.y() != 0)
-            mSwapChain->resize(e.size);
+            mSwapchain->resize(e.size);
     }
 
     void mainLoop()
@@ -75,30 +75,28 @@ public:
         {
             mRuntime.windowManager()->processEvents();
             mRuntime.inputManager()->processEvents();
-            mSwapChain->acquireNextImage();
+            mSwapchain->acquireNextImage();
 
             auto cmd_list = mCommandPool->allocateGraphicsCommandList();
             cmd_list->beginRecording();
             cmd_list->transitionImage(
-                mSwapChain->currentImage(),
+                mSwapchain->currentImage(),
                 GpuImageLayout::UNDEFINED,
                 GpuImageLayout::TRANSFER_DST,
                 GraphicsPipelineStage::TRANSFER,
-                GraphicsPipelineStage::TRANSFER,
-                GpuAccess::MEMORY_READ,
-                GpuAccess::TRANSFER_WRITE
+                GraphicsPipelineStage::TRANSFER
             );
             cmd_list->clearColorImage(
-                mSwapChain->currentImage(), mFillColor
+                mSwapchain->currentImage(),
+                GpuImageLayout::TRANSFER_DST,
+                mFillColor
             );
             cmd_list->transitionImage(
-                mSwapChain->currentImage(),
+                mSwapchain->currentImage(),
                 GpuImageLayout::TRANSFER_DST,
                 GpuImageLayout::PRESENT,
                 GraphicsPipelineStage::TRANSFER,
-                GraphicsPipelineStage::BOTTOM_OF_PIPE,
-                GpuAccess::TRANSFER_WRITE,
-                GpuAccess::MEMORY_READ
+                GraphicsPipelineStage::BOTTOM_OF_PIPE
             );
             cmd_list->endRecording();
 
@@ -106,7 +104,7 @@ public:
             gpu->submitGraphicsJobs(
                 { cmd_list }, { }, { }, { rendering_finished_sem }
             );
-            mSwapChain->present({ rendering_finished_sem });
+            mSwapchain->present({ rendering_finished_sem });
 
             gpu->reclaimResources();
         }

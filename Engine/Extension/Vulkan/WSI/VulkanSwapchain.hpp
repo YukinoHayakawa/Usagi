@@ -10,9 +10,7 @@ namespace usagi
 {
 class VulkanGpuDevice;
 
-class VulkanSwapchain final
-    : public Swapchain
-    , std::enable_shared_from_this<VulkanSwapchain>
+class VulkanSwapchain final : public Swapchain
 {
     VulkanGpuDevice *mDevice;
 

@@ -4,7 +4,6 @@
 #include <Usagi/Engine/Core/Math.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GpuImageLayout.hpp>
-#include <Usagi/Engine/Runtime/Graphics/Enum/GpuAccess.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Shader/ShaderStage.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
 
@@ -29,14 +28,15 @@ public:
     // todo: demo purpose only. too complicated.
     virtual void transitionImage(
         GpuImage *image,
-        GpuImageLayout from,
-        GpuImageLayout to,
+        GpuImageLayout old_layout,
+        GpuImageLayout new_layout,
         GraphicsPipelineStage src_stage,
-        GraphicsPipelineStage dest_stage,
-        GpuAccess src_access,
-        GpuAccess dest_access
+        GraphicsPipelineStage dest_stage
     ) = 0;
-    virtual void clearColorImage(GpuImage *image, Color4f color) = 0;
+    virtual void clearColorImage(
+        GpuImage *image,
+        GpuImageLayout layout,
+        Color4f color) = 0;
 
     //... copy buffer
 

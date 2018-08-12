@@ -4,7 +4,6 @@
 #include <Usagi/Engine/Runtime/Graphics/Shader/ShaderStage.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
-#include <Usagi/Engine/Runtime/Graphics/Enum/GpuAccess.hpp>
 #include <Usagi/Engine/Runtime/Graphics/RenderPassCreateInfo.hpp>
 
 vk::ShaderStageFlagBits usagi::translate(ShaderStage stage)
@@ -271,46 +270,5 @@ vk::PipelineStageFlagBits usagi::translate(GraphicsPipelineStage stage)
         case GraphicsPipelineStage::BOTTOM_OF_PIPE:
             return vk::PipelineStageFlagBits::eBottomOfPipe;
         default: throw std::runtime_error("Invalid GraphicsPipelineStage.");
-    }
-}
-
-vk::AccessFlagBits usagi::translate(GpuAccess access)
-{
-    switch(access)
-    {
-        case GpuAccess::INDEX_READ:
-            return vk::AccessFlagBits::eIndexRead;
-        case GpuAccess::VERTEX_ATTRIBUTE_READ:
-            return vk::AccessFlagBits::eVertexAttributeRead;
-        case GpuAccess::UNIFORM_READ:
-            return vk::AccessFlagBits::eUniformRead;
-        case GpuAccess::INPUT_ATTACHMENT_READ:
-            return vk::AccessFlagBits::eInputAttachmentRead;
-        case GpuAccess::SHADER_READ:
-            return vk::AccessFlagBits::eShaderRead;
-        case GpuAccess::SHADER_WRITE:
-            return vk::AccessFlagBits::eShaderWrite;
-        case GpuAccess::COLOR_ATTACHMENT_READ:
-            return vk::AccessFlagBits::eColorAttachmentRead;
-        case GpuAccess::COLOR_ATTACHMENT_WRITE:
-            return vk::AccessFlagBits::eColorAttachmentWrite;
-        case GpuAccess::DEPTH_STENCIL_ATTACHMENT_READ:
-            return vk::AccessFlagBits::eDepthStencilAttachmentRead;
-        case GpuAccess::DEPTH_STENCIL_ATTACHMENT_WRITE:
-            return vk::AccessFlagBits::eDepthStencilAttachmentWrite;
-        case GpuAccess::TRANSFER_READ:
-            return vk::AccessFlagBits::eTransferRead;
-        case GpuAccess::TRANSFER_WRITE:
-            return vk::AccessFlagBits::eTransferWrite;
-        case GpuAccess::HOST_READ:
-            return vk::AccessFlagBits::eHostRead;
-        case GpuAccess::HOST_WRITE:
-            return vk::AccessFlagBits::eHostWrite;
-        case GpuAccess::MEMORY_READ:
-            return vk::AccessFlagBits::eMemoryRead;
-        case GpuAccess::MEMORY_WRITE:
-            return vk::AccessFlagBits::eMemoryWrite;
-        default:
-            throw std::runtime_error("Invalid GpuAccess.");
     }
 }

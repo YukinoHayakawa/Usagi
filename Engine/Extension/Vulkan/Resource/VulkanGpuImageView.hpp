@@ -4,30 +4,28 @@
 
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageView.hpp>
 
+#include "VulkanBatchResource.hpp"
+
 namespace usagi
 {
 class VulkanGpuImage;
 
-class VulkanGpuImageView : public GpuImageView
+class VulkanGpuImageView
+    : public GpuImageView
+    , public VulkanBatchResource
 {
-    std::shared_ptr<VulkanGpuImage> mImage;
+    VulkanGpuImage *mImage;
     vk::UniqueImageView mImageView;
     vk::Format mFormat;
 
 public:
     VulkanGpuImageView(
-        std::shared_ptr<VulkanGpuImage> image,
+        VulkanGpuImage *image,
         vk::UniqueImageView vk_image_view,
         vk::Format format);
 
-    vk::ImageView view() const
-    {
-        return mImageView.get();
-    }
-
-    vk::Format format() const
-    {
-        return mFormat;
-    }
+    vk::ImageView view() const { return mImageView.get(); }
+    vk::Format format() const { return mFormat; }
+    VulkanGpuImage * image() const { return mImage; }
 };
 }

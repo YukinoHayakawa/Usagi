@@ -15,11 +15,11 @@
 #include <Usagi/Engine/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Swapchain.hpp>
 #include <Usagi/Engine/Runtime/Input/InputManager.hpp>
+#include <Usagi/Engine/Runtime/Input/Keyboard/Keyboard.hpp>
+#include <Usagi/Engine/Runtime/Input/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/Runtime.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Runtime/Window/WindowManager.hpp>
-#include <Usagi/Engine/Runtime/Input/Keyboard/Keyboard.hpp>
-#include <Usagi/Engine/Runtime/Input/Mouse/Mouse.hpp>
 
 using namespace usagi;
 
@@ -76,10 +76,10 @@ public:
             mSwapchain->format(),
             1,
             GpuImageLayout::UNDEFINED,
-            GpuImageLayout::PRESENT
+            GpuImageLayout::PRESENT,
+            GpuAttachmentLoadOp::CLEAR,
+            GpuAttachmentStoreOp::STORE
         );
-        // todo: fix
-        mAttachments.attachment_usages[0].layout = GpuImageLayout::COLOR;
         mImGui->createPipeline(mAttachments);
         runtime->inputManager()->virtualKeyboard()->addEventListener(mImGui);
         runtime->inputManager()->virtualMouse()->addEventListener(mImGui);

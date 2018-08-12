@@ -102,9 +102,6 @@ void usagi::ImGuiSubsystem::createPipeline(
     }
     // Render Pass
     {
-        // todo: fix
-        render_pass_info.attachment_usages[0].load_op
-            = GpuAttachmentLoadOp::UNDEFINED;
         render_pass_info.attachment_usages[0].layout = GpuImageLayout::COLOR;
         compiler->setRenderPass(gpu->createRenderPass(render_pass_info));
     }

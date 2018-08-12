@@ -289,7 +289,6 @@ void usagi::VulkanSwapchain::getSwapchainImages()
         subresource_range.setLevelCount(1);
         info.setSubresourceRange(subresource_range);
         mSwapchainImages.push_back(std::make_shared<VulkanSwapchainImage>(
-            shared_from_this(),
             vk_image,
             mDevice->device().createImageViewUnique(info),
             mFormat.format

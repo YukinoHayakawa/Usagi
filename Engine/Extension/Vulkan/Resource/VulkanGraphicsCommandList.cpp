@@ -11,6 +11,7 @@
 #include "VulkanBufferAllocation.hpp"
 #include "VulkanMemoryPool.hpp"
 #include "VulkanGraphicsPipeline.hpp"
+#include "VulkanGpuImageView.hpp"
 
 usagi::VulkanGraphicsCommandList::VulkanGraphicsCommandList(
     std::shared_ptr<VulkanGpuCommandPool> pool,
@@ -36,42 +37,92 @@ void usagi::VulkanGraphicsCommandList::endRecording()
 
 void usagi::VulkanGraphicsCommandList::transitionImage(
     GpuImage *image,
-    GpuImageLayout from,
-    GpuImageLayout to,
+    GpuImageLayout old_layout,
+    GpuImageLayout new_layout,
     GraphicsPipelineStage src_stage,
-    GraphicsPipelineStage dest_stage,
-    GpuAccess src_access,
-    GpuAccess dest_access)
+    GraphicsPipelineStage dest_stage)
 {
     auto &vk_image = dynamic_cast_ref<VulkanGpuImage>(image);
 
     vk::ImageMemoryBarrier barrier;
     barrier.setImage(vk_image.image());
-    barrier.setOldLayout(translate(from));
-    const auto new_layout = translate(to);
-    barrier.setNewLayout(new_layout);
+    barrier.setOldLayout(translate(old_layout));
+    barrier.setNewLayout(translate(new_layout));
     const auto queue_family_index = mPool->device()->graphicsQueueFamily();
     barrier.setSrcQueueFamilyIndex(queue_family_index);
     barrier.setDstQueueFamilyIndex(queue_family_index);
-    barrier.setSrcAccessMask(translate(src_access));
-    barrier.setDstAccessMask(translate(dest_access));
-    vk::ImageSubresourceRange subresource_range;
-    subresource_range.setAspectMask(vk::ImageAspectFlagBits::eColor);
-    subresource_range.setBaseArrayLayer(0);
-    subresource_range.setLayerCount(1);
-    subresource_range.setBaseMipLevel(0);
-    subresource_range.setLevelCount(1);
-    barrier.setSubresourceRange(subresource_range);
+
+    // modified from
+    // https://harrylovescode.gitbooks.io/vulkan-api/content/chap07/chap07.html
+    using vk::AccessFlagBits;
+    switch(barrier.oldLayout)
+    {
+        case vk::ImageLayout::ePreinitialized:
+            barrier.srcAccessMask =
+                AccessFlagBits::eHostWrite | AccessFlagBits::eTransferWrite;
+            break;
+        case vk::ImageLayout::eColorAttachmentOptimal:
+            barrier.srcAccessMask =
+                AccessFlagBits::eColorAttachmentWrite;
+            break;
+        case vk::ImageLayout::eDepthStencilAttachmentOptimal:
+            barrier.srcAccessMask =
+                AccessFlagBits::eDepthStencilAttachmentWrite;
+            break;
+        case vk::ImageLayout::eTransferSrcOptimal:
+            barrier.srcAccessMask = AccessFlagBits::eTransferRead;
+            break;
+        case vk::ImageLayout::eShaderReadOnlyOptimal:
+            barrier.srcAccessMask = AccessFlagBits::eShaderRead;
+            break;
+        //case vk::ImageLayout::ePresentSrcKHR:
+        //    barrier.srcAccessMask = AccessFlagBits::eMemoryRead;
+        //    break;
+        default: ;
+    }
+    switch(barrier.newLayout)
+    {
+        case vk::ImageLayout::eTransferDstOptimal:
+            barrier.dstAccessMask = AccessFlagBits::eTransferWrite;
+            break;
+        case vk::ImageLayout::eTransferSrcOptimal:
+            barrier.srcAccessMask |= AccessFlagBits::eTransferRead;
+            barrier.dstAccessMask = AccessFlagBits::eTransferRead;
+            break;
+        case vk::ImageLayout::eColorAttachmentOptimal:
+            barrier.dstAccessMask = AccessFlagBits::eColorAttachmentWrite;
+            barrier.srcAccessMask = AccessFlagBits::eTransferRead;
+            break;
+        case vk::ImageLayout::eDepthAttachmentStencilReadOnlyOptimal:
+            barrier.dstAccessMask |=
+                AccessFlagBits::eDepthStencilAttachmentWrite;
+            break;
+        case vk::ImageLayout::eShaderReadOnlyOptimal:
+            barrier.srcAccessMask =
+                AccessFlagBits::eHostWrite | AccessFlagBits::eTransferWrite;
+            barrier.dstAccessMask = AccessFlagBits::eShaderRead;
+            break;
+        //case vk::ImageLayout::ePresentSrcKHR:
+        //    barrier.dstAccessMask = AccessFlagBits::eMemoryRead;
+        //    break;
+        default:;
+    }
+    barrier.subresourceRange.setAspectMask(vk::ImageAspectFlagBits::eColor);
+    barrier.subresourceRange.setBaseArrayLayer(0);
+    barrier.subresourceRange.setLayerCount(1);
+    barrier.subresourceRange.setBaseMipLevel(0);
+    barrier.subresourceRange.setLevelCount(1);
 
     mCommandBuffer->pipelineBarrier(
         translate(src_stage), translate(dest_stage),
         { }, { }, { }, { barrier }
     );
-    vk_image.setLayout(new_layout);
 }
 
 void usagi::VulkanGraphicsCommandList::clearColorImage(
-    GpuImage *image, Color4f color)
+    GpuImage *image,
+    GpuImageLayout layout,
+    Color4f color)
 {
     auto &vk_image = dynamic_cast_ref<VulkanGpuImage>(image);
     // todo: depending on image format, float/uint/int should be used
@@ -85,7 +136,7 @@ void usagi::VulkanGraphicsCommandList::clearColorImage(
     subresource_range.setBaseMipLevel(0);
     subresource_range.setLevelCount(1);
     mCommandBuffer->clearColorImage(
-        vk_image.image(), vk_image.layout(),
+        vk_image.image(), translate(layout),
         color_value, { subresource_range }
     );
 }
@@ -119,6 +170,11 @@ void usagi::VulkanGraphicsCommandList::beginRendering(
 
     mCurrentPipeline = vk_pipeline;
 
+    for(auto &&view : vk_framebuffer->views())
+    {
+        mResources.push_back(view);
+        mResources.push_back(view->image()->shared_from_this());
+    }
     mResources.push_back(std::move(vk_framebuffer));
     mResources.push_back(std::move(vk_pipeline));
 }

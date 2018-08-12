@@ -33,9 +33,11 @@ public:
 
     void create(vk::RenderPass render_pass);
 
-    vk::Framebuffer framebuffer() const
+    vk::Framebuffer framebuffer() const { return mFramebuffer.get(); }
+
+    const std::vector<std::shared_ptr<VulkanGpuImageView>> & views() const
     {
-        return mFramebuffer.get();
+        return mViews;
     }
 };
 }

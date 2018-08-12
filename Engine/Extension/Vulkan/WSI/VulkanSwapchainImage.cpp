@@ -1,13 +1,18 @@
 ﻿#include "VulkanSwapchainImage.hpp"
 
+#include <Usagi/Engine/Extension/Vulkan/Resource/VulkanGpuImageView.hpp>
+
 usagi::VulkanSwapchainImage::VulkanSwapchainImage(
-    std::shared_ptr<VulkanSwapchain> swapchain,
     vk::Image vk_image,
-    vk::UniqueImageView vk_image_view,
+    vk::UniqueImageView full_view,
     vk::Format format)
-    : VulkanGpuImage(std::move(vk_image_view), format,
-        vk::ImageLayout::eUndefined)
-    , mSwapchain(std::move(swapchain))
-    , mImage(vk_image)
+    : mImage(vk_image)
+    , mFullView(std::make_shared<VulkanGpuImageView>(
+        this, std::move(full_view), format))
 {
+}
+
+std::shared_ptr<usagi::GpuImageView> usagi::VulkanSwapchainImage::fullView()
+{
+    return mFullView;
 }

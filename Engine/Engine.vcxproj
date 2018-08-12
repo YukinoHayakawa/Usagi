@@ -134,7 +134,6 @@
     <ClCompile Include="Extension\Vulkan\Resource\VulkanFramebuffer.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuBuffer.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuCommandPool.cpp" />
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuImage.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuImageView.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanMemoryPool.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanEnumTranslation.cpp" />
@@ -221,7 +220,6 @@
     <ClInclude Include="Core\Element.hpp" />
     <ClCompile Include="Core\Event\Event.cpp" />
     <ClCompile Include="Core\Element.cpp" />
-    <ClInclude Include="Runtime\Graphics\Enum\GpuAccess.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuBufferFormat.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuImageLayout.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GraphicsImageLayout.hpp" />

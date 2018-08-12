@@ -32,13 +32,14 @@ public:
 
     void transitionImage(
         GpuImage *image,
-        GpuImageLayout from,
-        GpuImageLayout to,
+        GpuImageLayout old_layout,
+        GpuImageLayout new_layout,
         GraphicsPipelineStage src_stage,
-        GraphicsPipelineStage dest_stage,
-        GpuAccess src_access,
-        GpuAccess dest_access) override;
-    void clearColorImage(GpuImage *image, Color4f color) override;
+        GraphicsPipelineStage dest_stage) override;
+    void clearColorImage(
+        GpuImage *image,
+        GpuImageLayout layout,
+        Color4f color) override;
 
     void beginRendering(
         std::shared_ptr<GraphicsPipeline> pipeline,
@@ -49,28 +50,23 @@ public:
         std::uint32_t index,
         Vector2f origin,
         Vector2f size) override;
-
     void setScissor(
         std::uint32_t viewport_index,
         Vector2i32 origin,
         Vector2u32 size) override;
-
     void setConstant(
         ShaderStage stage,
         const char *name,
         const void *data,
         std::size_t size) override;
-
     void bindIndexBuffer(
         GpuBuffer *buffer,
         std::size_t offset,
         GraphicsIndexType type) override;
-
     void bindVertexBuffer(
         std::uint32_t binding_index,
         GpuBuffer *buffer,
         std::size_t offset) override;
-
     void drawIndexedInstanced(
         std::uint32_t index_count,
         std::uint32_t instance_count,
@@ -78,9 +74,6 @@ public:
         std::int32_t vertex_offset,
         std::uint32_t first_instance) override;
 
-    vk::CommandBuffer commandBuffer() const
-    {
-        return mCommandBuffer.get();
-    }
+    vk::CommandBuffer commandBuffer() const { return mCommandBuffer.get(); }
 };
 }
