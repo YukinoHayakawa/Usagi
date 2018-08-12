@@ -21,24 +21,24 @@ public:
 
     /**
      * \brief Get client area size.
-     * \return 
+     * \return
      */
     virtual Vector2u32 size() const = 0;
 
     /**
      * \brief Set client area size (excluding title bar, border, etc.)
-     * \param size 
+     * \param size
      */
     virtual void setSize(const Vector2u32 &size) = 0;
-    
+
     /**
      * \brief Get window title encoded using UTF-8.
-     * \return 
+     * \return
      */
     virtual std::string title() const = 0;
 
     /**
-     * \brief 
+     * \brief
      * \param title New window title encoded using UTF-8.
      */
     virtual void setTitle(std::string title) = 0;
@@ -47,5 +47,7 @@ public:
     virtual bool focused() const = 0;
     virtual bool isOpen() const = 0;
     virtual void close() = 0;
+
+    virtual Vector2f dpiScale() const = 0;
 };
 }

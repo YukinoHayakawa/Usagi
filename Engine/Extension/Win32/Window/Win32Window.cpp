@@ -6,6 +6,9 @@
 #include "../Win32Helper.hpp"
 #include "Win32WindowManager.hpp"
 
+#include <ShellScalingAPI.h>
+#include "../Win32MacroFix.hpp"
+
 RECT usagi::Win32Window::clientScreenRect() const
 {
     // Get the window client area.
@@ -164,6 +167,14 @@ bool usagi::Win32Window::isOpen() const
 void usagi::Win32Window::close()
 {
     DestroyWindow(mHandle);
+}
+
+usagi::Vector2f usagi::Win32Window::dpiScale() const
+{
+    const auto monitor = MonitorFromWindow(mHandle, MONITOR_DEFAULTTONEAREST);
+    unsigned int dpi_x, dpi_y;
+    GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &dpi_x, &dpi_y);
+    return Vector2f { dpi_x, dpi_y } / 96.f;
 }
 
 LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,

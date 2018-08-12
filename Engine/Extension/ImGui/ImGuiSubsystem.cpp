@@ -28,6 +28,8 @@ usagi::ImGuiSubsystem::ImGuiSubsystem(
 {
     mContext = ImGui::CreateContext();
     ImGui::StyleColorsDark();
+    // todo hidpi
+    //ImGui::GetStyle().ScaleAllSizes(mWindow->dpiScale().x());
     // todo: load fonts
     // todo: create font texture ImGui_ImplVulkan_CreateFontsTexture
 

@@ -65,6 +65,8 @@ public:
     bool isOpen() const override;
     void close() override;
 
+    Vector2f dpiScale() const override;
+
     // Win32 helpers
 
     HDC deviceContext() const;
