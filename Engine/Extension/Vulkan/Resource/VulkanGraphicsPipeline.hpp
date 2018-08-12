@@ -53,7 +53,7 @@ public:
 
     vk::Pipeline pipeline() const { return mPipeline.get(); }
     vk::PipelineLayout layout() const { return mPipelineLayout.get(); }
-    vk::RenderPass renderPass() const;
+    VulkanRenderPass * renderPass() const;
 
     VulkanPushConstantField queryConstantInfo(
         ShaderStage stage,

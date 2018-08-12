@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <Usagi/Engine/Core/Math.hpp>
+
 #include "Enum/GpuBufferFormat.hpp"
 #include "Enum/GpuImageLayout.hpp"
 
@@ -42,18 +44,24 @@ struct GpuAttachmentUsage
     */
     const GpuImageLayout final_layout;
 
-    GpuAttachmentLoadOp load_op = GpuAttachmentLoadOp::LOAD;
-    GpuAttachmentStoreOp store_op = GpuAttachmentStoreOp::STORE;
+    const GpuAttachmentLoadOp load_op;
+    const GpuAttachmentStoreOp store_op;
+
+    Color4f clear_color;
 
     GpuAttachmentUsage(
-        const GpuBufferFormat format,
-        const std::uint16_t sample_count,
-        const GpuImageLayout initial_layout,
-        const GpuImageLayout final_layout)
-        : format { format }
-        , sample_count { sample_count }
-        , initial_layout { initial_layout }
-        , final_layout { final_layout }
+        GpuBufferFormat format,
+        std::uint16_t sample_count,
+        GpuImageLayout initial_layout,
+        GpuImageLayout final_layout,
+        GpuAttachmentLoadOp load_op,
+        GpuAttachmentStoreOp store_op)
+        : format(format)
+        , sample_count(sample_count)
+        , initial_layout(initial_layout)
+        , final_layout(final_layout)
+        , load_op(load_op)
+        , store_op(store_op)
     {
     }
 };

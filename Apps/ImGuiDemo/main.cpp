@@ -79,7 +79,7 @@ public:
             GpuImageLayout::PRESENT,
             GpuAttachmentLoadOp::CLEAR,
             GpuAttachmentStoreOp::STORE
-        );
+        ).clear_color = Color4f::Zero();
         mImGui->createPipeline(mAttachments);
         runtime->inputManager()->virtualKeyboard()->addEventListener(mImGui);
         runtime->inputManager()->virtualMouse()->addEventListener(mImGui);

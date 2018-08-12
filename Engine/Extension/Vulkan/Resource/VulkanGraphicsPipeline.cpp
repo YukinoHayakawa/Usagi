@@ -2,9 +2,9 @@
 
 #include <Usagi/Engine/Extension/Vulkan/VulkanRenderPass.hpp>
 
-vk::RenderPass usagi::VulkanGraphicsPipeline::renderPass() const
+usagi::VulkanRenderPass * usagi::VulkanGraphicsPipeline::renderPass() const
 {
-    return mRenderPass->renderPass();
+    return mRenderPass.get();
 }
 
 usagi::VulkanPushConstantField usagi::VulkanGraphicsPipeline::queryConstantInfo(

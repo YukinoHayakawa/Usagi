@@ -9,6 +9,8 @@ usagi::VulkanRenderPass::VulkanRenderPass(
     VulkanGpuDevice *device,
     const RenderPassCreateInfo &info)
 {
+    mClearValues.reserve(info.attachment_usages.size());
+
     vk::RenderPassCreateInfo vk_info;
 
     std::vector<vk::AttachmentDescription> attachment_descriptions;
@@ -23,6 +25,10 @@ usagi::VulkanRenderPass::VulkanRenderPass(
         d.setLoadOp(translate(u.load_op));
         d.setStoreOp(translate(u.store_op));
         attachment_descriptions.push_back(d);
+        mClearValues.emplace_back(std::array<float, 4> {
+            u.clear_color.x(), u.clear_color.y(),
+            u.clear_color.z(), u.clear_color.w()
+        });
     }
     vk_info.setAttachmentCount(
         static_cast<uint32_t>(attachment_descriptions.size()));

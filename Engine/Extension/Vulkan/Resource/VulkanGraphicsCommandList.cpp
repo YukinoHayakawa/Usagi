@@ -3,6 +3,7 @@
 #include <Usagi/Engine/Utility/TypeCast.hpp>
 #include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
 #include <Usagi/Engine/Extension/Vulkan/VulkanEnumTranslation.hpp>
+#include <Usagi/Engine/Extension/Vulkan/VulkanRenderPass.hpp>
 
 #include "VulkanGpuBuffer.hpp"
 #include "VulkanGpuImage.hpp"
@@ -149,10 +150,11 @@ void usagi::VulkanGraphicsCommandList::beginRendering(
         dynamic_pointer_cast_throw<VulkanFramebuffer>(framebuffer);
     auto vk_pipeline =
         dynamic_pointer_cast_throw<VulkanGraphicsPipeline>(pipeline);
+    const auto vk_renderpass = vk_pipeline->renderPass();
 
     // todo reuse framebuffers?
     // todo unmatched view amount?
-    vk_framebuffer->create(vk_pipeline->renderPass());
+    vk_framebuffer->create(vk_renderpass->renderPass());
 
     vk::RenderPassBeginInfo begin_info;
     // todo support clear values
@@ -160,8 +162,10 @@ void usagi::VulkanGraphicsCommandList::beginRendering(
     begin_info.renderArea.extent.width = s.x();
     begin_info.renderArea.extent.height = s.y();
     begin_info.setFramebuffer(vk_framebuffer->framebuffer());
-    begin_info.setRenderPass(vk_pipeline->renderPass());
-
+    begin_info.setRenderPass(vk_renderpass->renderPass());
+    const auto &clear_values = vk_renderpass->clearValues();
+    begin_info.setClearValueCount(static_cast<uint32_t>(clear_values.size()));
+    begin_info.setPClearValues(clear_values.data());
     // assuming that only one render pass is used
     mCommandBuffer->beginRenderPass(begin_info, vk::SubpassContents::eInline);
 
