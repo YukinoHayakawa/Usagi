@@ -24,13 +24,6 @@ class VulkanGpuDevice : public GpuDevice
     vk::Queue mGraphicsQueue;
     std::uint32_t mGraphicsQueueFamilyIndex = -1;
 
-    struct BatchResourceList
-    {
-        vk::UniqueFence fence;
-        std::vector<std::shared_ptr<VulkanBatchResource>> resources;
-    };
-    std::deque<BatchResourceList> mBatchResourceLists;
-
     static uint32_t selectQueue(
         std::vector<vk::QueueFamilyProperties> &queue_family,
         const vk::QueueFlags &queue_flags);
@@ -67,6 +60,17 @@ class VulkanGpuDevice : public GpuDevice
     std::unique_ptr<VulkanMemoryPool> mDynamicMemoryPool;
 
     void createMemoryPools();
+
+    // Resource Tracking
+
+    struct BatchResourceList
+    {
+        vk::UniqueFence fence;
+        std::vector<std::shared_ptr<VulkanBatchResource>> resources;
+    };
+    // must be the first to be destructed in dtor since it may refer to other
+    // members.
+    std::deque<BatchResourceList> mBatchResourceLists;
 
 public:
     VulkanGpuDevice();
