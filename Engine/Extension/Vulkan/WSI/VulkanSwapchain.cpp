@@ -242,6 +242,7 @@ void usagi::VulkanSwapchain::createSwapchain(
     // Ensures non-blocking vkAcquireNextImageKHR() in mailbox mode.
     // See 3.6.12 of http://vulkan-spec-chunked.ahcox.com/apes03.html
     // todo: mailbox not available on my R9 290X
+    // todo triple buffering
     create_info.setMinImageCount(std::clamp(
         3u,
         surface_capabilities.minImageCount + 1,

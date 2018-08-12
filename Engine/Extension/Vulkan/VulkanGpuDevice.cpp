@@ -120,15 +120,15 @@ void usagi::VulkanGpuDevice::createInstance()
     vk::InstanceCreateInfo instance_create_info;
     instance_create_info.setPApplicationInfo(&application_info);
 
-    const std::vector<const char *> instance_extensions
+    std::vector<const char *> instance_extensions
     {
         // application window
-        "VK_KHR_surface",
-        // todo remove OS dependency, move to VulkanWin32WSI
-        "VK_KHR_win32_surface",
+        VK_KHR_SURFACE_EXTENSION_NAME,
+        // todo: use VK_EXT_debug_utils & add name/color tag support
         // provide feedback from validation layer
-        "VK_EXT_debug_report",
+        VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
     };
+    addPlatformSurfaceExtension(instance_extensions);
     instance_create_info.setEnabledExtensionCount(
         static_cast<uint32_t>(instance_extensions.size()));
     instance_create_info.setPpEnabledExtensionNames(instance_extensions.data());
@@ -225,7 +225,7 @@ void usagi::VulkanGpuDevice::createDeviceAndQueues()
     // todo: check device capacity
     const std::vector<const char *> device_extensions
     {
-        "VK_KHR_swapchain",
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
     };
     device_create_info.setEnabledExtensionCount(static_cast<uint32_t>(
         device_extensions.size()));

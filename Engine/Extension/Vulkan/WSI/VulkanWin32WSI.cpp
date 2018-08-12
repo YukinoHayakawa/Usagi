@@ -10,6 +10,12 @@
 
 #include "VulkanSwapchain.hpp"
 
+void usagi::VulkanGpuDevice::addPlatformSurfaceExtension(
+    std::vector<const char *> &extensions)
+{
+    extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+}
+
 std::shared_ptr<usagi::Swapchain> usagi::VulkanGpuDevice::createSwapchain(
     Window *window)
 {

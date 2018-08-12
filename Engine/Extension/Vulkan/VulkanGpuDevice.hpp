@@ -18,6 +18,9 @@ class VulkanGpuDevice : public GpuDevice
     vk::PhysicalDevice mPhysicalDevice;
     vk::UniqueDevice mDevice;
 
+    static void addPlatformSurfaceExtension(
+        std::vector<const char *> & extensions);
+
     vk::Queue mGraphicsQueue;
     std::uint32_t mGraphicsQueueFamilyIndex = -1;
 
