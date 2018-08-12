@@ -18,9 +18,11 @@ usagi::Element::~Element()
     // Component header is not included in Entity header so its destruction
     // can only be done here.
 
+    // todo: need someway to notify the subsystems that an element has been
+    // destoryed. maybe listen on removeChild?
     // Erase all components and notify the subsystems
-    for(auto i = mComponents.begin(); i != mComponents.end();
-        i = eraseComponent(i));
+    //for(auto i = mComponents.begin(); i != mComponents.end();
+    //    i = eraseComponent(i));
 }
 
 void usagi::Element::removeChild(Element *child)
