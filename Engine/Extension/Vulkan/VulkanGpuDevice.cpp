@@ -284,31 +284,16 @@ std::shared_ptr<usagi::RenderPass> usagi::VulkanGpuDevice::createRenderPass(
 }
 
 std::shared_ptr<usagi::Framebuffer> usagi::VulkanGpuDevice::createFramebuffer(
-    const RenderPassCreateInfo &info,
     const Vector2u32 &size,
-    std::initializer_list<GpuImageView *> views)
+    std::initializer_list<std::shared_ptr<GpuImageView>> views)
 {
-    auto render_pass {
-        std::make_shared<VulkanRenderPass>(this, info)
-    };
-
-    const auto vk_views = vulkan::transformObjects(views,
-        [&](auto v) {
-            return dynamic_cast_ref<VulkanGpuImageView>(v).view();
+    auto vk_views = vulkan::transformObjects(views,
+        [&](auto &&v) {
+            return dynamic_pointer_cast_throw<VulkanGpuImageView>(v);
         }
     );
-    vk::FramebufferCreateInfo fb_info;
-    fb_info.setRenderPass(render_pass->renderPass());
-    fb_info.setAttachmentCount(static_cast<uint32_t>(vk_views.size()));
-    fb_info.setPAttachments(vk_views.data());
-    fb_info.setWidth(size.x());
-    fb_info.setHeight(size.y());
-    fb_info.setLayers(1);
 
-    return std::make_shared<VulkanFramebuffer>(
-        std::move(render_pass),
-        mDevice->createFramebufferUnique(fb_info),
-        size);
+    return std::make_shared<VulkanFramebuffer>(this, size, std::move(vk_views));
 }
 
 // todo sem pool

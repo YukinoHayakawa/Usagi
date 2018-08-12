@@ -82,9 +82,8 @@ public:
     std::shared_ptr<RenderPass> createRenderPass(
         const RenderPassCreateInfo &info) override;
     std::shared_ptr<Framebuffer> createFramebuffer(
-        const RenderPassCreateInfo &info,
         const Vector2u32 &size,
-        std::initializer_list<GpuImageView *> views) override;
+        std::initializer_list<std::shared_ptr<GpuImageView>> views) override;
     std::shared_ptr<GpuSemaphore> createSemaphore() override;
     std::shared_ptr<GpuBuffer> createBuffer() override;
 

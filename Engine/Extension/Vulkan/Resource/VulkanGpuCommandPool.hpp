@@ -10,7 +10,7 @@ class VulkanGpuDevice;
 
 class VulkanGpuCommandPool
     : public GpuCommandPool
-    , public std::enable_shared_from_this<VulkanGpuCommandPool>
+    , std::enable_shared_from_this<VulkanGpuCommandPool>
 {
     VulkanGpuDevice *mDevice;
     vk::UniqueCommandPool mPool;

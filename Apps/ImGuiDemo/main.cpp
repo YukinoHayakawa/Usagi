@@ -18,6 +18,8 @@
 #include <Usagi/Engine/Runtime/Runtime.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Runtime/Window/WindowManager.hpp>
+#include <Usagi/Engine/Runtime/Input/Keyboard/Keyboard.hpp>
+#include <Usagi/Engine/Runtime/Input/Mouse/Mouse.hpp>
 
 using namespace usagi;
 
@@ -79,6 +81,8 @@ public:
         // todo: fix
         mAttachments.attachment_usages[0].layout = GpuImageLayout::COLOR;
         mImGui->createPipeline(mAttachments);
+        runtime->inputManager()->virtualKeyboard()->addEventListener(mImGui);
+        runtime->inputManager()->virtualMouse()->addEventListener(mImGui);
 
         mImGuiRoot = rootElement()->addChild("ImGuiRoot");
         mImGuiRoot->addComponent<ImGuiDemoComponent>();
@@ -104,11 +108,11 @@ public:
 
             // Process window/input events
             runtime()->windowManager()->processEvents();
+            runtime()->inputManager()->processEvents();
 
             // Create framebuffer
             const auto wait_semaphores = { mSwapchain->acquireNextImage() };
             const auto framebuffer = gpu->createFramebuffer(
-                mAttachments,
                 mSwapchain->size(),
                 {
                     mSwapchain->currentImage()->fullView()

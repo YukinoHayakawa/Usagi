@@ -1,9 +1,11 @@
 ﻿#include "VulkanGpuImageView.hpp"
 
 usagi::VulkanGpuImageView::VulkanGpuImageView(
+    std::shared_ptr<VulkanGpuImage> image,
     vk::UniqueImageView vk_image_view,
     const vk::Format format)
-    : mImageView(std::move(vk_image_view))
+    : mImage(std::move(image))
+    , mImageView(std::move(vk_image_view))
     , mFormat(format)
 {
 }

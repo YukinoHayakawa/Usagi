@@ -10,7 +10,7 @@
 #include "../VulkanGpuDevice.hpp"
 
 usagi::VulkanSwapchain::VulkanSwapchain(
-    VulkanGpuDevice *    device,
+    VulkanGpuDevice *device,
     vk::UniqueSurfaceKHR vk_surface_khr)
     : mDevice { device }
     , mSurface { std::move(vk_surface_khr) }
@@ -261,8 +261,7 @@ void usagi::VulkanSwapchain::createSwapchain(
 
     create_info.setOldSwapchain(mSwapchain.get());
 
-    mSwapchain = mDevice->device().createSwapchainKHRUnique(
-        create_info);
+    mSwapchain = mDevice->device().createSwapchainKHRUnique(create_info);
     mFormat = vk_format;
     mSize = { create_info.imageExtent.width, create_info.imageExtent.height };
 
@@ -271,8 +270,7 @@ void usagi::VulkanSwapchain::createSwapchain(
 
 void usagi::VulkanSwapchain::getSwapchainImages()
 {
-    auto images = mDevice->device().getSwapchainImagesKHR(
-        mSwapchain.get());
+    auto images = mDevice->device().getSwapchainImagesKHR(mSwapchain.get());
 
     mSwapchainImages.clear();
     mSwapchainImages.reserve(images.size());
@@ -291,6 +289,7 @@ void usagi::VulkanSwapchain::getSwapchainImages()
         subresource_range.setLevelCount(1);
         info.setSubresourceRange(subresource_range);
         mSwapchainImages.push_back(std::make_shared<VulkanSwapchainImage>(
+            shared_from_this(),
             vk_image,
             mDevice->device().createImageViewUnique(info),
             mFormat.format

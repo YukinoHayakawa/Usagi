@@ -6,13 +6,19 @@
 
 namespace usagi
 {
+class VulkanGpuImage;
+
 class VulkanGpuImageView : public GpuImageView
 {
+    std::shared_ptr<VulkanGpuImage> mImage;
     vk::UniqueImageView mImageView;
     vk::Format mFormat;
 
 public:
-    VulkanGpuImageView(vk::UniqueImageView vk_image_view, vk::Format format);
+    VulkanGpuImageView(
+        std::shared_ptr<VulkanGpuImage> image,
+        vk::UniqueImageView vk_image_view,
+        vk::Format format);
 
     vk::ImageView view() const
     {

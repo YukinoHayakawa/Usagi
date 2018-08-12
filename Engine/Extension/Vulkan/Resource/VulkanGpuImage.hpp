@@ -8,9 +8,11 @@
 
 namespace usagi
 {
-class VulkanGpuImage : public GpuImage
+class VulkanGpuImage
+    : public GpuImage
+    , std::enable_shared_from_this<VulkanGpuImage>
 {
-    VulkanGpuImageView mFullView;
+    std::shared_ptr<VulkanGpuImageView> mFullView;
     vk::ImageLayout mLayout;
 
 public:
@@ -21,7 +23,7 @@ public:
 
     virtual vk::Image image() const = 0;
 
-    VulkanGpuImageView * fullView() override;
+    std::shared_ptr<GpuImageView> fullView() override;
 
     vk::ImageLayout layout() const
     {

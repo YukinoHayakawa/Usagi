@@ -33,11 +33,9 @@ public:
         createPipelineCompiler() = 0;
     virtual std::shared_ptr<RenderPass> createRenderPass(
         const RenderPassCreateInfo &info) = 0;
-    // todo: cleaner interface
     virtual std::shared_ptr<Framebuffer> createFramebuffer(
-        const RenderPassCreateInfo &info,
         const Vector2u32 &size,
-        std::initializer_list<GpuImageView*> views) = 0;
+        std::initializer_list<std::shared_ptr<GpuImageView>> views) = 0;
     virtual std::shared_ptr<GpuSemaphore> createSemaphore() = 0;
 
     /**

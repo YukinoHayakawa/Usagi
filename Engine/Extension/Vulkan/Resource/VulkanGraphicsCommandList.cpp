@@ -99,6 +99,10 @@ void usagi::VulkanGraphicsCommandList::beginRendering(
     auto vk_pipeline =
         dynamic_pointer_cast_throw<VulkanGraphicsPipeline>(pipeline);
 
+    // todo reuse framebuffers?
+    // todo unmatched view amount?
+    vk_framebuffer->create(vk_pipeline->renderPass());
+
     vk::RenderPassBeginInfo begin_info;
     // todo support clear values
     const auto s = vk_framebuffer->size();

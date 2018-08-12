@@ -4,12 +4,13 @@ usagi::VulkanGpuImage::VulkanGpuImage(
     vk::UniqueImageView full_view,
     const vk::Format format,
     vk::ImageLayout layout)
-    : mFullView(std::move(full_view), format)
+    : mFullView(std::make_shared<VulkanGpuImageView>(
+        shared_from_this(), std::move(full_view), format))
     , mLayout(layout)
 {
 }
 
-usagi::VulkanGpuImageView * usagi::VulkanGpuImage::fullView()
+std::shared_ptr<usagi::GpuImageView> usagi::VulkanGpuImage::fullView()
 {
-    return &mFullView;
+    return mFullView;
 }

@@ -456,9 +456,6 @@
     <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\ImGui\ImGuiInputListener.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Extension\Vulkan\VulkanRenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

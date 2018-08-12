@@ -129,7 +129,6 @@
     <ClCompile Include="Asset\Filesystem\FilesystemAssetPackage.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
     <ClCompile Include="Extension\ImGui\ImGuiImpl.cpp" />
-    <ClCompile Include="Extension\ImGui\ImGuiInputListener.cpp" />
     <ClCompile Include="Extension\ImGui\ImGuiSubsystem.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanBufferAllocation.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanFramebuffer.cpp" />
