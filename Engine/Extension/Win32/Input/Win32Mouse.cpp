@@ -109,11 +109,15 @@ void usagi::Win32Mouse::handleRawInput(RAWINPUT *raw)
 
         // process scrolling
         if(mouse.usButtonFlags & RI_MOUSE_WHEEL)
-            sendWheelEvent({ 0, static_cast<short>(mouse.usButtonData) });
+            sendWheelEvent({
+                0, static_cast<short>(mouse.usButtonData) / WHEEL_DELTA
+            });
         // horizontal scrolling, which seems to be undocumented.
         // found here: https://stackoverflow.com/questions/7942307/horizontal-mouse-wheel-messages-from-windows-raw-input
         if(mouse.usButtonFlags & RI_MOUSE_HWHEEL)
-            sendWheelEvent({ static_cast<short>(mouse.usButtonData), 0 });
+            sendWheelEvent({
+                static_cast<short>(mouse.usButtonData) / WHEEL_DELTA, 0
+            });
     }
 }
 
