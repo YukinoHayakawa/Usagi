@@ -1,4 +1,5 @@
-﻿#include <Usagi/Engine/Runtime/Graphics/GpuDevice.hpp>
+﻿#include <Usagi/Engine/Core/Logging.hpp>
+#include <Usagi/Engine/Runtime/Graphics/GpuDevice.hpp>
 #include <Usagi/Engine/Runtime/Graphics/RenderPassCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuCommandPool.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
@@ -20,7 +21,7 @@ class HelloSwapchain
     std::shared_ptr<Window> mWindow;
     std::shared_ptr<Swapchain> mSwapchain;
     std::shared_ptr<GpuCommandPool> mCommandPool;
-    Color4f mFillColor = Color4f::Random();
+    Color4f mFillColor { 0.64f, 0.81f, 1.0f, 1.0f }; // baby blue
 
 public:
     HelloSwapchain()
@@ -40,8 +41,6 @@ public:
         mSwapchain = mRuntime.gpu()->createSwapchain(mWindow.get());
         mSwapchain->create(mWindow->size(), GpuBufferFormat::R8G8B8A8_UNORM);
 
-        // todo pool is released before command buffers on shutdown
-        // use sharedptr in tree like structures
         mCommandPool = mRuntime.gpu()->createCommandPool();
 
         // Setting up input
@@ -51,11 +50,48 @@ public:
 
     void onKeyStateChange(const KeyEvent &e) override
     {
+        if(!e.pressed) return;
         switch(e.key_code)
         {
             case KeyCode::ENTER:
-                if(e.pressed)
-                    mFillColor = Color4f::Random();
+                (mFillColor = Color4f::Random()).w() = 1;
+                LOG(info, "Random");
+                break;
+            case KeyCode::BACKQUOTE:
+                mFillColor = { 1, 0.82f, 0.87f, 1 };
+                LOG(info, "Light Pink");
+                break;
+            case KeyCode::DIGIT_1:
+                mFillColor = { 1, 0, 0, 1 };
+                LOG(info, "Red");
+                break;
+            case KeyCode::DIGIT_2:
+                mFillColor = { 0, 1, 0, 1 };
+                LOG(info, "Green");
+                break;
+            case KeyCode::DIGIT_3:
+                mFillColor = { 0, 0, 1, 1 };
+                LOG(info, "Blue");
+                break;
+            case KeyCode::DIGIT_4:
+                mFillColor = { 1, 1, 0, 1 };
+                LOG(info, "Yellow");
+                break;
+            case KeyCode::DIGIT_5:
+                mFillColor = { 1, 0, 1, 1 };
+                LOG(info, "Magenta");
+                break;
+            case KeyCode::DIGIT_6:
+                mFillColor = { 0, 1, 1, 1 };
+                LOG(info, "Aqua");
+                break;
+            case KeyCode::DIGIT_7:
+                mFillColor = { 1, 1, 1, 1 };
+                LOG(info, "White");
+                break;
+            case KeyCode::DIGIT_8:
+                mFillColor = { 0, 0, 0, 1 };
+                LOG(info, "Black");
                 break;
             default: break ;
         }
