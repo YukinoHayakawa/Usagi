@@ -3,41 +3,174 @@
 #include <vulkan/vulkan.hpp>
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
-#include <Usagi/Engine/Runtime/Memory/BitmapMemoryAllocator.hpp>
+
+#include "VulkanBufferAllocation.hpp"
+#include "VulkanPooledImage.hpp"
 
 namespace usagi
 {
-class VulkanBufferAllocation;
+struct GpuImageCreateInfo;
 class VulkanGpuDevice;
+class VulkanBufferAllocation;
 
 class VulkanMemoryPool : Noncopyable
 {
+protected:
     VulkanGpuDevice *mDevice = nullptr;
     vk::UniqueDeviceMemory mMemory;
-    vk::UniqueBuffer mBuffer;
-    std::unique_ptr<BitmapMemoryAllocator> mAllocator;
+    vk::MemoryRequirements mMemoryRequirements { };
+    // the memory will be autommatically mapped if has eHostVisible flag
     char *mMappedMemory = nullptr;
 
-    void createBuffer(std::size_t size,
-        const vk::BufferUsageFlags &usages);
-    void allocateDeviceMemory(
+    void mapMemory();
+    void unmapMemory();
+
+    void allocateDeviceMemory(const vk::MemoryPropertyFlags &mem_properties);
+
+    vk::UniqueImage createImage(
+        const GpuImageCreateInfo &info, vk::Format &format) const;
+    std::size_t getImageRequiredSize(vk::Image image) const;
+    void bindImageMemory(VulkanPooledImage *image);
+    static void createImageBaseView(VulkanPooledImage *image, vk::Format format);
+
+    void allocateDeviceMemoryForBuffer(
         std::size_t size,
         const vk::MemoryPropertyFlags &mem_properties,
-        const vk::BufferUsageFlags &usages);
+        const vk::BufferUsageFlags &usages,
+        vk::UniqueBuffer &buffer);
+
+    void allocateDeviceMemoryForImage(
+        std::size_t total_size,
+        const vk::MemoryPropertyFlags &mem_properties,
+        const vk::ImageUsageFlags &usages);
 
 public:
-    VulkanMemoryPool(
-        VulkanGpuDevice *device,
-        std::size_t size,
-        const vk::MemoryPropertyFlags &mem_properties,
-        const vk::BufferUsageFlags &usages);
-    ~VulkanMemoryPool();
+    VulkanMemoryPool(VulkanGpuDevice *device);
+    virtual ~VulkanMemoryPool();
 
-    std::shared_ptr<VulkanBufferAllocation> allocate(std::size_t size);
-    void deallocate(std::size_t offset);
+    virtual void deallocate(std::size_t offset) = 0;
 
     VulkanGpuDevice * device() const { return mDevice; }
     vk::DeviceMemory memory() const { return mMemory.get(); }
+};
+
+class VulkanBufferMemoryPoolBase : public VulkanMemoryPool
+{
+protected:
+    vk::UniqueBuffer mBuffer;
+
+public:
+    using VulkanMemoryPool::VulkanMemoryPool;
+
+    virtual std::shared_ptr<VulkanBufferAllocation> allocate(
+        std::size_t size) = 0;
+
     vk::Buffer buffer() const { return mBuffer.get(); }
+};
+
+template <typename Allocator>
+class VulkanBufferMemoryPool : public VulkanBufferMemoryPoolBase
+{
+    std::unique_ptr<Allocator> mAllocator;
+
+public:
+    template <typename AllocCreateFunc>
+    VulkanBufferMemoryPool(
+        VulkanGpuDevice *device,
+        const std::size_t size,
+        const vk::MemoryPropertyFlags &mem_properties,
+        const vk::BufferUsageFlags &usages,
+        AllocCreateFunc alloc_create_func)
+        : VulkanBufferMemoryPoolBase(device)
+    {
+        allocateDeviceMemoryForBuffer(size, mem_properties, usages, mBuffer);
+        mAllocator = alloc_create_func(mMemoryRequirements);
+    }
+
+    ~VulkanBufferMemoryPool()
+    {
+        // all memory all freed
+        assert(mAllocator || mAllocator->usedSize() == 0);
+    }
+
+    std::shared_ptr<VulkanBufferAllocation> allocate(std::size_t size) override
+    {
+        auto offset = reinterpret_cast<std::size_t>(mAllocator->allocate(size));
+        try
+        {
+            auto alloc = std::make_shared<VulkanBufferAllocation>(
+                this,
+                offset, size,
+                mMappedMemory ? mMappedMemory + offset : nullptr
+            );
+            return std::move(alloc);
+        }
+        catch(...)
+        {
+            deallocate(offset);
+            throw;
+        }
+    }
+
+    void deallocate(const std::size_t offset) override
+    {
+        mAllocator->deallocate(reinterpret_cast<void*>(offset));
+    }
+};
+
+template <typename Allocator>
+class VulkanImageMemoryPool : public VulkanMemoryPool
+{
+    std::unique_ptr<Allocator> mAllocator;
+
+public:
+    template <typename AllocCreateFunc>
+    VulkanImageMemoryPool(
+        VulkanGpuDevice *device,
+        std::size_t size,
+        const vk::MemoryPropertyFlags &mem_properties,
+        const vk::ImageUsageFlags &usages,
+        AllocCreateFunc alloc_create_func)
+        : VulkanMemoryPool(device)
+    {
+        allocateDeviceMemoryForImage(size, mem_properties, usages);
+        mAllocator = alloc_create_func(mMemoryRequirements);
+    }
+
+    ~VulkanImageMemoryPool()
+    {
+        // all memory all freed
+        assert(mAllocator || mAllocator->usedSize() == 0);
+    }
+
+    std::shared_ptr<VulkanPooledImage> createPooledImage(
+        const GpuImageCreateInfo &info)
+    {
+        vk::Format vk_format;
+        auto image = createImage(info, vk_format);
+        const auto size = getImageRequiredSize(image.get());
+        auto offset = reinterpret_cast<std::size_t>(mAllocator->allocate(size));
+        try
+        {
+            auto wrapper = std::make_shared<VulkanPooledImage>(
+                this,
+                std::move(image),
+                offset, size, mMappedMemory + offset
+            );
+            bindImageMemory(wrapper.get());
+            createImageBaseView(wrapper.get(), vk_format);
+            return std::move(wrapper);
+        }
+        catch(...)
+        {
+            deallocate(offset);
+            throw;
+        }
+    }
+
+    void deallocate(const std::size_t offset) override
+    {
+        mAllocator->deallocate(reinterpret_cast<void*>(offset));
+    }
 };
 }

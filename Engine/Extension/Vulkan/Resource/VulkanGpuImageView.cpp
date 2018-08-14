@@ -1,11 +1,36 @@
 ﻿#include "VulkanGpuImageView.hpp"
 
+#include "VulkanGpuImage.hpp"
+
 usagi::VulkanGpuImageView::VulkanGpuImageView(
     VulkanGpuImage *image,
     vk::UniqueImageView vk_image_view,
     const vk::Format format)
-    : mImage(std::move(image))
+    : mImage(image)
     , mImageView(std::move(vk_image_view))
     , mFormat(format)
 {
+}
+
+void usagi::VulkanGpuImageView::fillShaderResourceInfo(
+    vk::WriteDescriptorSet &write,
+    VulkanResourceInfo &info)
+{
+    auto &image_info = std::get<vk::DescriptorImageInfo>(info);
+    switch(write.descriptorType)
+    {
+        case vk::DescriptorType::eSampledImage:
+            image_info.setImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
+            break;
+        default:
+            throw std::runtime_error("Unsupported image usage.");
+    }
+    image_info.setImageView(mImageView.get());
+    write.setPImageInfo(&image_info);
+}
+
+void usagi::VulkanGpuImageView::appendAdditionalResources(
+    std::vector<std::shared_ptr<usagi::VulkanBatchResource>> &resources)
+{
+    resources.push_back(mImage->shared_from_this());
 }

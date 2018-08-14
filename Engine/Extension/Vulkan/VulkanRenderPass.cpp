@@ -5,6 +5,8 @@
 #include "VulkanEnumTranslation.hpp"
 #include "VulkanGpuDevice.hpp"
 
+using namespace usagi::vulkan;
+
 usagi::VulkanRenderPass::VulkanRenderPass(
     VulkanGpuDevice *device,
     const RenderPassCreateInfo &info)

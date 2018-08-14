@@ -115,7 +115,7 @@ public:
 
             auto cmd_list = mCommandPool->allocateGraphicsCommandList();
             cmd_list->beginRecording();
-            cmd_list->transitionImage(
+            cmd_list->imageTransition(
                 mSwapchain->currentImage(),
                 GpuImageLayout::UNDEFINED,
                 GpuImageLayout::TRANSFER_DST,
@@ -127,7 +127,7 @@ public:
                 GpuImageLayout::TRANSFER_DST,
                 mFillColor
             );
-            cmd_list->transitionImage(
+            cmd_list->imageTransition(
                 mSwapchain->currentImage(),
                 GpuImageLayout::TRANSFER_DST,
                 GpuImageLayout::PRESENT,

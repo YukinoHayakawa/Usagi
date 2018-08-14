@@ -1,11 +1,6 @@
-﻿#include <imgui/imgui.h>
-#include <imgui/imgui_demo.cpp>
-
-#include <Usagi/Engine/Asset/AssetRoot.hpp>
+﻿#include <Usagi/Engine/Asset/AssetRoot.hpp>
 #include <Usagi/Engine/Asset/Filesystem/FilesystemAssetPackage.hpp>
 #include <Usagi/Engine/Core/Logging.hpp>
-#include <Usagi/Engine/Extension/ImGui/ImGuiComponent.hpp>
-#include <Usagi/Engine/Extension/ImGui/ImGuiSubsystem.hpp>
 #include <Usagi/Engine/Game/Game.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GpuBufferFormat.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
@@ -20,6 +15,11 @@
 #include <Usagi/Engine/Runtime/Runtime.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Runtime/Window/WindowManager.hpp>
+
+#include <Usagi/Engine/Extension/ImGui/ImGui.hpp>
+#include <Usagi/Engine/Extension/ImGui/ImGuiComponent.hpp>
+#include <Usagi/Engine/Extension/ImGui/ImGuiSubsystem.hpp>
+#include <imgui/imgui_demo.cpp>
 
 using namespace usagi;
 
@@ -115,7 +115,7 @@ public:
             const auto framebuffer = gpu->createFramebuffer(
                 mSwapchain->size(),
                 {
-                    mSwapchain->currentImage()->fullView()
+                    mSwapchain->currentImage()->baseView()
                 }
             );
 

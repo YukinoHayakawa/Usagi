@@ -9,5 +9,6 @@ enum class GpuImageLayout
     TRANSFER_SRC,
     TRANSFER_DST,
     COLOR,
+    SHADER_READ_ONLY,
 };
 }

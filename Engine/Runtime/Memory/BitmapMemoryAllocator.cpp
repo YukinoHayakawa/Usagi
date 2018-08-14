@@ -7,11 +7,11 @@ namespace usagi
 {
 BitmapMemoryAllocator::BitmapMemoryAllocator(void *base,
     const std::size_t total_size,
-    const std::size_t block_size, const std::size_t max_alignment)
+    const std::size_t block_size, const std::size_t alignment)
     : mBase { static_cast<char*>(base) }
     , mTotalSize { total_size }
     , mBlockSize { block_size }
-    , mMaxAlignment { max_alignment }
+    , mAlignment { alignment }
 {
     if(!block_size)
         throw std::invalid_argument(
@@ -19,33 +19,32 @@ BitmapMemoryAllocator::BitmapMemoryAllocator(void *base,
     if(total_size < block_size)
         throw std::invalid_argument(
             "total size cannot hold a single block");
-    if(!utility::isPowerOfTwoOrZero(max_alignment))
+    if(!utility::isPowerOfTwoOrZero(mAlignment))
         throw std::invalid_argument(
             "alignment must be power-of-two or zero");
-    if(max_alignment)
+    if(mAlignment)
     {
-        if(reinterpret_cast<std::size_t>(mBase) % max_alignment)
+        if(reinterpret_cast<std::size_t>(mBase) % mAlignment != 0)
             throw std::invalid_argument(
-                "base address not aligned to maximum alignment");
-        if(block_size % max_alignment)
+                "base address not aligned to alignment requirement");
+        if(block_size % mAlignment != 0)
             throw std::invalid_argument(
-                "block size is not a multiple of maximum alignment");
+                "block size is not a multiple of alignment requirement");
     }
 
     mAllocation.reset(total_size / block_size);
 }
 
-void * BitmapMemoryAllocator::allocate(const std::size_t num_bytes,
-    const std::size_t alignment)
+void * BitmapMemoryAllocator::allocate(const std::size_t num_bytes)
 {
     if(num_bytes == 0)
         throw std::invalid_argument(
             "allocation size must be positive");
-    if(alignment > mMaxAlignment)
-        throw std::invalid_argument(
-            "alignment request is greater than the maximum allowed");
-    if(!utility::isPowerOfTwoOrZero(alignment))
-        throw std::invalid_argument("alignment must be power-of-two or zero");
+    //if(alignment > mMaxAlignment)
+    //    throw std::invalid_argument(
+    //        "alignment request is greater than the maximum allowed");
+    //if(!utility::isPowerOfTwoOrZero(alignment))
+    //    throw std::invalid_argument("alignment must be power-of-two or zero");
 
     const auto alloc_unit = utility::calculateSpanningPages(
         num_bytes, mBlockSize);

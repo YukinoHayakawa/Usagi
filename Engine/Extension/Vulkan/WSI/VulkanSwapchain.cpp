@@ -9,6 +9,8 @@
 
 #include "../VulkanGpuDevice.hpp"
 
+using namespace usagi::vulkan;
+
 usagi::VulkanSwapchain::VulkanSwapchain(
     VulkanGpuDevice *device,
     vk::UniqueSurfaceKHR vk_surface_khr)
@@ -194,7 +196,7 @@ void usagi::VulkanSwapchain::resize(const Vector2u32 &size)
 
 usagi::GpuBufferFormat usagi::VulkanSwapchain::format() const
 {
-    return fromVulkan(mFormat.format);
+    return from(mFormat.format);
 }
 
 usagi::Vector2u32 usagi::VulkanSwapchain::size() const
@@ -276,23 +278,8 @@ void usagi::VulkanSwapchain::getSwapchainImages()
     mSwapchainImages.reserve(images.size());
     for(auto &&vk_image : images)
     {
-        vk::ImageViewCreateInfo info;
-        info.setImage(vk_image);
-        info.setViewType(vk::ImageViewType::e2D);
-        info.setFormat(mFormat.format);
-        info.setComponents(vk::ComponentMapping { });
-        vk::ImageSubresourceRange subresource_range;
-        subresource_range.setAspectMask(vk::ImageAspectFlagBits::eColor);
-        subresource_range.setBaseArrayLayer(0);
-        subresource_range.setLayerCount(1);
-        subresource_range.setBaseMipLevel(0);
-        subresource_range.setLevelCount(1);
-        info.setSubresourceRange(subresource_range);
         mSwapchainImages.push_back(std::make_shared<VulkanSwapchainImage>(
-            vk_image,
-            mDevice->device().createImageViewUnique(info),
-            mFormat.format
-        ));
+            mDevice->device(), vk_image, mFormat.format));
     }
     mCurrentImageIndex = INVALID_IMAGE_INDEX;
 }

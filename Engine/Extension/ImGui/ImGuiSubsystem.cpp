@@ -1,7 +1,5 @@
 ﻿#include "ImGuiSubsystem.hpp"
 
-#include <imgui/imgui.h>
-
 #include <Usagi/Engine/Asset/AssetRoot.hpp>
 #include <Usagi/Engine/Game/Game.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
@@ -11,11 +9,15 @@
 #include <Usagi/Engine/Runtime/Graphics/Resource/Framebuffer.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuBuffer.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuCommandPool.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageCreateInfo.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageView.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
 #include <Usagi/Engine/Runtime/Input/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/Runtime.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 
+#include "ImGui.hpp"
 #include "ImGuiComponent.hpp"
 
 usagi::ImGuiSubsystem::ImGuiSubsystem(
@@ -30,19 +32,33 @@ usagi::ImGuiSubsystem::ImGuiSubsystem(
     ImGui::StyleColorsDark();
     // todo hidpi
     //ImGui::GetStyle().ScaleAllSizes(mWindow->dpiScale().x());
-    // todo: load fonts
-    // todo: create font texture ImGui_ImplVulkan_CreateFontsTexture
-
-    ImGuiIO& io = ImGui::GetIO();
-
-    unsigned char* pixels;
-    int width, height;
-    io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
     auto gpu = mGame->runtime()->gpu();
-    mVertexBuffer = gpu->createBuffer();
-    mIndexBuffer = gpu->createBuffer();
+    mVertexBuffer = gpu->createBuffer(GpuBufferUsage::VERTEX);
+    mIndexBuffer = gpu->createBuffer(GpuBufferUsage::INDEX);
     mCommandPool = gpu->createCommandPool();
+    {
+        auto &io = ImGui::GetIO();
+        unsigned char* pixels;
+        int width, height;
+        io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+        const auto upload_size = width * height * 4 * sizeof(char);
+
+        GpuImageCreateInfo info;
+        info.format = GpuBufferFormat::R32G32B32A32_SFLOAT;
+        info.size = { width, height };
+        info.usage = GpuImageUsage::SAMPLED;
+        mFontTexture = gpu->createImage(info);
+        mFontTexture->upload(pixels, upload_size);
+    }
+    {
+        GpuSamplerCreateInfo info;
+        info.min_filter = GpuFilter::LINEAR;
+        info.mag_filter = GpuFilter::NEAREST;
+        info.addressing_mode_u = GpuSamplerAddressMode::REPEAT;
+        info.addressing_mode_v = GpuSamplerAddressMode::REPEAT;
+        mSampler = gpu->createSampler(info);
+    }
 }
 
 usagi::ImGuiSubsystem::~ImGuiSubsystem()
@@ -258,8 +274,8 @@ void usagi::ImGuiSubsystem::render(
     // Upload Vertex and index Data
     {
         // persistently mapped
-        auto vtx_dst = mVertexBuffer->getMappedMemory<ImDrawVert>();
-        auto idx_dst = mIndexBuffer->getMappedMemory<ImDrawIdx>();
+        auto vtx_dst = mVertexBuffer->mappedMemory<ImDrawVert>();
+        auto idx_dst = mIndexBuffer->mappedMemory<ImDrawIdx>();
         for(auto n = 0; n < draw_data->CmdListsCount; n++)
         {
             const ImDrawList *im_draw_list = draw_data->CmdLists[n];
@@ -278,16 +294,7 @@ void usagi::ImGuiSubsystem::render(
     auto cmd_list = mCommandPool->allocateGraphicsCommandList();
     cmd_list->beginRecording();
     cmd_list->beginRendering(mPipeline, framebuffer);
-
-    // Bind descriptor sets
-    {
-        // when create pipeline: .... PipelineCompiler (with default setup)
-        // ...setXXX...
-        // ...setVertexInput("aPos", 0, 0); format and location are reflected
-        // from the shader
-        //cmd_list->updateResourceSet()
-        // ... todo desc sets
-    }
+    cmd_list->bindResourceSet(0, { mSampler });
 
     // Bind Vertex And Index Buffer
     {
@@ -324,9 +331,10 @@ void usagi::ImGuiSubsystem::render(
     auto vtx_offset = 0;
     auto idx_offset = 0;
     const auto display_pos = draw_data->DisplayPos;
+    ImTextureID last_texture = nullptr;
     for(auto n = 0; n < draw_data->CmdListsCount; n++)
     {
-        const ImDrawList *im_cmd_list = draw_data->CmdLists[n];
+        auto im_cmd_list = draw_data->CmdLists[n];
         for(auto cmd_i = 0; cmd_i < im_cmd_list->CmdBuffer.Size; ++cmd_i)
         {
             const auto pcmd = &im_cmd_list->CmdBuffer[cmd_i];
@@ -346,6 +354,14 @@ void usagi::ImGuiSubsystem::render(
                     pcmd->ClipRect.w - pcmd->ClipRect.y
                 };
                 cmd_list->setScissor(0, origin, size);
+
+                if(last_texture != pcmd->TextureId)
+                {
+                    cmd_list->bindResourceSet(1, {
+                        pcmd->TextureId->shared_from_this()
+                    });
+                    last_texture = pcmd->TextureId;
+                }
 
                 cmd_list->drawIndexedInstanced(
                     pcmd->ElemCount, // index count

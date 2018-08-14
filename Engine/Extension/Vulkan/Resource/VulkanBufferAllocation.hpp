@@ -6,25 +6,24 @@
 
 namespace usagi
 {
-class VulkanMemoryPool;
+class VulkanBufferMemoryPoolBase;
 
 class VulkanBufferAllocation : public VulkanBatchResource
 {
-    VulkanMemoryPool * mPool = nullptr;
+    VulkanBufferMemoryPoolBase * mPool = nullptr;
     const std::size_t mOffset, mSize;
-
-    // Offset to base buffer is applied.
+    // nullptr if the buffer is not mapped
     void * const mMappedAddress = nullptr;
 
 public:
     VulkanBufferAllocation(
-        VulkanMemoryPool *pool,
+        VulkanBufferMemoryPoolBase *pool,
         std::size_t offset,
         std::size_t size,
         void *apped_address);
     ~VulkanBufferAllocation();
 
-    VulkanMemoryPool * pool() const { return mPool; }
+    VulkanBufferMemoryPoolBase * pool() const { return mPool; }
     std::size_t offset() const { return mOffset; }
     std::size_t size() const { return mSize; }
     void * mappedAddress() const { return mMappedAddress; }

@@ -2,22 +2,22 @@
 
 #include <cstddef>
 
-#include <Usagi/Engine/Utility/Noncopyable.hpp>
+#include "ShaderResource.hpp"
 
 namespace usagi
 {
-class GpuBuffer : Noncopyable
+class GpuBuffer : public ShaderResource
 {
 public:
     virtual ~GpuBuffer() = default;
 
     virtual void allocate(std::size_t size) = 0;
-    virtual void * getMappedMemory() = 0;
+    virtual void * mappedMemory() = 0;
 
     template <typename CastType>
-    CastType* getMappedMemory()
+    CastType* mappedMemory()
     {
-        return reinterpret_cast<CastType *>(getMappedMemory());
+        return reinterpret_cast<CastType *>(mappedMemory());
     }
 
     virtual void flush() = 0;

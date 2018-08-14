@@ -10,6 +10,7 @@
 #include "Resource/VulkanGraphicsPipeline.hpp"
 
 using namespace spirv_cross;
+using namespace usagi::vulkan;
 
 vk::UniqueShaderModule usagi::VulkanGraphicsPipelineCompiler::
     createShaderModule(const SpirvBinary *binary) const
@@ -90,9 +91,9 @@ void usagi::VulkanGraphicsPipelineCompiler::setRenderPass(
 struct usagi::VulkanGraphicsPipelineCompiler::Context
 {
     // Descriptor Set Layouts
-    std::map<std::uint32_t, std::vector<vk::DescriptorSetLayoutBinding>>
+    VulkanGraphicsPipeline::DescriptorSetLayoutBindingMap
         desc_set_layout_bindings;
-    std::map<std::uint32_t, vk::UniqueDescriptorSetLayout> desc_set_layouts;
+    VulkanGraphicsPipeline::DescriptorSetLayoutMap desc_set_layouts;
     std::vector<vk::DescriptorSetLayout> desc_set_layout_array;
 
     // Push Constants
@@ -212,7 +213,7 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
     }
 
     void addResource(std::vector<Resource>::value_type &resource,
-        vk::DescriptorType resource_type) const
+        const vk::DescriptorType resource_type) const
     {
         // todo: ensure different stages uses different set indices
         const auto set = compiler.get_decoration(
@@ -230,11 +231,31 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
         ctx.desc_set_layout_bindings[set].push_back(layout_binding);
     }
 
+    void ignoreResource(std::vector<Resource>::value_type &resource,
+        const vk::DescriptorType resource_type) const
+    {
+        const auto set = compiler.get_decoration(
+            resource.id, spv::DecorationDescriptorSet);
+        const auto binding = compiler.get_decoration(
+            resource.id, spv::DecorationBinding);
+
+        LOG(warn, "{type} {name} (set={},binding={}) is ignored.",
+            to_string(resource_type), resource.name, set, binding);
+    }
+
     void reflectDescriptorSets()
     {
         LOG(info, "Descriptor set layouts:");
 
-        // todo: others resource types
+        // todo: deal with others resource types
+
+        for(auto &&resource : resources.storage_buffers)
+            ignoreResource(resource, vk::DescriptorType::eStorageBuffer);
+
+        // sampler2D is not supported in HLSL so not included here.
+        // don't use them in shaders.
+        for(auto &&resource : resources.sampled_images)
+            ignoreResource(resource, vk::DescriptorType::eSampledImage);
 
         for(auto &&resource : resources.separate_images)
             addResource(resource, vk::DescriptorType::eSampledImage);
@@ -245,18 +266,19 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
         for(auto &&resource : resources.uniform_buffers)
             addResource(resource, vk::DescriptorType::eUniformBuffer);
 
+        // note that only one subpass is used to maintain compatibility
+        // for shader cross-compiling
         for(auto &&resource : resources.subpass_inputs)
             addResource(resource, vk::DescriptorType::eInputAttachment);
     }
 
+    // todo auto get render targets?
     //void reflectRenderTargets()
     //{
     //    for(const auto &resource : resources.stage_outputs)
     //    {
     //        const auto attachment_index = compiler.get_decoration(
     //            resource.id, spv::DecorationInputAttachmentIndex);
-
-
     //    }
     //}
 };
@@ -281,7 +303,7 @@ std::shared_ptr<usagi::GraphicsPipeline> usagi::VulkanGraphicsPipelineCompiler::
         if(shader.first == ShaderStage::VERTEX)
             helper.reflectVertexInputAttributes();
 		//if(shader.first == ShaderStage::FRAGMENT)
-  //          helper.reflectRenderTargets();
+        //    helper.reflectRenderTargets();
         helper.reflectPushConstantRanges();
         helper.reflectDescriptorSets();
 	}
@@ -323,6 +345,7 @@ std::shared_ptr<usagi::GraphicsPipeline> usagi::VulkanGraphicsPipelineCompiler::
         std::move(pipeline),
 	    std::move(compatible_pipeline_layout),
         mRenderPass,
+	    std::move(ctx.desc_set_layout_bindings),
 	    std::move(ctx.desc_set_layouts),
 	    std::move(ctx.push_constant_field_map)
     );

@@ -4,6 +4,7 @@
 #include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
 #include <Usagi/Engine/Extension/Vulkan/VulkanEnumTranslation.hpp>
 #include <Usagi/Engine/Extension/Vulkan/VulkanRenderPass.hpp>
+#include <Usagi/Engine/Extension/Vulkan/VulkanHelper.hpp>
 
 #include "VulkanGpuBuffer.hpp"
 #include "VulkanGpuImage.hpp"
@@ -13,11 +14,14 @@
 #include "VulkanMemoryPool.hpp"
 #include "VulkanGraphicsPipeline.hpp"
 #include "VulkanGpuImageView.hpp"
+#include "VulkanShaderResource.hpp"
+
+using namespace usagi::vulkan;
 
 usagi::VulkanGraphicsCommandList::VulkanGraphicsCommandList(
     std::shared_ptr<VulkanGpuCommandPool> pool,
     vk::UniqueCommandBuffer vk_command_buffer)
-    : mPool(std::move(pool))
+    : mCommandPool(std::move(pool))
     , mCommandBuffer(std::move(vk_command_buffer))
 {
 }
@@ -36,7 +40,7 @@ void usagi::VulkanGraphicsCommandList::endRecording()
     mCommandBuffer->end();
 }
 
-void usagi::VulkanGraphicsCommandList::transitionImage(
+void usagi::VulkanGraphicsCommandList::imageTransition(
     GpuImage *image,
     GpuImageLayout old_layout,
     GpuImageLayout new_layout,
@@ -49,7 +53,7 @@ void usagi::VulkanGraphicsCommandList::transitionImage(
     barrier.setImage(vk_image.image());
     barrier.setOldLayout(translate(old_layout));
     barrier.setNewLayout(translate(new_layout));
-    const auto queue_family_index = mPool->device()->graphicsQueueFamily();
+    const auto queue_family_index = mCommandPool->device()->graphicsQueueFamily();
     barrier.setSrcQueueFamilyIndex(queue_family_index);
     barrier.setDstQueueFamilyIndex(queue_family_index);
 
@@ -176,8 +180,9 @@ void usagi::VulkanGraphicsCommandList::beginRendering(
 
     for(auto &&view : vk_framebuffer->views())
     {
+        // todo: merge into ...->appendResources?
         mResources.push_back(view);
-        mResources.push_back(view->image()->shared_from_this());
+        view->appendAdditionalResources(mResources);
     }
     mResources.push_back(std::move(vk_framebuffer));
     mResources.push_back(std::move(vk_pipeline));
@@ -186,6 +191,100 @@ void usagi::VulkanGraphicsCommandList::beginRendering(
 void usagi::VulkanGraphicsCommandList::endRendering()
 {
     mCommandBuffer->endRenderPass();
+}
+
+void usagi::VulkanGraphicsCommandList::createDescriptorPool()
+{
+    // todo: precise control over allocation size
+    vk::DescriptorPoolCreateInfo info;
+    info.setMaxSets(16);
+    std::initializer_list<vk::DescriptorPoolSize> sizes {
+        { vk::DescriptorType::eSampler, 16 },
+    { vk::DescriptorType::eSampledImage, 16 },
+    { vk::DescriptorType::eUniformBuffer, 16 },
+    };
+    info.setPoolSizeCount(static_cast<uint32_t>(sizes.size()));
+    info.setPPoolSizes(sizes.begin());
+    mDescriptorPools.push_back(
+        mCommandPool->device()->device().createDescriptorPoolUnique(info));
+}
+
+vk::DescriptorSet usagi::VulkanGraphicsCommandList::
+    allocateDescriptorSet(const std::uint32_t set_id)
+{
+    assert(mCurrentPipeline);
+
+    auto allow_new_pool = true;
+
+    if(mDescriptorPools.empty())
+    {
+        createDescriptorPool();
+        allow_new_pool = false;
+    }
+
+    while(true) try
+    {
+        vk::DescriptorSetAllocateInfo info;
+        info.setDescriptorPool(mDescriptorPools.back().get());
+        info.setDescriptorSetCount(1);
+        const auto layout = { mCurrentPipeline->descriptorSetLayout(set_id) };
+        info.setPSetLayouts(layout.begin());
+
+        mDescriptorSets.push_back(std::move(mCommandPool->device()->device()
+            .allocateDescriptorSetsUnique(info).front()));
+        return mDescriptorSets.back().get();
+    }
+    catch(const vk::SystemError &e)
+    {
+        switch(static_cast<vk::Result>(e.code().value()))
+        {
+            case vk::Result::eErrorFragmentedPool:
+            case vk::Result::eErrorOutOfPoolMemory:
+                if(!allow_new_pool) throw;
+                createDescriptorPool();
+                allow_new_pool = false;
+            default: break;
+        }
+    }
+}
+
+void usagi::VulkanGraphicsCommandList::bindResourceSet(
+    const std::uint32_t set_id,
+    std::initializer_list<std::shared_ptr<ShaderResource>> resources)
+{
+    auto vk_resources = vulkan::transformObjects(resources, [](auto &&r) {
+        return dynamic_pointer_cast_throw<VulkanShaderResource>(r);
+    });
+
+    const auto desc_set = allocateDescriptorSet(set_id);
+    std::vector<vk::WriteDescriptorSet> writes {
+        vk_resources.size(), vk::WriteDescriptorSet {}
+    };
+    std::vector<VulkanResourceInfo> res_infos {
+        vk_resources.size(), VulkanResourceInfo { }
+    };
+    for(std::size_t i = 0; i < writes.size(); ++i)
+    {
+        auto &res = vk_resources[i];
+        auto batch_res = dynamic_pointer_cast_throw<VulkanBatchResource>(res);
+        auto &write = writes[i];
+        write.setDescriptorType(mCurrentPipeline->descriptorType(
+            set_id, static_cast<uint32_t>(i)));
+        write.setDstSet(desc_set);
+        write.setDstBinding(static_cast<uint32_t>(i));
+        write.setDstArrayElement(0);
+        write.setDescriptorCount(1);
+        res->fillShaderResourceInfo(write, res_infos[i]);
+        batch_res->appendAdditionalResources(mResources);
+        mResources.push_back(std::move(batch_res));
+    }
+
+    mCommandPool->device()->device().updateDescriptorSets(writes, { });
+    mCommandBuffer->bindDescriptorSets(
+        vk::PipelineBindPoint::eGraphics,
+        mCurrentPipeline->layout(),
+        set_id, { desc_set }, { }
+    );
 }
 
 void usagi::VulkanGraphicsCommandList::setViewport(

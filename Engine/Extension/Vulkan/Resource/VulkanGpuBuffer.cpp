@@ -5,8 +5,11 @@
 #include "VulkanBufferAllocation.hpp"
 #include "VulkanMemoryPool.hpp"
 
-usagi::VulkanGpuBuffer::VulkanGpuBuffer(VulkanMemoryPool *pool)
+usagi::VulkanGpuBuffer::VulkanGpuBuffer(
+    VulkanBufferMemoryPoolBase *pool,
+    const GpuBufferUsage usage)
     : mPool(pool)
+    , mUsage(usage)
 {
 }
 
@@ -15,7 +18,7 @@ void usagi::VulkanGpuBuffer::allocate(std::size_t size)
     mAllocation = mPool->allocate(size);
 }
 
-void * usagi::VulkanGpuBuffer::getMappedMemory()
+void * usagi::VulkanGpuBuffer::mappedMemory()
 {
     return mAllocation->mappedAddress();
 }
@@ -28,4 +31,15 @@ void usagi::VulkanGpuBuffer::flush()
     range.setSize(mAllocation->size());
 
     mPool->device()->device().flushMappedMemoryRanges({ range });
+}
+
+void usagi::VulkanGpuBuffer::fillShaderResourceInfo(
+    vk::WriteDescriptorSet &write,
+    VulkanResourceInfo &info)
+{
+    auto &buffer_info = std::get<vk::DescriptorBufferInfo>(info);
+    buffer_info.setBuffer(mAllocation->pool()->buffer());
+    buffer_info.setOffset(mAllocation->offset());
+    buffer_info.setRange(mAllocation->size());
+    write.setPBufferInfo(&buffer_info);
 }

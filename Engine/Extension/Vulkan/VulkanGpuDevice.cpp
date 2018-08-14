@@ -4,6 +4,8 @@
 
 #include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageView.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
+#include <Usagi/Engine/Runtime/Memory/BitmapMemoryAllocator.hpp>
 #include <Usagi/Engine/Utility/Flag.hpp>
 #include <Usagi/Engine/Utility/TypeCast.hpp>
 
@@ -14,10 +16,14 @@
 #include "Resource/VulkanGraphicsCommandList.hpp"
 #include "Resource/VulkanMemoryPool.hpp"
 #include "Resource/VulkanSemaphore.hpp"
+#include "Resource/VulkanPooledImage.hpp"
 #include "VulkanEnumTranslation.hpp"
 #include "VulkanGraphicsPipelineCompiler.hpp"
 #include "VulkanHelper.hpp"
 #include "VulkanRenderPass.hpp"
+#include "Resource/VulkanSampler.hpp"
+
+using namespace usagi::vulkan;
 
 uint32_t usagi::VulkanGpuDevice::selectQueue(
     std::vector<vk::QueueFamilyProperties> &queue_family,
@@ -239,13 +245,38 @@ void usagi::VulkanGpuDevice::createDeviceAndQueues()
 
 void usagi::VulkanGpuDevice::createMemoryPools()
 {
-    mDynamicMemoryPool = std::make_unique<VulkanMemoryPool>(
+    mDynamicBufferPool = std::make_unique<BitmapBufferPool>(
         this,
         1024 * 1024 * 512, // 512MiB  todo from config
-        vk::MemoryPropertyFlagBits::eHostVisible,
+        vk::MemoryPropertyFlagBits::eHostVisible |
+        vk::MemoryPropertyFlagBits::eHostCoherent,
         vk::BufferUsageFlagBits::eVertexBuffer |
         vk::BufferUsageFlagBits::eIndexBuffer |
-        vk::BufferUsageFlagBits::eUniformBuffer
+        vk::BufferUsageFlagBits::eUniformBuffer,
+        [](const vk::MemoryRequirements &req) {
+            return std::make_unique<BitmapMemoryAllocator>(
+                nullptr,
+                req.size,
+                32 * 1024 /* 32 KiB */, // todo config
+                req.alignment
+                );
+        }
+    );
+
+    mHostImagePool = std::make_unique<BitmapImagePool>(
+        this,
+        1024 * 1024 * 512, // 512MiB  todo from config
+        vk::MemoryPropertyFlagBits::eHostVisible |
+        vk::MemoryPropertyFlagBits::eHostCoherent,
+        vk::ImageUsageFlagBits::eSampled,
+        [](const vk::MemoryRequirements &req) {
+            return std::make_unique<BitmapMemoryAllocator>(
+                nullptr,
+                req.size,
+                32 * 1024 /* 32 KiB */, // todo config
+                req.alignment
+            );
+        }
     );
 }
 
@@ -287,7 +318,7 @@ std::shared_ptr<usagi::Framebuffer> usagi::VulkanGpuDevice::createFramebuffer(
     const Vector2u32 &size,
     std::initializer_list<std::shared_ptr<GpuImageView>> views)
 {
-    auto vk_views = vulkan::transformObjects(views,
+    auto vk_views = transformObjects(views,
         [&](auto &&v) {
             return dynamic_pointer_cast_throw<VulkanGpuImageView>(v);
         }
@@ -303,9 +334,31 @@ std::shared_ptr<usagi::GpuSemaphore> usagi::VulkanGpuDevice::createSemaphore()
     return std::make_unique<VulkanSemaphore>(std::move(sem));
 }
 
-std::shared_ptr<usagi::GpuBuffer> usagi::VulkanGpuDevice::createBuffer()
+std::shared_ptr<usagi::GpuBuffer> usagi::VulkanGpuDevice::createBuffer(
+    GpuBufferUsage usage)
 {
-    return std::make_shared<VulkanGpuBuffer>(mDynamicMemoryPool.get());
+    return std::make_shared<VulkanGpuBuffer>(mDynamicBufferPool.get(), usage);
+}
+
+std::shared_ptr<usagi::GpuImage> usagi::VulkanGpuDevice::createImage(
+    const GpuImageCreateInfo &info)
+{
+    return mHostImagePool->createPooledImage(info);
+}
+
+std::shared_ptr<usagi::GpuSampler> usagi::VulkanGpuDevice::createSampler(
+    const GpuSamplerCreateInfo &info)
+{
+    vk::SamplerCreateInfo vk_info;
+    vk_info.setMagFilter(translate(info.mag_filter));
+    vk_info.setMinFilter(translate(info.min_filter));
+    vk_info.setMipmapMode(vk::SamplerMipmapMode::eLinear);
+    vk_info.setAddressModeU(translate(info.addressing_mode_u));
+    vk_info.setAddressModeV(translate(info.addressing_mode_v));
+    // todo sampler setBorderColor
+    // vk_info.setBorderColor({ });
+    return std::make_shared<VulkanSampler>(
+        mDevice->createSamplerUnique(vk_info));
 }
 
 void usagi::VulkanGpuDevice::submitGraphicsJobs(
@@ -314,21 +367,21 @@ void usagi::VulkanGpuDevice::submitGraphicsJobs(
     std::initializer_list<GraphicsPipelineStage> wait_stages,
     std::initializer_list<std::shared_ptr<GpuSemaphore>> signal_semaphores)
 {
-    const auto vk_jobs = vulkan::transformObjects(jobs, [&](auto &&j) {
+    const auto vk_jobs = transformObjects(jobs, [&](auto &&j) {
         return dynamic_cast_ref<VulkanGraphicsCommandList>(j).commandBuffer();
     });
-    const auto vk_wait_sems = vulkan::transformObjects(wait_semaphores,
+    const auto vk_wait_sems = transformObjects(wait_semaphores,
         [&](auto &&s) {
             return dynamic_cast_ref<VulkanSemaphore>(s).semaphore();
         }
     );
-    const auto vk_wait_stages = vulkan::transformObjects(wait_stages,
+    const auto vk_wait_stages = transformObjects(wait_stages,
         [&](auto &&s) {
             // todo wait on multiple stages
             return vk::PipelineStageFlags(translate(s));
         }
     );
-    const auto vk_signal_sems = vulkan::transformObjects(signal_semaphores,
+    const auto vk_signal_sems = transformObjects(signal_semaphores,
         [&](auto &&s) {
             return dynamic_cast_ref<VulkanSemaphore>(s).semaphore();
         }

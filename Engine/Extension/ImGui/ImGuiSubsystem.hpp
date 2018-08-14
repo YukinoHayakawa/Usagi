@@ -6,6 +6,8 @@
 #include <Usagi/Engine/Runtime/Graphics/RenderableSubsystem.hpp>
 #include <Usagi/Engine/Runtime/Input/Keyboard/KeyEventListener.hpp>
 #include <Usagi/Engine/Runtime/Input/Mouse/MouseEventListener.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImage.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuSampler.hpp>
 
 struct ImGuiContext;
 
@@ -50,6 +52,8 @@ class ImGuiSubsystem
 	std::shared_ptr<GpuCommandPool> mCommandPool;
 	std::shared_ptr<GpuBuffer> mVertexBuffer;
 	std::shared_ptr<GpuBuffer> mIndexBuffer;
+    std::shared_ptr<GpuImage> mFontTexture;
+    std::shared_ptr<GpuSampler> mSampler;
 
 public:
     ImGuiSubsystem(Game *game, Window *window, Mouse *mouse);

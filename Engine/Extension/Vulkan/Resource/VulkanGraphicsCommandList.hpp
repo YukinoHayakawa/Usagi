@@ -17,10 +17,15 @@ class VulkanGraphicsCommandList
 {
     // this shared_ptr is used to ensure that the pool won't be freed before
     // command lists.
-    std::shared_ptr<VulkanGpuCommandPool> mPool;
+    std::shared_ptr<VulkanGpuCommandPool> mCommandPool;
     vk::UniqueCommandBuffer mCommandBuffer;
     std::shared_ptr<VulkanGraphicsPipeline> mCurrentPipeline;
+    std::vector<vk::UniqueDescriptorPool> mDescriptorPools;
+    std::vector<vk::UniqueDescriptorSet> mDescriptorSets;
     std::vector<std::shared_ptr<VulkanBatchResource>> mResources;
+
+    void createDescriptorPool();
+    vk::DescriptorSet allocateDescriptorSet(std::uint32_t set_id);
 
 public:
     VulkanGraphicsCommandList(
@@ -30,7 +35,7 @@ public:
     void beginRecording() override;
     void endRecording() override;
 
-    void transitionImage(
+    void imageTransition(
         GpuImage *image,
         GpuImageLayout old_layout,
         GpuImageLayout new_layout,
@@ -45,6 +50,11 @@ public:
         std::shared_ptr<GraphicsPipeline> pipeline,
         std::shared_ptr<Framebuffer> framebuffer) override;
     void endRendering() override;
+
+    void bindResourceSet(
+        std::uint32_t set_id,
+        std::initializer_list<std::shared_ptr<ShaderResource>> resources
+    ) override;
 
     void setViewport(
         std::uint32_t index,

@@ -4,6 +4,10 @@
 
 namespace usagi
 {
+enum class GpuFilter;
+enum class GpuSamplerAddressMode;
+enum class GpuImageUsage;
+enum class GpuBufferUsage;
 enum class GraphicsPipelineStage;
 enum class GpuBufferFormat;
 enum class GraphicsIndexType;
@@ -19,9 +23,11 @@ enum class BlendingOperation;
 enum class BlendingFactor;
 enum class ShaderStage;
 
+namespace vulkan
+{
 vk::ShaderStageFlagBits translate(ShaderStage stage);
 vk::Format translate(GpuBufferFormat format);
-GpuBufferFormat fromVulkan(vk::Format format);
+GpuBufferFormat from(vk::Format format);
 vk::VertexInputRate translate(VertexInputRate rate);
 vk::PrimitiveTopology translate(PrimitiveTopology topology);
 vk::CullModeFlags translate(FaceCullingMode face_culling_mode);
@@ -35,4 +41,9 @@ vk::ImageLayout translate(GpuImageLayout layout);
 vk::IndexType translate(GraphicsIndexType type);
 vk::SampleCountFlagBits translateSampleCount(std::uint32_t sample_count);
 vk::PipelineStageFlagBits translate(GraphicsPipelineStage stage);
+vk::BufferUsageFlagBits translate(GpuBufferUsage usage);
+vk::ImageUsageFlagBits translate(GpuImageUsage usage);
+vk::SamplerAddressMode translate(GpuSamplerAddressMode mode);
+vk::Filter translate(GpuFilter filter);
+}
 }

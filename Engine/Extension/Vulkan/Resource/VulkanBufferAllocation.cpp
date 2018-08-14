@@ -3,7 +3,7 @@
 #include "VulkanMemoryPool.hpp"
 
 usagi::VulkanBufferAllocation::VulkanBufferAllocation(
-    VulkanMemoryPool *pool,
+    VulkanBufferMemoryPoolBase *pool,
     std::size_t offset,
     std::size_t size,
     void *apped_address)

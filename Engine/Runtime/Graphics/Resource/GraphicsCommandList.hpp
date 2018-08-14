@@ -6,6 +6,7 @@
 #include <Usagi/Engine/Runtime/Graphics/Enum/GpuImageLayout.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Shader/ShaderStage.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
+#include "ShaderResource.hpp"
 
 namespace usagi
 {
@@ -26,7 +27,7 @@ public:
     // Cannot be used between beginRender() and endRender().
 
     // todo: demo purpose only. too complicated.
-    virtual void transitionImage(
+    virtual void imageTransition(
         GpuImage *image,
         GpuImageLayout old_layout,
         GpuImageLayout new_layout,
@@ -102,6 +103,19 @@ public:
         std::uint32_t binding_index,
         GpuBuffer *buffer,
         std::size_t offset
+    ) = 0;
+
+    // Shader Resource Binding
+
+    /**
+     * \brief Update shader resource set. Amount and types of resources must
+     * match with the shader.
+     * \param set_id
+     * \param resources
+     */
+    virtual void bindResourceSet(
+        std::uint32_t set_id,
+        std::initializer_list<std::shared_ptr<ShaderResource>> resources
     ) = 0;
 
     // Draw

@@ -3,24 +3,37 @@
 #include <memory>
 
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuBuffer.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Enum/GpuBufferUsage.hpp>
+
+#include "VulkanShaderResource.hpp"
 
 namespace usagi
 {
-class VulkanMemoryPool;
+class VulkanBufferMemoryPoolBase;
 class VulkanGpuDevice;
 class VulkanBufferAllocation;
 
-class VulkanGpuBuffer : public GpuBuffer
+// note that VulkanBufferAllocation is inherited from VulkanBatchResource,
+// but not this class, which is only a wrapper of the real resource.
+class VulkanGpuBuffer
+    : public GpuBuffer
+    , public VulkanShaderResource
 {
-    VulkanMemoryPool * mPool = nullptr;
+    VulkanBufferMemoryPoolBase * mPool = nullptr;
+    GpuBufferUsage mUsage;
     std::shared_ptr<VulkanBufferAllocation> mAllocation;
 
 public:
-    explicit VulkanGpuBuffer(VulkanMemoryPool *pool);
+    VulkanGpuBuffer(VulkanBufferMemoryPoolBase *pool, GpuBufferUsage usage);
 
     void allocate(std::size_t size) override;
-    void * getMappedMemory() override;
+    void * mappedMemory() override;
     void flush() override;
+
+    // only used by uniform buffers
+    void fillShaderResourceInfo(
+        vk::WriteDescriptorSet &write,
+        VulkanResourceInfo &info) override;
 
     std::shared_ptr<VulkanBufferAllocation> allocation() const
     {

@@ -6,8 +6,11 @@
 
 #include <Usagi/Engine/Runtime/Graphics/GpuDevice.hpp>
 
+#include "Resource/VulkanMemoryPool.hpp"
+
 namespace usagi
 {
+class BitmapMemoryAllocator;
 class VulkanMemoryPool;
 class VulkanBatchResource;
 
@@ -57,7 +60,10 @@ class VulkanGpuDevice : public GpuDevice
 
     // Buffer Management
 
-    std::unique_ptr<VulkanMemoryPool> mDynamicMemoryPool;
+    using BitmapBufferPool = VulkanBufferMemoryPool<BitmapMemoryAllocator>;
+    std::unique_ptr<BitmapBufferPool> mDynamicBufferPool;
+    using BitmapImagePool = VulkanImageMemoryPool<BitmapMemoryAllocator>;
+    std::unique_ptr<BitmapImagePool> mHostImagePool;
 
     void createMemoryPools();
 
@@ -85,7 +91,11 @@ public:
         const Vector2u32 &size,
         std::initializer_list<std::shared_ptr<GpuImageView>> views) override;
     std::shared_ptr<GpuSemaphore> createSemaphore() override;
-    std::shared_ptr<GpuBuffer> createBuffer() override;
+    std::shared_ptr<GpuBuffer> createBuffer(GpuBufferUsage usage) override;
+    std::shared_ptr<GpuImage> createImage(const GpuImageCreateInfo &info)
+        override;
+    std::shared_ptr<GpuSampler> createSampler(const GpuSamplerCreateInfo &info)
+        override;
 
     void submitGraphicsJobs(
         std::vector<std::shared_ptr<GraphicsCommandList>> jobs,

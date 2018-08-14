@@ -4,9 +4,14 @@
 #include <Usagi/Engine/Runtime/Graphics/Shader/ShaderStage.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Enum/GpuBufferUsage.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Enum/GpuImageUsage.hpp>
 #include <Usagi/Engine/Runtime/Graphics/RenderPassCreateInfo.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
 
-vk::ShaderStageFlagBits usagi::translate(ShaderStage stage)
+namespace usagi::vulkan
+{
+vk::ShaderStageFlagBits translate(ShaderStage stage)
 {
     switch(stage)
     {
@@ -19,7 +24,7 @@ vk::ShaderStageFlagBits usagi::translate(ShaderStage stage)
     }
 }
 
-vk::Format usagi::translate(GpuBufferFormat format)
+vk::Format translate(GpuBufferFormat format)
 {
     switch(format)
     {
@@ -38,7 +43,7 @@ vk::Format usagi::translate(GpuBufferFormat format)
     }
 }
 
-usagi::GpuBufferFormat usagi::fromVulkan(vk::Format format)
+GpuBufferFormat from(vk::Format format)
 {
     switch(format)
     {
@@ -57,7 +62,7 @@ usagi::GpuBufferFormat usagi::fromVulkan(vk::Format format)
     }
 }
 
-vk::VertexInputRate usagi::translate(VertexInputRate rate)
+vk::VertexInputRate translate(VertexInputRate rate)
 {
     switch(rate)
     {
@@ -70,7 +75,7 @@ vk::VertexInputRate usagi::translate(VertexInputRate rate)
     }
 }
 
-vk::PrimitiveTopology usagi::translate(PrimitiveTopology topology)
+vk::PrimitiveTopology translate(PrimitiveTopology topology)
 {
     switch(topology)
     {
@@ -91,7 +96,7 @@ vk::PrimitiveTopology usagi::translate(PrimitiveTopology topology)
     }
 }
 
-vk::CullModeFlags usagi::translate(FaceCullingMode face_culling_mode)
+vk::CullModeFlags translate(FaceCullingMode face_culling_mode)
 {
     switch(face_culling_mode)
     {
@@ -106,7 +111,7 @@ vk::CullModeFlags usagi::translate(FaceCullingMode face_culling_mode)
     }
 }
 
-vk::FrontFace usagi::translate(FrontFace front_face)
+vk::FrontFace translate(FrontFace front_face)
 {
     switch(front_face)
     {
@@ -119,7 +124,7 @@ vk::FrontFace usagi::translate(FrontFace front_face)
     }
 }
 
-vk::PolygonMode usagi::translate(PolygonMode polygon_mode)
+vk::PolygonMode translate(PolygonMode polygon_mode)
 {
     switch(polygon_mode)
     {
@@ -134,7 +139,7 @@ vk::PolygonMode usagi::translate(PolygonMode polygon_mode)
     }
 }
 
-vk::BlendOp usagi::translate(BlendingOperation blending_operation)
+vk::BlendOp translate(BlendingOperation blending_operation)
 {
     switch(blending_operation)
     {
@@ -153,7 +158,7 @@ vk::BlendOp usagi::translate(BlendingOperation blending_operation)
     }
 }
 
-vk::BlendFactor usagi::translate(BlendingFactor blending_factor)
+vk::BlendFactor translate(BlendingFactor blending_factor)
 {
     switch(blending_factor)
     {
@@ -170,7 +175,7 @@ vk::BlendFactor usagi::translate(BlendingFactor blending_factor)
     }
 }
 
-vk::AttachmentLoadOp usagi::translate(GpuAttachmentLoadOp op)
+vk::AttachmentLoadOp translate(GpuAttachmentLoadOp op)
 {
     switch(op)
     {
@@ -185,7 +190,7 @@ vk::AttachmentLoadOp usagi::translate(GpuAttachmentLoadOp op)
     }
 }
 
-vk::AttachmentStoreOp usagi::translate(GpuAttachmentStoreOp op)
+vk::AttachmentStoreOp translate(GpuAttachmentStoreOp op)
 {
     switch(op)
     {
@@ -198,7 +203,7 @@ vk::AttachmentStoreOp usagi::translate(GpuAttachmentStoreOp op)
     }
 }
 
-vk::ImageLayout usagi::translate(GpuImageLayout layout)
+vk::ImageLayout translate(GpuImageLayout layout)
 {
     switch(layout)
     {
@@ -212,12 +217,14 @@ vk::ImageLayout usagi::translate(GpuImageLayout layout)
             return vk::ImageLayout::eTransferDstOptimal;
         case GpuImageLayout::COLOR:
             return vk::ImageLayout::eColorAttachmentOptimal;
+        case GpuImageLayout::SHADER_READ_ONLY:
+            return vk::ImageLayout::eShaderReadOnlyOptimal;
         default:
             throw std::runtime_error("Invalid GpuImageLayout.");
     }
 }
 
-vk::IndexType usagi::translate(GraphicsIndexType type)
+vk::IndexType translate(GraphicsIndexType type)
 {
     switch(type)
     {
@@ -230,7 +237,7 @@ vk::IndexType usagi::translate(GraphicsIndexType type)
     }
 }
 
-vk::SampleCountFlagBits usagi::translateSampleCount(std::uint32_t sample_count)
+vk::SampleCountFlagBits translateSampleCount(std::uint32_t sample_count)
 {
     switch(sample_count)
     {
@@ -245,7 +252,7 @@ vk::SampleCountFlagBits usagi::translateSampleCount(std::uint32_t sample_count)
     }
 }
 
-vk::PipelineStageFlagBits usagi::translate(GraphicsPipelineStage stage)
+vk::PipelineStageFlagBits translate(GraphicsPipelineStage stage)
 {
     switch(stage)
     {
@@ -271,4 +278,63 @@ vk::PipelineStageFlagBits usagi::translate(GraphicsPipelineStage stage)
             return vk::PipelineStageFlagBits::eBottomOfPipe;
         default: throw std::runtime_error("Invalid GraphicsPipelineStage.");
     }
+}
+
+vk::BufferUsageFlagBits translate(const GpuBufferUsage usage)
+{
+    switch(usage)
+    {
+        case GpuBufferUsage::VERTEX:
+            return vk::BufferUsageFlagBits::eVertexBuffer;
+        case GpuBufferUsage::INDEX:
+            return vk::BufferUsageFlagBits::eIndexBuffer;
+        case GpuBufferUsage::UNIFORM:
+            return vk::BufferUsageFlagBits::eUniformBuffer;
+        default: throw std::runtime_error("Invalid GpuBufferUsage.");
+    }
+}
+
+vk::ImageUsageFlagBits translate(const GpuImageUsage usage)
+{
+    switch(usage)
+    {
+        case GpuImageUsage::SAMPLED:
+            return vk::ImageUsageFlagBits::eSampled;
+        case GpuImageUsage::COLOR_ATTACHMENT:
+            return vk::ImageUsageFlagBits::eColorAttachment;
+        case GpuImageUsage::DEPTH_STENCIL_ATTACHMENT:
+            return vk::ImageUsageFlagBits::eDepthStencilAttachment;
+        case GpuImageUsage::INPUT_ATTACHMENT:
+            return vk::ImageUsageFlagBits::eInputAttachment;
+        default: throw std::runtime_error("Invalid GpuImageUsage.");
+    }
+}
+
+vk::SamplerAddressMode translate(GpuSamplerAddressMode mode)
+{
+    switch(mode)
+    {
+        case GpuSamplerAddressMode::REPEAT:
+            return vk::SamplerAddressMode::eRepeat;
+        case GpuSamplerAddressMode::MIRRORED_REPEAT:
+            return vk::SamplerAddressMode::eMirroredRepeat;
+        case GpuSamplerAddressMode::CLAMP_TO_EDGE:
+            return vk::SamplerAddressMode::eClampToEdge;
+        case GpuSamplerAddressMode::CLAMP_TO_BORDER:
+            return vk::SamplerAddressMode::eClampToBorder;
+        case GpuSamplerAddressMode::MIRROR_CLAMP_TO_EDGE:
+            return vk::SamplerAddressMode::eMirrorClampToEdge;
+        default: throw std::runtime_error("Invalid GpuSamplerAddressMode.");
+    }
+}
+
+vk::Filter translate(GpuFilter filter)
+{
+    switch(filter)
+    {
+        case GpuFilter::NEAREST: return vk::Filter::eNearest;
+        case GpuFilter::LINEAR: return vk::Filter::eLinear;
+        default: throw std::runtime_error("Invalid GpuFilter.");
+    }
+}
 }

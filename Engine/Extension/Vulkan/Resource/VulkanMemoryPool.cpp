@@ -2,56 +2,49 @@
 
 #include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
+#include <Usagi/Engine/Extension/Vulkan/VulkanEnumTranslation.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageCreateInfo.hpp>
+#include <Usagi/Engine/Utility/Rounding.hpp>
 
-#include "VulkanBufferAllocation.hpp"
+using namespace usagi::vulkan;
 
-void usagi::VulkanMemoryPool::createBuffer(
-    std::size_t size,
-    const vk::BufferUsageFlags &usages)
+void usagi::VulkanMemoryPool::mapMemory()
 {
-    vk::BufferCreateInfo buffer_create_info;
+    mMappedMemory = static_cast<char*>(mDevice->device().mapMemory(
+        mMemory.get(), 0, VK_WHOLE_SIZE));
+}
 
-    buffer_create_info.setSize(size);
-    buffer_create_info.setUsage(usages);
-    buffer_create_info.setSharingMode(vk::SharingMode::eExclusive);
-
-    mBuffer = mDevice->device().createBufferUnique(buffer_create_info);
+void usagi::VulkanMemoryPool::unmapMemory()
+{
+    if(mMappedMemory != nullptr)
+    {
+        mDevice->device().unmapMemory(mMemory.get());
+        mMappedMemory = nullptr;
+    }
 }
 
 void usagi::VulkanMemoryPool::allocateDeviceMemory(
-    std::size_t size,
-    const vk::MemoryPropertyFlags &mem_properties,
-    const vk::BufferUsageFlags &usages)
+    const vk::MemoryPropertyFlags &mem_properties)
 {
-    createBuffer(size, usages);
-    const auto buffer_memory_requirements =
-        mDevice->device().getBufferMemoryRequirements(mBuffer.get());
     const auto memory_properties =
         mDevice->physicalDevice().getMemoryProperties();
 
-    // find first heap
+    // find first heap supporting our needs and has enough space
     for(uint32_t i = 0; i < memory_properties.memoryTypeCount; ++i)
     {
         // the i-th bit is set only when that memory type is supported.
         // https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkMemoryRequirements.html
-        if((buffer_memory_requirements.memoryTypeBits & 1 << i) &&
+        if((mMemoryRequirements.memoryTypeBits & 1 << i) &&
             (memory_properties.memoryTypes[i].propertyFlags & mem_properties))
         {
             vk::MemoryAllocateInfo info;
-            info.setAllocationSize(buffer_memory_requirements.size);
+            info.setAllocationSize(mMemoryRequirements.size);
             info.setMemoryTypeIndex(i);
-
             try
             {
                 mMemory = mDevice->device().allocateMemoryUnique(info);
-                mDevice->device().bindBufferMemory(
-                    mBuffer.get(), mMemory.get(), 0);
-                mAllocator = std::make_unique<BitmapMemoryAllocator>(
-                    nullptr,
-                    buffer_memory_requirements.size,
-                    8 * 1024 /* 8 KiB */, // todo config
-                    buffer_memory_requirements.alignment
-                );
+                if(mem_properties & vk::MemoryPropertyFlagBits::eHostVisible)
+                    mapMemory();
                 return;
             }
             catch(const vk::OutOfHostMemoryError &e)
@@ -68,48 +61,106 @@ void usagi::VulkanMemoryPool::allocateDeviceMemory(
     throw std::bad_alloc();
 }
 
-usagi::VulkanMemoryPool::VulkanMemoryPool(
-    VulkanGpuDevice *device,
-    std::size_t size,
+vk::UniqueImage usagi::VulkanMemoryPool::createImage(
+    const GpuImageCreateInfo &info, vk::Format &format) const
+{
+    vk::ImageCreateInfo vk_info;
+    vk_info.setImageType(vk::ImageType::e2D);
+    vk_info.setFormat(translate(info.format));
+    vk_info.extent.width = info.size.x();
+    vk_info.extent.height = info.size.y();
+    vk_info.extent.depth = 1;
+    vk_info.setMipLevels(info.mip_levels);
+    vk_info.setArrayLayers(1);
+    vk_info.setSamples(translateSampleCount(info.sample_count));
+    // todo currently not using stage buffer and uses mapped memory write.
+    // change do optimal when resource staging is implemented.
+    vk_info.setTiling(vk::ImageTiling::eLinear);
+    vk_info.setUsage(translate(info.usage));
+    vk_info.setSharingMode(vk::SharingMode::eExclusive);
+    // todo also change this if using stage buffer
+    vk_info.setInitialLayout(vk::ImageLayout::ePreinitialized);
+
+    format = vk_info.format;
+    return mDevice->device().createImageUnique(vk_info);
+}
+
+std::size_t usagi::VulkanMemoryPool::getImageRequiredSize(vk::Image image) const
+{
+    const auto req =  mDevice->device().getImageMemoryRequirements(image);
+    return req.size;
+}
+
+void usagi::VulkanMemoryPool::bindImageMemory(
+    VulkanPooledImage *image)
+{
+    mDevice->device().bindImageMemory(image->image(), mMemory.get(),
+        image->offset());
+}
+
+void usagi::VulkanMemoryPool::createImageBaseView(
+    VulkanPooledImage *image,
+    const vk::Format format)
+{
+    image->createBaseView(format);
+}
+
+void usagi::VulkanMemoryPool::allocateDeviceMemoryForBuffer(
+    const std::size_t size,
     const vk::MemoryPropertyFlags &mem_properties,
-    const vk::BufferUsageFlags &usages)
+    const vk::BufferUsageFlags &usages,
+    vk::UniqueBuffer &buffer)
+{
+    vk::BufferCreateInfo buffer_create_info;
+
+    buffer_create_info.setSize(size);
+    buffer_create_info.setUsage(usages);
+    buffer_create_info.setSharingMode(vk::SharingMode::eExclusive);
+
+    auto vk_device = mDevice->device();
+    buffer = vk_device.createBufferUnique(buffer_create_info);
+
+    mMemoryRequirements = vk_device.getBufferMemoryRequirements(buffer.get());
+    allocateDeviceMemory(mem_properties);
+    vk_device.bindBufferMemory(buffer.get(), mMemory.get(), 0);
+}
+
+void usagi::VulkanMemoryPool::allocateDeviceMemoryForImage(
+    std::size_t total_size,
+    const vk::MemoryPropertyFlags &mem_properties,
+    const vk::ImageUsageFlags &usages)
+{
+    vk::ImageCreateInfo vk_info;
+    vk_info.setImageType(vk::ImageType::e2D);
+    vk_info.setFormat(vk::Format::eB8G8R8A8Snorm);
+    vk_info.extent.width = 1;
+    vk_info.extent.height = 1;
+    vk_info.extent.depth = 1;
+    vk_info.setMipLevels(1);
+    vk_info.setArrayLayers(1);
+    vk_info.setSamples(vk::SampleCountFlagBits::e1);
+    vk_info.setTiling(vk::ImageTiling::eLinear);
+    vk_info.setUsage(usages);
+    vk_info.setSharingMode(vk::SharingMode::eExclusive);
+    vk_info.setInitialLayout(vk::ImageLayout::ePreinitialized);
+
+    auto vk_device = mDevice->device();
+    auto dummy_image = vk_device.createImageUnique(vk_info);
+
+    mMemoryRequirements =
+        vk_device.getImageMemoryRequirements(dummy_image.get());
+    mMemoryRequirements.size =
+        utility::roundUpUnsigned(total_size, mMemoryRequirements.alignment);
+
+    allocateDeviceMemory(mem_properties);
+}
+
+usagi::VulkanMemoryPool::VulkanMemoryPool(VulkanGpuDevice *device)
     : mDevice(device)
 {
-    allocateDeviceMemory(size, mem_properties, usages);
-
-    mMappedMemory = static_cast<char*>(mDevice->device().mapMemory(
-        mMemory.get(), 0, VK_WHOLE_SIZE));
 }
 
 usagi::VulkanMemoryPool::~VulkanMemoryPool()
 {
-    if(mMappedMemory != nullptr)
-        mDevice->device().unmapMemory(mMemory.get());
-    mMappedMemory = nullptr;
-}
-
-std::shared_ptr<usagi::VulkanBufferAllocation> usagi::VulkanMemoryPool::
-    allocate(std::size_t size)
-{
-    auto offset = reinterpret_cast<std::size_t>(mAllocator->allocate(size));
-
-    try
-    {
-        auto alloc = std::make_shared<VulkanBufferAllocation>(
-            this,
-            offset, size,
-            mMappedMemory + offset
-        );
-        return std::move(alloc);
-    }
-    catch(...)
-    {
-        mAllocator->deallocate(reinterpret_cast<void*>(offset));
-        throw;
-    }
-}
-
-void usagi::VulkanMemoryPool::deallocate(std::size_t offset)
-{
-    mAllocator->deallocate(reinterpret_cast<void*>(offset));
+    unmapMemory();
 }

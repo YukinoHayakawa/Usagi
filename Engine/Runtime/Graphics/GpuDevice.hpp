@@ -6,8 +6,13 @@
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 #include <Usagi/Engine/Core/Math.hpp>
 
+#include "Enum/GpuBufferUsage.hpp"
+
 namespace usagi
 {
+struct GpuImageCreateInfo;
+class GpuSampler;
+struct GpuSamplerCreateInfo;
 class GpuBuffer;
 class GpuImageView;
 class Framebuffer;
@@ -37,12 +42,16 @@ public:
         const Vector2u32 &size,
         std::initializer_list<std::shared_ptr<GpuImageView>> views) = 0;
     virtual std::shared_ptr<GpuSemaphore> createSemaphore() = 0;
+    virtual std::shared_ptr<GpuImage> createImage(
+        const GpuImageCreateInfo &info) = 0;
 
     /**
      * \brief Memory is not allocated until GpuBuffer::allocate() is called.
      * \return
      */
-    virtual std::shared_ptr<GpuBuffer> createBuffer() = 0;
+    virtual std::shared_ptr<GpuBuffer> createBuffer(GpuBufferUsage usage) = 0;
+    virtual std::shared_ptr<GpuSampler> createSampler(
+        const GpuSamplerCreateInfo &info) = 0;
 
     virtual void submitGraphicsJobs(
         std::vector<std::shared_ptr<GraphicsCommandList>> jobs,
