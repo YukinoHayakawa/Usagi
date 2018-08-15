@@ -474,6 +474,7 @@ void usagi::VulkanGraphicsPipelineCompiler::setDepthStencilState(
 void usagi::VulkanGraphicsPipelineCompiler::setColorBlendState(
     const ColorBlendState &state)
 {
+    mColorBlendAttachmentState.setBlendEnable(state.enable);
     mColorBlendAttachmentState.setColorBlendOp(
         translate(state.color_blend_op));
     mColorBlendAttachmentState.setAlphaBlendOp(
