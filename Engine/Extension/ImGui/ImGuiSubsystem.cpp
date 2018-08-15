@@ -214,6 +214,8 @@ void usagi::ImGuiSubsystem::setupInput()
     io.KeyMap[ImGuiKey_X] = static_cast<int>(KeyCode::X);
     io.KeyMap[ImGuiKey_Y] = static_cast<int>(KeyCode::Y);
     io.KeyMap[ImGuiKey_Z] = static_cast<int>(KeyCode::Z);
+
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 }
 
 void usagi::ImGuiSubsystem::update(
