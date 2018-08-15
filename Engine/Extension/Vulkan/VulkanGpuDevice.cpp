@@ -15,15 +15,89 @@
 #include "Resource/VulkanGpuImageView.hpp"
 #include "Resource/VulkanGraphicsCommandList.hpp"
 #include "Resource/VulkanMemoryPool.hpp"
-#include "Resource/VulkanSemaphore.hpp"
 #include "Resource/VulkanPooledImage.hpp"
+#include "Resource/VulkanSampler.hpp"
+#include "Resource/VulkanSemaphore.hpp"
 #include "VulkanEnumTranslation.hpp"
 #include "VulkanGraphicsPipelineCompiler.hpp"
 #include "VulkanHelper.hpp"
 #include "VulkanRenderPass.hpp"
-#include "Resource/VulkanSampler.hpp"
 
 using namespace usagi::vulkan;
+
+VkBool32 usagi::VulkanGpuDevice::debugMessengerCallbackDispatcher(
+    const VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+    const VkDebugUtilsMessageTypeFlagsEXT message_type,
+    const VkDebugUtilsMessengerCallbackDataEXT *callback_data,
+    void *user_data)
+{
+    const auto device = reinterpret_cast<VulkanGpuDevice*>(user_data);
+    return device->debugMessengerCallback(
+        vk::DebugUtilsMessageSeverityFlagBitsEXT { message_severity },
+        vk::DebugUtilsMessageTypeFlagsEXT  { message_type },
+        reinterpret_cast<const vk::DebugUtilsMessengerCallbackDataEXT *>(
+            callback_data));
+}
+
+VkBool32 usagi::VulkanGpuDevice::debugMessengerCallback(
+    const vk::DebugUtilsMessageSeverityFlagsEXT &message_severity,
+    const vk::DebugUtilsMessageTypeFlagsEXT &message_type,
+    const vk::DebugUtilsMessengerCallbackDataEXT *callback_data) const
+{
+    spdlog::level::level_enum level;
+    using Severity = vk::DebugUtilsMessageSeverityFlagBitsEXT;
+    if(message_severity & Severity::eVerbose)
+        level = spdlog::level::debug;
+    else if(message_severity & Severity::eInfo)
+        level = spdlog::level::info;
+    else if(message_severity & Severity::eWarning)
+        level = spdlog::level::warn;
+    else if(message_severity & Severity::eError)
+        level = spdlog::level::err;
+    else
+        level = spdlog::level::info;
+
+    LOG(log, level,
+        "[Vulkan] {} [{}][ID={}]: {}",
+        to_string(message_type),
+        callback_data->pMessageIdName
+            ? callback_data->pMessageIdName
+            : "<Unknown>",
+        callback_data->messageIdNumber,
+        callback_data->pMessage);
+
+    if(callback_data->objectCount > 0)
+    {
+        for(uint32_t i = 0; i < callback_data->objectCount; ++i)
+        {
+            const auto &object = callback_data->pObjects[i];
+            LOG(log, level, "Object #{}: Handle {}, Type {}, Name \"{}\"",
+                i,
+                object.objectHandle,
+                to_string(object.objectType),
+                object.pObjectName ? object.pObjectName : "");
+        }
+    }
+    if(callback_data->cmdBufLabelCount > 0)
+    {
+        LOG(info, "Command Buffer Label Count: {}",
+            callback_data->cmdBufLabelCount);
+        for(uint32_t i = 0; i < callback_data->cmdBufLabelCount; ++i)
+        {
+            LOG(log, level,
+                "Label #{}: {} {{ {}, {}, {}, {} }}\n",
+                i,
+                callback_data->pCmdBufLabels[i].pLabelName,
+                callback_data->pCmdBufLabels[i].color[0],
+                callback_data->pCmdBufLabels[i].color[1],
+                callback_data->pCmdBufLabels[i].color[2],
+                callback_data->pCmdBufLabels[i].color[3]);
+        }
+    }
+
+    // Don't bail out, but keep going. return false;
+    return false;
+}
 
 uint32_t usagi::VulkanGpuDevice::selectQueue(
     std::vector<vk::QueueFamilyProperties> &queue_family,
@@ -38,55 +112,6 @@ uint32_t usagi::VulkanGpuDevice::selectQueue(
     }
     throw std::runtime_error(
         "Could not find a queue family with required flags.");
-}
-
-VkBool32 usagi::VulkanGpuDevice::debugLayerCallbackDispatcher(
-    VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT obj_type,
-    uint64_t obj, size_t location, int32_t code,
-    const char *layer_prefix, const char *msg, void *user_data)
-{
-    const auto device = reinterpret_cast<VulkanGpuDevice*>(user_data);
-    return device->debugLayerCallback(
-        static_cast<vk::DebugReportFlagBitsEXT>(flags),
-        static_cast<vk::DebugReportObjectTypeEXT>(obj_type),
-        obj,
-        location,
-        code,
-        layer_prefix,
-        msg
-    );
-}
-
-bool usagi::VulkanGpuDevice::debugLayerCallback(
-    vk::DebugReportFlagsEXT flags,
-    vk::DebugReportObjectTypeEXT obj_type,
-    std::uint64_t obj,
-    std::size_t location,
-    std::int32_t code,
-    const char *layer_prefix,
-    const char *msg) const
-{
-    if(flags & vk::DebugReportFlagBitsEXT::eInformation)
-    {
-        // LOG(info, "Vulkan: {}", msg);
-    }
-    if(flags & vk::DebugReportFlagBitsEXT::eWarning)
-    {
-        LOG(warn, "Vulkan: {}", msg);
-    }
-    if(flags & vk::DebugReportFlagBitsEXT::ePerformanceWarning)
-    {
-        LOG(warn, "Vulkan: (Perf) {}", msg);
-    }
-    if(flags & vk::DebugReportFlagBitsEXT::eError)
-    {
-        LOG(error, "Vulkan: {}", msg);
-    }
-    if(flags & vk::DebugReportFlagBitsEXT::eDebug)
-    {
-        LOG(debug, "Vulkan: {}", msg);
-    }
-    return false;
 }
 
 void usagi::VulkanGpuDevice::createInstance()
@@ -130,9 +155,8 @@ void usagi::VulkanGpuDevice::createInstance()
     {
         // application window
         VK_KHR_SURFACE_EXTENSION_NAME,
-        // todo: use VK_EXT_debug_utils & add name/color tag support
-        // provide feedback from validation layer
-        VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+        // provide feedback from validation layer, etc.
+        VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
     };
     addPlatformSurfaceExtension(instance_extensions);
     instance_create_info.setEnabledExtensionCount(
@@ -154,19 +178,21 @@ void usagi::VulkanGpuDevice::createInstance()
 
 void usagi::VulkanGpuDevice::createDebugReport()
 {
-    vk::DebugReportCallbackCreateInfoEXT debug_info;
-    debug_info.setFlags(
-        vk::DebugReportFlagBitsEXT::eInformation |
-        vk::DebugReportFlagBitsEXT::eWarning |
-        vk::DebugReportFlagBitsEXT::ePerformanceWarning |
-        vk::DebugReportFlagBitsEXT::eError |
-        vk::DebugReportFlagBitsEXT::eDebug |
-        vk::DebugReportFlagBitsEXT(0)
-    );
-    debug_info.setPfnCallback(&debugLayerCallbackDispatcher);
-    debug_info.pUserData = this;
-    mDebugReportCallback =
-        mInstance->createDebugReportCallbackEXTUnique(debug_info);
+    vk::DebugUtilsMessengerCreateInfoEXT info;
+    using Severity = vk::DebugUtilsMessageSeverityFlagBitsEXT;
+    info.messageSeverity =
+        Severity::eVerbose |
+        Severity::eInfo |
+        Severity::eWarning |
+        Severity::eError;
+    using Type = vk::DebugUtilsMessageTypeFlagBitsEXT;
+    info.messageType =
+        Type::eGeneral |
+        Type::eValidation |
+        Type::ePerformance;
+    info.pfnUserCallback = &debugMessengerCallbackDispatcher;
+
+    mDebugUtilsMessenger = mInstance->createDebugUtilsMessengerEXTUnique(info);
 }
 
 void usagi::VulkanGpuDevice::selectPhysicalDevice()

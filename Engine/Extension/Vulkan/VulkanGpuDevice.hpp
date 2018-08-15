@@ -17,7 +17,7 @@ class VulkanBatchResource;
 class VulkanGpuDevice : public GpuDevice
 {
     vk::UniqueInstance mInstance;
-    vk::UniqueDebugReportCallbackEXT mDebugReportCallback;
+    vk::UniqueDebugUtilsMessengerEXT mDebugUtilsMessenger;
     vk::PhysicalDevice mPhysicalDevice;
     vk::UniqueDevice mDevice;
 
@@ -32,26 +32,16 @@ class VulkanGpuDevice : public GpuDevice
         const vk::QueueFlags &queue_flags);
     void checkQueuePresentationCapacity(uint32_t queue_family_index) const;
 
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugLayerCallbackDispatcher(
-        VkDebugReportFlagsEXT flags,
-        VkDebugReportObjectTypeEXT objType,
-        uint64_t obj,
-        size_t location,
-        int32_t code,
-        const char *layerPrefix,
-        const char *msg,
-        void *userData
-    );
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallbackDispatcher(
+        VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+        VkDebugUtilsMessageTypeFlagsEXT message_type,
+        const VkDebugUtilsMessengerCallbackDataEXT *callback_data,
+        void *user_data);
 
-    bool debugLayerCallback(
-        vk::DebugReportFlagsEXT flags,
-        vk::DebugReportObjectTypeEXT obj_type,
-        std::uint64_t obj,
-        std::size_t location,
-        std::int32_t code,
-        const char *layer_prefix,
-        const char *msg
-    ) const;
+    VkBool32 debugMessengerCallback(
+        const vk::DebugUtilsMessageSeverityFlagsEXT &message_severity,
+        const vk::DebugUtilsMessageTypeFlagsEXT &message_type,
+        const vk::DebugUtilsMessengerCallbackDataEXT *callback_data) const;
 
     void createInstance();
     void createDebugReport();
