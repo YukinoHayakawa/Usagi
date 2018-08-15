@@ -393,6 +393,9 @@
     <ClInclude Include="Runtime\Graphics\Resource\GpuImageViewCreateInfo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Extension\Win32\Win32Runtime.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utility\File.cpp">
@@ -471,9 +474,6 @@
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\Init\Win32Runtime.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Game\Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -535,6 +535,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Win32\Win32Runtime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

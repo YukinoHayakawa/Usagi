@@ -17,7 +17,7 @@ class HelloSwapchain
     : public KeyEventListener,
     public WindowEventListener
 {
-    Runtime mRuntime;
+    std::shared_ptr<Runtime> mRuntime;
     std::shared_ptr<Window> mWindow;
     std::shared_ptr<Swapchain> mSwapchain;
     std::shared_ptr<GpuCommandPool> mCommandPool;
@@ -26,9 +26,11 @@ class HelloSwapchain
 public:
     HelloSwapchain()
     {
+        mRuntime = Runtime::create();
+
         // Setting up window
-        mRuntime.initWindow();
-        mWindow = mRuntime.windowManager()->createWindow(
+        mRuntime->initWindow();
+        mWindow = mRuntime->windowManager()->createWindow(
             u8"🐰 - Hello Swapchain",
             Vector2i { 100, 100 },
             Vector2u32 { 1920, 1080 }
@@ -36,16 +38,16 @@ public:
         mWindow->addEventListener(this);
 
         // Setting up graphics
-        mRuntime.initGpu();
+        mRuntime->initGpu();
 
-        mSwapchain = mRuntime.gpu()->createSwapchain(mWindow.get());
+        mSwapchain = mRuntime->gpu()->createSwapchain(mWindow.get());
         mSwapchain->create(mWindow->size(), GpuBufferFormat::R8G8B8A8_UNORM);
 
-        mCommandPool = mRuntime.gpu()->createCommandPool();
+        mCommandPool = mRuntime->gpu()->createCommandPool();
 
         // Setting up input
-        mRuntime.initInput();
-        mRuntime.inputManager()->virtualKeyboard()->addEventListener(this);
+        mRuntime->initInput();
+        mRuntime->inputManager()->virtualKeyboard()->addEventListener(this);
     }
 
     void onKeyStateChange(const KeyEvent &e) override
@@ -105,12 +107,12 @@ public:
 
     void mainLoop()
     {
-        auto gpu = mRuntime.gpu();
+        auto gpu = mRuntime->gpu();
 
         while(mWindow->isOpen())
         {
-            mRuntime.windowManager()->processEvents();
-            mRuntime.inputManager()->processEvents();
+            mRuntime->windowManager()->processEvents();
+            mRuntime->inputManager()->processEvents();
             mSwapchain->acquireNextImage();
 
             auto cmd_list = mCommandPool->allocateGraphicsCommandList();

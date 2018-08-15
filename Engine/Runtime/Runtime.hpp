@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <memory>
+#include <string>
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 
@@ -11,38 +12,30 @@ class InputManager;
 class WindowManager;
 
 /**
- * \brief Provides access to platform-dependent resources including GPU,
- * input system, and windowing system.
+ * \brief Provides access to platform-dependent resources and other
+ * functionalities.
  */
-class Runtime final : Noncopyable
+class Runtime : Noncopyable
 {
-     std::unique_ptr<GpuDevice> mGpu;
-     std::unique_ptr<InputManager> mInputManager;
-     std::unique_ptr<WindowManager> mWindowManager;
-
 public:
-    // Implement the init methods for each specific platform.
+    virtual ~Runtime() = default;
 
-    Runtime();
-    ~Runtime();
+    // Each platform should implements a factory method.
+    static std::shared_ptr<Runtime> create();
 
-    void initGpu();
-    void initInput();
-    void initWindow();
+    virtual void initGpu() = 0;
+    virtual void initInput() = 0;
+    virtual void initWindow() = 0;
 
-    GpuDevice * gpu() const
-    {
-        return mGpu.get();
-    }
+    /**
+     * \brief
+     * \param report_file_path Without file extension.
+     */
+    virtual void enableCrashHandler(const std::string &report_file_path) = 0;
+    virtual void displayErrorDialog(const std::string & msg) = 0;
 
-    InputManager * inputManager() const
-    {
-        return mInputManager.get();
-    }
-
-    WindowManager * windowManager() const
-    {
-        return mWindowManager.get();
-    }
+    virtual GpuDevice * gpu() const = 0;
+    virtual InputManager * inputManager() const = 0;
+    virtual WindowManager * windowManager() const = 0;
 };
 }

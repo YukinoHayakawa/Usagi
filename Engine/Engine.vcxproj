@@ -155,7 +155,7 @@
     <ClCompile Include="Extension\Win32\Input\Win32Keyboard.cpp" />
     <ClCompile Include="Extension\Win32\Input\Win32Mouse.cpp" />
     <ClCompile Include="Extension\Win32\Input\Win32RawInputDevice.cpp" />
-    <ClCompile Include="Extension\Init\Win32Runtime.cpp" />
+    <ClCompile Include="Extension\Win32\Win32Runtime.cpp" />
     <ClCompile Include="Extension\Win32\Window\Win32Window.cpp" />
     <ClCompile Include="Extension\Win32\Window\Win32WindowManager.cpp" />
     <ClCompile Include="Game\Game.cpp" />
@@ -216,6 +216,7 @@
     <ClInclude Include="Extension\Win32\Win32MacroFix.hpp" />
     <ClInclude Include="Extension\Win32\Input\Win32Mouse.hpp" />
     <ClInclude Include="Extension\Win32\Input\Win32RawInputDevice.hpp" />
+    <ClInclude Include="Extension\Win32\Win32Runtime.hpp" />
     <ClInclude Include="Extension\Win32\Window\Win32Window.hpp" />
     <ClInclude Include="Extension\Win32\Win32.hpp" />
     <ClInclude Include="Extension\Win32\Window\Win32WindowManager.hpp" />

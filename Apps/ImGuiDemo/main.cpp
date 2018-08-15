@@ -156,7 +156,16 @@ public:
 
 int main(int argc, char *argv[])
 {
-    Runtime runtime;
-    ImGuiDemo demo(&runtime);
-    demo.run();
+    auto runtime = Runtime::create();
+    runtime->enableCrashHandler("ImGuiDemoErrorDump");
+    try
+    {
+        ImGuiDemo demo(runtime.get());
+        demo.run();
+    }
+    catch(const std::exception &e)
+    {
+        runtime->displayErrorDialog(e.what());
+        throw;
+    }
 }
