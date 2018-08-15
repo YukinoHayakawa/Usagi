@@ -58,10 +58,32 @@ usagi::ImGuiSubsystem::ImGuiSubsystem(
     // fonts
     mCommandPool = gpu->createCommandPool();
     {
+        const auto size = 12 * scale;
+        // todo fetch from asset system
+        const auto file = "Data/fonts/Microsoft-Yahei-Mono.ttf";
+
+        // add fonts
+        ImFontConfig config;
+        config.MergeMode = true;
         // io.Fonts->AddFontDefault();
-        const auto font = io.Fonts->AddFontFromFileTTF(
-            "Data/fonts/Microsoft-Yahei-Mono.ttf", 12 * scale);
+
+        // Basic Latin, Extended Latin
+        auto font = io.Fonts->AddFontFromFileTTF(file, size, nullptr,
+            io.Fonts->GetGlyphRangesDefault());
         font->DisplayOffset.y = scale;
+
+        // Default + Selection of 2500 Ideographs used by Simplified Chinese
+        font = io.Fonts->AddFontFromFileTTF(file, size, &config,
+            io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+        font->DisplayOffset.y = scale;
+
+        // Default + Hiragana, Katakana, Half-Width,
+        // Selection of 1946 Ideographs
+        font = io.Fonts->AddFontFromFileTTF(file, size, &config,
+            io.Fonts->GetGlyphRangesJapanese());
+        font->DisplayOffset.y = scale;
+
+        // upload font texture
         unsigned char* pixels;
         int width, height, bytes_per_pixel;
         io.Fonts->GetTexDataAsAlpha8(
