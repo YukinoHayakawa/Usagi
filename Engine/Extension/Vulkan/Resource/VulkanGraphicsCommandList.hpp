@@ -21,7 +21,8 @@ class VulkanGraphicsCommandList
     vk::UniqueCommandBuffer mCommandBuffer;
     std::shared_ptr<VulkanGraphicsPipeline> mCurrentPipeline;
     std::vector<vk::UniqueDescriptorPool> mDescriptorPools;
-    std::vector<vk::UniqueDescriptorSet> mDescriptorSets;
+    // whole pool is discarded after use, so unique handles are not used.
+    std::vector<vk::DescriptorSet> mDescriptorSets;
     std::vector<std::shared_ptr<VulkanBatchResource>> mResources;
 
     void createDescriptorPool();

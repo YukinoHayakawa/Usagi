@@ -10,5 +10,6 @@ enum class GpuImageLayout
     TRANSFER_DST,
     COLOR,
     SHADER_READ_ONLY,
+    PREINITIALIZED,
 };
 }

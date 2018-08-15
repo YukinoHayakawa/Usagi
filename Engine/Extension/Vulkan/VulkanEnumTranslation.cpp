@@ -8,6 +8,7 @@
 #include <Usagi/Engine/Runtime/Graphics/Enum/GpuImageUsage.hpp>
 #include <Usagi/Engine/Runtime/Graphics/RenderPassCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageViewCreateInfo.hpp>
 
 namespace usagi::vulkan
 {
@@ -28,6 +29,8 @@ vk::Format translate(GpuBufferFormat format)
 {
     switch(format)
     {
+        case GpuBufferFormat::R8_UNORM:
+            return vk::Format::eR8Unorm;
         case GpuBufferFormat::R8G8B8A8_UNORM:
             return vk::Format::eR8G8B8A8Unorm;
         case GpuBufferFormat::R32_SFLOAT:
@@ -219,6 +222,8 @@ vk::ImageLayout translate(GpuImageLayout layout)
             return vk::ImageLayout::eColorAttachmentOptimal;
         case GpuImageLayout::SHADER_READ_ONLY:
             return vk::ImageLayout::eShaderReadOnlyOptimal;
+        case GpuImageLayout::PREINITIALIZED:
+            return vk::ImageLayout::ePreinitialized;
         default:
             throw std::runtime_error("Invalid GpuImageLayout.");
     }
@@ -276,6 +281,8 @@ vk::PipelineStageFlagBits translate(GraphicsPipelineStage stage)
             return vk::PipelineStageFlagBits::eTransfer;
         case GraphicsPipelineStage::BOTTOM_OF_PIPE:
             return vk::PipelineStageFlagBits::eBottomOfPipe;
+        case GraphicsPipelineStage::HOST:
+            return vk::PipelineStageFlagBits::eHost;
         default: throw std::runtime_error("Invalid GraphicsPipelineStage.");
     }
 }
@@ -328,13 +335,35 @@ vk::SamplerAddressMode translate(GpuSamplerAddressMode mode)
     }
 }
 
-vk::Filter translate(GpuFilter filter)
+vk::Filter translate(const GpuFilter filter)
 {
     switch(filter)
     {
         case GpuFilter::NEAREST: return vk::Filter::eNearest;
         case GpuFilter::LINEAR: return vk::Filter::eLinear;
         default: throw std::runtime_error("Invalid GpuFilter.");
+    }
+}
+
+vk::ComponentSwizzle translate(const GpuImageComponentSwizzle swizzle)
+{
+    switch(swizzle)
+    {
+        case GpuImageComponentSwizzle::IDENTITY:
+            return vk::ComponentSwizzle::eIdentity;
+        case GpuImageComponentSwizzle::ZERO:
+            return vk::ComponentSwizzle::eZero;
+        case GpuImageComponentSwizzle::ONE:
+            return vk::ComponentSwizzle::eOne;
+        case GpuImageComponentSwizzle::R:
+            return vk::ComponentSwizzle::eR;
+        case GpuImageComponentSwizzle::G:
+            return vk::ComponentSwizzle::eG;
+        case GpuImageComponentSwizzle::B:
+            return vk::ComponentSwizzle::eB;
+        case GpuImageComponentSwizzle::A:
+            return vk::ComponentSwizzle::eA;
+        default: throw std::runtime_error("Invalid GpuImageComponentSwizzle.");
     }
 }
 }

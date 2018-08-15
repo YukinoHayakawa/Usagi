@@ -247,6 +247,7 @@
     <ClInclude Include="Runtime\Graphics\Resource\GpuImage.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\GpuImageCreateInfo.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\GpuImageView.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\GpuImageViewCreateInfo.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\GpuSampler.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\GpuSamplerCreateInfo.hpp" />
     <ClInclude Include="Runtime\Graphics\Resource\GraphicsCommandList.hpp" />

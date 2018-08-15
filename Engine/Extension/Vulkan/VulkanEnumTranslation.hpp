@@ -4,6 +4,7 @@
 
 namespace usagi
 {
+enum class GpuImageComponentSwizzle;
 enum class GpuFilter;
 enum class GpuSamplerAddressMode;
 enum class GpuImageUsage;
@@ -45,5 +46,6 @@ vk::BufferUsageFlagBits translate(GpuBufferUsage usage);
 vk::ImageUsageFlagBits translate(GpuImageUsage usage);
 vk::SamplerAddressMode translate(GpuSamplerAddressMode mode);
 vk::Filter translate(GpuFilter filter);
+vk::ComponentSwizzle translate(GpuImageComponentSwizzle swizzle);
 }
 }

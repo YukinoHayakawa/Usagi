@@ -64,7 +64,7 @@ void usagi::VulkanGraphicsCommandList::imageTransition(
     {
         case vk::ImageLayout::ePreinitialized:
             barrier.srcAccessMask =
-                AccessFlagBits::eHostWrite | AccessFlagBits::eTransferWrite;
+                AccessFlagBits::eHostWrite;
             break;
         case vk::ImageLayout::eColorAttachmentOptimal:
             barrier.srcAccessMask =
@@ -103,8 +103,6 @@ void usagi::VulkanGraphicsCommandList::imageTransition(
                 AccessFlagBits::eDepthStencilAttachmentWrite;
             break;
         case vk::ImageLayout::eShaderReadOnlyOptimal:
-            barrier.srcAccessMask =
-                AccessFlagBits::eHostWrite | AccessFlagBits::eTransferWrite;
             barrier.dstAccessMask = AccessFlagBits::eShaderRead;
             break;
         //case vk::ImageLayout::ePresentSrcKHR:
@@ -230,9 +228,9 @@ vk::DescriptorSet usagi::VulkanGraphicsCommandList::
         const auto layout = { mCurrentPipeline->descriptorSetLayout(set_id) };
         info.setPSetLayouts(layout.begin());
 
-        mDescriptorSets.push_back(std::move(mCommandPool->device()->device()
-            .allocateDescriptorSetsUnique(info).front()));
-        return mDescriptorSets.back().get();
+        mDescriptorSets.push_back(mCommandPool->device()->device()
+            .allocateDescriptorSets(info).front());
+        return mDescriptorSets.back();
     }
     catch(const vk::SystemError &e)
     {

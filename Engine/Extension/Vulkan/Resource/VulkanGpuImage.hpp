@@ -16,12 +16,19 @@ class VulkanGpuImage
     , public std::enable_shared_from_this<VulkanGpuImage>
 {
 protected:
+    vk::Device mDevice;
+    vk::Format mFormat;
     std::shared_ptr<VulkanGpuImageView> mBaseView;
 
-    void createBaseView(vk::Device device, vk::Image image, vk::Format format);
+    void createBaseView();
 
 public:
+    VulkanGpuImage(vk::Device vk_device, vk::Format format);
+
     std::shared_ptr<GpuImageView> baseView() override;
+    std::shared_ptr<GpuImageView> createView(
+        const GpuImageViewCreateInfo &info) override;
+
     virtual vk::Image image() const = 0;
 };
 }

@@ -14,5 +14,6 @@ enum class GraphicsPipelineStage
     COLOR_ATTACHMENT_OUTPUT,
     TRANSFER,
     BOTTOM_OF_PIPE,
+    HOST,
 };
 }

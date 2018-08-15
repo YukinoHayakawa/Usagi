@@ -98,11 +98,9 @@ void usagi::VulkanMemoryPool::bindImageMemory(
         image->offset());
 }
 
-void usagi::VulkanMemoryPool::createImageBaseView(
-    VulkanPooledImage *image,
-    const vk::Format format)
+void usagi::VulkanMemoryPool::createImageBaseView(VulkanPooledImage *image)
 {
-    image->createBaseView(format);
+    image->createBaseView();
 }
 
 void usagi::VulkanMemoryPool::allocateDeviceMemoryForBuffer(

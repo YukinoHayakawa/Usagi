@@ -19,7 +19,7 @@ protected:
     VulkanGpuDevice *mDevice = nullptr;
     vk::UniqueDeviceMemory mMemory;
     vk::MemoryRequirements mMemoryRequirements { };
-    // the memory will be autommatically mapped if has eHostVisible flag
+    // the memory will be automatically mapped if has eHostVisible flag
     char *mMappedMemory = nullptr;
 
     void mapMemory();
@@ -31,7 +31,7 @@ protected:
         const GpuImageCreateInfo &info, vk::Format &format) const;
     std::size_t getImageRequiredSize(vk::Image image) const;
     void bindImageMemory(VulkanPooledImage *image);
-    static void createImageBaseView(VulkanPooledImage *image, vk::Format format);
+    static void createImageBaseView(VulkanPooledImage *image);
 
     void allocateDeviceMemoryForBuffer(
         std::size_t size,
@@ -154,11 +154,11 @@ public:
         {
             auto wrapper = std::make_shared<VulkanPooledImage>(
                 this,
-                std::move(image),
+                std::move(image), vk_format,
                 offset, size, mMappedMemory + offset
             );
             bindImageMemory(wrapper.get());
-            createImageBaseView(wrapper.get(), vk_format);
+            createImageBaseView(wrapper.get());
             return std::move(wrapper);
         }
         catch(...)

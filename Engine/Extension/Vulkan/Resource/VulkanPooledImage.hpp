@@ -14,10 +14,14 @@ class VulkanPooledImage : public VulkanGpuImage
     std::size_t mSize;
     void *mMappedAddress = nullptr;
 
+    friend class VulkanMemoryPool;
+    void createBaseView();
+
 public:
     VulkanPooledImage(
         VulkanMemoryPool *pool,
         vk::UniqueImage vk_image,
+        vk::Format format,
         std::size_t offset,
         std::size_t size,
         void *mapped_address);
@@ -25,7 +29,6 @@ public:
 
     void upload(void *data, std::size_t size) override;
 
-    void createBaseView(vk::Format format);
     vk::Image image() const override { return mImage.get(); }
     std::size_t offset() const { return mOffset; }
 };

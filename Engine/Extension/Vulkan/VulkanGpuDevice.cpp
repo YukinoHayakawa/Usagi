@@ -181,8 +181,8 @@ void usagi::VulkanGpuDevice::createDebugReport()
     vk::DebugUtilsMessengerCreateInfoEXT info;
     using Severity = vk::DebugUtilsMessageSeverityFlagBitsEXT;
     info.messageSeverity =
-        Severity::eVerbose |
-        Severity::eInfo |
+        // Severity::eVerbose |
+        // Severity::eInfo |
         Severity::eWarning |
         Severity::eError;
     using Type = vk::DebugUtilsMessageTypeFlagBitsEXT;

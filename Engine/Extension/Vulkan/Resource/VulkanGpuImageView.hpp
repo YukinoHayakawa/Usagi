@@ -18,13 +18,11 @@ class VulkanGpuImageView
 {
     VulkanGpuImage *mImage;
     vk::UniqueImageView mImageView;
-    vk::Format mFormat;
 
 public:
     VulkanGpuImageView(
         VulkanGpuImage *image,
-        vk::UniqueImageView vk_image_view,
-        vk::Format format);
+        vk::UniqueImageView vk_image_view);
 
     void fillShaderResourceInfo(
         vk::WriteDescriptorSet &write,
@@ -33,7 +31,6 @@ public:
         std::vector<std::shared_ptr<VulkanBatchResource>> &resources) override;
 
     vk::ImageView view() const { return mImageView.get(); }
-    vk::Format format() const { return mFormat; }
     VulkanGpuImage * image() const { return mImage; }
 };
 }

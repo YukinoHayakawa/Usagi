@@ -53,6 +53,7 @@ class ImGuiSubsystem
 	std::shared_ptr<GpuBuffer> mVertexBuffer;
 	std::shared_ptr<GpuBuffer> mIndexBuffer;
     std::shared_ptr<GpuImage> mFontTexture;
+    std::shared_ptr<GpuImageView> mFontTextureView;
     std::shared_ptr<GpuSampler> mSampler;
 
 public:

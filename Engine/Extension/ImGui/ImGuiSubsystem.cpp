@@ -11,6 +11,7 @@
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuCommandPool.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageView.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageViewCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
 #include <Usagi/Engine/Runtime/Input/Mouse/Mouse.hpp>
@@ -29,27 +30,40 @@ usagi::ImGuiSubsystem::ImGuiSubsystem(
     , mMouse(mouse)
 {
     mContext = ImGui::CreateContext();
+    auto &io = ImGui::GetIO();
+
     ImGui::StyleColorsDark();
     // todo hidpi
     //ImGui::GetStyle().ScaleAllSizes(mWindow->dpiScale().x());
+
+    setupInput();
 
     auto gpu = mGame->runtime()->gpu();
     mVertexBuffer = gpu->createBuffer(GpuBufferUsage::VERTEX);
     mIndexBuffer = gpu->createBuffer(GpuBufferUsage::INDEX);
     mCommandPool = gpu->createCommandPool();
     {
-        auto &io = ImGui::GetIO();
         unsigned char* pixels;
-        int width, height;
-        io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-        const auto upload_size = width * height * 4 * sizeof(char);
-
+        int width, height, bytes_per_pixel;
+        io.Fonts->GetTexDataAsAlpha8(
+            &pixels, &width, &height, &bytes_per_pixel);
+        const auto upload_size =
+            width * height * bytes_per_pixel * sizeof(char);
         GpuImageCreateInfo info;
-        info.format = GpuBufferFormat::R32G32B32A32_SFLOAT;
+        info.format = GpuBufferFormat::R8_UNORM;
         info.size = { width, height };
         info.usage = GpuImageUsage::SAMPLED;
         mFontTexture = gpu->createImage(info);
         mFontTexture->upload(pixels, upload_size);
+    }
+    {
+        GpuImageViewCreateInfo info;
+        info.components.r = GpuImageComponentSwizzle::ONE;
+        info.components.g = GpuImageComponentSwizzle::ONE;
+        info.components.b = GpuImageComponentSwizzle::ONE;
+        info.components.a = GpuImageComponentSwizzle::R;
+        mFontTextureView = mFontTexture->createView(info);
+        io.Fonts->TexID = mFontTextureView.get();
     }
     {
         GpuSamplerCreateInfo info;
@@ -331,7 +345,6 @@ void usagi::ImGuiSubsystem::render(
     auto vtx_offset = 0;
     auto idx_offset = 0;
     const auto display_pos = draw_data->DisplayPos;
-    ImTextureID last_texture = nullptr;
     for(auto n = 0; n < draw_data->CmdListsCount; n++)
     {
         auto im_cmd_list = draw_data->CmdLists[n];
@@ -355,13 +368,11 @@ void usagi::ImGuiSubsystem::render(
                 };
                 cmd_list->setScissor(0, origin, size);
 
-                if(last_texture != pcmd->TextureId)
-                {
-                    cmd_list->bindResourceSet(1, {
-                        pcmd->TextureId->shared_from_this()
-                    });
-                    last_texture = pcmd->TextureId;
-                }
+                cmd_list->bindResourceSet(1, {
+                    pcmd->TextureId
+                        ? pcmd->TextureId->shared_from_this()
+                        : mFontTextureView
+                });
 
                 cmd_list->drawIndexedInstanced(
                     pcmd->ElemCount, // index count
