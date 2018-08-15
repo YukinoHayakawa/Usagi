@@ -32,17 +32,36 @@ usagi::ImGuiSubsystem::ImGuiSubsystem(
     mContext = ImGui::CreateContext();
     auto &io = ImGui::GetIO();
 
-    ImGui::StyleColorsDark();
-    // todo hidpi
-    //ImGui::GetStyle().ScaleAllSizes(mWindow->dpiScale().x());
-
+    // input
     setupInput();
 
+    // style
+    const auto scale = mWindow->dpiScale().x();
+    ImGui::StyleColorsLight();
+    auto &style = ImGui::GetStyle();
+    style.FrameBorderSize = 1.f;
+    style.WindowRounding = 0;
+    style.ChildRounding = 0;
+    style.PopupRounding = 0;
+    style.FrameRounding = 0;
+    style.ScrollbarRounding = 0;
+    style.GrabRounding = 0;
+    auto *colors = style.Colors;
+    colors[ImGuiCol_ResizeGrip] = ImVec4(0.78f, 0.78f, 0.78f, 0.56f);
+    style.ScaleAllSizes(scale);
+
+    // resources
     auto gpu = mGame->runtime()->gpu();
     mVertexBuffer = gpu->createBuffer(GpuBufferUsage::VERTEX);
     mIndexBuffer = gpu->createBuffer(GpuBufferUsage::INDEX);
+
+    // fonts
     mCommandPool = gpu->createCommandPool();
     {
+        // io.Fonts->AddFontDefault();
+        const auto font = io.Fonts->AddFontFromFileTTF(
+            "Data/fonts/Microsoft-Yahei-Mono.ttf", 12 * scale);
+        font->DisplayOffset.y = scale;
         unsigned char* pixels;
         int width, height, bytes_per_pixel;
         io.Fonts->GetTexDataAsAlpha8(

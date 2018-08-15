@@ -39,7 +39,6 @@ class ImGuiDemo
     std::shared_ptr<Window> mWindow;
     std::shared_ptr<Swapchain> mSwapchain;
     ImGuiSubsystem *mImGui = nullptr;
-    Color4f mFillColor;
     RenderPassCreateInfo mAttachments;
     Element *mImGuiRoot = nullptr;
 
