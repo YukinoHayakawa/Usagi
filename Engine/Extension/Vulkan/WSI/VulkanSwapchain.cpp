@@ -22,34 +22,40 @@ usagi::VulkanSwapchain::VulkanSwapchain(
 
 std::shared_ptr<usagi::GpuSemaphore> usagi::VulkanSwapchain::acquireNextImage()
 {
+    if(mImagesInUse != 0)
+        LOG(warn, "Requesting another image from swapchain while "
+            "already {} is used.", mImagesInUse);
+
     auto sem = mDevice->createSemaphore();
     const auto vk_sem = static_cast<VulkanSemaphore&>(*sem).semaphore();
 
     // todo sometimes hangs when debugging with RenderDoc
     const auto result = mDevice->device().acquireNextImageKHR(
         mSwapchain.get(),
-        1000000000u, // 1s
+        UINT64_MAX, // 1000000000u, // 1s
         vk_sem,
         nullptr,
         &mCurrentImageIndex
     );
     switch(result)
     {
+        case vk::Result::eSuboptimalKHR:
+            LOG(warn, "Suboptimal swapchain");
         case vk::Result::eSuccess: break;
+        case vk::Result::eNotReady:
+            throw std::runtime_error("Currently no usable swapchain image.");
+        case vk::Result::eTimeout:
+            throw std::runtime_error("acquireNextImageKHR() timed out.");
 
         case vk::Result::eErrorOutOfDateKHR:
             LOG(info, "Swapchain is out-of-date, recreating");
             createSwapchain(mSize, mFormat.format);
             return acquireNextImage();
 
-        case vk::Result::eSuboptimalKHR:
-            LOG(info, "Suboptimal swapchain, recreating");
-            createSwapchain(mSize, mFormat.format);
-            return acquireNextImage();
-
         default: throw std::runtime_error("acquireNextImageKHR() failed.");
     }
 
+    ++mImagesInUse;
     return sem;
 }
 
@@ -67,6 +73,7 @@ void usagi::VulkanSwapchain::present(
         }
     );
     present(sems);
+    --mImagesInUse;
 }
 
 void usagi::VulkanSwapchain::present(
@@ -241,16 +248,15 @@ void usagi::VulkanSwapchain::createSwapchain(
     LOG(info, "Surface extent: {}x{}",
         create_info.imageExtent.width, create_info.imageExtent.height);
 
-    // Ensures non-blocking vkAcquireNextImageKHR() in mailbox mode.
-    // See 3.6.12 of http://vulkan-spec-chunked.ahcox.com/apes03.html
+    create_info.setPresentMode(selectPresentMode(surface_present_modes));
     // todo: mailbox not available on my R9 290X
     // todo triple buffering
-    create_info.setMinImageCount(std::clamp(
-        3u,
-        surface_capabilities.minImageCount + 1,
-        surface_capabilities.maxImageCount
-    ));
-    create_info.setPresentMode(selectPresentMode(surface_present_modes));
+    if(create_info.presentMode == vk::PresentModeKHR::eMailbox)
+        // Ensures non-blocking vkAcquireNextImageKHR() in mailbox mode.
+        // See 3.6.12 of http://vulkan-spec-chunked.ahcox.com/apes03.html
+        create_info.setMinImageCount(surface_capabilities.minImageCount + 1);
+    else
+        create_info.setMinImageCount(surface_capabilities.minImageCount);
 
     create_info.setImageArrayLayers(1);
     create_info.setImageSharingMode(vk::SharingMode::eExclusive);

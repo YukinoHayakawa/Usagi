@@ -23,6 +23,7 @@ class VulkanSwapchain final : public Swapchain
     static inline constexpr uint32_t INVALID_IMAGE_INDEX = -1;
     uint32_t mCurrentImageIndex = INVALID_IMAGE_INDEX;
     std::vector<std::shared_ptr<VulkanSwapchainImage>> mSwapchainImages;
+    int mImagesInUse = 0;
 
     static vk::SurfaceFormatKHR selectSurfaceFormat(
         const std::vector<vk::SurfaceFormatKHR> &surface_formats,
