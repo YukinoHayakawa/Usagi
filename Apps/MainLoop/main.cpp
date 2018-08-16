@@ -19,7 +19,7 @@ class MainLoop
     , public WindowEventListener
     , public GamepadEventListener
 {
-    Runtime mRuntime;
+    std::shared_ptr<Runtime> mRuntime;
     std::shared_ptr<Window> mWindow;
     std::shared_ptr<Mouse> mMouse;
     std::shared_ptr<Keyboard> mKeyboard;
@@ -28,17 +28,19 @@ class MainLoop
 public:
     MainLoop()
     {
-        mRuntime.initWindow();
-        mRuntime.initInput();
+        mRuntime = Runtime::create();
 
-        mWindow = mRuntime.windowManager()->createWindow(
+        mRuntime->initWindow();
+        mRuntime->initInput();
+
+        mWindow = mRuntime->windowManager()->createWindow(
             u8"\U0001F430 - Event Handling Test",
             Vector2i { 100, 100 },
             Vector2u32 { 1920, 1080 }
         );
         mWindow->addEventListener(this);
 
-        const auto input_manager = mRuntime.inputManager();
+        const auto input_manager = mRuntime->inputManager();
         mMouse = input_manager->virtualMouse();
         mKeyboard = input_manager->virtualKeyboard();
         mKeyboard->addEventListener(this);
@@ -191,8 +193,8 @@ public:
     {
         while(mWindow->isOpen())
         {
-            mRuntime.windowManager()->processEvents();
-            mRuntime.inputManager()->processEvents();
+            mRuntime->windowManager()->processEvents();
+            mRuntime->inputManager()->processEvents();
         }
     }
 };
