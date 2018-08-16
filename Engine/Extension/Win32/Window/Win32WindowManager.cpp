@@ -83,17 +83,6 @@ LRESULT usagi::Win32WindowManager::windowMessageDispatcher(
     return DefWindowProcW(hWnd, message, wParam, lParam);
 }
 
-void usagi::Win32WindowManager::processMessageRange(UINT min, UINT max)
-{
-    MSG msg;
-    // hWnd should be nullptr in order to clear the queue.
-    while(PeekMessageW(&msg, nullptr, min, max, PM_REMOVE))
-    {
-        TranslateMessage(&msg);
-        DispatchMessageW(&msg);
-    }
-}
-
 usagi::Win32Window * usagi::Win32WindowManager::activeWindow()
 {
     // some interesting posts:
@@ -114,7 +103,16 @@ std::shared_ptr<usagi::Window> usagi::Win32WindowManager::createWindow(
 
 void usagi::Win32WindowManager::processEvents()
 {
-    // Skip raw input messages which are processed by Win32InputManager.
-    processMessageRange(WM_NULL, WM_INPUT_DEVICE_CHANGE - 1);
-    processMessageRange(WM_INPUT + 1, -1);
+    // Win32WindowManager and Win32InputManager both has a message loop that
+    // processes messages for any windows in the current thread to prevent
+    // leaving some messages unprocessed in the queue, which causes Windows
+    // to believe our windows are unresponsive. therefore the order of
+    // calling processEvents() on these two managers is insignificant on
+    // Windows.
+    MSG msg;
+    while(PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
+    {
+        TranslateMessage(&msg);
+        DispatchMessageW(&msg);
+    }
 }

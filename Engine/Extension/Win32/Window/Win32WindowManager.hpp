@@ -32,8 +32,6 @@ class Win32WindowManager
     static LRESULT CALLBACK windowMessageDispatcher(
         HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-    static void processMessageRange(UINT min, UINT max);
-
 public:
     Win32WindowManager();
     ~Win32WindowManager();

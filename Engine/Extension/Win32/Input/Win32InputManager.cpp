@@ -353,7 +353,7 @@ LRESULT CALLBACK usagi::Win32InputManager::inputMessageHandler(
 void usagi::Win32InputManager::processEvents()
 {
     MSG msg;
-    while(PeekMessageW(&msg, mMessageWindow, 0, 0, PM_REMOVE))
+    while(PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
