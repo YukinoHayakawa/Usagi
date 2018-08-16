@@ -67,9 +67,9 @@ void usagi::ImGuiSubsystem::setup()
             io.Fonts->GetGlyphRangesDefault());
         font->DisplayOffset.y = scale;
 
-        // Default + Selection of 2500 Ideographs used by Simplified Chinese
+        // All Chinese characters
         font = io.Fonts->AddFontFromFileTTF(file, size, &config,
-            io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+            io.Fonts->GetGlyphRangesChineseFull());
         font->DisplayOffset.y = scale;
 
         // Default + Hiragana, Katakana, Half-Width,
