@@ -165,7 +165,7 @@
     <ClCompile Include="Runtime\Memory\detail\MemoryBitmap.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClCompile Include="Utility\Hash.cpp" />
-    <ClCompile Include="Utility\String.cpp" />
+    <ClCompile Include="Utility\Unicode.cpp" />
     <ClInclude Include="Asset\Asset.hpp" />
     <ClInclude Include="Asset\AssetRoot.hpp" />
     <ClInclude Include="Asset\AssetType.hpp" />
@@ -294,7 +294,7 @@
     <ClInclude Include="Utility\Rounding.hpp" />
     <ClInclude Include="Utility\RAIIHelper.hpp" />
     <ClInclude Include="Utility\Singleton.hpp" />
-    <ClInclude Include="Utility\String.hpp" />
+    <ClInclude Include="Utility\Unicode.hpp" />
     <ClInclude Include="Utility\TypeCast.hpp" />
   </ItemGroup>
   <ItemGroup>

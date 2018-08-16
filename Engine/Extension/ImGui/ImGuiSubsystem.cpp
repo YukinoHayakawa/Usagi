@@ -14,6 +14,7 @@
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageViewCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
+#include <Usagi/Engine/Runtime/Input/Keyboard/Keyboard.hpp>
 #include <Usagi/Engine/Runtime/Input/Mouse/Mouse.hpp>
 #include <Usagi/Engine/Runtime/Runtime.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
@@ -21,13 +22,7 @@
 #include "ImGui.hpp"
 #include "ImGuiComponent.hpp"
 
-usagi::ImGuiSubsystem::ImGuiSubsystem(
-    Game *game,
-    Window *window,
-    Mouse *mouse)
-    : mGame(game)
-    , mWindow(window)
-    , mMouse(mouse)
+void usagi::ImGuiSubsystem::setup()
 {
     mContext = ImGui::CreateContext();
     auto &io = ImGui::GetIO();
@@ -116,8 +111,29 @@ usagi::ImGuiSubsystem::ImGuiSubsystem(
     }
 }
 
+usagi::ImGuiSubsystem::ImGuiSubsystem(
+    Game *game,
+    std::shared_ptr<Window> window,
+    std::shared_ptr<Keyboard> keyboard,
+    std::shared_ptr<Mouse> mouse)
+    : mGame(game)
+    , mWindow(std::move(window))
+    , mKeyboard(std::move(keyboard))
+    , mMouse(std::move(mouse))
+{
+    setup();
+
+    mWindow->addEventListener(this);
+    mKeyboard->addEventListener(this);
+    mMouse->addEventListener(this);
+}
+
 usagi::ImGuiSubsystem::~ImGuiSubsystem()
 {
+    mWindow->removeEventListener(this);
+    mKeyboard->removeEventListener(this);
+    mMouse->removeEventListener(this);
+
     ImGui::SetCurrentContext(mContext);
     ImGui::DestroyContext();
 }
@@ -478,4 +494,11 @@ void usagi::ImGuiSubsystem::onMouseWheelScroll(const MouseWheelEvent &e)
 
     io.MouseWheelH += e.distance.x();
     io.MouseWheel += e.distance.y();
+}
+
+void usagi::ImGuiSubsystem::onWindowCharInput(const WindowCharEvent &e)
+{
+    auto &io = ImGui::GetIO();
+
+    io.AddInputCharacter(e.utf16);
 }

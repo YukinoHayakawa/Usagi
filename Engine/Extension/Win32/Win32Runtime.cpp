@@ -8,7 +8,7 @@
 #include <Usagi/Engine/Extension/Win32/Input/Win32InputManager.hpp>
 #include <Usagi/Engine/Extension/Win32/Win32Helper.hpp>
 #include <Usagi/Engine/Extension/Win32/Window/Win32WindowManager.hpp>
-#include <Usagi/Engine/Utility/String.hpp>
+#include <Usagi/Engine/Utility/Unicode.hpp>
 
 std::shared_ptr<usagi::Runtime> usagi::Runtime::create()
 {

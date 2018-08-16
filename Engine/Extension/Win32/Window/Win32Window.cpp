@@ -1,6 +1,6 @@
 ﻿#include "Win32Window.hpp"
 
-#include <Usagi/Engine/Utility/String.hpp>
+#include <Usagi/Engine/Utility/Unicode.hpp>
 #include <Usagi/Engine/Core/Logging.hpp>
 
 #include "../Win32Helper.hpp"
@@ -280,34 +280,27 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
             });
             break;
         }
-        // these legacy messages are preserved to make non-client area work
-        // properly.
-        case WM_SYSKEYDOWN:
-        case WM_SYSKEYUP:
-        case WM_KEYDOWN:
-        case WM_KEYUP:
-        case WM_MOUSEMOVE:
-        case WM_LBUTTONDBLCLK:
-        case WM_LBUTTONDOWN:
-        case WM_LBUTTONUP:
-        case WM_MBUTTONDBLCLK:
-        case WM_MBUTTONDOWN:
-        case WM_MBUTTONUP:
-        case WM_RBUTTONDBLCLK:
-        case WM_RBUTTONDOWN:
-        case WM_RBUTTONUP:
-        case WM_XBUTTONDBLCLK:
-        case WM_XBUTTONDOWN:
-        case WM_XBUTTONUP:
-        {
-            break;
-        }
+        // WM_UNICHAR uses UTF-32 but is not sent for Unicode windows
         case WM_CHAR:
         {
+            WindowCharEvent e;
+            e.window = this;
+            e.utf16 = static_cast<std::uint16_t>(wParam);
+            if(isUtf16HighSurrogate(e.utf16))
+                mHighSurrogate = e.utf16;
+            else
+                e.utf32 = isUtf16LowSurrogate(e.utf16)
+                    ? utf16SurrogatesToUtf32(mHighSurrogate, e.utf16)
+                    : e.utf16;
+            codePointToUtf8(e.utf8, e.utf32);
+            forEachListener([&](auto h) {
+                h->onWindowCharInput(e);
+            });
             break;
         }
         case WM_CLOSE:
         {
+            // todo prompt the user
             DestroyWindow(mHandle);
             break;
         }

@@ -7,7 +7,7 @@
 
 #include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Utility/RAIIHelper.hpp>
-#include <Usagi/Engine/Utility/String.hpp>
+#include <Usagi/Engine/Utility/Unicode.hpp>
 
 #include "Win32Mouse.hpp"
 #include "Win32Keyboard.hpp"

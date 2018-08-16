@@ -20,6 +20,7 @@ class Win32Window : public Window
     bool mClosed = false;
     bool mResizing = false;
     bool mMoving = false;
+    wchar_t mHighSurrogate = L'\0';
 
     static constexpr DWORD WINDOW_STYLE = WS_OVERLAPPEDWINDOW;
     static constexpr DWORD WINDOW_STYLE_EX = WS_EX_ACCEPTFILES;

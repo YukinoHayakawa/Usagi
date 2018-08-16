@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include <Usagi/Engine/Core/Logging.hpp>
-#include <Usagi/Engine/Utility/String.hpp>
+#include <Usagi/Engine/Utility/Unicode.hpp>
 #include <Usagi/Engine/Utility/RAIIHelper.hpp>
 
 #pragma warning(disable: 4005) // macro redefinition

@@ -26,6 +26,13 @@ struct WindowSizeEvent : WindowEvent
     bool sequence;
 };
 
+struct WindowCharEvent : WindowEvent
+{
+    char utf8[4] = { };
+    std::uint32_t utf32 = 0;
+    std::uint16_t utf16 = 0;
+};
+
 class WindowEventListener
 {
 public:
@@ -81,6 +88,10 @@ public:
     }
 
     virtual void onWindowResizeEnd(const WindowSizeEvent &e)
+    {
+    }
+
+    virtual void onWindowCharInput(const WindowCharEvent &e)
     {
     }
 };

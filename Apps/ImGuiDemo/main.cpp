@@ -62,14 +62,15 @@ public:
 
         // Setting up input
         runtime->initInput();
-        // todo ...
 
         // Setting up ImGui
         assets()->addChild<FilesystemAssetPackage>("imgui", "Data/imgui");
+        const auto input_manager = runtime->inputManager();
         mImGui = addSubsystem("imgui", std::make_unique<ImGuiSubsystem>(
             this,
-            mWindow.get(),
-            runtime->inputManager()->virtualMouse().get()
+            mWindow,
+            input_manager->virtualKeyboard(),
+            input_manager->virtualMouse()
         ));
         mAttachments.attachment_usages.emplace_back(
             mSwapchain->format(),
@@ -80,8 +81,6 @@ public:
             GpuAttachmentStoreOp::STORE
         ).clear_color = Color4f::Zero();
         mImGui->createPipeline(mAttachments);
-        runtime->inputManager()->virtualKeyboard()->addEventListener(mImGui);
-        runtime->inputManager()->virtualMouse()->addEventListener(mImGui);
 
         mImGuiRoot = rootElement()->addChild("ImGuiRoot");
         mImGuiRoot->addComponent<ImGuiDemoComponent>();

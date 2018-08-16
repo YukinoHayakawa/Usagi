@@ -39,9 +39,6 @@
     <ClInclude Include="Utility\Rounding.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\String.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Asset\AssetPackage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -399,6 +396,9 @@
     <ClInclude Include="Utility\Hash.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\Unicode.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utility\File.cpp">
@@ -433,9 +433,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Win32\Win32Helper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Utility\String.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Vulkan\WSI\VulkanWin32WSI.cpp">
@@ -544,6 +541,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utility\Hash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\Unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

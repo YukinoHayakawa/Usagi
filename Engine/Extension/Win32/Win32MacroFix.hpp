@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+// Undefines problematic macros
 // Include after including Windows headers
 
 #ifdef DELETE

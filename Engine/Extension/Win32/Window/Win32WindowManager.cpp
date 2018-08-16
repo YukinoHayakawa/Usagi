@@ -1,8 +1,6 @@
 ﻿#include "../Win32.hpp"
 #include <ShellScalingAPI.h>
 #pragma comment(lib, "Shcore.lib")
-// some Windows macros are undefined by our header
-#include "../Win32MacroFix.hpp"
 
 #include "Win32WindowManager.hpp"
 
@@ -45,19 +43,12 @@ void usagi::Win32WindowManager::unregisterWindowClass()
 
 usagi::Win32Window * usagi::Win32WindowManager::windowFromHandle(HWND handle)
 {
+    // vulkan swapchain somehow changes the WndProc, so don't use
+    // GWLP_WNDPROC to identify the windows
     const auto i = mWindows.find(handle);
     if(i != mWindows.end())
         return i->second;
     return nullptr;
-
-    // vulkan swapchain somehow changed the wndproc
-    // make sure the windows is created by our class
-    //if(GetWindowLongPtrW(handle, GWLP_WNDPROC) != reinterpret_cast<LONG_PTR>(
-    //    &Win32WindowManager::windowMessageDispatcher))
-    //    return nullptr;
-
-    //return reinterpret_cast<Win32Window*>(
-    //    GetWindowLongPtrW(handle, GWLP_USERDATA));
 }
 
 usagi::Win32WindowManager::Win32WindowManager()

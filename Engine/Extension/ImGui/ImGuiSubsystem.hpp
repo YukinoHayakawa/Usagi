@@ -8,6 +8,7 @@
 #include <Usagi/Engine/Runtime/Input/Mouse/MouseEventListener.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuImage.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuSampler.hpp>
+#include <Usagi/Engine/Runtime/Window/WindowEventListener.hpp>
 
 struct ImGuiContext;
 
@@ -27,10 +28,12 @@ class ImGuiSubsystem
     : public RenderableSubsystem
     , public KeyEventListener
     , public MouseEventListener
+    , public WindowEventListener
 {
     Game *mGame = nullptr;
-    Window *mWindow = nullptr;
-    Mouse *mMouse = nullptr;
+    std::shared_ptr<Window> mWindow;
+    std::shared_ptr<Keyboard> mKeyboard;
+    std::shared_ptr<Mouse> mMouse;
 
     ImGuiContext *mContext = nullptr;
     bool mMouseJustPressed[5] = { };
@@ -56,8 +59,14 @@ class ImGuiSubsystem
     std::shared_ptr<GpuImageView> mFontTextureView;
     std::shared_ptr<GpuSampler> mSampler;
 
+    void setup();
+
 public:
-    ImGuiSubsystem(Game *game, Window *window, Mouse *mouse);
+    ImGuiSubsystem(
+        Game *game,
+        std::shared_ptr<Window> window,
+        std::shared_ptr<Keyboard> keyboard,
+        std::shared_ptr<Mouse> mouse);
     ~ImGuiSubsystem() override;
 
     /**
@@ -72,6 +81,7 @@ public:
     void onKeyStateChange(const KeyEvent &e) override;
     void onMouseButtonStateChange(const MouseButtonEvent &e) override;
     void onMouseWheelScroll(const MouseWheelEvent &e) override;
+    void onWindowCharInput(const WindowCharEvent &e) override;
 
     void update(
         const TimeDuration &dt,
