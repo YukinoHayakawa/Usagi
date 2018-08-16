@@ -40,7 +40,7 @@ class ImGuiSubsystem
 
     std::set<Element*> mRegistry;
 
-    static void setupInput();
+    void setupInput();
 
     void newFrame(float dt, Framebuffer *framebuffer);
     void processElements(const TimeDuration &dt);

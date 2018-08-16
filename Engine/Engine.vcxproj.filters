@@ -243,9 +243,6 @@
     <ClInclude Include="Extension\Vulkan\VulkanSwapChain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\ImGui\ImGuiSubsystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipelineCompiler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -397,6 +394,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utility\Unicode.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\ImGui\ImGuiSubsystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -48,6 +48,9 @@ public:
     virtual bool isOpen() const = 0;
     virtual void close() = 0;
 
+    virtual std::string getClipboardText() = 0;
+    virtual void setClipboardText(const std::string &text) = 0;
+
     virtual Vector2f dpiScale() const = 0;
 };
 }

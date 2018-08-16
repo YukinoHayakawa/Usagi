@@ -1,6 +1,7 @@
 ﻿#include "ImGuiSubsystem.hpp"
 
 #include <Usagi/Engine/Asset/AssetRoot.hpp>
+#include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Game/Game.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
 #include <Usagi/Engine/Runtime/Graphics/GpuDevice.hpp>
@@ -53,6 +54,8 @@ void usagi::ImGuiSubsystem::setup()
     // fonts
     mCommandPool = gpu->createCommandPool();
     {
+        LOG(info, "ImGui: Building font atlas");
+
         const auto size = 12 * scale;
         // todo fetch from asset system
         const auto file = "Data/fonts/Microsoft-Yahei-Mono.ttf";
@@ -232,6 +235,16 @@ void usagi::ImGuiSubsystem::setupInput()
     io.KeyMap[ImGuiKey_Z] = static_cast<int>(KeyCode::Z);
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    io.GetClipboardTextFn = [](void *window) {
+        static std::string text;
+        text = static_cast<Window*>(window)->getClipboardText();
+        return text.c_str();
+    };
+    io.SetClipboardTextFn = [](void *window, const char* text) {
+        return static_cast<Window*>(window)->setClipboardText(text);
+    };
+    io.ClipboardUserData = mWindow.get();
 }
 
 void usagi::ImGuiSubsystem::update(

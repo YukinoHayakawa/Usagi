@@ -68,6 +68,9 @@ public:
 
     Vector2f dpiScale() const override;
 
+    std::string getClipboardText() override;
+    void setClipboardText(const std::string &text) override;
+
     // Win32 helpers
 
     HDC deviceContext() const;
