@@ -17,8 +17,10 @@ usagi::FilesystemAsset::FilesystemAsset(
 
 void usagi::FilesystemAsset::load()
 {
-    const auto full_path =
-        static_cast<FilesystemAssetPackage*>(parent())->rootPath() / name();
+    // todo file handlers by extension name
+    const auto pkg = static_cast<FilesystemAssetPackage*>(parent());
+    const auto full_path = pkg->rootPath() / name();
+    const auto cache_path = pkg->rootPath() / ".cache";
     const auto ext = full_path.extension();
     std::ifstream in { full_path, std::ios::binary };
     in.exceptions(std::ios::badbit | std::ios::failbit);
@@ -31,13 +33,20 @@ void usagi::FilesystemAsset::load()
 
     if(ext == ".vert")
     {
-        mPayload = SpirvBinary::fromGlslSourceStream(in, ShaderStage::VERTEX);
+        mPayload = SpirvBinary::fromGlslSourceStream(
+            in, ShaderStage::VERTEX, cache_path
+
+        );
         mType = AssetType::VERTEX_SHADER;
     }
     else if(ext == ".frag")
     {
-        mPayload = SpirvBinary::fromGlslSourceStream(in, ShaderStage::FRAGMENT);
+        mPayload = SpirvBinary::fromGlslSourceStream(
+            in, ShaderStage::FRAGMENT, cache_path);
         mType = AssetType::FRAGMENT_SHADER;
     }
-    else { throw std::runtime_error("Unsupported file format."); }
+    else
+    {
+        throw std::runtime_error("Unsupported file format.");
+    }
 }

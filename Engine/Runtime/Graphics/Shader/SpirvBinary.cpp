@@ -12,6 +12,7 @@
 #include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Utility/RAIIHelper.hpp>
 #include <Usagi/Engine/Utility/File.hpp>
+#include <Usagi/Engine/Utility/Hash.hpp>
 
 // See https://www.khronos.org/registry/spir-v/papers/WhitePaper.html for
 // SPIR-V format.
@@ -77,7 +78,7 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromStream(
 
 namespace
 {
-EShLanguage translateShaderStage(usagi::ShaderStage stage)
+EShLanguage translate(const usagi::ShaderStage stage)
 {
     switch(stage)
     {
@@ -88,11 +89,42 @@ EShLanguage translateShaderStage(usagi::ShaderStage stage)
 }
 }
 
+// refer to glslangValidator source code
 std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
     const std::string &glsl_source_code,
-    const ShaderStage stage)
+    const ShaderStage stage,
+    const std::optional<std::filesystem::path> & cache_folder)
 {
     LOG(info, "Compiling {} shader...", to_string(stage));
+
+    std::string hash;
+    std::filesystem::path cache_file;
+    if(cache_folder)
+    {
+        hash = sha256(glsl_source_code);
+        cache_file = cache_folder.value();
+        create_directories(cache_file);
+        cache_file /= hash;
+        cache_file += ".spv";
+
+        // try loading from cache
+        try
+        {
+            auto cache = fromFile(cache_file);
+            LOG(info, "Shader loaded from cache {}", cache_file);
+            return std::move(cache);
+        }
+        catch(const std::exception &e)
+        {
+            LOG(warn, "Could not load the shader from cache: {}, {}",
+                e.what(), strerror(errno));
+        }
+        catch(...)
+        {
+            LOG(error,
+                "Unknown error occurred while loading the shader from cache.");
+        }
+    }
 
     using namespace glslang;
     using namespace spv;
@@ -104,7 +136,7 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
     const auto opengl_client_version = EShTargetOpenGL_450;
     const auto target_version = EShTargetSpv_1_0;
     const auto default_version = 110; // defaults to desktop version
-    const auto glslang_stage = translateShaderStage(stage);
+    const auto glslang_stage = translate(stage);
     const auto messages = EShMsgDefault;
 
     RAIIHelper glslang_process {
@@ -115,7 +147,7 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
     // the shaders.
     TShader shader(glslang_stage);
     TProgram program;
-    TBuiltInResource resources = glslang::DefaultTBuiltInResource;
+    TBuiltInResource resources = DefaultTBuiltInResource;
 
     const char *strings[] = { glsl_source_code.data() };
     const int sizes[] = { static_cast<int>(glsl_source_code.size()) };
@@ -151,7 +183,7 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
 	LOG(info, "Reflection database:");
 	program.dumpReflection();
 
-    // Genearte SPIR-V code
+    // Generate SPIR-V code
     std::vector<Bytecode> spirv;
     std::string warnings_errors;
     SpvBuildLogger logger;
@@ -162,22 +194,33 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
 
     GlslangToSpv(*program.getIntermediate(glslang_stage), spirv, &logger,
         &spv_options);
-	LOG(info, "Disassembly:");
-    Disassemble(std::cout, spirv);
+	// LOG(info, "Disassembly:");
+    // Disassemble(std::cout, spirv);
+
+    // save bytecode to cache
+    if(cache_folder)
+    {
+        LOG(info, "Saving snader cache to {}", cache_file);
+        dumpBinary(cache_file, spirv.data(), spirv.size() * sizeof(Bytecode));
+    }
 
     return std::make_shared<SpirvBinary>(std::move(spirv));
 }
 
 std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceFile(
     const fs::path &glsl_source_path,
-    const ShaderStage stage)
+    const ShaderStage stage,
+    const std::optional<std::filesystem::path> & cache_folder)
 {
-    return fromGlslSourceString(readFileAsString(glsl_source_path), stage);
+    return fromGlslSourceString(
+        readFileAsString(glsl_source_path), stage, cache_folder);
 }
 
 std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceStream(
     std::istream &glsl_source_stream,
-    const ShaderStage stage)
+    const ShaderStage stage,
+    const std::optional<std::filesystem::path> & cache_folder)
 {
-    return fromGlslSourceString(readStreamAsString(glsl_source_stream), stage);
+    return fromGlslSourceString(
+        readStreamAsString(glsl_source_stream), stage, cache_folder);
 }

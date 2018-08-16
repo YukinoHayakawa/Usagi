@@ -52,7 +52,7 @@ usagi::Win32Window::Win32Window(
 {
     LOG(info, "Creating window: {}", mTitle);
 
-    auto window_title_wide = s2ws(mTitle);
+    auto window_title_wide = u8to16(mTitle);
 
     const auto window_rect = getWindowRect();
 
@@ -137,7 +137,7 @@ std::string usagi::Win32Window::title() const
 void usagi::Win32Window::setTitle(std::string title)
 {
     mTitle = std::move(title);
-    SetWindowTextW(mHandle, s2ws(mTitle).c_str());
+    SetWindowTextW(mHandle, u8to16(mTitle).c_str());
 }
 
 usagi::Vector2i usagi::Win32Window::position() const

@@ -3,6 +3,7 @@
 #include <vector>
 #include <filesystem>
 #include <map>
+#include <optional>
 
 #include <spirv_cross.hpp>
 
@@ -17,7 +18,7 @@ namespace usagi
 class SpirvBinary
 {
 public:
-	// SPIR-V binary is 32-bit
+    // SPIR-V binary is 32-bit
     using Bytecode = std::uint32_t;
 
 private:
@@ -29,6 +30,7 @@ private:
         std::size_t size;
         std::uint32_t offset;
     };
+
     std::map<std::string, ConstantFieldInfo> mConstantFieldInfoMap;
 
 public:
@@ -48,12 +50,15 @@ public:
         std::istream &glsl_source_stream);
     static std::shared_ptr<SpirvBinary> fromGlslSourceString(
         const std::string &glsl_source_code,
-        ShaderStage stage);
+        ShaderStage stage,
+        const std::optional<std::filesystem::path> & cache_folder = { });
     static std::shared_ptr<SpirvBinary> fromGlslSourceFile(
         const std::filesystem::path &glsl_source_path,
-        ShaderStage stage);
+        ShaderStage stage,
+        const std::optional<std::filesystem::path> & cache_folder = { });
     static std::shared_ptr<SpirvBinary> fromGlslSourceStream(
         std::istream &glsl_source_stream,
-        ShaderStage stage);
+        ShaderStage stage,
+        const std::optional<std::filesystem::path> & cache_folder = { });
 };
 }

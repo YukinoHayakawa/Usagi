@@ -164,6 +164,7 @@
     <ClCompile Include="Runtime\Memory\BitmapMemoryAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\detail\MemoryBitmap.cpp" />
     <ClCompile Include="Utility\File.cpp" />
+    <ClCompile Include="Utility\Hash.cpp" />
     <ClCompile Include="Utility\String.cpp" />
     <ClInclude Include="Asset\Asset.hpp" />
     <ClInclude Include="Asset\AssetRoot.hpp" />
@@ -285,6 +286,7 @@
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
     <ClInclude Include="Utility\File.hpp" />
     <ClInclude Include="Utility\Flag.hpp" />
+    <ClInclude Include="Utility\Hash.hpp" />
     <ClInclude Include="Utility\Iterator.hpp" />
     <ClInclude Include="Utility\Math.hpp" />
     <ClInclude Include="Utility\Noncopyable.hpp" />

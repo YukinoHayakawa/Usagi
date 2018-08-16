@@ -396,6 +396,9 @@
     <ClInclude Include="Extension\Win32\Win32Runtime.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\Hash.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utility\File.cpp">
@@ -538,6 +541,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Win32\Win32Runtime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\Hash.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

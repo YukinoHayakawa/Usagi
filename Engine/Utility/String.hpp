@@ -4,6 +4,6 @@
 
 namespace usagi
 {
-std::wstring s2ws(const std::string &string);
-std::string ws2s(const std::wstring &string);
+std::wstring u8to16(const std::string &string);
+std::string u16to8(const std::wstring &string);
 }
