@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{db9b76ca-a88d-427f-be22-23b7ef533de2}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)export.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)identifier.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)infix_join.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)make_nested_namespace.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)op.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)transform.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)tuple.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)unpack.hpp" />
+  </ItemGroup>
+</Project>
