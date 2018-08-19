@@ -23,6 +23,9 @@ class RenderableSubsystem : public Subsystem
     }
 
 public:
+    using CommandListSink =
+        std::function<void(std::shared_ptr<GraphicsCommandList>)>;
+
     /**
      * \brief
      * \param dt
@@ -32,7 +35,7 @@ public:
     virtual void update(
         const TimeDuration &dt,
         std::shared_ptr<Framebuffer> framebuffer,
-        const std::function<void(std::shared_ptr<GraphicsCommandList>)> &cmd_out
+        const CommandListSink &cmd_out
     ) = 0;
 };
 }

@@ -46,7 +46,7 @@ class ImGuiSubsystem
     void processElements(const TimeDuration &dt);
     void render(
         const std::shared_ptr<Framebuffer> &framebuffer,
-        const std::function<void(std::shared_ptr<GraphicsCommandList>)> &cmd_out
+        const CommandListSink &cmd_out
     ) const;
 
     void updateMouse();
@@ -86,7 +86,7 @@ public:
     void update(
         const TimeDuration &dt,
         std::shared_ptr<Framebuffer> framebuffer,
-        const std::function<void(std::shared_ptr<GraphicsCommandList>)> &cmd_out
+        const CommandListSink &cmd_out
     ) override;
 
     bool processable(Element *element) override;

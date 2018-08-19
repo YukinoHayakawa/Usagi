@@ -61,25 +61,22 @@ void usagi::ImGuiSubsystem::setup()
         const auto file = "Data/fonts/Microsoft-Yahei-Mono.ttf";
 
         // add fonts
-        ImFontConfig config;
-        config.MergeMode = true;
-        // io.Fonts->AddFontDefault();
-
-        // Basic Latin, Extended Latin
-        auto font = io.Fonts->AddFontFromFileTTF(file, size, nullptr,
-            io.Fonts->GetGlyphRangesDefault());
-        font->DisplayOffset.y = scale;
-
-        // All Chinese characters
-        font = io.Fonts->AddFontFromFileTTF(file, size, &config,
-            io.Fonts->GetGlyphRangesChineseFull());
-        font->DisplayOffset.y = scale;
-
-        // Default + Hiragana, Katakana, Half-Width,
-        // Selection of 1946 Ideographs
-        font = io.Fonts->AddFontFromFileTTF(file, size, &config,
-            io.Fonts->GetGlyphRangesJapanese());
-        font->DisplayOffset.y = scale;
+        // http://jrgraphix.net/research/unicode_blocks.php
+        static const ImWchar RANGES[] =
+        {
+            0x0020, 0x007F, // Basic Latin
+            0x00A0, 0x00FF, // Latin-1 Supplement
+            0x2000, 0x206F, // General Punctuation
+            0x3000, 0x303F, // CJK Symbols and Punctuation
+            0x3040, 0x309F, // Hiragana
+            0x30A0, 0x30FF, // Katakana
+            0x31F0, 0x31FF, // Katakana Phonetic Extensions
+            0x4E00, 0x9FFF, // CJK Unified Ideographs
+            0xFF00, 0xFFEF, // Halfwidth and Fullwidth Forms
+            0,
+        };
+        io.Fonts->AddFontFromFileTTF(file, size, nullptr, RANGES)
+            ->DisplayOffset.y = scale;
 
         // upload font texture
         unsigned char* pixels;
@@ -250,7 +247,7 @@ void usagi::ImGuiSubsystem::setupInput()
 void usagi::ImGuiSubsystem::update(
     const TimeDuration &dt,
     std::shared_ptr<Framebuffer> framebuffer,
-    const std::function<void(std::shared_ptr<GraphicsCommandList>)> &cmd_out)
+    const CommandListSink &cmd_out)
 {
     ImGui::SetCurrentContext(mContext);
 
