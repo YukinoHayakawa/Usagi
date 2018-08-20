@@ -567,5 +567,8 @@
     <ClCompile Include="Extension\Vulkan\VulkanSampler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Extension\DebugDraw\DebugDrawImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

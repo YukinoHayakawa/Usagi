@@ -1,5 +1,4 @@
-﻿#define DEBUG_DRAW_IMPLEMENTATION
-#include "DebugDrawSubsystem.hpp"
+﻿#include "DebugDrawSubsystem.hpp"
 
 #include <Usagi/Engine/Asset/AssetRoot.hpp>
 #include <Usagi/Engine/Core/Element.hpp>
