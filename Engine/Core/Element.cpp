@@ -41,7 +41,7 @@ void usagi::Element::removeChild(Element *child)
 
 void usagi::Element::addComponent(std::unique_ptr<Component> component)
 {
-    auto &info = component->getBaseTypeInfo();
+    auto &info = component->baseType();
     insertComponent(info, std::move(component));
 }
 
@@ -57,7 +57,7 @@ usagi::Element::ComponentMap::iterator usagi::Element::eraseComponent(
     ComponentMap::iterator i)
 {
     const auto comp = i->second.get();
-    const auto &t = comp->getBaseTypeInfo();
+    const auto &t = comp->baseType();
     fireEvent<PreComponentRemovalEvent>(t, comp);
     i = mComponents.erase(i);
     fireEvent<PostComponentRemovalEvent>(t);

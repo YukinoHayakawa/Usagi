@@ -191,8 +191,9 @@ void usagi::ImGuiSubsystem::createPipeline(
     }
     // Render Pass
     {
-        render_pass_info.attachment_usages[0].layout = GpuImageLayout::COLOR;
-        compiler->setRenderPass(gpu->createRenderPass(render_pass_info));
+        render_pass_info.attachment_usages[0].layout = GpuImageLayout::COLOR_ATTACHMENT;
+        mRenderPass = gpu->createRenderPass(render_pass_info);
+        compiler->setRenderPass(mRenderPass);
     }
 
     mPipeline = compiler->compile();
@@ -376,7 +377,8 @@ void usagi::ImGuiSubsystem::render(
     // Render Command List
     auto cmd_list = mCommandPool->allocateGraphicsCommandList();
     cmd_list->beginRecording();
-    cmd_list->beginRendering(mPipeline, framebuffer);
+    cmd_list->beginRendering(mRenderPass, framebuffer);
+    cmd_list->bindPipeline(mPipeline);
     cmd_list->bindResourceSet(0, { mSampler });
 
     // Bind Vertex And Index Buffer

@@ -75,7 +75,11 @@ vk::UniqueImage usagi::VulkanMemoryPool::createImage(
     vk_info.setSamples(translateSampleCount(info.sample_count));
     // todo currently not using stage buffer and uses mapped memory write.
     // change do optimal when resource staging is implemented.
-    vk_info.setTiling(vk::ImageTiling::eLinear);
+    // todo fix this
+    if(info.usage == GpuImageUsage::DEPTH_STENCIL_ATTACHMENT)
+        vk_info.setTiling(vk::ImageTiling::eOptimal);
+    else
+        vk_info.setTiling(vk::ImageTiling::eLinear);
     vk_info.setUsage(translate(info.usage));
     vk_info.setSharingMode(vk::SharingMode::eExclusive);
     // todo also change this if using stage buffer
@@ -87,7 +91,7 @@ vk::UniqueImage usagi::VulkanMemoryPool::createImage(
 
 std::size_t usagi::VulkanMemoryPool::getImageRequiredSize(vk::Image image) const
 {
-    const auto req =  mDevice->device().getImageMemoryRequirements(image);
+    const auto req = mDevice->device().getImageMemoryRequirements(image);
     return req.size;
 }
 

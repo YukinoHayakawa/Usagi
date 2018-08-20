@@ -203,7 +203,7 @@ void usagi::VulkanSwapchain::resize(const Vector2u32 &size)
 
 usagi::GpuBufferFormat usagi::VulkanSwapchain::format() const
 {
-    return from(mFormat.format);
+    return translate(mFormat.format);
 }
 
 usagi::Vector2u32 usagi::VulkanSwapchain::size() const

@@ -1,5 +1,6 @@
 ﻿#include "VulkanRenderPass.hpp"
 
+#include <Usagi/Engine/Core/Logging.hpp>
 #include <Usagi/Engine/Runtime/Graphics/RenderPassCreateInfo.hpp>
 
 #include "VulkanEnumTranslation.hpp"
@@ -37,19 +38,31 @@ usagi::VulkanRenderPass::VulkanRenderPass(
     vk_info.setPAttachments(attachment_descriptions.data());
 
     vk::SubpassDescription subpass;
-    std::vector<vk::AttachmentReference> attachment_references;
-    attachment_references.reserve(info.attachment_usages.size());
+    std::vector<vk::AttachmentReference> color_refs;
+    vk::AttachmentReference ds_ref;
     for(std::size_t i = 0; i < info.attachment_usages.size(); ++i)
     {
-        vk::AttachmentReference r;
-        r.setAttachment(static_cast<uint32_t>(i));
-        r.setLayout(translate(info.attachment_usages[i].layout));
-        attachment_references.push_back(r);
+        auto &&a = info.attachment_usages[i];
+        if(a.layout == GpuImageLayout::DEPTH_STENCIL_ATTACHMENT)
+        {
+            if(subpass.pDepthStencilAttachment)
+                LOG(error, "Only one depth stencil attachmend may be used.");
+            ds_ref.setAttachment(static_cast<uint32_t>(i));
+            ds_ref.setLayout(translate(a.layout));
+            subpass.setPDepthStencilAttachment(&ds_ref);
+        }
+        else
+        {
+            vk::AttachmentReference r;
+            r.setAttachment(static_cast<uint32_t>(i));
+            r.setLayout(translate(a.layout));
+            color_refs.push_back(r);
+        }
     }
     subpass.setPipelineBindPoint(vk::PipelineBindPoint::eGraphics);
     subpass.setColorAttachmentCount(
-        static_cast<uint32_t>(attachment_references.size()));
-    subpass.setPColorAttachments(attachment_references.data());
+        static_cast<uint32_t>(color_refs.size()));
+    subpass.setPColorAttachments(color_refs.data());
 
     vk_info.setSubpassCount(1);
     vk_info.setPSubpasses(&subpass);

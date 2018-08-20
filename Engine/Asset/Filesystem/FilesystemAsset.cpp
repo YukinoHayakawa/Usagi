@@ -34,9 +34,7 @@ void usagi::FilesystemAsset::load()
     if(ext == ".vert")
     {
         mPayload = SpirvBinary::fromGlslSourceStream(
-            in, ShaderStage::VERTEX, cache_path
-
-        );
+            in, ShaderStage::VERTEX, cache_path);
         mType = AssetType::VERTEX_SHADER;
     }
     else if(ext == ".frag")

@@ -33,6 +33,16 @@ void usagi::VulkanGpuBuffer::flush()
     mPool->device()->device().flushMappedMemoryRanges({ range });
 }
 
+void usagi::VulkanGpuBuffer::release()
+{
+    mAllocation.reset();
+}
+
+std::size_t usagi::VulkanGpuBuffer::size() const
+{
+    return mAllocation ? mAllocation->size() : 0;
+}
+
 void usagi::VulkanGpuBuffer::fillShaderResourceInfo(
     vk::WriteDescriptorSet &write,
     VulkanResourceInfo &info)

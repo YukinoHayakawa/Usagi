@@ -2,6 +2,7 @@
 
 #include <Usagi/Engine/Extension/Vulkan/VulkanHelper.hpp>
 #include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
+#include <Usagi/Engine/Extension/Vulkan/VulkanRenderPass.hpp>
 
 #include "VulkanGpuImageView.hpp"
 
@@ -15,7 +16,8 @@ usagi::VulkanFramebuffer::VulkanFramebuffer(
 {
 }
 
-void usagi::VulkanFramebuffer::create(vk::RenderPass render_pass)
+void usagi::VulkanFramebuffer::create(
+    std::shared_ptr<VulkanRenderPass> render_pass)
 {
     assert(!mFramebuffer);
 
@@ -26,7 +28,7 @@ void usagi::VulkanFramebuffer::create(vk::RenderPass render_pass)
     );
 
     vk::FramebufferCreateInfo fb_info;
-    fb_info.setRenderPass(render_pass);
+    fb_info.setRenderPass(render_pass->renderPass());
     fb_info.setAttachmentCount(static_cast<uint32_t>(vk_views.size()));
     fb_info.setPAttachments(vk_views.data());
     fb_info.setWidth(mSize.x());

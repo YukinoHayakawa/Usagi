@@ -22,6 +22,7 @@ class VulkanFramebuffer
     Vector2u32 mSize;
     std::vector<std::shared_ptr<VulkanGpuImageView>> mViews;
     vk::UniqueFramebuffer mFramebuffer;
+    std::shared_ptr<VulkanRenderPass> mRenderPass;
 
 public:
     VulkanFramebuffer(
@@ -31,7 +32,7 @@ public:
 
     Vector2u32 size() const override { return mSize; }
 
-    void create(vk::RenderPass render_pass);
+    void create(std::shared_ptr<VulkanRenderPass> render_pass);
 
     vk::Framebuffer framebuffer() const { return mFramebuffer.get(); }
 

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <Usagi/Engine/Runtime/Graphics/Enum/CompareOp.hpp>
+
 namespace usagi
 {
 enum class PrimitiveTopology
@@ -48,9 +50,10 @@ struct RasterizationState
 
 struct DepthStencilState
 {
-    bool enable_depth_test = true;
-
-    // stencil test
+    bool depth_test_enable = true;
+    bool depth_write_enable = true;
+    CompareOp depth_compare_op = CompareOp::LESS;
+    // todo stencil test
 };
 
 enum class BlendingFactor

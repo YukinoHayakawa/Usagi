@@ -48,9 +48,11 @@ public:
         Color4f color) override;
 
     void beginRendering(
-        std::shared_ptr<GraphicsPipeline> pipeline,
+        std::shared_ptr<RenderPass> render_pass,
         std::shared_ptr<Framebuffer> framebuffer) override;
     void endRendering() override;
+
+    void bindPipeline(std::shared_ptr<GraphicsPipeline> pipeline) override;
 
     void bindResourceSet(
         std::uint32_t set_id,
@@ -65,6 +67,8 @@ public:
         std::uint32_t viewport_index,
         Vector2i32 origin,
         Vector2u32 size) override;
+    void setLineWidth(float width) override;
+
     void setConstant(
         ShaderStage stage,
         const char *name,
@@ -78,6 +82,12 @@ public:
         std::uint32_t binding_index,
         GpuBuffer *buffer,
         std::size_t offset) override;
+
+    void drawInstanced(
+        std::uint32_t vertex_count,
+        std::uint32_t instance_count,
+        std::uint32_t first_vertex,
+        std::uint32_t first_instance) override;
     void drawIndexedInstanced(
         std::uint32_t index_count,
         std::uint32_t instance_count,

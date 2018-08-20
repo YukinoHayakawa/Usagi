@@ -7,6 +7,27 @@
 
 using namespace usagi::vulkan;
 
+vk::ImageAspectFlags usagi::VulkanGpuImage::getAspectsFromFormat() const
+{
+    vk::ImageAspectFlags aspects;
+    switch(mFormat) {
+        case vk::Format::eD16Unorm:
+        case vk::Format::eD32Sfloat:
+            aspects = vk::ImageAspectFlagBits::eDepth;
+            break;
+        case vk::Format::eD16UnormS8Uint:
+        case vk::Format::eD24UnormS8Uint:
+        case vk::Format::eD32SfloatS8Uint:
+            aspects =
+                vk::ImageAspectFlagBits::eDepth |
+                vk::ImageAspectFlagBits::eStencil;
+            break;
+        default:
+            aspects = vk::ImageAspectFlagBits::eColor;
+    }
+    return aspects;
+}
+
 void usagi::VulkanGpuImage::createBaseView()
 {
     vk::ImageViewCreateInfo info;
@@ -15,7 +36,7 @@ void usagi::VulkanGpuImage::createBaseView()
     info.setFormat(mFormat);
     info.setComponents(vk::ComponentMapping { });
     vk::ImageSubresourceRange subresource_range;
-    subresource_range.setAspectMask(vk::ImageAspectFlagBits::eColor);
+    subresource_range.setAspectMask(getAspectsFromFormat());
     subresource_range.setBaseArrayLayer(0);
     subresource_range.setLayerCount(1);
     subresource_range.setBaseMipLevel(0);
@@ -51,7 +72,7 @@ std::shared_ptr<usagi::GpuImageView> usagi::VulkanGpuImage::createView(
     vk_info.components.b = translate(info.components.b);
     vk_info.components.a = translate(info.components.a);
     vk::ImageSubresourceRange subresource_range;
-    subresource_range.setAspectMask(vk::ImageAspectFlagBits::eColor);
+    subresource_range.setAspectMask(getAspectsFromFormat());
     subresource_range.setBaseArrayLayer(0);
     subresource_range.setLayerCount(1);
     subresource_range.setBaseMipLevel(0);

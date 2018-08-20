@@ -49,11 +49,29 @@ public:
         std::uint32_t offset,
         GpuBufferFormat source_format) = 0;
 
+    virtual void iaSetPrimitiveTopology(PrimitiveTopology topology) = 0;
     virtual void setInputAssemblyState(const InputAssemblyState &state) = 0;
+
+    virtual void rsSetPolygonmode(PolygonMode mode) = 0;
+    virtual void rsSetFaceCullingMode(FaceCullingMode mode) = 0;
+    virtual void rsSetFrontFace(FrontFace face) = 0;
     virtual void setRasterizationState(const RasterizationState &state) = 0;
+
+    /**
+     * \brief Turn on/off depth test & write together.
+     * \param enabled
+     */
+    virtual void omSetDepthEnabled(bool enabled) = 0;
     virtual void setDepthStencilState(const DepthStencilState &state) = 0;
+
+    virtual void omSetColorBlendEnabled(bool enabled) = 0;
     virtual void setColorBlendState(const ColorBlendState &state) = 0;
 
+    /**
+     * \brief Create the pipeline. If called more than once, the other pipelines
+     * will be the derivatives of the first one.
+     * \return
+     */
     virtual std::shared_ptr<GraphicsPipeline> compile() = 0;
 };
 }

@@ -74,6 +74,7 @@ void usagi::VulkanGraphicsPipelineCompiler::setupDynamicStates()
     mDynamicStates = {
 		vk::DynamicState::eViewport,
 		vk::DynamicState::eScissor,
+        vk::DynamicState::eLineWidth,
 	};
 	mDynamicStateCreateInfo.dynamicStateCount =
         static_cast<uint32_t>(mDynamicStates.size());
@@ -82,7 +83,7 @@ void usagi::VulkanGraphicsPipelineCompiler::setupDynamicStates()
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setRenderPass(
-    std::shared_ptr<RenderPass> render_pass)
+    const std::shared_ptr<RenderPass> render_pass)
 {
     mRenderPass = dynamic_pointer_cast_throw<VulkanRenderPass>(render_pass);
     mPipelineCreateInfo.setRenderPass(mRenderPass->renderPass());
@@ -283,8 +284,8 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
     //}
 };
 
-std::shared_ptr<usagi::GraphicsPipeline> usagi::VulkanGraphicsPipelineCompiler::
-    compile()
+std::shared_ptr<usagi::GraphicsPipeline>
+    usagi::VulkanGraphicsPipelineCompiler::compile()
 {
 	LOG(info, "Compiling graphics pipeline...");
 
@@ -340,15 +341,26 @@ std::shared_ptr<usagi::GraphicsPipeline> usagi::VulkanGraphicsPipelineCompiler::
 
 	auto pipeline = mDevice->device().createGraphicsPipelineUnique(
 		{ }, mPipelineCreateInfo);
-
-	return std::make_shared<VulkanGraphicsPipeline>(
+    auto wrapped_pipeline = std::make_shared<VulkanGraphicsPipeline>(
         std::move(pipeline),
-	    std::move(compatible_pipeline_layout),
+        std::move(compatible_pipeline_layout),
         mRenderPass,
-	    std::move(ctx.desc_set_layout_bindings),
-	    std::move(ctx.desc_set_layouts),
-	    std::move(ctx.push_constant_field_map)
+        std::move(ctx.desc_set_layout_bindings),
+        std::move(ctx.desc_set_layouts),
+        std::move(ctx.push_constant_field_map)
     );
+
+    if(!mParentPipeline)
+    {
+        mParentPipeline = wrapped_pipeline;
+        // if more pipelines are created using this compiler, they will be
+        // the children of the first one
+        mPipelineCreateInfo.setFlags(vk::PipelineCreateFlagBits::eDerivative);
+        mPipelineCreateInfo.setBasePipelineHandle(mParentPipeline->pipeline());
+        mPipelineCreateInfo.setBasePipelineIndex(-1);
+    }
+
+    return std::move(wrapped_pipeline);
 }
 
 usagi::VulkanGraphicsPipelineCompiler::VulkanGraphicsPipelineCompiler(
@@ -359,7 +371,7 @@ usagi::VulkanGraphicsPipelineCompiler::VulkanGraphicsPipelineCompiler(
     mPipelineCreateInfo.setPInputAssemblyState(&mInputAssemblyStateCreateInfo);
     setInputAssemblyState({ });
 
-    // Viewport (set as dynamic state in command lists)
+    // Viewport (configured as dynamic state in command lists)
     // todo: multiple viewports
     mViewportStateCreateInfo.setViewportCount(1);
     mViewportStateCreateInfo.setScissorCount(1);
@@ -377,7 +389,8 @@ usagi::VulkanGraphicsPipelineCompiler::VulkanGraphicsPipelineCompiler(
     mPipelineCreateInfo.setPMultisampleState(&mMultisampleStateCreateInfo);
 
     // Depth/stencil
-    // todo
+    mPipelineCreateInfo.setPDepthStencilState(&mDepthStencilStateCreateInfo);
+    setDepthStencilState({ });
 
     // Blending
     // todo: multiple attachments
@@ -385,10 +398,14 @@ usagi::VulkanGraphicsPipelineCompiler::VulkanGraphicsPipelineCompiler(
     mColorBlendStateCreateInfo.setPAttachments(&mColorBlendAttachmentState);
     mPipelineCreateInfo.setPColorBlendState(&mColorBlendStateCreateInfo);
     setColorBlendState({ });
+
+    // Derivatives
+    mPipelineCreateInfo.setFlags(
+        vk::PipelineCreateFlagBits::eAllowDerivatives);
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setShader(
-    ShaderStage stage,
+    const ShaderStage stage,
     std::shared_ptr<SpirvBinary> shader)
 {
     ShaderInfo info;
@@ -397,9 +414,9 @@ void usagi::VulkanGraphicsPipelineCompiler::setShader(
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setVertexBufferBinding(
-    std::uint32_t binding_index,
-    std::uint32_t stride,
-    VertexInputRate input_rate)
+    const std::uint32_t binding_index,
+    const std::uint32_t stride,
+    const VertexInputRate input_rate)
 {
     vk::VertexInputBindingDescription vulkan_binding;
     vulkan_binding.setBinding(binding_index);
@@ -418,9 +435,9 @@ void usagi::VulkanGraphicsPipelineCompiler::setVertexBufferBinding(
 
 void usagi::VulkanGraphicsPipelineCompiler::setVertexAttribute(
     std::string attr_name,
-    std::uint32_t binding_index,
-    std::uint32_t offset,
-    GpuBufferFormat source_format)
+    const std::uint32_t binding_index,
+    const std::uint32_t offset,
+    const GpuBufferFormat source_format)
 {
     vk::VertexInputAttributeDescription vulkan_attr;
     // Deferred to compilation when shader reflection is available.
@@ -432,10 +449,10 @@ void usagi::VulkanGraphicsPipelineCompiler::setVertexAttribute(
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setVertexAttribute(
-    std::uint32_t attr_location,
-    std::uint32_t binding_index,
-    std::uint32_t offset,
-    GpuBufferFormat source_format)
+    const std::uint32_t attr_location,
+    const std::uint32_t binding_index,
+    const std::uint32_t offset,
+    const GpuBufferFormat source_format)
 {
     vk::VertexInputAttributeDescription vulkan_attr;
     vulkan_attr.setLocation(attr_location);
@@ -445,36 +462,71 @@ void usagi::VulkanGraphicsPipelineCompiler::setVertexAttribute(
     mVertexAttributeLocationArray.push_back(vulkan_attr);
 }
 
+void usagi::VulkanGraphicsPipelineCompiler::iaSetPrimitiveTopology(
+    const PrimitiveTopology topology)
+{
+    mInputAssemblyStateCreateInfo.setTopology(
+        translate(topology));
+}
+
 void usagi::VulkanGraphicsPipelineCompiler::setInputAssemblyState(
     const InputAssemblyState &state)
 {
-    mInputAssemblyStateCreateInfo.setTopology(
-        translate(state.topology));
+    iaSetPrimitiveTopology(state.topology);
+}
+
+void usagi::VulkanGraphicsPipelineCompiler::rsSetPolygonmode(
+    const PolygonMode mode)
+{
+    mRasterizationStateCreateInfo.setPolygonMode(translate(mode));
+}
+
+void usagi::VulkanGraphicsPipelineCompiler::rsSetFaceCullingMode(
+    const FaceCullingMode mode)
+{
+    mRasterizationStateCreateInfo.setCullMode(translate(mode));
+}
+
+void usagi::VulkanGraphicsPipelineCompiler::rsSetFrontFace(
+    const FrontFace face)
+{
+    mRasterizationStateCreateInfo.setFrontFace(translate(face));
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setRasterizationState(
     const RasterizationState &state)
 {
     mRasterizationStateCreateInfo.setDepthBiasEnable(false);
-    mRasterizationStateCreateInfo.setCullMode(
-        translate(state.face_culling_mode));
-    mRasterizationStateCreateInfo.setFrontFace(
-        translate(state.front_face));
-    mRasterizationStateCreateInfo.setPolygonMode(
-        translate(state.polygon_mode));
+    rsSetPolygonmode(state.polygon_mode);
+    rsSetFaceCullingMode(state.face_culling_mode);
+    rsSetFrontFace(state.front_face);
     mRasterizationStateCreateInfo.setLineWidth(1.f);
+}
+
+void usagi::VulkanGraphicsPipelineCompiler::omSetDepthEnabled(bool enabled)
+{
+    mDepthStencilStateCreateInfo.setDepthTestEnable(enabled);
+    mDepthStencilStateCreateInfo.setDepthWriteEnable(enabled);
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setDepthStencilState(
     const DepthStencilState &state)
 {
-    // todo
+    mDepthStencilStateCreateInfo.setDepthTestEnable(state.depth_test_enable);
+    mDepthStencilStateCreateInfo.setDepthWriteEnable(state.depth_write_enable);
+    mDepthStencilStateCreateInfo.setDepthCompareOp(
+        translate(state.depth_compare_op));
+}
+
+void usagi::VulkanGraphicsPipelineCompiler::omSetColorBlendEnabled(bool enabled)
+{
+    mColorBlendAttachmentState.setBlendEnable(enabled);
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setColorBlendState(
     const ColorBlendState &state)
 {
-    mColorBlendAttachmentState.setBlendEnable(state.enable);
+    omSetColorBlendEnabled(state.enable);
     mColorBlendAttachmentState.setColorBlendOp(
         translate(state.color_blend_op));
     mColorBlendAttachmentState.setAlphaBlendOp(

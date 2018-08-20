@@ -53,7 +53,8 @@ class ImGuiSubsystem
 
 	std::shared_ptr<GraphicsPipeline> mPipeline;
 	std::shared_ptr<GpuCommandPool> mCommandPool;
-	std::shared_ptr<GpuBuffer> mVertexBuffer;
+    std::shared_ptr<RenderPass> mRenderPass;
+    std::shared_ptr<GpuBuffer> mVertexBuffer;
 	std::shared_ptr<GpuBuffer> mIndexBuffer;
     std::shared_ptr<GpuImage> mFontTexture;
     std::shared_ptr<GpuImageView> mFontTextureView;

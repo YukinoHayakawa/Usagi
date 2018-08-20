@@ -1,11 +1,13 @@
 ﻿#pragma once
 
-#include <Usagi/Engine/Utility/Noncopyable.hpp>
 #include <Usagi/Engine/Core/Math.hpp>
-#include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GpuImageLayout.hpp>
-#include <Usagi/Engine/Runtime/Graphics/Shader/ShaderStage.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
+#include <Usagi/Engine/Runtime/Graphics/GraphicsPipeline.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Shader/ShaderStage.hpp>
+#include <Usagi/Engine/Utility/Noncopyable.hpp>
+
 #include "ShaderResource.hpp"
 
 namespace usagi
@@ -37,17 +39,18 @@ public:
     virtual void clearColorImage(
         GpuImage *image,
         GpuImageLayout layout,
-        Color4f color) = 0;
-
-    //... copy buffer
+        Color4f color
+    ) = 0;
 
     // Graphics commands
 
-    // <-- in attachments, & clear values & renderpass
     virtual void beginRendering(
-        std::shared_ptr<GraphicsPipeline> pipeline,
-        std::shared_ptr<Framebuffer> framebuffer) = 0;
+        std::shared_ptr<RenderPass> render_pass,
+        std::shared_ptr<Framebuffer> framebuffer
+    ) = 0;
     virtual void endRendering() = 0;
+
+    virtual void bindPipeline(std::shared_ptr<GraphicsPipeline> pipeline) = 0;
 
     // Dynamic States
 
@@ -68,6 +71,8 @@ public:
         Vector2i32 origin,
         Vector2u32 size
 	) = 0;
+
+    virtual void setLineWidth(float width) = 0;
 
     // Resource
 
@@ -99,6 +104,13 @@ public:
         GraphicsIndexType type
     ) = 0;
 
+    /**
+     * \brief
+     * \param binding_index
+     * \param buffer Passed in as pointer since it is only a wrapper of the
+     * allocated memory, which is the real tracked resource.
+     * \param offset
+     */
     virtual void bindVertexBuffer(
         std::uint32_t binding_index,
         GpuBuffer *buffer,
@@ -119,6 +131,13 @@ public:
     ) = 0;
 
     // Draw
+
+    virtual void drawInstanced(
+        std::uint32_t vertex_count,
+        std::uint32_t instance_count,
+        std::uint32_t first_vertex,
+        std::uint32_t first_instance
+    ) = 0;
 
     /**
      * \brief Note: indices, per-vertex and per-instance data are in buffers.

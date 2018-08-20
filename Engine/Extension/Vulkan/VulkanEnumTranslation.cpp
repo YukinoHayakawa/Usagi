@@ -1,15 +1,19 @@
 ﻿#include "VulkanEnumTranslation.hpp"
 
-#include <Usagi/Engine/Runtime/Graphics/PipelineCreateInfo.hpp>
-#include <Usagi/Engine/Runtime/Graphics/Shader/ShaderStage.hpp>
-#include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
-#include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Enum/CompareOp.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GpuBufferUsage.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Enum/GpuImageUsage.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
+#include <Usagi/Engine/Runtime/Graphics/PipelineCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/RenderPassCreateInfo.hpp>
-#include <Usagi/Engine/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageViewCreateInfo.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Shader/ShaderStage.hpp>
 
+using namespace usagi;
+
+// todo all use USAGI_ENUM_TRANSLATION
 namespace usagi::vulkan
 {
 vk::ShaderStageFlagBits translate(ShaderStage stage)
@@ -22,27 +26,6 @@ vk::ShaderStageFlagBits translate(ShaderStage stage)
             return vk::ShaderStageFlagBits::eFragment;
         default:
             throw std::runtime_error("Invalid shader stage");
-    }
-}
-
-vk::Format translate(GpuBufferFormat format)
-{
-    switch(format)
-    {
-        case GpuBufferFormat::R8_UNORM:
-            return vk::Format::eR8Unorm;
-        case GpuBufferFormat::R8G8B8A8_UNORM:
-            return vk::Format::eR8G8B8A8Unorm;
-        case GpuBufferFormat::R32_SFLOAT:
-            return vk::Format::eR32Sfloat;
-        case GpuBufferFormat::R32G32_SFLOAT:
-            return vk::Format::eR32G32Sfloat;
-        case GpuBufferFormat::R32G32B32_SFLOAT:
-            return vk::Format::eR32G32B32Sfloat;
-        case GpuBufferFormat::R32G32B32A32_SFLOAT:
-            return vk::Format::eR32G32B32A32Sfloat;
-        default:
-            throw std::runtime_error("Unsupported GpuBufferFormat.");
     }
 }
 
@@ -206,29 +189,6 @@ vk::AttachmentStoreOp translate(GpuAttachmentStoreOp op)
     }
 }
 
-vk::ImageLayout translate(GpuImageLayout layout)
-{
-    switch(layout)
-    {
-        case GpuImageLayout::UNDEFINED:
-            return vk::ImageLayout::eUndefined;
-        case GpuImageLayout::PRESENT:
-            return vk::ImageLayout::ePresentSrcKHR;
-        case GpuImageLayout::TRANSFER_SRC:
-            return vk::ImageLayout::eTransferSrcOptimal;
-        case GpuImageLayout::TRANSFER_DST:
-            return vk::ImageLayout::eTransferDstOptimal;
-        case GpuImageLayout::COLOR:
-            return vk::ImageLayout::eColorAttachmentOptimal;
-        case GpuImageLayout::SHADER_READ_ONLY:
-            return vk::ImageLayout::eShaderReadOnlyOptimal;
-        case GpuImageLayout::PREINITIALIZED:
-            return vk::ImageLayout::ePreinitialized;
-        default:
-            throw std::runtime_error("Invalid GpuImageLayout.");
-    }
-}
-
 vk::IndexType translate(GraphicsIndexType type)
 {
     switch(type)
@@ -301,22 +261,6 @@ vk::BufferUsageFlagBits translate(const GpuBufferUsage usage)
     }
 }
 
-vk::ImageUsageFlagBits translate(const GpuImageUsage usage)
-{
-    switch(usage)
-    {
-        case GpuImageUsage::SAMPLED:
-            return vk::ImageUsageFlagBits::eSampled;
-        case GpuImageUsage::COLOR_ATTACHMENT:
-            return vk::ImageUsageFlagBits::eColorAttachment;
-        case GpuImageUsage::DEPTH_STENCIL_ATTACHMENT:
-            return vk::ImageUsageFlagBits::eDepthStencilAttachment;
-        case GpuImageUsage::INPUT_ATTACHMENT:
-            return vk::ImageUsageFlagBits::eInputAttachment;
-        default: throw std::runtime_error("Invalid GpuImageUsage.");
-    }
-}
-
 vk::SamplerAddressMode translate(GpuSamplerAddressMode mode)
 {
     switch(mode)
@@ -367,3 +311,87 @@ vk::ComponentSwizzle translate(const GpuImageComponentSwizzle swizzle)
     }
 }
 }
+
+USAGI_ENUM_TRANSLATION_NS(usagi::vulkan, GpuBufferFormat, vk::Format, 11,
+    (
+        GpuBufferFormat::R8_UNORM,
+        GpuBufferFormat::R8G8B8A8_UNORM,
+        GpuBufferFormat::R32_SFLOAT,
+        GpuBufferFormat::R32G32_SFLOAT,
+        GpuBufferFormat::R32G32B32_SFLOAT,
+        GpuBufferFormat::R32G32B32A32_SFLOAT,
+        GpuBufferFormat::D16_UNORM,
+        GpuBufferFormat::D32_SFLOAT,
+        GpuBufferFormat::D16_UNORM_S8_UINT,
+        GpuBufferFormat::D24_UNORM_S8_UINT,
+        GpuBufferFormat::D32_SFLOAT_S8_UINT,
+    ),
+    (
+        vk::Format::eR8Unorm,
+        vk::Format::eR8G8B8A8Unorm,
+        vk::Format::eR32Sfloat,
+        vk::Format::eR32G32Sfloat,
+        vk::Format::eR32G32B32Sfloat,
+        vk::Format::eR32G32B32A32Sfloat,
+        vk::Format::eD16Unorm,
+        vk::Format::eD32Sfloat,
+        vk::Format::eD16UnormS8Uint,
+        vk::Format::eD24UnormS8Uint,
+        vk::Format::eD32SfloatS8Uint,
+    )
+)
+
+USAGI_ENUM_TRANSLATION_NS(usagi::vulkan, GpuImageUsage, vk::ImageUsageFlagBits, 4,
+(
+    GpuImageUsage::SAMPLED,
+    GpuImageUsage::COLOR_ATTACHMENT,
+    GpuImageUsage::DEPTH_STENCIL_ATTACHMENT,
+    GpuImageUsage::INPUT_ATTACHMENT,
+), (
+    vk::ImageUsageFlagBits::eSampled,
+    vk::ImageUsageFlagBits::eColorAttachment,
+    vk::ImageUsageFlagBits::eDepthStencilAttachment,
+    vk::ImageUsageFlagBits::eInputAttachment,
+))
+
+USAGI_ENUM_TRANSLATION_NS(usagi::vulkan, CompareOp, vk::CompareOp, 8,
+(
+    CompareOp::NEVER,
+    CompareOp::LESS,
+    CompareOp::EQUAL,
+    CompareOp::LESS_OR_EQUAL,
+    CompareOp::GREATER,
+    CompareOp::NOT_EQUAL,
+    CompareOp::GREATER_OR_EQUAL,
+    CompareOp::ALWAYS,
+), (
+    vk::CompareOp::eNever,
+    vk::CompareOp::eLess,
+    vk::CompareOp::eEqual,
+    vk::CompareOp::eLessOrEqual,
+    vk::CompareOp::eGreater,
+    vk::CompareOp::eNotEqual,
+    vk::CompareOp::eGreaterOrEqual,
+    vk::CompareOp::eAlways,
+))
+
+USAGI_ENUM_TRANSLATION_NS(usagi::vulkan, GpuImageLayout, vk::ImageLayout, 8,
+(
+    GpuImageLayout::UNDEFINED,
+    GpuImageLayout::PRESENT,
+    GpuImageLayout::TRANSFER_SRC,
+    GpuImageLayout::TRANSFER_DST,
+    GpuImageLayout::COLOR_ATTACHMENT,
+    GpuImageLayout::DEPTH_STENCIL_ATTACHMENT,
+    GpuImageLayout::SHADER_READ_ONLY,
+    GpuImageLayout::PREINITIALIZED,
+), (
+    vk::ImageLayout::eUndefined,
+    vk::ImageLayout::ePresentSrcKHR,
+    vk::ImageLayout::eTransferSrcOptimal,
+    vk::ImageLayout::eTransferDstOptimal,
+    vk::ImageLayout::eColorAttachmentOptimal,
+    vk::ImageLayout::eDepthStencilAttachmentOptimal,
+    vk::ImageLayout::eShaderReadOnlyOptimal,
+    vk::ImageLayout::ePreinitialized,
+))

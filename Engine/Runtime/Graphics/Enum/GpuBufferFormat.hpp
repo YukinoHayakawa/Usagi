@@ -11,5 +11,13 @@ enum class GpuBufferFormat
     R32G32_SFLOAT,
     R32G32B32_SFLOAT,
     R32G32B32A32_SFLOAT,
+
+    // Depth stencil formats
+
+    D16_UNORM,
+    D32_SFLOAT,
+    D16_UNORM_S8_UINT,
+    D24_UNORM_S8_UINT,
+    D32_SFLOAT_S8_UINT,
 };
 }

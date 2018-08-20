@@ -136,7 +136,7 @@ public:
     {
         auto comp = std::make_unique<CompT>(std::forward<Args>(args)...);
         const auto r = comp.get();
-        insertComponent(comp->getBaseTypeInfo(), std::move(comp));
+        insertComponent(comp->baseType(), std::move(comp));
         return r;
     }
 

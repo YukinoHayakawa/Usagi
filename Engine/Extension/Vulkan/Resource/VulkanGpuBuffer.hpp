@@ -27,6 +27,9 @@ public:
     VulkanGpuBuffer(VulkanBufferMemoryPoolBase *pool, GpuBufferUsage usage);
 
     void allocate(std::size_t size) override;
+    void release() override;
+    std::size_t size() const override;
+
     void * mappedMemory() override;
     void flush() override;
 

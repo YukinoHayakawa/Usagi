@@ -22,6 +22,6 @@ public:
      * This method can be implemented in the base type as final.
      * \return
      */
-    virtual const std::type_info & getBaseTypeInfo() = 0;
+    virtual const std::type_info & baseType() = 0;
 };
 }

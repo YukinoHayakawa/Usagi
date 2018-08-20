@@ -9,7 +9,7 @@ struct ImGuiComponent : Component
 {
     virtual void draw(const TimeDuration &dt) = 0;
 
-    const std::type_info & getBaseTypeInfo() override
+    const std::type_info & baseType() override final
     {
         return typeid(ImGuiComponent);
     }

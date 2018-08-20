@@ -37,7 +37,7 @@ struct GpuAttachmentUsage
     /**
     * \brief The layout used during the render pass.
     */
-    GpuImageLayout layout = GpuImageLayout::COLOR;
+    GpuImageLayout layout = GpuImageLayout::COLOR_ATTACHMENT;
 
     /**
     * \brief The layout after the render pass.

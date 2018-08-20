@@ -32,7 +32,12 @@ struct EnumTranslator
 };
 }
 
-#define USAGI_ENUM_TRANSLATION(src_t, dst_t, num_elem, src_elems, dst_elems) \
+#define USAGI_ENUM_TRANSLATION_DECL(src_t, dst_t) \
+/*constexpr*/ dst_t translate(const src_t e); \
+/*constexpr*/ src_t translate(const dst_t e) \
+/**/
+
+#define USAGI_ENUM_TRANSLATION_BASE(ns, src_t, dst_t, num_elem, src_elems, dst_elems) \
 template <> \
 struct ::usagi::EnumTranslationTraits<src_t, dst_t> \
 { \
@@ -45,12 +50,18 @@ struct ::usagi::EnumTranslationTraits<dst_t, src_t> \
     static constexpr std::array<dst_t, num_elem> src { USAGI_UNPACK dst_elems }; \
     static constexpr std::array<src_t, num_elem> dest { USAGI_UNPACK src_elems }; \
 }; \
-/*constexpr*/ inline dst_t translate(const src_t e) \
+/*constexpr*/ dst_t ns translate(const src_t e) \
 { \
     return ::usagi::EnumTranslator<src_t, dst_t>::translate(e); \
 } \
-/*constexpr*/ inline src_t translate(const dst_t e) \
+/*constexpr*/ src_t ns translate(const dst_t e) \
 { \
     return ::usagi::EnumTranslator<dst_t, src_t>::translate(e); \
 } \
 /**/
+
+#define USAGI_ENUM_TRANSLATION(src_t, dst_t, num_elem, src_elems, dst_elems) \
+USAGI_ENUM_TRANSLATION_BASE(, src_t, dst_t, num_elem, src_elems, dst_elems)
+
+#define USAGI_ENUM_TRANSLATION_NS(ns, src_t, dst_t, num_elem, src_elems, dst_elems) \
+USAGI_ENUM_TRANSLATION_BASE(ns::, src_t, dst_t, num_elem, src_elems, dst_elems)

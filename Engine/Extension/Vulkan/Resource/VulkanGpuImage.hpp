@@ -20,6 +20,7 @@ protected:
     vk::Format mFormat;
     std::shared_ptr<VulkanGpuImageView> mBaseView;
 
+    vk::ImageAspectFlags getAspectsFromFormat() const;
     void createBaseView();
 
 public:

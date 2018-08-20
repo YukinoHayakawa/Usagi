@@ -8,6 +8,7 @@
 
 namespace usagi
 {
+class VulkanGraphicsPipeline;
 class VulkanRenderPass;
 class VulkanGpuDevice;
 
@@ -61,6 +62,9 @@ class VulkanGraphicsPipelineCompiler final : public GraphicsPipelineCompiler
     void setupVertexInput();
     void setupDynamicStates();
 
+    // Pipeline derivatives support
+    std::shared_ptr<VulkanGraphicsPipeline> mParentPipeline;
+
 public:
     explicit VulkanGraphicsPipelineCompiler(VulkanGpuDevice *device);
 
@@ -85,9 +89,18 @@ public:
         std::uint32_t offset,
         GpuBufferFormat source_format) override;
 
+    void iaSetPrimitiveTopology(PrimitiveTopology topology) override;
     void setInputAssemblyState(const InputAssemblyState &state) override;
+
+    void rsSetPolygonmode(PolygonMode mode) override;
+    void rsSetFaceCullingMode(FaceCullingMode mode) override;
+    void rsSetFrontFace(FrontFace face) override;
     void setRasterizationState(const RasterizationState &state) override;
+
+    void omSetDepthEnabled(bool enabled) override;
     void setDepthStencilState(const DepthStencilState &state) override;
+
+    void omSetColorBlendEnabled(bool enabled) override;
     void setColorBlendState(const ColorBlendState &state) override;
 
     std::shared_ptr<GraphicsPipeline> compile() override;

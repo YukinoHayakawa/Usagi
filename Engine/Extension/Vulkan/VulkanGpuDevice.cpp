@@ -246,6 +246,12 @@ void usagi::VulkanGpuDevice::createDeviceAndQueues()
 
     vk::DeviceCreateInfo device_create_info;
 
+    vk::PhysicalDeviceFeatures features;
+    device_create_info.setPEnabledFeatures(&features);
+    features.setFillModeNonSolid(true);
+    features.setLargePoints(true);
+    features.setWideLines(true);
+
     vk::DeviceQueueCreateInfo queue_create_info[1];
     float queue_priority = 1;
     queue_create_info[0].setQueueFamilyIndex(graphics_queue_index);
@@ -273,7 +279,7 @@ void usagi::VulkanGpuDevice::createMemoryPools()
 {
     mDynamicBufferPool = std::make_unique<BitmapBufferPool>(
         this,
-        1024 * 1024 * 512, // 512MiB  todo from config
+        1024 * 1024 * 128, // 512MiB  todo from config
         vk::MemoryPropertyFlagBits::eHostVisible |
         vk::MemoryPropertyFlagBits::eHostCoherent,
         vk::BufferUsageFlagBits::eVertexBuffer |
@@ -291,7 +297,7 @@ void usagi::VulkanGpuDevice::createMemoryPools()
 
     mHostImagePool = std::make_unique<BitmapImagePool>(
         this,
-        1024 * 1024 * 512, // 512MiB  todo from config
+        1024 * 1024 * 128, // 512MiB  todo from config
         vk::MemoryPropertyFlagBits::eHostVisible |
         vk::MemoryPropertyFlagBits::eHostCoherent,
         vk::ImageUsageFlagBits::eSampled,
@@ -369,6 +375,7 @@ std::shared_ptr<usagi::GpuBuffer> usagi::VulkanGpuDevice::createBuffer(
 std::shared_ptr<usagi::GpuImage> usagi::VulkanGpuDevice::createImage(
     const GpuImageCreateInfo &info)
 {
+    // todo check format availability
     return mHostImagePool->createPooledImage(info);
 }
 

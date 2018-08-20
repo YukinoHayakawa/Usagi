@@ -15,6 +15,7 @@
 #include "VulkanGraphicsPipeline.hpp"
 #include "VulkanGpuImageView.hpp"
 #include "VulkanShaderResource.hpp"
+#include "../VulkanRenderPass.hpp"
 
 using namespace usagi::vulkan;
 
@@ -145,18 +146,17 @@ void usagi::VulkanGraphicsCommandList::clearColorImage(
 }
 
 void usagi::VulkanGraphicsCommandList::beginRendering(
-    std::shared_ptr<GraphicsPipeline> pipeline,
+    std::shared_ptr<RenderPass> render_pass,
     std::shared_ptr<Framebuffer> framebuffer)
 {
     auto vk_framebuffer =
         dynamic_pointer_cast_throw<VulkanFramebuffer>(framebuffer);
-    auto vk_pipeline =
-        dynamic_pointer_cast_throw<VulkanGraphicsPipeline>(pipeline);
-    const auto vk_renderpass = vk_pipeline->renderPass();
+    const auto vk_renderpass =
+        dynamic_pointer_cast_throw<VulkanRenderPass>(render_pass);
 
     // todo reuse framebuffers?
     // todo unmatched view amount?
-    vk_framebuffer->create(vk_renderpass->renderPass());
+    vk_framebuffer->create(vk_renderpass);
 
     vk::RenderPassBeginInfo begin_info;
     // todo support clear values
@@ -171,11 +171,6 @@ void usagi::VulkanGraphicsCommandList::beginRendering(
     // assuming that only one render pass is used
     mCommandBuffer->beginRenderPass(begin_info, vk::SubpassContents::eInline);
 
-    mCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics,
-        vk_pipeline->pipeline());
-
-    mCurrentPipeline = vk_pipeline;
-
     for(auto &&view : vk_framebuffer->views())
     {
         // todo: merge into ...->appendResources?
@@ -183,12 +178,23 @@ void usagi::VulkanGraphicsCommandList::beginRendering(
         view->appendAdditionalResources(mResources);
     }
     mResources.push_back(std::move(vk_framebuffer));
-    mResources.push_back(std::move(vk_pipeline));
 }
 
 void usagi::VulkanGraphicsCommandList::endRendering()
 {
+    mCurrentPipeline.reset();
     mCommandBuffer->endRenderPass();
+}
+
+void usagi::VulkanGraphicsCommandList::bindPipeline(
+    std::shared_ptr<GraphicsPipeline> pipeline)
+{
+    auto vk_pipeline =
+        dynamic_pointer_cast_throw<VulkanGraphicsPipeline>(pipeline);
+    mCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics,
+        vk_pipeline->pipeline());
+    mCurrentPipeline = vk_pipeline;
+    mResources.push_back(std::move(vk_pipeline));
 }
 
 void usagi::VulkanGraphicsCommandList::createDescriptorPool()
@@ -307,6 +313,11 @@ void usagi::VulkanGraphicsCommandList::setScissor(
     mCommandBuffer->setScissor(viewport_index, 1, &scissor);
 }
 
+void usagi::VulkanGraphicsCommandList::setLineWidth(float width)
+{
+    mCommandBuffer->setLineWidth(width);
+}
+
 void usagi::VulkanGraphicsCommandList::setConstant(
     ShaderStage stage,
     const char *name,
@@ -359,6 +370,16 @@ void usagi::VulkanGraphicsCommandList::bindVertexBuffer(
     mCommandBuffer->bindVertexBuffers(binding_index, 1, buffers, sizes);
 
     mResources.push_back(std::move(allocation));
+}
+
+void usagi::VulkanGraphicsCommandList::drawInstanced(
+    const std::uint32_t vertex_count,
+    const std::uint32_t instance_count,
+    const std::uint32_t first_vertex,
+    const std::uint32_t first_instance)
+{
+    mCommandBuffer->draw(vertex_count, instance_count, first_vertex,
+        first_instance);
 }
 
 void usagi::VulkanGraphicsCommandList::drawIndexedInstanced(

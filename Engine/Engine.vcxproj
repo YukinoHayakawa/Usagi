@@ -128,6 +128,7 @@
     <ClCompile Include="Asset\Filesystem\FilesystemAsset.cpp" />
     <ClCompile Include="Asset\Filesystem\FilesystemAssetPackage.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
+    <ClCompile Include="Extension\DebugDraw\DebugDrawSubsystem.cpp" />
     <ClCompile Include="Extension\ImGui\ImGuiImpl.cpp" />
     <ClCompile Include="Extension\ImGui\ImGuiSubsystem.cpp" />
     <ClCompile Include="Extension\Vulkan\Resource\VulkanBufferAllocation.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="Extension\Win32\Window\Win32Window.cpp" />
     <ClCompile Include="Extension\Win32\Window\Win32WindowManager.cpp" />
     <ClCompile Include="Game\Game.cpp" />
+    <ClCompile Include="Interactive\InputMap.cpp" />
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\Memory\BitmapMemoryAllocator.cpp" />
@@ -182,6 +184,9 @@
     <ClInclude Include="Core\Logging.hpp" />
     <ClInclude Include="Core\Math.hpp" />
     <ClInclude Include="Core\Time.hpp" />
+    <ClInclude Include="Extension\DebugDraw\DebugDraw.hpp" />
+    <ClInclude Include="Extension\DebugDraw\DebugDrawComponent.hpp" />
+    <ClInclude Include="Extension\DebugDraw\DebugDrawSubsystem.hpp" />
     <ClInclude Include="Extension\ImGui\ImGui.hpp" />
     <ClInclude Include="Extension\ImGui\ImGuiComponent.hpp" />
     <ClInclude Include="Extension\ImGui\ImGuiConfig.hpp" />
@@ -231,6 +236,8 @@
     <ClInclude Include="Core\Element.hpp" />
     <ClCompile Include="Core\Event\Event.cpp" />
     <ClCompile Include="Core\Element.cpp" />
+    <ClInclude Include="Interactive\InputMap.hpp" />
+    <ClInclude Include="Runtime\Graphics\Enum\CompareOp.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuBufferFormat.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuBufferUsage.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuImageLayout.hpp" />
@@ -282,8 +289,10 @@
     <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Runtime\Window\WindowEventListener.hpp" />
     <ClInclude Include="Runtime\Window\WindowManager.hpp" />
+    <ClInclude Include="Scene\Scene.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
+    <ClInclude Include="Utility\EnumTranslator.hpp" />
     <ClInclude Include="Utility\File.hpp" />
     <ClInclude Include="Utility\Flag.hpp" />
     <ClInclude Include="Utility\Hash.hpp" />
