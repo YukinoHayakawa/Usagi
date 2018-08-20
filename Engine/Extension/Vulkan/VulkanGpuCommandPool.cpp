@@ -1,7 +1,6 @@
 ﻿#include "VulkanGpuCommandPool.hpp"
 
-#include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
-
+#include "VulkanGpuDevice.hpp"
 #include "VulkanGraphicsCommandList.hpp"
 
 usagi::VulkanGpuCommandPool::VulkanGpuCommandPool(VulkanGpuDevice *device)

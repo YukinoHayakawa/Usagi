@@ -1,7 +1,6 @@
 ﻿#include "VulkanGpuBuffer.hpp"
 
-#include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
-
+#include "VulkanGpuDevice.hpp"
 #include "VulkanBufferAllocation.hpp"
 #include "VulkanMemoryPool.hpp"
 

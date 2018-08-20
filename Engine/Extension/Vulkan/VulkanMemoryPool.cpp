@@ -1,10 +1,11 @@
 ﻿#include "VulkanMemoryPool.hpp"
 
 #include <Usagi/Engine/Core/Logging.hpp>
-#include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
-#include <Usagi/Engine/Extension/Vulkan/VulkanEnumTranslation.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageCreateInfo.hpp>
 #include <Usagi/Engine/Utility/Rounding.hpp>
+
+#include "VulkanGpuDevice.hpp"
+#include "VulkanEnumTranslation.hpp"
 
 using namespace usagi::vulkan;
 

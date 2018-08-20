@@ -7,7 +7,7 @@
 #include "VulkanGpuDevice.hpp"
 #include "VulkanEnumTranslation.hpp"
 #include "VulkanRenderPass.hpp"
-#include "Resource/VulkanGraphicsPipeline.hpp"
+#include "VulkanGraphicsPipeline.hpp"
 
 using namespace spirv_cross;
 using namespace usagi::vulkan;

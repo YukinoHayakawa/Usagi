@@ -1,8 +1,8 @@
 ﻿#include "VulkanGpuImage.hpp"
 
-#include <Usagi/Engine/Extension/Vulkan/VulkanEnumTranslation.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageViewCreateInfo.hpp>
 
+#include "VulkanEnumTranslation.hpp"
 #include "VulkanGpuImageView.hpp"
 
 using namespace usagi::vulkan;

@@ -261,18 +261,6 @@
     <ClInclude Include="Runtime\Graphics\Resource\GpuImage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanGpuCommandPool.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanGraphicsCommandList.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanGpuBuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanGpuImage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Graphics\RenderPass.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -303,9 +291,6 @@
     <ClInclude Include="Extension\Vulkan\WSI\VulkanSwapchainImage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanFramebuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Time.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -315,22 +300,10 @@
     <ClInclude Include="Runtime\Graphics\Resource\GpuImageView.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanGpuImageView.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Extension\Vulkan\VulkanHelper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanBatchResource.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Graphics\Enum\GraphicsPipelineStage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanSemaphore.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanBufferAllocation.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Memory\detail\MemoryBitmap.hpp">
@@ -342,28 +315,13 @@
     <ClInclude Include="Runtime\Memory\BitmapMemoryAllocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanMemoryPool.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanGraphicsPipeline.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Graphics\Resource\ShaderResource.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanShaderResource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Graphics\Enum\GpuBufferUsage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Graphics\Resource\GpuSampler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanSampler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanResourceInfo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Graphics\Resource\GpuSamplerCreateInfo.hpp">
@@ -373,9 +331,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Graphics\Enum\GpuImageUsage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Vulkan\Resource\VulkanPooledImage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Extension\ImGui\ImGui.hpp">
@@ -418,6 +373,51 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Graphics\Enum\CompareOp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanBatchResource.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanBufferAllocation.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanFramebuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanGpuBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanGpuCommandPool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanGpuImage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanGpuImageView.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanGraphicsCommandList.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipeline.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanMemoryPool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanPooledImage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanResourceInfo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanSampler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanSemaphore.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Vulkan\VulkanShaderResource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -504,12 +504,6 @@
     <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipelineCompiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuCommandPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanGraphicsCommandList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Extension\Vulkan\VulkanRenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -522,40 +516,13 @@
     <ClCompile Include="Extension\Vulkan\WSI\VulkanSwapchainImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanFramebuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuImageView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\Memory\detail\MemoryBitmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Memory\BitmapMemoryAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanMemoryPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanBufferAllocation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Extension\ImGui\ImGuiImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanGraphicsPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanSampler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanPooledImage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\Resource\VulkanGpuImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Win32\Win32Runtime.cpp">
@@ -571,6 +538,39 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Interactive\InputMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanBufferAllocation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanFramebuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanGpuBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanGpuCommandPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanGpuImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanGpuImageView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanGraphicsCommandList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanMemoryPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanPooledImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanSampler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

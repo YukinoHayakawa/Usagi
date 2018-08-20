@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Engine/Extension/Vulkan/Resource/VulkanGpuImage.hpp>
+#include "../VulkanGpuImage.hpp"
 
 namespace usagi
 {

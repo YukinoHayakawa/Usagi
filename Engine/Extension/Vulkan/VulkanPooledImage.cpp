@@ -1,8 +1,8 @@
 ﻿#include "VulkanPooledImage.hpp"
 
-#include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
 
+#include "VulkanGpuDevice.hpp"
 #include "VulkanMemoryPool.hpp"
 #include "VulkanGpuCommandPool.hpp"
 
@@ -54,7 +54,7 @@ void usagi::VulkanPooledImage::upload(void *data, const std::size_t size)
     );
     post->endRecording();
     gpu_device->submitGraphicsJobs({ post }, { }, { }, { });
-    gpu_device->waitIdle();
+  //  gpu_device->waitIdle();
 }
 
 void usagi::VulkanPooledImage::createBaseView()

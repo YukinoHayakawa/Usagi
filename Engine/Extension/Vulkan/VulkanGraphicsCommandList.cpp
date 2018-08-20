@@ -1,11 +1,11 @@
 ﻿#include "VulkanGraphicsCommandList.hpp"
 
 #include <Usagi/Engine/Utility/TypeCast.hpp>
-#include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
-#include <Usagi/Engine/Extension/Vulkan/VulkanEnumTranslation.hpp>
-#include <Usagi/Engine/Extension/Vulkan/VulkanRenderPass.hpp>
-#include <Usagi/Engine/Extension/Vulkan/VulkanHelper.hpp>
 
+#include "VulkanGpuDevice.hpp"
+#include "VulkanEnumTranslation.hpp"
+#include "VulkanRenderPass.hpp"
+#include "VulkanHelper.hpp"
 #include "VulkanGpuBuffer.hpp"
 #include "VulkanGpuImage.hpp"
 #include "VulkanFramebuffer.hpp"
@@ -15,7 +15,7 @@
 #include "VulkanGraphicsPipeline.hpp"
 #include "VulkanGpuImageView.hpp"
 #include "VulkanShaderResource.hpp"
-#include "../VulkanRenderPass.hpp"
+#include "VulkanRenderPass.hpp"
 
 using namespace usagi::vulkan;
 

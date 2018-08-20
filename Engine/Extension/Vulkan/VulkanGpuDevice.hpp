@@ -6,7 +6,7 @@
 
 #include <Usagi/Engine/Runtime/Graphics/GpuDevice.hpp>
 
-#include "Resource/VulkanMemoryPool.hpp"
+#include "VulkanMemoryPool.hpp"
 
 namespace usagi
 {

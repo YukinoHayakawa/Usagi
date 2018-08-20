@@ -1,9 +1,8 @@
 ﻿#include "VulkanFramebuffer.hpp"
 
-#include <Usagi/Engine/Extension/Vulkan/VulkanHelper.hpp>
-#include <Usagi/Engine/Extension/Vulkan/VulkanGpuDevice.hpp>
-#include <Usagi/Engine/Extension/Vulkan/VulkanRenderPass.hpp>
-
+#include "VulkanHelper.hpp"
+#include "VulkanGpuDevice.hpp"
+#include "VulkanRenderPass.hpp"
 #include "VulkanGpuImageView.hpp"
 
 usagi::VulkanFramebuffer::VulkanFramebuffer(

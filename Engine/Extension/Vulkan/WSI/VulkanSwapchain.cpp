@@ -1,13 +1,13 @@
 ﻿#include "VulkanSwapchain.hpp"
 
 #include <Usagi/Engine/Core/Logging.hpp>
-#include <Usagi/Engine/Extension/Vulkan/VulkanEnumTranslation.hpp>
-#include <Usagi/Engine/Extension/Vulkan/VulkanHelper.hpp>
-#include <Usagi/Engine/Extension/Vulkan/Resource/VulkanSemaphore.hpp>
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Utility/TypeCast.hpp>
 
 #include "../VulkanGpuDevice.hpp"
+#include "../VulkanEnumTranslation.hpp"
+#include "../VulkanHelper.hpp"
+#include "../VulkanSemaphore.hpp"
 
 using namespace usagi::vulkan;
 
