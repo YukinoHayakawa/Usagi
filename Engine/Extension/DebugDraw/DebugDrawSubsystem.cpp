@@ -165,17 +165,20 @@ usagi::DebugDrawSubsystem::~DebugDrawSubsystem()
     mContext = nullptr;
 }
 
-void usagi::DebugDrawSubsystem::update(
-    const TimeDuration &dt,
-    const std::shared_ptr<Framebuffer> framebuffer,
-    const CommandListSink &cmd_out)
+void usagi::DebugDrawSubsystem::update(const TimeDuration &dt)
 {
-    mDisplaySize = framebuffer->size().cast<float>();
-
     for(auto &&e : mRegistry)
     {
         e->getComponent<DebugDrawComponent>()->draw(mContext);
     }
+}
+
+void usagi::DebugDrawSubsystem::render(
+    const TimeDuration &dt,
+    const std::shared_ptr<Framebuffer> framebuffer,
+    const CommandListSink &cmd_out) const
+{
+    mDisplaySize = framebuffer->size().cast<float>();
 
     mCurrentCmdList = mCommandPool->allocateGraphicsCommandList();
     mCurrentCmdList->beginRecording();

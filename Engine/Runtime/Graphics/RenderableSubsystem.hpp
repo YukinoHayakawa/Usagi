@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <vector>
 #include <memory>
 #include <functional>
 
@@ -16,26 +15,22 @@ class GraphicsCommandList;
  */
 class RenderableSubsystem : public Subsystem
 {
-    void update(const TimeDuration &dt) override final
-    {
-        throw std::runtime_error(
-            "Framebuffer must be provided to update RenderableSubsystem.");
-    }
-
 public:
     using CommandListSink =
         std::function<void(std::shared_ptr<GraphicsCommandList>)>;
 
     /**
-     * \brief
+     * \brief Record command lists. In order to achieve multi-threaded
+     * recording, this method may not modify the game states. Any modification
+     * to the game states should happen in update().
      * \param dt
      * \param framebuffer
      * \param cmd_out Command list receiver, should be thread-safe.
      */
-    virtual void update(
+    virtual void render(
         const TimeDuration &dt,
         std::shared_ptr<Framebuffer> framebuffer,
         const CommandListSink &cmd_out
-    ) = 0;
+    ) const = 0;
 };
 }

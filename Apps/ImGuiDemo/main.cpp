@@ -117,12 +117,14 @@ public:
                 }
             );
 
+            update(dt);
+
             // Record command lists
             std::vector<std::shared_ptr<GraphicsCommandList>> cmd_lists;
             const auto cmd_inserter = [&](auto cmd_list) {
                 cmd_lists.push_back(std::move(cmd_list));
             };
-            mImGui->update(dt, framebuffer, cmd_inserter);
+            mImGui->render(dt, framebuffer, cmd_inserter);
 
             // Submit jobs
             const auto wait_stages = {

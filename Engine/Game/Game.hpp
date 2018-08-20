@@ -2,11 +2,11 @@
 
 #include <memory>
 #include <vector>
-#include <chrono>
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 #include <Usagi/Engine/Core/Element.hpp>
 #include <Usagi/Engine/Utility/TypeCast.hpp>
+#include <Usagi/Engine/Core/Time.hpp>
 
 namespace usagi
 {
@@ -71,6 +71,6 @@ public:
     * of their registration.
     * \param dt The elapsed time from last frame.
     */
-    void update(const std::chrono::seconds& dt);
+    void update(const TimeDuration& dt);
 };
 }

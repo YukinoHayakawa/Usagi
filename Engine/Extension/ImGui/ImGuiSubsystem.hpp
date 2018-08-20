@@ -37,12 +37,13 @@ class ImGuiSubsystem
 
     ImGuiContext *mContext = nullptr;
     bool mMouseJustPressed[5] = { };
+    mutable Vector2f mLastFrameBufferSize;
 
     std::set<Element*> mRegistry;
 
     void setupInput();
 
-    void newFrame(float dt, Framebuffer *framebuffer);
+    void newFrame(float dt);
     void processElements(const TimeDuration &dt);
     void render(
         const std::shared_ptr<Framebuffer> &framebuffer,
@@ -84,11 +85,11 @@ public:
     void onMouseWheelScroll(const MouseWheelEvent &e) override;
     void onWindowCharInput(const WindowCharEvent &e) override;
 
-    void update(
+    void update(const TimeDuration &dt) override;
+    void render(
         const TimeDuration &dt,
         std::shared_ptr<Framebuffer> framebuffer,
-        const CommandListSink &cmd_out
-    ) override;
+        const CommandListSink &cmd_out) const override;
 
     bool processable(Element *element) override;
     void updateRegistry(Element *element) override;

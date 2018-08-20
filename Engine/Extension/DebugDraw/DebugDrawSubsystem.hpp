@@ -35,9 +35,9 @@ class DebugDrawSubsystem
     std::shared_ptr<GpuImage> mFontTexture;
     std::shared_ptr<GpuSampler> mFontSampler;
     std::shared_ptr<GpuCommandPool> mCommandPool;
-    std::shared_ptr<GraphicsCommandList> mCurrentCmdList;
     std::shared_ptr<GpuBuffer> mVertexBuffer;
-    Vector2f mDisplaySize;
+    mutable std::shared_ptr<GraphicsCommandList> mCurrentCmdList;
+    mutable Vector2f mDisplaySize;
 
     void createPointLinePipeline();
     void createTextPipeline();
@@ -48,10 +48,11 @@ public:
 
     void createPipelines(RenderPassCreateInfo &render_pass_info);
 
-    void update(
+    void update(const TimeDuration &dt) override;
+    void render(
         const TimeDuration &dt,
         std::shared_ptr<Framebuffer> framebuffer,
-        const CommandListSink &cmd_out) override;
+        const CommandListSink &cmd_out) const override;
     bool processable(Element *element) override;
     void updateRegistry(Element *element) override;
 

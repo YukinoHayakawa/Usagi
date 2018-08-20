@@ -127,6 +127,8 @@ usagi::ImGuiSubsystem::ImGuiSubsystem(
     mWindow->addEventListener(this);
     mKeyboard->addEventListener(this);
     mMouse->addEventListener(this);
+
+    mLastFrameBufferSize = mWindow->size().cast<float>();
 }
 
 usagi::ImGuiSubsystem::~ImGuiSubsystem()
@@ -244,21 +246,24 @@ void usagi::ImGuiSubsystem::setupInput()
     io.ClipboardUserData = mWindow.get();
 }
 
-void usagi::ImGuiSubsystem::update(
-    const TimeDuration &dt,
-    std::shared_ptr<Framebuffer> framebuffer,
-    const CommandListSink &cmd_out)
+void usagi::ImGuiSubsystem::update(const TimeDuration &dt)
 {
     ImGui::SetCurrentContext(mContext);
 
-    // Input system must be updated previously.
-
-    newFrame(static_cast<float>(dt.count()), framebuffer.get());
+    newFrame(static_cast<float>(dt.count()));
     processElements(dt);
-    render(framebuffer, cmd_out);
 }
 
-void usagi::ImGuiSubsystem::newFrame(const float dt, Framebuffer *framebuffer)
+void usagi::ImGuiSubsystem::render(
+    const TimeDuration &dt,
+    const std::shared_ptr<Framebuffer> framebuffer,
+    const CommandListSink &cmd_out) const
+{
+    render(framebuffer, cmd_out);
+    mLastFrameBufferSize = framebuffer->size().cast<float>();
+}
+
+void usagi::ImGuiSubsystem::newFrame(const float dt)
 {
     auto &io = ImGui::GetIO();
 
@@ -268,8 +273,8 @@ void usagi::ImGuiSubsystem::newFrame(const float dt, Framebuffer *framebuffer)
 
     // Setup display size
     const auto d = mWindow->size().cast<float>();
-    const auto f = framebuffer->size().cast<float>();
-    const auto s = f.cwiseQuotient(d); // f / d
+    // mLastFrameBufferSize ./ d
+    const auto s = mLastFrameBufferSize.cwiseQuotient(d);
 
     io.DisplaySize = { d.x(), d.y() };
     io.DisplayFramebufferScale = { s.x(), s.y() };
@@ -279,7 +284,7 @@ void usagi::ImGuiSubsystem::newFrame(const float dt, Framebuffer *framebuffer)
 
     updateMouse();
 
-    // todo: Gamepad
+    // todo: update Gamepad
 
     ImGui::NewFrame();
 }
@@ -333,30 +338,12 @@ void usagi::ImGuiSubsystem::render(
     if(draw_data->TotalVtxCount == 0)
         return;
 
-    // Create the Vertex and Index buffers
+    // Upload Vertex and index Data
     {
         const auto vertex_size = draw_data->TotalVtxCount * sizeof(ImDrawVert);
         const auto index_size = draw_data->TotalIdxCount * sizeof(ImDrawIdx);
-        // todo:
-        // buffers have usage attributes (vertex, uniform, index, image, etc.)
-        // reallocation are handled by memory allocator like the orphaning
-        // technique used in opengl
-        // buffer usage are tracked by the renderer. when a buffer is no longer
-        // used, it is discarded. (possible impl: buffer holds refs to real buffer,
-        // which has a lastUsedFrameId counter, and is put into gc list.
-        // (possibly sorted by frameId)
-        // when its frame ended, the resources are freed.
-        // or, find the frame and put it into its gc list. if the frame is already
-        // ended, free the buffer immediately. otherwise wait until the frame
-        // ends, which is signaled by the device using fence. warn: this may
-        // requires locking.
-        mVertexBuffer->allocate(vertex_size); // immediately gets a new buffer
+        mVertexBuffer->allocate(vertex_size);
         mIndexBuffer->allocate(index_size);
-    }
-
-    // Upload Vertex and index Data
-    {
-        // persistently mapped
         auto vtx_dst = mVertexBuffer->mappedMemory<ImDrawVert>();
         auto idx_dst = mIndexBuffer->mappedMemory<ImDrawIdx>();
         for(auto n = 0; n < draw_data->CmdListsCount; n++)
@@ -370,9 +357,7 @@ void usagi::ImGuiSubsystem::render(
             idx_dst += im_draw_list->IdxBuffer.Size;
         }
         mVertexBuffer->flush();
-        mVertexBuffer->release();
         mIndexBuffer->flush();
-        mIndexBuffer->release();
     }
 
     // Render Command List
@@ -388,6 +373,8 @@ void usagi::ImGuiSubsystem::render(
         cmd_list->bindIndexBuffer(mIndexBuffer.get(), 0,
             GraphicsIndexType::UINT16
         );
+        mVertexBuffer->release();
+        mIndexBuffer->release();
     }
 
     // Setup viewport
@@ -461,6 +448,7 @@ void usagi::ImGuiSubsystem::render(
 
     cmd_list->endRendering();
     cmd_list->endRecording();
+
     cmd_out(std::move(cmd_list));
 }
 

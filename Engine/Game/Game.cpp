@@ -83,8 +83,7 @@ void usagi::Game::setSubsystemEnabled(
     iter->enabled = enabled;
 }
 
-// todo: almost useless due to the presence of RenderableSubsystem
-void usagi::Game::update(const std::chrono::seconds &dt)
+void usagi::Game::update(const TimeDuration &dt)
 {
     for (auto &&s : mSubsystems)
     {
