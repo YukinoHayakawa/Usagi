@@ -7,6 +7,7 @@
 #include <Usagi/Engine/Runtime/Graphics/GpuDevice.hpp>
 #include <Usagi/Engine/Runtime/Graphics/RenderPassCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuImage.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Swapchain.hpp>
 #include <Usagi/Engine/Runtime/Input/InputManager.hpp>
@@ -19,7 +20,6 @@
 #include <Usagi/Engine/Extension/DebugDraw/DebugDrawSubsystem.hpp>
 
 #include "DebugDrawDemoComponent.hpp"
-#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageCreateInfo.hpp>
 
 using namespace usagi;
 
@@ -34,6 +34,20 @@ class DebugDrawDemo
     RenderPassCreateInfo mAttachments;
     Element *mDebugDrawRoot = nullptr;
 
+    void createRenderTargets()
+    {
+        mSwapchain->create(mWindow->size(), GpuBufferFormat::R8G8B8A8_UNORM);
+
+        // Create depth buffer
+        {
+            GpuImageCreateInfo info;
+            info.size = mWindow->size();
+            info.format = GpuBufferFormat::D32_SFLOAT;
+            info.usage = GpuImageUsage::DEPTH_STENCIL_ATTACHMENT;
+            mDepthBuffer = runtime()->gpu()->createImage(info);
+        }
+    }
+
 public:
     explicit DebugDrawDemo(Runtime *runtime)
         : Game { runtime }
@@ -42,7 +56,7 @@ public:
 
         runtime->initWindow();
         mWindow = runtime->windowManager()->createWindow(
-            u8"🐰 - ImGui Demo",
+            u8"🐰 - DebugDraw Demo",
             Vector2i { 100, 100 },
             Vector2u32 { 1920, 1080 }
         );
@@ -57,16 +71,7 @@ public:
         runtime->initGpu();
         auto gpu = runtime->gpu();
         mSwapchain = gpu->createSwapchain(mWindow.get());
-        mSwapchain->create(mWindow->size(), GpuBufferFormat::R8G8B8A8_UNORM);
-
-        // Create depth buffer
-        {
-            GpuImageCreateInfo info;
-            info.size = mWindow->size();
-            info.format = GpuBufferFormat::D32_SFLOAT;
-            info.usage = GpuImageUsage::DEPTH_STENCIL_ATTACHMENT;
-            mDepthBuffer = gpu->createImage(info);
-        }
+        createRenderTargets();
 
         // Setting up ImGui
 
@@ -100,7 +105,7 @@ public:
     void onWindowResizeEnd(const WindowSizeEvent &e) override
     {
         if(e.size.x() != 0 && e.size.y() != 0)
-            mSwapchain->resize(e.size);
+            createRenderTargets();
     }
 
     void run()

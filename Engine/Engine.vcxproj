@@ -164,7 +164,6 @@
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\Memory\BitmapMemoryAllocator.cpp" />
-    <ClCompile Include="Runtime\Memory\detail\MemoryBitmap.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClCompile Include="Utility\Hash.cpp" />
     <ClCompile Include="Utility\Unicode.cpp" />
@@ -284,7 +283,6 @@
     <ClInclude Include="Core\Event\Library\Input\MouseMoveEvent.hpp" />
     <ClInclude Include="Runtime\Input\InputManager.hpp" />
     <ClInclude Include="Runtime\Memory\BitmapMemoryAllocator.hpp" />
-    <ClInclude Include="Runtime\Memory\detail\MemoryBitmap.hpp" />
     <ClInclude Include="Runtime\Runtime.hpp" />
     <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Runtime\Window\WindowEventListener.hpp" />

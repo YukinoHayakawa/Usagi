@@ -289,9 +289,8 @@ void usagi::VulkanGpuDevice::createMemoryPools()
             return std::make_unique<BitmapMemoryAllocator>(
                 nullptr,
                 req.size,
-                32 * 1024 /* 32 KiB */, // todo config
-                req.alignment
-                );
+                32 * 1024 /* 32 KiB */ // todo config
+            );
         }
     );
 
@@ -305,8 +304,7 @@ void usagi::VulkanGpuDevice::createMemoryPools()
             return std::make_unique<BitmapMemoryAllocator>(
                 nullptr,
                 req.size,
-                32 * 1024 /* 32 KiB */, // todo config
-                req.alignment
+                32 * 1024 /* 32 KiB */ // todo config
             );
         }
     );

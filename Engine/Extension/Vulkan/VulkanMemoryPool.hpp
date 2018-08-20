@@ -29,7 +29,7 @@ protected:
 
     vk::UniqueImage createImage(
         const GpuImageCreateInfo &info, vk::Format &format) const;
-    std::size_t getImageRequiredSize(vk::Image image) const;
+    vk::MemoryRequirements getImageRequirements(vk::Image image) const;
     void bindImageMemory(VulkanPooledImage *image);
     static void createImageBaseView(VulkanPooledImage *image);
 
@@ -148,14 +148,15 @@ public:
     {
         vk::Format vk_format;
         auto image = createImage(info, vk_format);
-        const auto size = getImageRequiredSize(image.get());
-        auto offset = reinterpret_cast<std::size_t>(mAllocator->allocate(size));
+        const auto req = getImageRequirements(image.get());
+        auto offset = reinterpret_cast<std::size_t>(mAllocator->allocate(
+            req.size, req.alignment));
         try
         {
             auto wrapper = std::make_shared<VulkanPooledImage>(
                 this,
                 std::move(image), vk_format,
-                offset, size, mMappedMemory + offset
+                offset, req.size, mMappedMemory + offset
             );
             bindImageMemory(wrapper.get());
             createImageBaseView(wrapper.get());

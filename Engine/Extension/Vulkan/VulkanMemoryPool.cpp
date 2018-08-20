@@ -90,10 +90,10 @@ vk::UniqueImage usagi::VulkanMemoryPool::createImage(
     return mDevice->device().createImageUnique(vk_info);
 }
 
-std::size_t usagi::VulkanMemoryPool::getImageRequiredSize(vk::Image image) const
+vk::MemoryRequirements usagi::VulkanMemoryPool::getImageRequirements(
+    vk::Image image) const
 {
-    const auto req = mDevice->device().getImageMemoryRequirements(image);
-    return req.size;
+    return mDevice->device().getImageMemoryRequirements(image);
 }
 
 void usagi::VulkanMemoryPool::bindImageMemory(

@@ -4,8 +4,6 @@
 
 #include <Usagi/Engine/Utility/Noncopyable.hpp>
 
-#include "detail/MemoryBitmap.hpp"
-
 namespace usagi
 {
 /**
@@ -13,13 +11,23 @@ namespace usagi
  */
 class BitmapMemoryAllocator : Noncopyable
 {
-    char *const mBase = nullptr;
+    enum Block : char
+    {
+        BLOCK_FREE = 0,
+        BLOCK_USED = 1,
+        BLOCK_USED_BEGIN = 2,
+    };
+
+    const std::size_t mBase = 0;
     const std::size_t mTotalSize = 0;
     const std::size_t mBlockSize = 0;
-    // alignment currently has no use except for checking block size
-    const std::size_t mAlignment = 0;
-    detail::MemoryBitmap mAllocation;
+    std::string mBitmap;
     std::mutex mBitmapLock;
+
+    std::size_t getAddressBlock(std::size_t address) const;
+    void markBlocksAllocated(
+        std::string::iterator begin,
+        std::string::iterator end);
 
 public:
     /**
@@ -32,25 +40,17 @@ public:
      * big enough to hold a block will not be used.
      * \param block_size A positive size of minimum allocation unit. Must
      * be multiple of max_alignment if which is non-zero.
-     * \param alignment The minimum alignment requirement. Must be power
-     * of two. It can be zero if no alignment is needed.
      */
     BitmapMemoryAllocator(
         void *base,
         std::size_t total_size,
-        std::size_t block_size,
-        std::size_t alignment);
+        std::size_t block_size);
 
     std::size_t managedSize() const { return mTotalSize; }
-
-    std::size_t usableSize() const
-    {
-        return mBlockSize * mAllocation.blockCount();
-    }
-
+    std::size_t usableSize() const;
     std::size_t usedSize() const { return managedSize() - usableSize(); }
 
-    void * allocate(std::size_t num_bytes);
+    void * allocate(std::size_t num_bytes, std::size_t alignment = 0);
     void deallocate(void *pointer);
 };
 }

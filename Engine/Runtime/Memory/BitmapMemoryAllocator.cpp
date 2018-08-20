@@ -1,72 +1,106 @@
 ﻿#include "BitmapMemoryAllocator.hpp"
 
-#include <Usagi/Engine/Utility/BitHack.hpp>
+#include <algorithm>
+
 #include <Usagi/Engine/Utility/Rounding.hpp>
 
 namespace usagi
 {
+std::size_t BitmapMemoryAllocator::getAddressBlock(
+    const std::size_t address) const
+{
+    assert(address >= mBase);
+    const auto rel = address - mBase;
+    return rel / mBlockSize;
+}
+
 BitmapMemoryAllocator::BitmapMemoryAllocator(void *base,
     const std::size_t total_size,
-    const std::size_t block_size, const std::size_t alignment)
-    : mBase { static_cast<char*>(base) }
+    const std::size_t block_size)
+    : mBase { reinterpret_cast<std::size_t>(base) }
     , mTotalSize { total_size }
     , mBlockSize { block_size }
-    , mAlignment { alignment }
 {
+    static_assert(sizeof(char) == 1);
+
     if(!block_size)
         throw std::invalid_argument(
             "block size must be positive");
     if(total_size < block_size)
         throw std::invalid_argument(
             "total size cannot hold a single block");
-    if(!utility::isPowerOfTwoOrZero(mAlignment))
-        throw std::invalid_argument(
-            "alignment must be power-of-two or zero");
-    if(mAlignment)
-    {
-        if(reinterpret_cast<std::size_t>(mBase) % mAlignment != 0)
-            throw std::invalid_argument(
-                "base address not aligned to alignment requirement");
-        if(block_size % mAlignment != 0)
-            throw std::invalid_argument(
-                "block size is not a multiple of alignment requirement");
-    }
 
-    mAllocation.reset(total_size / block_size);
+    mBitmap = std::string(total_size / block_size, BLOCK_FREE);
 }
 
-void * BitmapMemoryAllocator::allocate(const std::size_t num_bytes)
+std::size_t BitmapMemoryAllocator::usableSize() const
+{
+    return mBlockSize * std::count(mBitmap.begin(), mBitmap.end(), BLOCK_FREE);
+}
+
+void BitmapMemoryAllocator::markBlocksAllocated(
+    std::string::iterator begin,
+    std::string::iterator end)
+{
+    *begin = BLOCK_USED_BEGIN;
+    std::fill(++begin, end, BLOCK_USED);
+}
+
+void * BitmapMemoryAllocator::allocate(
+    const std::size_t num_bytes, const std::size_t alignment)
 {
     if(num_bytes == 0)
-        throw std::invalid_argument(
-            "allocation size must be positive");
-    //if(alignment > mMaxAlignment)
-    //    throw std::invalid_argument(
-    //        "alignment request is greater than the maximum allowed");
-    //if(!utility::isPowerOfTwoOrZero(alignment))
-    //    throw std::invalid_argument("alignment must be power-of-two or zero");
+        throw std::invalid_argument("allocation size must be greater than 0");
 
-    const auto alloc_unit = utility::calculateSpanningPages(
-        num_bytes, mBlockSize);
+    std::lock_guard<std::mutex> lock_guard(mBitmapLock);
 
-    std::size_t allocation;
+    if(alignment == 0)
     {
-        std::lock_guard<std::mutex> lock_guard(mBitmapLock);
-        allocation = mAllocation.allocate(alloc_unit);
+        const auto alloc_unit = utility::calculateSpanningPages(
+            num_bytes, mBlockSize);
+
+        const auto first_free_block = mBitmap.find(std::string(
+            alloc_unit, BLOCK_FREE));
+        if(first_free_block == std::string::npos)
+            throw std::bad_alloc();
+        markBlocksAllocated(
+            mBitmap.begin() + first_free_block,
+            mBitmap.begin() + first_free_block + alloc_unit
+        );
+        return reinterpret_cast<void*>(mBase + first_free_block * mBlockSize);
     }
 
-    return mBase + allocation * mBlockSize;
+    auto first_addr = utility::roundUpUnsigned(mBase, alignment);
+    const auto end_addr = mBase + mBlockSize * mBitmap.size();
+    while(true)
+    {
+        if(first_addr >= end_addr)
+            throw std::bad_alloc();
+
+        const auto last_addr = first_addr + num_bytes - 1;
+        const auto begin_block = mBitmap.begin() + getAddressBlock(first_addr);
+        const auto end_block = mBitmap.begin() + getAddressBlock(last_addr) + 1;
+        if(std::all_of(
+            begin_block, end_block,
+            [](const char c) { return c == BLOCK_FREE; }))
+        {
+            markBlocksAllocated(begin_block, end_block);
+            return reinterpret_cast<void*>(first_addr);
+        }
+
+        first_addr += alignment;
+    }
 }
 
 void BitmapMemoryAllocator::deallocate(void *pointer)
 {
-    const std::size_t offset = static_cast<char*>(pointer) - mBase;
-    const std::size_t block = offset / mBlockSize;
-    if(offset % mBlockSize != 0)
-        throw std::invalid_argument(
-            "the pointer does not point to the beginning of any block");
-
     std::lock_guard<std::mutex> lock_guard(mBitmapLock);
-    mAllocation.deallocate(block);
+
+    const auto block = getAddressBlock(reinterpret_cast<std::size_t>(pointer));
+    auto iter = mBitmap.begin() + block;
+    assert(*iter == BLOCK_USED_BEGIN);
+    *iter = BLOCK_FREE;
+    while(*++iter == BLOCK_USED)
+        *iter = BLOCK_FREE;
 }
 }

@@ -306,9 +306,6 @@
     <ClInclude Include="Runtime\Graphics\Enum\GraphicsPipelineStage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Memory\detail\MemoryBitmap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Utility\Iterator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -514,9 +511,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Vulkan\WSI\VulkanSwapchainImage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\Memory\detail\MemoryBitmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Memory\BitmapMemoryAllocator.cpp">
