@@ -27,7 +27,7 @@ public:
         void *mapped_address);
     ~VulkanPooledImage();
 
-    void upload(void *data, std::size_t size) override;
+    void upload(const void *data, std::size_t size) override;
 
     vk::Image image() const override { return mImage.get(); }
     std::size_t offset() const { return mOffset; }

@@ -10,6 +10,11 @@
 #include <Usagi/Engine/Runtime/Graphics/Resource/Framebuffer.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuBuffer.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GpuCommandPool.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImage.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageCreateInfo.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuImageView.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuSampler.hpp>
+#include <Usagi/Engine/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Engine/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
 #include <Usagi/Engine/Runtime/Runtime.hpp>
 #include <Usagi/Engine/Utility/TypeCast.hpp>
@@ -19,30 +24,29 @@
 void usagi::DebugDrawSubsystem::createPipelines(
     RenderPassCreateInfo &render_pass_info)
 {
-    createPointLinePipeline(render_pass_info);
+    render_pass_info.attachment_usages[0].layout
+        = GpuImageLayout::COLOR_ATTACHMENT;
+    render_pass_info.attachment_usages[1].layout
+        = GpuImageLayout::DEPTH_STENCIL_ATTACHMENT;
+
+    auto gpu = mGame->runtime()->gpu();
+    mRenderPass = gpu->createRenderPass(render_pass_info);
+    mCommandPool = gpu->createCommandPool();
+    mVertexBuffer = gpu->createBuffer(GpuBufferUsage::VERTEX);
+
+    createPointLinePipeline();
+    createTextPipeline();
 }
 
-void usagi::DebugDrawSubsystem::createPointLinePipeline(
-    RenderPassCreateInfo &render_pass_info)
+void usagi::DebugDrawSubsystem::createPointLinePipeline()
 {
     auto gpu = mGame->runtime()->gpu();
     auto assets = mGame->assets();
     auto compiler = gpu->createPipelineCompiler();
 
-    mCommandPool = gpu->createCommandPool();
-    mVertexBuffer = gpu->createBuffer(GpuBufferUsage::VERTEX);
-
     // ~~ Point Pipelines ~~
 
-    // Renderpass
-    {
-        render_pass_info.attachment_usages[0].layout
-            = GpuImageLayout::COLOR_ATTACHMENT;
-        render_pass_info.attachment_usages[1].layout
-            = GpuImageLayout::DEPTH_STENCIL_ATTACHMENT;
-        mRenderPass = gpu->createRenderPass(render_pass_info);
-        compiler->setRenderPass(mRenderPass);
-    }
+    compiler->setRenderPass(mRenderPass);
     // Shaders
     {
         compiler->setShader(ShaderStage::VERTEX,
@@ -76,9 +80,10 @@ void usagi::DebugDrawSubsystem::createPointLinePipeline(
     compiler->omSetColorBlendEnabled(false);
 
     mPointDepthEnabledPipeline = compiler->compile();
-    compiler->omSetDepthEnabled(false);
 
-    // Create child pipeline
+    // Create child pipelines
+
+    compiler->omSetDepthEnabled(false);
     mPointDepthDisabledPipeline = compiler->compile();
 
     // ~~ Line Pipelines ~~
@@ -89,6 +94,64 @@ void usagi::DebugDrawSubsystem::createPointLinePipeline(
 
     compiler->omSetDepthEnabled(true);
     mLineDepthEnabledPipeline = compiler->compile();
+}
+
+void usagi::DebugDrawSubsystem::createTextPipeline()
+{
+    auto gpu = mGame->runtime()->gpu();
+    auto assets = mGame->assets();
+    auto compiler = gpu->createPipelineCompiler();
+
+    compiler->setRenderPass(mRenderPass);
+    // Shaders
+    {
+        compiler->setShader(ShaderStage::VERTEX,
+            assets->find<SpirvBinary>("dd:shaders/text.vert")
+        );
+        compiler->setShader(ShaderStage::FRAGMENT,
+            assets->find<SpirvBinary>("dd:shaders/text.frag")
+        );
+    }
+    // Vertex Inputs
+    {
+        compiler->setVertexBufferBinding(0, sizeof(dd::DrawVertex));
+
+        std::size_t offset = 0;
+
+        compiler->setVertexAttribute(
+            "in_Position", 0,
+            static_cast<uint32_t>(offset), GpuBufferFormat::R32G32_SFLOAT
+        );
+        offset += sizeof(float) * 2;
+
+        compiler->setVertexAttribute(
+            "in_TexCoords", 0,
+            static_cast<uint32_t>(offset), GpuBufferFormat::R32G32_SFLOAT
+        );
+        offset += sizeof(float) * 2;
+
+        compiler->setVertexAttribute(
+            "in_Color", 0,
+            static_cast<uint32_t>(offset), GpuBufferFormat::R32G32B32_SFLOAT
+        );
+    }
+    compiler->iaSetPrimitiveTopology(PrimitiveTopology::TRIANGLE_LIST);
+    compiler->rsSetPolygonmode(PolygonMode::FILL);
+    compiler->rsSetFaceCullingMode(FaceCullingMode::NONE);
+    compiler->omSetDepthEnabled(false);
+
+    // Blending
+    {
+        ColorBlendState state;
+        state.enable = true;
+        state.setBlendingFactor(
+            BlendingFactor::SOURCE_ALPHA,
+            BlendingFactor::ONE_MINUS_SOURCE_ALPHA);
+        state.setBlendingOperation(BlendingOperation::ADD);
+        compiler->setColorBlendState(state);
+    }
+
+    mTextPipeline = compiler->compile();
 }
 
 usagi::DebugDrawSubsystem::DebugDrawSubsystem(Game *game)
@@ -108,6 +171,8 @@ void usagi::DebugDrawSubsystem::update(
     const std::shared_ptr<Framebuffer> framebuffer,
     const CommandListSink &cmd_out)
 {
+    mDisplaySize = framebuffer->size().cast<float>();
+
     for(auto &&e : mRegistry)
     {
         e->getComponent<DebugDrawComponent>()->draw(mContext);
@@ -136,6 +201,41 @@ void usagi::DebugDrawSubsystem::updateRegistry(Element *element)
         mRegistry.insert(element);
     else
         mRegistry.erase(element);
+}
+
+dd::GlyphTextureHandle usagi::DebugDrawSubsystem::createGlyphTexture(
+    const int width,
+    const int height,
+    const void *pixels)
+{
+    assert(!mFontTexture);
+    assert(!mFontSampler);
+
+    auto gpu = mGame->runtime()->gpu();
+    {
+        GpuImageCreateInfo info;
+        info.format = GpuBufferFormat::R8_UNORM;
+        info.size = { width, height };
+        info.usage = GpuImageUsage::SAMPLED;
+        mFontTexture = gpu->createImage(info);
+        mFontTexture->upload(pixels, width * height * sizeof(char));
+    }
+    {
+        GpuSamplerCreateInfo info;
+        info.min_filter = GpuFilter::LINEAR;
+        info.mag_filter = GpuFilter::NEAREST;
+        info.addressing_mode_u = GpuSamplerAddressMode::REPEAT;
+        info.addressing_mode_v = GpuSamplerAddressMode::REPEAT;
+        mFontSampler = gpu->createSampler(info);
+    }
+    return reinterpret_cast<dd::GlyphTextureHandle>(
+        mFontTexture->baseView().get());
+}
+
+void usagi::DebugDrawSubsystem::destroyGlyphTexture(dd::GlyphTextureHandle)
+{
+    mFontTexture.reset();
+    mFontSampler.reset();
 }
 
 void usagi::DebugDrawSubsystem::drawPointList(
@@ -206,8 +306,25 @@ void usagi::DebugDrawSubsystem::drawLineList(
 
 void usagi::DebugDrawSubsystem::drawGlyphList(
     const dd::DrawVertex *glyphs,
-    int count,
-    dd::GlyphTextureHandle glyph_tex)
+    const int count,
+    const dd::GlyphTextureHandle glyph_tex)
 {
-    // todo
+    mVertexBuffer->allocate(count * sizeof(dd::DrawVertex));
+    {
+        const auto mem = mVertexBuffer->mappedMemory();
+        memcpy(mem, glyphs, mVertexBuffer->size());
+        mVertexBuffer->flush();
+    }
+    mCurrentCmdList->bindPipeline(mTextPipeline);
+    mCurrentCmdList->setConstant(
+        ShaderStage::VERTEX, "u_screenDimensions",
+        mDisplaySize.data(), 2 * sizeof(float)
+    );
+    mCurrentCmdList->bindResourceSet(0, {
+        mFontSampler,
+        reinterpret_cast<GpuImageView*>(glyph_tex)->shared_from_this()
+    });
+    mCurrentCmdList->bindVertexBuffer(0, mVertexBuffer.get(), 0);
+    mCurrentCmdList->drawInstanced(count, 1, 0, 0);
+    mVertexBuffer->release();
 }

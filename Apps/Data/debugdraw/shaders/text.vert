@@ -15,7 +15,7 @@ void main()
 {
     // Map to normalized clip coordinates:
     float x = ((2.0 * (in_Position.x - 0.5)) / pc.u_screenDimensions.x) - 1.0;
-    float y = 1.0 - ((2.0 * (in_Position.y - 0.5)) / pc.u_screenDimensions.y);
+    float y = ((2.0 * (in_Position.y - 0.5)) / pc.u_screenDimensions.y) - 1.0;
 
     gl_Position = vec4(x, y, 0.0, 1.0);
     v_TexCoords = in_TexCoords;

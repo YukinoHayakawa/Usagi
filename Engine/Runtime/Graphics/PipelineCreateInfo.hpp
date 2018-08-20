@@ -84,6 +84,17 @@ struct ColorBlendState
 
     BlendingOperation color_blend_op = BlendingOperation::ADD,
         alpha_blend_op = BlendingOperation::ADD;
+
+    void setBlendingFactor(const BlendingFactor src, const BlendingFactor dst)
+    {
+        src_color_factor = src_alpha_factor = src;
+        dst_color_factor = dst_alpha_factor = dst;
+    }
+
+    void setBlendingOperation(const BlendingOperation op)
+    {
+        color_blend_op = alpha_blend_op = op;
+    }
 };
 
 enum class VertexInputRate

@@ -2,12 +2,15 @@
 
 #include <set>
 
+#include <Usagi/Engine/Core/Math.hpp>
 #include <Usagi/Engine/Runtime/Graphics/RenderableSubsystem.hpp>
 
 #include "DebugDraw.hpp"
 
 namespace usagi
 {
+class GpuImage;
+class GpuSampler;
 class RenderPass;
 struct RenderPassCreateInfo;
 class Game;
@@ -28,11 +31,16 @@ class DebugDrawSubsystem
     std::shared_ptr<GraphicsPipeline> mPointDepthDisabledPipeline;
     std::shared_ptr<GraphicsPipeline> mLineDepthEnabledPipeline;
     std::shared_ptr<GraphicsPipeline> mLineDepthDisabledPipeline;
+    std::shared_ptr<GraphicsPipeline> mTextPipeline;
+    std::shared_ptr<GpuImage> mFontTexture;
+    std::shared_ptr<GpuSampler> mFontSampler;
     std::shared_ptr<GpuCommandPool> mCommandPool;
     std::shared_ptr<GraphicsCommandList> mCurrentCmdList;
     std::shared_ptr<GpuBuffer> mVertexBuffer;
+    Vector2f mDisplaySize;
 
-    void createPointLinePipeline(RenderPassCreateInfo &render_pass_info);
+    void createPointLinePipeline();
+    void createTextPipeline();
 
 public:
     explicit DebugDrawSubsystem(Game *game);
@@ -46,6 +54,12 @@ public:
         const CommandListSink &cmd_out) override;
     bool processable(Element *element) override;
     void updateRegistry(Element *element) override;
+
+    dd::GlyphTextureHandle createGlyphTexture(
+        int width,
+        int height,
+        const void *pixels) override;
+    void destroyGlyphTexture(dd::GlyphTextureHandle) override;
 
     void drawPointList(
         const dd::DrawVertex *points,

@@ -27,7 +27,7 @@ usagi::VulkanPooledImage::~VulkanPooledImage()
     mPool->deallocate(mOffset);
 }
 
-void usagi::VulkanPooledImage::upload(void *data, const std::size_t size)
+void usagi::VulkanPooledImage::upload(const void *data, const std::size_t size)
 {
     assert(size <= mSize);
 

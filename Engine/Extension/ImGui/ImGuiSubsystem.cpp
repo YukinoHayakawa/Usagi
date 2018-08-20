@@ -51,8 +51,9 @@ void usagi::ImGuiSubsystem::setup()
     mVertexBuffer = gpu->createBuffer(GpuBufferUsage::VERTEX);
     mIndexBuffer = gpu->createBuffer(GpuBufferUsage::INDEX);
 
-    // fonts
     mCommandPool = gpu->createCommandPool();
+
+    // fonts
     {
         LOG(info, "ImGui: Building font atlas");
 
@@ -181,12 +182,10 @@ void usagi::ImGuiSubsystem::createPipeline(
     {
         ColorBlendState state;
         state.enable = true;
-        state.src_color_factor = BlendingFactor::SOURCE_ALPHA;
-        state.dst_color_factor = BlendingFactor::ONE_MINUS_SOURCE_ALPHA;
-        state.color_blend_op = BlendingOperation::ADD;
-        state.src_alpha_factor = BlendingFactor::SOURCE_ALPHA;
-        state.dst_alpha_factor = BlendingFactor::ONE_MINUS_SOURCE_ALPHA;
-        state.alpha_blend_op = BlendingOperation::ADD;
+        state.setBlendingFactor(
+            BlendingFactor::SOURCE_ALPHA,
+            BlendingFactor::ONE_MINUS_SOURCE_ALPHA);
+        state.setBlendingOperation(BlendingOperation::ADD);
         compiler->setColorBlendState(state);
     }
     // Render Pass
@@ -371,7 +370,9 @@ void usagi::ImGuiSubsystem::render(
             idx_dst += im_draw_list->IdxBuffer.Size;
         }
         mVertexBuffer->flush();
+        mVertexBuffer->release();
         mIndexBuffer->flush();
+        mIndexBuffer->release();
     }
 
     // Render Command List
