@@ -19,6 +19,7 @@ class Window;
 class DebugDrawDemo
     : public Game
     , public WindowEventListener
+    , public MouseEventListener
 {
     std::shared_ptr<Window> mWindow;
     std::shared_ptr<Swapchain> mSwapchain;
@@ -31,6 +32,9 @@ class DebugDrawDemo
     std::unique_ptr<ModelViewCameraController> mCameraController;
     InputMap mInputMap;
 
+    void createWindow();
+    void setupInput();
+    void setupGraphics();
     void createRenderTargets();
     void setupDebugDraw();
     void setupCamera();
@@ -39,6 +43,7 @@ public:
     explicit DebugDrawDemo(Runtime *runtime);
     ~DebugDrawDemo();
 
+    void onMouseButtonStateChange(const MouseButtonEvent &e) override;
     void onWindowResizeEnd(const WindowSizeEvent &e) override;
     void run();
 };

@@ -17,11 +17,11 @@ class ModelViewCameraController
     // the radius of the spherical coordinate system
     float mDistance = 10.f;
 
-    float mSensitivity = 1.f;
+    float mSensitivity = 0.2f;
     float mYPositivity = 1.f; // set -1.f to reverse Y axis
 
     // by default look at the target from the front
-    // <Azimuth, Inclination>, in degrees
+    // <Azimuth (cw angle from X), Inclination (angle from Z)>, in degrees
     Vector2f mSpherical = Vector2f::Zero();
 
 public:

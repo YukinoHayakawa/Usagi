@@ -37,6 +37,7 @@ private:
     std::set<std::string> mMouseRelativeMoveBindings;
 
 public:
+    /*
     void addDiscreteAction(std::string name, DiscreteActionHandler handler);
 
     void bindKey(
@@ -49,6 +50,7 @@ public:
         KeyState state);
 
     void addAnalogAction1D(std::string name, AnalogAction1DHandler handler);
+    */
 
 
     void addAnalogAction2D(std::string name, AnalogAction2DHandler handler);

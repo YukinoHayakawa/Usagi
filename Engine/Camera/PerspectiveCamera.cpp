@@ -1,16 +1,16 @@
 ﻿#include "PerspectiveCamera.hpp"
 
 usagi::PerspectiveCamera::PerspectiveCamera(
-    const float fov_y,
+    const float fov_y_radians,
     const float aspect,
     const float near,
     const float far)
 {
-    setMatrix(fov_y, aspect, near, far);
+    setMatrix(fov_y_radians, aspect, near, far);
 }
 
 void usagi::PerspectiveCamera::setMatrix(
-    const float fov_y,
+    const float fov_y_radians,
     const float aspect,
     const float near,
     const float far)
@@ -21,18 +21,16 @@ void usagi::PerspectiveCamera::setMatrix(
     // of the graphics hardware by dividing the vector by w component.
     // http://vulkan-spec-chunked.ahcox.com/ch23s04.html
 
-    const auto theta = fov_y * 0.5f;
+    const auto theta = fov_y_radians * 0.5f;
     const auto range = far - near;
-    const auto invtan = 1.f / tan(theta);
+    const auto invtan = 1.f / std::tan(theta);
 
     mLocalToNdc = Matrix4f::Zero();
     mLocalToNdc(0, 0) = invtan / aspect;
-    mLocalToNdc(1, 1) = 0;
     mLocalToNdc(1, 2) = -invtan;
     mLocalToNdc(2, 1) = far / range;
     mLocalToNdc(2, 3) = -near * far / range;
     mLocalToNdc(3, 1) = 1;
-    mLocalToNdc(3, 3) = 0;
 
     // The transform includes two steps:
     // First, swap & invert the camera axises so they match with those of

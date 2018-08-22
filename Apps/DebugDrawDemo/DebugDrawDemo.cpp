@@ -22,11 +22,37 @@
 #include <Usagi/Engine/Runtime/Window/Window.hpp>
 #include <Usagi/Engine/Runtime/Window/WindowManager.hpp>
 #include <Usagi/Engine/Transform/TransformComponent.hpp>
-#include <Usagi/Engine/Transform/Util.hpp>
 
 #include <Usagi/Engine/Extension/DebugDraw/DebugDrawSubsystem.hpp>
 
 #include "DebugDrawDemoComponent.hpp"
+
+void usagi::DebugDrawDemo::createWindow()
+{
+    runtime()->initWindow();
+    mWindow = runtime()->windowManager()->createWindow(
+        u8"🐰 - DebugDraw Demo",
+        Vector2i { 100, 100 },
+        Vector2u32 { 1920, 1080 }
+    );
+    mWindow->addEventListener(this);
+}
+
+void usagi::DebugDrawDemo::setupInput()
+{
+    runtime()->initInput();
+    const auto mouse = runtime()->inputManager()->virtualMouse();
+    mouse->addEventListener(&mInputMap);
+    mouse->addEventListener(this);
+}
+
+void usagi::DebugDrawDemo::setupGraphics()
+{
+    runtime()->initGpu();
+    auto gpu = runtime()->gpu();
+    mSwapchain = gpu->createSwapchain(mWindow.get());
+    createRenderTargets();
+}
 
 void usagi::DebugDrawDemo::createRenderTargets()
 {
@@ -81,42 +107,30 @@ void usagi::DebugDrawDemo::setupCamera()
     mCameraElement->addComponent<CameraComponent>(mCamera);
     mCameraController = std::make_unique<ModelViewCameraController>(
         *mCameraTransform, Vector3f::Zero(), 10.f);
-    /*mInputMap.addAnalogAction2D("Camera:Move", std::bind(
+    mInputMap.addAnalogAction2D("Camera:Move", std::bind(
         &ModelViewCameraController::rotate,
         mCameraController.get(), _1));
-    mInputMap.bindMouseRelativeMovement("Camera:Move");*/
+    mInputMap.bindMouseRelativeMovement("Camera:Move");
 }
 
 usagi::DebugDrawDemo::DebugDrawDemo(Runtime *runtime)
     : Game { runtime }
 {
-    // Setting up window
-
-    runtime->initWindow();
-    mWindow = runtime->windowManager()->createWindow(
-        u8"🐰 - DebugDraw Demo",
-        Vector2i { 100, 100 },
-        Vector2u32 { 1920, 1080 }
-    );
-    mWindow->addEventListener(this);
-
-    // Setting up input
-
-    runtime->initInput();
-
-    // Setting up graphics
-
-    runtime->initGpu();
-    auto gpu = runtime->gpu();
-    mSwapchain = gpu->createSwapchain(mWindow.get());
-    createRenderTargets();
-
+    createWindow();
+    setupInput();
+    setupGraphics();
     setupDebugDraw();
     setupCamera();
 }
 
 usagi::DebugDrawDemo::~DebugDrawDemo()
 {
+}
+
+void usagi::DebugDrawDemo::onMouseButtonStateChange(const MouseButtonEvent &e)
+{
+    if(e.button == MouseButtonCode::RIGHT)
+        e.mouse->setImmersiveMode(e.pressed);
 }
 
 void usagi::DebugDrawDemo::onWindowResizeEnd(const WindowSizeEvent &e)
@@ -153,8 +167,7 @@ void usagi::DebugDrawDemo::run()
 
         const auto size = framebuffer->size().cast<float>();
         const auto aspect = size.x() / size.y();
-        mCamera->setMatrix(90.f, aspect, 0.5f, 1000.f);
-        mCameraTransform->local_to_parent = lookAt(Vector3f(5, -5, 5));
+        mCamera->setMatrix(degreesToRadians(90.f), aspect, 0.5f, 100.f);
         mDebugDraw->setWorldToNDC(
             // world -> camera local -> NDC
             mCamera->projectionMatrix() *

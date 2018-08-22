@@ -10,9 +10,9 @@ class PerspectiveCamera : public Camera
 
 public:
     PerspectiveCamera() = default;
-    PerspectiveCamera(float fov_y, float aspect, float near, float far);
+    PerspectiveCamera(float fov_y_radians, float aspect, float near, float far);
 
-    void setMatrix(float fov_y, float aspect, float near, float far);
+    void setMatrix(float fov_y_radians, float aspect, float near, float far);
 
     Projective3f projectionMatrix() const override { return mLocalToNdc; }
 };

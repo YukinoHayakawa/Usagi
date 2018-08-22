@@ -1,7 +1,13 @@
 ﻿#include "DebugDrawDemoComponent.hpp"
 
+#include <Usagi/Engine/Core/Math.hpp>
+
 void usagi::DebugDrawDemoComponent::draw(dd::ContextHandle ctx)
 {
+    const Vector3f origin = Vector3f::Zero();
+    dd::sphere(ctx, origin.data(), dd::colors::Azure, 5.0f);
+    dd::point(ctx, origin.data(), dd::colors::BlueViolet, 20.f);
+
     drawGrid(ctx);
     drawMiscObjects(ctx);
     drawFrustum(ctx);
