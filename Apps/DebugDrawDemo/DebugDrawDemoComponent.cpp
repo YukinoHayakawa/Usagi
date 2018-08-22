@@ -13,7 +13,7 @@ void usagi::DebugDrawDemoComponent::drawGrid(dd::ContextHandle ctx)
     if(!show_grid) { return; }
 
     // Grid from -50 to +50 in both X & Z
-    dd::xzSquareGrid(ctx, -50.0f, 50.0f, -1.0f, 1.7f, dd::colors::Green);
+    dd::xySquareGrid(ctx, -50.0f, 50.0f, -1.0f, 2.f, dd::colors::Green);
 }
 
 void usagi::DebugDrawDemoComponent::drawLabel(
@@ -51,8 +51,8 @@ void usagi::DebugDrawDemoComponent::drawMiscObjects(dd::ContextHandle ctx)
     origin[0] += 4.0f;
 
     // Two cones, one open and one closed:
-    const ddVec3 condeDir = { 0.0f, 2.5f, 0.0f };
-    origin[1] -= 1.0f;
+    const ddVec3 condeDir = { 0.0f, 0.0f, 2.5f };
+    origin[2] -= 1.0f;
 
     drawLabel(ctx, origin, "cone (open)");
     dd::cone(ctx, origin, condeDir, dd::colors::Yellow, 1.0f, 2.0f);
@@ -76,13 +76,13 @@ void usagi::DebugDrawDemoComponent::drawMiscObjects(dd::ContextHandle ctx)
     dd::aabb(ctx, bbMins, bbMaxs, dd::colors::Orange);
     dd::point(ctx, bbCenter, dd::colors::White, 15.0f);
 
-    // Move along the Z for another row:
+    // Move along the Y for another row:
     origin[0] = -15.0f;
-    origin[2] += 5.0f;
+    origin[1] += 5.0f;
 
     // A big arrow pointing up:
     const ddVec3 arrowFrom = { origin[0], origin[1], origin[2] };
-    const ddVec3 arrowTo = { origin[0], origin[1] + 5.0f, origin[2] };
+    const ddVec3 arrowTo = { origin[0], origin[1], origin[2] + 5.0f };
     drawLabel(ctx, arrowFrom, "arrow");
     dd::arrow(ctx, arrowFrom, arrowTo, dd::colors::Magenta, 1.0f);
     dd::point(ctx, arrowFrom, dd::colors::White, 15.0f);
@@ -90,7 +90,7 @@ void usagi::DebugDrawDemoComponent::drawMiscObjects(dd::ContextHandle ctx)
     origin[0] += 4.0f;
 
     // Plane with normal vector:
-    const ddVec3 planeNormal = { 0.0f, 1.0f, 0.0f };
+    const ddVec3 planeNormal = { 0.0f, 0.0f, 1.0f };
     drawLabel(ctx, origin, "plane");
     dd::plane(ctx, origin, planeNormal, dd::colors::Yellow, dd::colors::Blue,
         1.5f, 1.0f);

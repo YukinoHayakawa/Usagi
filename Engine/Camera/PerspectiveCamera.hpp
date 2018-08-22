@@ -1,22 +1,19 @@
 ﻿#pragma once
 
-#include <Usagi/Engine/Geometry/Angle.hpp>
 #include "Camera.hpp"
 
 namespace usagi
 {
-
 class PerspectiveCamera : public Camera
 {
-    Eigen::Projective3f mLocalToNdc = Eigen::Projective3f::Identity();
+    Projective3f mLocalToNdc;
 
 public:
-    void setPerspective(Radians fovY, float aspect, float near, float far);
+    PerspectiveCamera() = default;
+    PerspectiveCamera(float fov_y, float aspect, float near, float far);
 
-    Eigen::Projective3f getProjectionMatrix() override
-    {
-        return mLocalToNdc;
-    }
+    void setMatrix(float fov_y, float aspect, float near, float far);
+
+    Projective3f projectionMatrix() const override { return mLocalToNdc; }
 };
-
 }

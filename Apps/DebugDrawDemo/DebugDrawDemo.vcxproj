@@ -117,10 +117,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DebugDrawDemo.cpp" />
     <ClCompile Include="DebugDrawDemoComponent.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DebugDrawDemo.hpp" />
     <ClInclude Include="DebugDrawDemoComponent.hpp" />
   </ItemGroup>
   <ItemGroup>

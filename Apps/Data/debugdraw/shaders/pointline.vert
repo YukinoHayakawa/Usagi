@@ -12,8 +12,6 @@ layout(location = 0) out vec4 v_Color;
 void main()
 {
     gl_Position  = pc.u_MvpMatrix * vec4(in_Position, 1.0);
-    gl_Position.y = -gl_Position.y;
-    gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
     gl_PointSize = in_ColorPointSize.w;
     v_Color      = vec4(in_ColorPointSize.xyz, 1.0);
 }

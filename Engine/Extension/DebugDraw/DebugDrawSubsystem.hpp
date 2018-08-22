@@ -38,6 +38,11 @@ class DebugDrawSubsystem
     std::shared_ptr<GpuBuffer> mVertexBuffer;
     mutable std::shared_ptr<GraphicsCommandList> mCurrentCmdList;
     mutable Vector2f mDisplaySize;
+    /**
+     * \brief The matrix for transforming from world coordinates to
+     * clip space.
+     */
+    Projective3f mWorldToNDC;
 
     void createPointLinePipeline();
     void createTextPipeline();
@@ -48,6 +53,7 @@ public:
 
     void createPipelines(RenderPassCreateInfo &render_pass_info);
 
+    void setWorldToNDC(const Projective3f &mat);
     void update(const TimeDuration &dt) override;
     void render(
         const TimeDuration &dt,

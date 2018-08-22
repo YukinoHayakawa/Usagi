@@ -37,6 +37,11 @@ void usagi::DebugDrawSubsystem::createPipelines(
     createTextPipeline();
 }
 
+void usagi::DebugDrawSubsystem::setWorldToNDC(const Projective3f &mat)
+{
+    mWorldToNDC = mat;
+}
+
 void usagi::DebugDrawSubsystem::createPointLinePipeline()
 {
     auto gpu = mGame->runtime()->gpu();
@@ -256,18 +261,9 @@ void usagi::DebugDrawSubsystem::drawPointList(
             ? mPointDepthEnabledPipeline
             : mPointDepthDisabledPipeline
     );
-    // dd uses column-major matrices
-    // todo
-
-    Matrix4f m;
-    m << -1.04781950f, 3.54236340e-06f, -0.767837644f, -3.74200988f,
-        -0.535599470f, 1.47611356f, 0.730905473f, -3.28316879f,
-        -0.503842056f, -0.523264706f, 0.687558949f, 8.64296627f,
-        -0.503741324f, -0.523160100f, 0.687421501f, 8.84121895f;
-
     mCurrentCmdList->setConstant(
         ShaderStage::VERTEX, "u_MvpMatrix",
-        m.data(), 16 * sizeof(float)
+        mWorldToNDC.data(), 16 * sizeof(float)
     );
     mCurrentCmdList->bindVertexBuffer(0, mVertexBuffer.get(), 0);
     mCurrentCmdList->drawInstanced(count, 1, 0, 0);
@@ -281,6 +277,7 @@ void usagi::DebugDrawSubsystem::drawLineList(
 {
     mVertexBuffer->allocate(count * sizeof(dd::DrawVertex));
     {
+        // todo add a method
         const auto mem = mVertexBuffer->mappedMemory();
         memcpy(mem, lines, mVertexBuffer->size());
         mVertexBuffer->flush();
@@ -290,16 +287,11 @@ void usagi::DebugDrawSubsystem::drawLineList(
         ? mLineDepthEnabledPipeline
         : mLineDepthDisabledPipeline
     );
+    // todo add a setting
     mCurrentCmdList->setLineWidth(1.f);
-    Matrix4f m;
-    m << -1.04781950f, 3.54236340e-06f, -0.767837644f, -3.74200988f,
-        -0.535599470f, 1.47611356f, 0.730905473f, -3.28316879f,
-        -0.503842056f, -0.523264706f, 0.687558949f, 8.64296627f,
-        -0.503741324f, -0.523160100f, 0.687421501f, 8.84121895f;
-
     mCurrentCmdList->setConstant(
         ShaderStage::VERTEX, "u_MvpMatrix",
-        m.data(), 16 * sizeof(float)
+        mWorldToNDC.data(), 16 * sizeof(float)
     );
     mCurrentCmdList->bindVertexBuffer(0, mVertexBuffer.get(), 0);
     mCurrentCmdList->drawInstanced(count, 1, 0, 0);

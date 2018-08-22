@@ -127,6 +127,8 @@
     <ClCompile Include="Asset\AssetRoot.cpp" />
     <ClCompile Include="Asset\Filesystem\FilesystemAsset.cpp" />
     <ClCompile Include="Asset\Filesystem\FilesystemAssetPackage.cpp" />
+    <ClCompile Include="Camera\ModelViewCameraController.cpp" />
+    <ClCompile Include="Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
     <ClCompile Include="Extension\DebugDraw\DebugDrawImpl.cpp" />
     <ClCompile Include="Extension\DebugDraw\DebugDrawSubsystem.cpp" />
@@ -165,6 +167,7 @@
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\Memory\BitmapMemoryAllocator.cpp" />
+    <ClCompile Include="Transform\TransformSubsystem.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClCompile Include="Utility\Hash.cpp" />
     <ClCompile Include="Utility\Unicode.cpp" />
@@ -174,6 +177,10 @@
     <ClInclude Include="Asset\AssetPackage.hpp" />
     <ClInclude Include="Asset\Filesystem\FilesystemAsset.hpp" />
     <ClInclude Include="Asset\Filesystem\FilesystemAssetPackage.hpp" />
+    <ClInclude Include="Camera\Camera.hpp" />
+    <ClInclude Include="Camera\CameraComponent.hpp" />
+    <ClInclude Include="Camera\ModelViewCameraController.hpp" />
+    <ClInclude Include="Camera\PerspectiveCamera.hpp" />
     <ClInclude Include="Core\Event\Library\Component\ComponentEvent.hpp" />
     <ClInclude Include="Core\Event\Library\Component\PostComponentRemovalEvent.hpp" />
     <ClInclude Include="Core\Event\Library\Element\ChildElementAddedEvent.hpp" />
@@ -289,6 +296,9 @@
     <ClInclude Include="Runtime\Window\WindowEventListener.hpp" />
     <ClInclude Include="Runtime\Window\WindowManager.hpp" />
     <ClInclude Include="Scene\Scene.hpp" />
+    <ClInclude Include="Transform\TransformComponent.hpp" />
+    <ClInclude Include="Transform\TransformSubsystem.hpp" />
+    <ClInclude Include="Transform\Util.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
     <ClInclude Include="Utility\EnumTranslator.hpp" />

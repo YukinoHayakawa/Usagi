@@ -1,27 +1,36 @@
 ﻿#pragma once
 
-#include <Usagi/Engine/Component/DynamicComponent.hpp>
+#include <Usagi/Engine/Core/Math.hpp>
 
 namespace usagi
 {
-
-/**
- * \brief 
- * projection matrix
- * ray generation
- * 
- * derive from entity - animation: last & next frame transform 
- */
-class Camera : public DynamicComponent
+class Camera
 {
 public:
+    virtual ~Camera() = default;
+
     /**
      * \brief Get the transformation from camera local space to
-     * normalized device coordinates, which is right-handed and
-     * having the bounding volume from (-1,-1,-1) to (1,1,1).
-     * \return 
+     * right-handed normalized device coordinates, whose bounding volume
+     * is (-1, -1, -1) to (1, 1, 1).
+     *
+     * Camera coordinates:
+     *      z (Up)
+     *      |  y (Shooting direction)
+     *      | /
+     *      |/
+     *      -------- x
+     *
+     * NDC coordinates:
+     *         z
+     *        /
+     *       /
+     *      -------- x
+     *      |
+     *      |
+     *      y
+     * \return
      */
-    virtual Eigen::Projective3f getProjectionMatrix() = 0;
+    virtual Projective3f projectionMatrix() const = 0;
 };
-
 }
