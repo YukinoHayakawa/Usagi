@@ -3,7 +3,10 @@
 #include <filesystem>
 #include <algorithm>
 #include <stack>
+#include <set>
+#include <map>
 #include <boost/algorithm/string.hpp>
+#include <strstream>
 
 #include <utfcpp/utf8.h>
 
@@ -258,6 +261,120 @@ struct Tokenizer
             tokens.push_back({ TokenType::NEWLINE, "" });
         }
         tokens.push_back({ TokenType::END, "" });
+    }
+};
+
+
+struct Scene
+{
+    static constexpr int INVALID_BLOCK_ID = -1;
+
+    string name;
+    fs::path path;
+    vector<Token>::const_iterator token_begin;
+    vector<Token>::const_iterator token_end;
+    set<string> preload_resources;
+    set<string> characters;
+    map<int, vector<string>> code_blocks;
+
+    Scene(
+        string name,
+        fs::path pathses,
+        const vector<Token>::const_iterator token_begin,
+        const vector<Token>::const_iterator token_end)
+        : name(std::move(name))
+        , path(std::move(pathses))
+        , token_begin(token_begin)
+        , token_end(token_end)
+    {
+    }
+
+    void parseCodeBlocks()
+    {
+        code_blocks.clear();
+
+        ifstream in(path);
+        in.exceptions(ios::badbit);
+        string line, token;
+        auto block_id = INVALID_BLOCK_ID;
+        vector<string> *block = nullptr;
+
+        while(getline(in, line))
+        {
+            strstream s;
+            s << line;
+            s >> token;
+            if(block_id == INVALID_BLOCK_ID)
+            {
+                if(token == "#!code-begin")
+                {
+                    s >> block_id;
+                    block = &code_blocks[block_id];
+                }
+            }
+            else
+            {
+                if(token == "#!code-end")
+                {
+                    block_id = INVALID_BLOCK_ID;
+                    block = nullptr;
+                }
+                else
+                {
+                    block->push_back(std::move(line));
+                }
+            }
+        }
+    }
+
+    void writeFile()
+    {
+        if(fs::exists(path))
+        {
+            parseCodeBlocks();
+        }
+    }
+};
+
+struct Translator
+{
+    vector<Token> tokens;
+    vector<Token>::iterator pos;
+    fs::path output_dir;
+    vector<string> heading_stack;
+
+    Translator(vector<Token> tokens, fs::path output_dir)
+        : tokens(std::move(tokens))
+        , output_dir(std::move(output_dir))
+    {
+        pos = tokens.begin();
+        translate();
+    }
+
+    TokenType peekType() const
+    {
+        return pos == tokens.end() ? TokenType::END : pos->type;
+    }
+
+    void translate()
+    {
+        switch(peekType())
+        {
+            case TokenType::HEADING_MARK:
+            {
+
+                break;
+            }
+            case TokenType::HEADING_TAG: break;
+            case TokenType::HEADING_NAME: break;
+            case TokenType::CODE_TAG: break;
+            case TokenType::CODE_COMMENT: break;
+            case TokenType::COMMAND_NAME: break;
+            case TokenType::COMMAND_PARAM: break;
+            case TokenType::CHAR_PARAM: break;
+            case TokenType::MESSAGE: break;
+            default: ;
+        }
     }
 };
 }
