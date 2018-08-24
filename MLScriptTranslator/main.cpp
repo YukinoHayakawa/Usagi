@@ -5,9 +5,10 @@
 #include <stack>
 #include <set>
 #include <map>
-#include <boost/algorithm/string.hpp>
-#include <strstream>
+#include <sstream>
 
+#include <boost/algorithm/string.hpp>
+#include <fmt/format.h>
 #include <utfcpp/utf8.h>
 
 #ifdef _WIN32
@@ -24,6 +25,7 @@ enum ErrorCodes
 {
     INVALID_USAGE = 1,
     SYNTAX_ERROR,
+    LOGIC_ERROR,
 };
 
 enum class TokenType
@@ -78,7 +80,18 @@ struct Token
 {
     TokenType type;
     string data;
+    int line;
 };
+
+ostream & operator<<(ostream &s, const Token &t)
+{
+    s << setw(20) << tokenName(t.type) << ": " << t.data;
+    return s;
+}
+
+const auto CODE_BEGIN_TAG = "#!code-begin";
+const auto CODE_END_TAG = "#!code-end";
+const auto CODE_COMMENT_TAG = "#!code-comment";
 
 bool is_number(const std::string &s)
 {
@@ -101,6 +114,7 @@ struct Tokenizer
     vector<Token> tokens;
     utf32string line;
     utf32string::iterator pos;
+    int line_num = 0;
 
     void skipSpace() { while(pos != line.end() && isSpace(*pos)) ++pos; }
 
@@ -109,7 +123,7 @@ struct Tokenizer
         skipSpace();
         if(*pos != c)
         {
-            cerr << "Expected a " << c << endl;
+            cerr << fmt::format("Line {}: Expected a {}", line_num, c) << endl;
             exit(SYNTAX_ERROR);
         }
         ++pos;
@@ -121,7 +135,7 @@ struct Tokenizer
         pos = find(begin, line.end(), c);
         if(pos == line.end())
         {
-            cerr << "Expected a " << c << endl;
+            cerr << fmt::format("Line {}: Expected a {}", line_num, c) << endl;
             exit(SYNTAX_ERROR);
         }
         string r;
@@ -136,7 +150,7 @@ struct Tokenizer
         pos = std::min(find(begin, line.end(), c), find(begin, line.end(), c1));
         if(pos == line.end())
         {
-            cerr << "Expected a " << c << endl;
+            cerr << fmt::format("Line {}: Expected a {}", line_num, c) << endl;
             exit(SYNTAX_ERROR);
         }
         string r;
@@ -153,7 +167,7 @@ struct Tokenizer
         trim(r);
         if(r.empty())
         {
-            cerr << "Expected a token" << endl;
+            cerr << fmt::format("Line {}: Expected a string", line_num) << endl;
             exit(SYNTAX_ERROR);
         }
         return r;
@@ -170,7 +184,7 @@ struct Tokenizer
         auto fetch = true;
         while(fetch)
         {
-            tokens.push_back({ param, tillAnyCharTrimmed(',', end) });
+            tokens.push_back({ param, tillAnyCharTrimmed(',', end), line_num });
             skipSpace();
             switch(peek())
             {
@@ -190,6 +204,7 @@ struct Tokenizer
         string utf8line;
         while(getline(in, utf8line))
         {
+            ++line_num;
             line.clear();
             utf8::utf8to32(utf8line.begin(), utf8line.end(), back_inserter(line));
             if(line.empty()) continue;
@@ -208,12 +223,14 @@ struct Tokenizer
                         pos, line.end(),
                         [](const char c) { return c != '#'; }
                     );
-                    tokens.push_back({ TokenType::HEADING_MARK, { pos, sharp_end } });
+                    // ignore comment (begin with ######)
+                    if(sharp_end - pos == 6) break;
+                    tokens.push_back({ TokenType::HEADING_MARK, { pos, sharp_end }, line_num });
                     pos = sharp_end;
                     expect('[');
-                    tokens.push_back({ TokenType::HEADING_TAG, tillCharTrimmed(']') });
+                    tokens.push_back({ TokenType::HEADING_TAG, tillCharTrimmed(']'), line_num });
                     expect(']');
-                    tokens.push_back({ TokenType::HEADING_NAME, tillEndTrimmed() });
+                    tokens.push_back({ TokenType::HEADING_NAME, tillEndTrimmed(), line_num });
                     break;
                 }
                 // code
@@ -224,13 +241,13 @@ struct Tokenizer
                     auto tag = tillAnyCharTrimmed(':', '}');
                     if(is_number(tag))
                     {
-                        tokens.push_back({ TokenType::CODE_TAG, std::move(tag) });
+                        tokens.push_back({ TokenType::CODE_TAG, std::move(tag), line_num });
                         expect(':');
-                        tokens.push_back({ TokenType::CODE_COMMENT, tillCharTrimmed('}') });
+                        tokens.push_back({ TokenType::CODE_COMMENT, tillCharTrimmed('}'), line_num });
                     }
                     else
                     {
-                        tokens.push_back({ TokenType::COMMAND_NAME, std::move(tag) });
+                        tokens.push_back({ TokenType::COMMAND_NAME, std::move(tag), line_num });
                         if(has_params)
                         {
                             expect(':');
@@ -248,45 +265,354 @@ struct Tokenizer
                 {
                     expect('[');
                     params(TokenType::CHAR_PARAM, ']');
-                    tokens.push_back({ TokenType::MESSAGE, tillEndTrimmed() });
+                    tokens.push_back({ TokenType::MESSAGE, tillEndTrimmed(), line_num });
                     break;
                 }
                 // narrator message
                 default:
                 {
-                    tokens.push_back({ TokenType::MESSAGE, tillEndTrimmed() });
+                    tokens.push_back({ TokenType::MESSAGE, tillEndTrimmed(), line_num });
                     break;
                 }
             }
-            tokens.push_back({ TokenType::NEWLINE, "" });
+            tokens.push_back({ TokenType::NEWLINE, "", line_num });
         }
-        tokens.push_back({ TokenType::END, "" });
+        tokens.push_back({ TokenType::END, "", line_num });
     }
 };
-
 
 struct Scene
 {
     static constexpr int INVALID_BLOCK_ID = -1;
 
+    string indent = "    ";
     string name;
+    string comment_name;
     fs::path path;
-    vector<Token>::const_iterator token_begin;
-    vector<Token>::const_iterator token_end;
-    set<string> preload_resources;
-    set<string> characters;
-    map<int, vector<string>> code_blocks;
-
-    Scene(
-        string name,
-        fs::path pathses,
-        const vector<Token>::const_iterator token_begin,
-        const vector<Token>::const_iterator token_end)
-        : name(std::move(name))
-        , path(std::move(pathses))
-        , token_begin(token_begin)
-        , token_end(token_end)
+    vector<Token>::const_iterator begin;
+    vector<Token>::const_iterator end;
+    vector<Token>::const_iterator pos;
+    struct Character
     {
+        string obj;
+        string last_expr;
+        string last_pos;
+        bool in_scene = false;
+    };
+    map<string, Character> characters;
+    map<int, vector<string>> code_blocks;
+    stringstream output;
+    map<string, string> expressions;
+    map<string, string> positions;
+
+    Scene(fs::path _path, vector<Token>::const_iterator _begin)
+        : path(std::move(_path))
+        , begin(std::move(_begin))
+    {
+        pos = begin;
+        if(fs::exists(path))
+        {
+            parseCodeBlocks();
+        }
+    }
+
+    TokenType type() const
+    {
+        return pos == end ? TokenType::END : pos->type;
+    }
+
+    TokenType peekNextType() const
+    {
+        const auto next = pos + 1;
+        return next == pos ? TokenType::END : next->type;
+    }
+
+    const string & data() const
+    {
+        return pos->data;
+    }
+
+    TokenType expectAny(std::initializer_list<TokenType> types)
+    {
+        ++pos;
+        const auto i = find(types.begin(), types.end(), type());
+        if(i == types.end())
+        {
+            cout << fmt::format("Line {}: Expected any of: ", pos->line);
+            for(auto && t : types)
+            {
+                cout << tokenName(t) << " ";
+            }
+            cout << endl;
+            exit(SYNTAX_ERROR);
+        }
+        return *i;
+    }
+
+    const string & expect(const TokenType type)
+    {
+        if((++pos)->type != type)
+        {
+            cout << fmt::format("Line {}: Expected a {}", pos->line, tokenName(type)) << endl;
+            exit(SYNTAX_ERROR);
+        }
+        return data();
+    }
+
+    void insertCodeBlock(const int id)
+    {
+        const auto i = code_blocks.find(id);
+        if(i == code_blocks.end())
+        {
+            output << indent << "UnimplementedCodeSegment();" << endl;
+        }
+        else
+        {
+            for(auto &&c : i->second)
+            {
+                output << c << endl;
+            }
+        }
+    }
+
+    void checkCharacterInScene(const string & cs)
+    {
+        const auto c = characters.find(cs);
+        if(c == characters.end())
+        {
+            cout << fmt::format("Line {}: Character {} is undefined.", pos->line, cs) << endl;
+            exit(LOGIC_ERROR);
+        }
+        if(!c->second.in_scene)
+        {
+            cout << fmt::format("Line {}: Character {} has not enter the scene yet.", pos->line, cs) << endl;
+            exit(LOGIC_ERROR);
+        }
+    }
+
+    Character & character(const string & cs)
+    {
+        const auto i = characters.find(cs);
+        if(i == characters.end())
+        {
+            Character c;
+            c.obj = "c" + to_string(characters.size());
+            return characters.insert({ cs, std::move(c) }).first->second;
+        }
+        return i->second;
+    }
+
+    string expressionObj(const string & cs)
+    {
+        const auto i = expressions.find(cs);
+        if(i == expressions.end())
+        {
+            auto hash = "e" + to_string(expressions.size());
+            expressions.insert({ cs, hash });
+            return hash;
+        }
+        return i->second;
+    }
+
+    string positionObj(const string & cs)
+    {
+        const auto i = positions.find(cs);
+        if(i == positions.end())
+        {
+            auto hash = "p" + to_string(positions.size());
+            positions.insert({ cs, hash });
+            return hash;
+        }
+        return i->second;
+    }
+
+    void changeExpr(const string & cs, const string & expr)
+    {
+        auto &c = character(cs);
+        output << indent << fmt::format("/* {},{} */ {}.changeExpression({});",
+            cs,
+            expr,
+            c.obj,
+            expressionObj(expr)
+        ) << endl;
+        c.last_expr = cs;
+    }
+
+    void move(const string & cs, const string & pos)
+    {
+        auto &c = character(cs);
+        output << indent << fmt::format("/* {},{} */ {}.move({});",
+            cs, pos,
+            c.obj,
+            positionObj(pos)
+        ) << endl;
+        c.last_pos = cs;
+    }
+
+    void parse()
+    {
+        while(pos != end)
+        {
+            switch(type())
+            {
+                case TokenType::NEWLINE:
+                {
+                    break;
+                }
+                case TokenType::END:
+                {
+                    cout << "End of scene: " << name << endl;
+                    return;
+                }
+                case TokenType::CODE_TAG:
+                {
+                    output << indent << endl;
+                    const auto id = data();
+                    output << indent << fmt::format("{} {}", CODE_BEGIN_TAG, id) << endl;
+                    if(!expect(TokenType::CODE_COMMENT).empty())
+                        output << indent << fmt::format("{} {}", CODE_COMMENT_TAG, data()) << endl;
+                    insertCodeBlock(stoi(id));
+                    output << indent << CODE_END_TAG << endl;
+                    output << indent << endl;
+                    expect(TokenType::NEWLINE);
+                    break;
+                }
+                case TokenType::COMMAND_NAME:
+                {
+                    if(data() == "expr")
+                    {
+                        checkCharacterInScene(expect(TokenType::COMMAND_PARAM));
+                        changeExpr(data(), expect(TokenType::COMMAND_PARAM));
+                    }
+                    else if(data() == "move")
+                    {
+                        checkCharacterInScene(expect(TokenType::COMMAND_PARAM));
+                        move(data(), expect(TokenType::COMMAND_PARAM));
+                    }
+                    else if(data() == "exitall")
+                    {
+                        for(auto &&c : characters)
+                        {
+                            if(c.second.in_scene)
+                            {
+                                output << indent << fmt::format("{}.exit();", c.second.obj) << endl;
+                                c.second.in_scene = false;
+                            }
+                        }
+                    }
+                    else if(data() == "exit")
+                    {
+                        checkCharacterInScene(expect(TokenType::COMMAND_PARAM));
+                        auto &c = characters[data()];
+                        output << indent << fmt::format("{}.exit();", c.obj) << endl;
+                        c.in_scene = false;
+                    }
+                    else if(data() == "state")
+                    {
+                        checkCharacterInScene(expect(TokenType::COMMAND_PARAM));
+                        const auto c = data();
+                        changeExpr(c, expect(TokenType::COMMAND_PARAM));
+                        move(c, expect(TokenType::COMMAND_PARAM));
+                    }
+                    expect(TokenType::NEWLINE);
+                    break;
+                }
+                case TokenType::CHAR_PARAM:
+                {
+                    const auto pretend = data().find('=');
+                    if(pretend == string::npos)
+                    {
+                        if(peekNextType() == TokenType::CHAR_PARAM)
+                        {
+                            const auto cn = data();
+                            auto &c = character(cn);
+                            const auto expr = expect(TokenType::CHAR_PARAM);
+                            const auto pos = expect(TokenType::CHAR_PARAM);
+                            if(!c.in_scene)
+                            {
+                                output << indent << fmt::format("/* {} */ {}.enterScene({}, {});",
+                                    cn,
+                                    c.obj,
+                                    c.last_expr = expr,
+                                    c.last_pos = pos
+                                ) << endl;
+                                c.in_scene = true;
+                            }
+                            if(expr != c.last_expr)
+                                changeExpr(cn, expr);
+                            if(pos != c.last_pos)
+                                move(cn, pos);
+                            output << indent << fmt::format("/* {} */ {}.say(\"{}\"); w();",
+                                cn,
+                                c.obj,
+                                expect(TokenType::MESSAGE)
+                            ) << endl;
+                        }
+                        else
+                        {
+                            const auto cn = data();
+                            output << indent << fmt::format("/* {} */ {}.message(\"{}\"); w();",
+                                cn,
+                                character(cn).obj,
+                                expect(TokenType::MESSAGE)
+                            ) << endl;
+                        }
+                    }
+                    else
+                    {
+                        const auto pretend_name = data().substr(0, pretend);
+                        const auto real_name = data().substr(pretend + 1, string::npos);
+                        if(peekNextType() == TokenType::CHAR_PARAM)
+                        {
+                            auto &c = character(real_name);
+                            const auto expr = expect(TokenType::CHAR_PARAM);
+                            const auto pos = expect(TokenType::CHAR_PARAM);
+                            if(!c.in_scene)
+                            {
+                                output << indent << fmt::format("/* {} */ {}.enterScene({}, {});",
+                                    real_name,
+                                    c.obj,
+                                    c.last_expr = expr,
+                                    c.last_pos = pos
+                                ) << endl;
+                                c.in_scene = true;
+                            }
+                            if(expr != c.last_expr)
+                                changeExpr(real_name, expr);
+                            if(pos != c.last_pos)
+                                move(real_name, pos);
+                            output << indent << fmt::format("/* {} */ {}.pretendSay(\"{}\", \"{}\"); w();",
+                                real_name,
+                                c.obj,
+                                pretend_name,
+                                expect(TokenType::MESSAGE)
+                            ) << endl;
+                        }
+                        else
+                        {
+                            output << indent << fmt::format("/* {} */ {}.pretendMessage(\"{}\", \"{}\"); w();",
+                                real_name,
+                                character(real_name).obj,
+                                pretend_name,
+                                expect(TokenType::MESSAGE)
+                            ) << endl;
+                        }
+                    }
+                    break;
+                }
+                case TokenType::MESSAGE:
+                {
+                    output << indent << fmt::format("narrator.message(\"{}\"); w();", data()) << endl;
+                    break;
+                }
+                default:
+                {
+                    cout << fmt::format("Line {}: Unexpected token.", pos->line) << endl;
+                    exit(SYNTAX_ERROR);
+                }
+            }
+            ++pos;
+        }
     }
 
     void parseCodeBlocks()
@@ -301,12 +627,12 @@ struct Scene
 
         while(getline(in, line))
         {
-            strstream s;
+            stringstream s;
             s << line;
             s >> token;
             if(block_id == INVALID_BLOCK_ID)
             {
-                if(token == "#!code-begin")
+                if(token == CODE_BEGIN_TAG)
                 {
                     s >> block_id;
                     block = &code_blocks[block_id];
@@ -314,10 +640,14 @@ struct Scene
             }
             else
             {
-                if(token == "#!code-end")
+                if(token == CODE_END_TAG)
                 {
                     block_id = INVALID_BLOCK_ID;
                     block = nullptr;
+                }
+                else if(token == CODE_COMMENT_TAG)
+                {
+                    // ignored. comment will be added back from the source.
                 }
                 else
                 {
@@ -329,10 +659,33 @@ struct Scene
 
     void writeFile()
     {
-        if(fs::exists(path))
+        fs::create_directories(path.parent_path());
+        ofstream out(path);
+        out.exceptions(ios::badbit | ios::failbit);
+
+        out << "// " << comment_name << "\n";
+        out << "function " << name << "()\n";
+        out << "{\n";
+        out << indent << "local scene = createScene();\n";
+        out << indent << "local narrator = scene.createNarrator();\n\n";
+        if(!characters.empty())
         {
-            parseCodeBlocks();
+            for(auto &&c : characters)
+            {
+                out << indent << fmt::format("local {} = scene.createCharacter(\"{}\");\n", c.second.obj, c.first);
+            }
+            out << "\n";
         }
+        if(!expressions.empty())
+        {
+            for(auto &&e : expressions)
+            {
+                out << indent << fmt::format("local {} = scene.createExpression(\"{}\");\n", e.second, e.first);
+            }
+            out << "\n";
+        }
+        out << output.str();
+        out << "}\n";
     }
 };
 
@@ -341,39 +694,138 @@ struct Translator
     vector<Token> tokens;
     vector<Token>::iterator pos;
     fs::path output_dir;
-    vector<string> heading_stack;
+    vector<string> heading_stack; // size = heading depth
+    unique_ptr<Scene> scene;
+    bool reading_message = false;
 
-    Translator(vector<Token> tokens, fs::path output_dir)
-        : tokens(std::move(tokens))
+    Translator(vector<Token> _tokens, fs::path output_dir)
+        : tokens(std::move(_tokens))
         , output_dir(std::move(output_dir))
     {
         pos = tokens.begin();
         translate();
     }
 
-    TokenType peekType() const
+    TokenType type()
     {
         return pos == tokens.end() ? TokenType::END : pos->type;
     }
 
+    string & data()
+    {
+        return pos->data;
+    }
+
+    string peekData()
+    {
+        const auto next = pos + 1;
+        return next == tokens.end() ? "<END>" : next->data;
+    }
+
+    string buildSceneName()
+    {
+        stringstream name;
+        for(auto &&h : heading_stack)
+        {
+            name << h << "_";
+        }
+        string s = name.str();
+        if(!heading_stack.empty())
+            s.pop_back();
+        return s;
+    }
+
+    const string & expect(const TokenType type)
+    {
+        if((++pos)->type != type)
+        {
+            cout << fmt::format("Line {}: Expected a {}", pos->line, tokenName(type)) << endl;
+            exit(SYNTAX_ERROR);
+        }
+        return data();
+    }
+
+    void endLastScene()
+    {
+        assert(!heading_stack.empty());
+        assert(scene);
+        if(reading_message)
+        {
+            scene->end = pos;
+            scene->parse();
+            scene->writeFile();
+        }
+        scene.reset();
+        heading_stack.pop_back();
+        reading_message = false;
+    }
+
+    void nextLine()
+    {
+        while(pos != tokens.end())
+        {
+            if(pos->type == TokenType::NEWLINE)
+            {
+                ++pos;
+                return;
+            }
+            ++pos;
+        }
+    }
+
     void translate()
     {
-        switch(peekType())
+        while(pos != tokens.end())
         {
-            case TokenType::HEADING_MARK:
+            switch(type())
             {
-
-                break;
+                case TokenType::HEADING_MARK:
+                {
+                    const auto depth = data().size(); // number of #s
+                    if(depth <= heading_stack.size()) // popping, last scene ends
+                    {
+                         endLastScene();
+                    }
+                    else // pushing
+                    {
+                        // to push a heading, there must not be any message between
+                        // current heading and parent heading
+                        if(reading_message)
+                        {
+                            cout << fmt::format("Line {}: Scene cannot be nested.", pos->line) << endl;
+                            exit(LOGIC_ERROR);
+                        }
+                    }
+                    heading_stack.resize(depth - 1);
+                    heading_stack.push_back(expect(TokenType::HEADING_TAG));
+                    const auto comment_name = expect(TokenType::HEADING_NAME);
+                    nextLine();
+                    const auto name = buildSceneName();
+                    auto path = output_dir / name;
+                    path += ".nut";
+                    scene.reset(new Scene(path, pos));
+                    scene->name = name;
+                    scene->comment_name = comment_name;
+                    break;
+                }
+                case TokenType::END:
+                {
+                    if(scene) endLastScene();
+                    nextLine();
+                    break;
+                }
+                case TokenType::NEWLINE:
+                {
+                    nextLine();
+                    break;
+                }
+                default:
+                {
+                    reading_message = true;
+                    nextLine();
+                }
             }
-            case TokenType::HEADING_TAG: break;
-            case TokenType::HEADING_NAME: break;
-            case TokenType::CODE_TAG: break;
-            case TokenType::CODE_COMMENT: break;
-            case TokenType::COMMAND_NAME: break;
-            case TokenType::COMMAND_PARAM: break;
-            case TokenType::CHAR_PARAM: break;
-            case TokenType::MESSAGE: break;
-            default: ;
+
         }
     }
 };
@@ -388,6 +840,7 @@ int main(const int argc, char *argv[])
 {
     using namespace moeloop;
 
+
 #ifdef _WIN32
     usagi::win32::patchConsole();
 #endif
@@ -401,15 +854,12 @@ int main(const int argc, char *argv[])
     }
 
     const fs::path input_file = argv[1];
-    const fs::path output_dir = argv[2];
+    fs::path output_dir = argv[2];
 
     ifstream script(input_file);
     script.exceptions(std::ios::badbit);
     fs::create_directories(output_dir);
 
     Tokenizer tokenizer(script);
-    for(auto &&t : tokenizer.tokens)
-    {
-        cout << setw(20) << tokenName(t.type) << ": " << t.data << endl;
-    }
+    Translator translator(std::move(tokenizer.tokens), std::move(output_dir));
 }
