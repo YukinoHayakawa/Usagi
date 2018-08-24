@@ -686,7 +686,7 @@ struct Scene
         out.exceptions(ios::badbit | ios::failbit);
 
         out << "// " << comment_name << "\n";
-        out << "function " << name << "()\n";
+        out << "function scene_" << name << "()\n";
         out << "{\n";
         out << indent << "local scene = createScene();\n";
         out << indent << "local narrator = scene.createNarrator();\n\n";
