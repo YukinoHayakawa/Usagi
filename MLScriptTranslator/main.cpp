@@ -700,6 +700,14 @@ struct Scene
             }
             out << "\n";
         }
+        if(!positions.empty())
+        {
+            for(auto &&e : positions)
+            {
+                out << indent << fmt::format("local {} = scene.createPosition(\"{}\");\n", e.second, e.first);
+            }
+            out << "\n";
+        }
         out << output.str();
         out << "}\n";
     }
