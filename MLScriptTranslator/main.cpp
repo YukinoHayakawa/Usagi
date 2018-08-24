@@ -457,11 +457,12 @@ struct Scene
         auto &cc = character(c);
         if(!cc.in_scene)
         {
-            output << indent << fmt::format("/* {} */ {}.enterScene({}, {});",
+            output << indent << fmt::format("/* {},{},{} */ {}.enterScene({}, {});",
                 c,
+                expr, pos,
                 cc.obj,
-                cc.last_expr = expr,
-                cc.last_pos = pos
+                expressionObj(cc.last_expr = expr),
+                positionObj(cc.last_pos = pos)
             ) << endl;
             cc.in_scene = true;
         }
@@ -555,6 +556,11 @@ struct Scene
                         ensureInScene(cn, expr, pos);
                         charChangeExpr(cn, expr);
                         charMove(cn, pos);
+                    }
+                    else
+                    {
+                        cout << fmt::format("Line {}: Invalid command {}.", pos->line, data()) << endl;
+                        throw std::runtime_error("");
                     }
                     expect(TokenType::NEWLINE);
                     break;
