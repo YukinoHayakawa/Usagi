@@ -344,7 +344,7 @@ struct Scene
                 cout << tokenName(t) << " ";
             }
             cout << endl;
-            exit(SYNTAX_ERROR);
+            throw std::runtime_error("");
         }
         return *i;
     }
@@ -354,7 +354,7 @@ struct Scene
         if((++pos)->type != type)
         {
             cout << fmt::format("Line {}: Expected a {}", pos->line, tokenName(type)) << endl;
-            exit(SYNTAX_ERROR);
+            throw std::runtime_error("");
         }
         return data();
     }
@@ -381,12 +381,12 @@ struct Scene
         if(c == characters.end())
         {
             cout << fmt::format("Line {}: Character {} is undefined.", pos->line, cs) << endl;
-            exit(LOGIC_ERROR);
+            throw std::runtime_error("");
         }
         if(!c->second.in_scene)
         {
-            cout << fmt::format("Line {}: Character {} has not enter the scene yet.", pos->line, cs) << endl;
-            exit(LOGIC_ERROR);
+            cout << fmt::format("Line {}: Character {} has not entered the scene yet.", pos->line, cs) << endl;
+            throw std::runtime_error("");
         }
     }
 
@@ -426,9 +426,10 @@ struct Scene
         return i->second;
     }
 
-    void changeExpr(const string & cs, const string & expr)
+    void charChangeExpr(const string & cs, const string & expr)
     {
         auto &c = character(cs);
+        if(expr == c.last_expr) return;
         output << indent << fmt::format("/* {},{} */ {}.changeExpression({});",
             cs,
             expr,
@@ -438,15 +439,46 @@ struct Scene
         c.last_expr = cs;
     }
 
-    void move(const string & cs, const string & pos)
+    void charMove(const string & cs, const string & pos)
     {
         auto &c = character(cs);
+        if(pos == c.last_pos) return;
         output << indent << fmt::format("/* {},{} */ {}.move({});",
             cs, pos,
             c.obj,
             positionObj(pos)
         ) << endl;
         c.last_pos = cs;
+    }
+
+    void ensureInScene(const string &c, const string &expr, const string &pos)
+    {
+        auto &cc = character(c);
+        if(!cc.in_scene)
+        {
+            output << indent << fmt::format("/* {} */ {}.enterScene({}, {});",
+                c,
+                cc.obj,
+                cc.last_expr = expr,
+                cc.last_pos = pos
+            ) << endl;
+            cc.in_scene = true;
+        }
+    }
+
+    void charSay(const string &c, const string &expr, const string &pos, const string &msg_line)
+    {
+        auto &cc = character(c);
+        ensureInScene(c, expr, pos);
+        charChangeExpr(c, expr);
+        charMove(c, pos);
+        output << indent << msg_line << endl;
+    }
+
+    void charMsg(const string &c, const string &msg_line)
+    {
+        auto &cc = character(c);
+        output << indent << msg_line << endl;
     }
 
     void parse()
@@ -466,14 +498,14 @@ struct Scene
                 }
                 case TokenType::CODE_TAG:
                 {
-                    output << indent << endl;
+                    output << endl;
                     const auto id = data();
                     output << indent << fmt::format("{} {}", CODE_BEGIN_TAG, id) << endl;
                     if(!expect(TokenType::CODE_COMMENT).empty())
                         output << indent << fmt::format("{} {}", CODE_COMMENT_TAG, data()) << endl;
                     insertCodeBlock(stoi(id));
                     output << indent << CODE_END_TAG << endl;
-                    output << indent << endl;
+                    output << endl;
                     expect(TokenType::NEWLINE);
                     break;
                 }
@@ -482,12 +514,12 @@ struct Scene
                     if(data() == "expr")
                     {
                         checkCharacterInScene(expect(TokenType::COMMAND_PARAM));
-                        changeExpr(data(), expect(TokenType::COMMAND_PARAM));
+                        charChangeExpr(data(), expect(TokenType::COMMAND_PARAM));
                     }
                     else if(data() == "move")
                     {
                         checkCharacterInScene(expect(TokenType::COMMAND_PARAM));
-                        move(data(), expect(TokenType::COMMAND_PARAM));
+                        charMove(data(), expect(TokenType::COMMAND_PARAM));
                     }
                     else if(data() == "exitall")
                     {
@@ -509,10 +541,12 @@ struct Scene
                     }
                     else if(data() == "state")
                     {
-                        checkCharacterInScene(expect(TokenType::COMMAND_PARAM));
-                        const auto c = data();
-                        changeExpr(c, expect(TokenType::COMMAND_PARAM));
-                        move(c, expect(TokenType::COMMAND_PARAM));
+                        const auto cn = expect(TokenType::COMMAND_PARAM);
+                        const auto expr = expect(TokenType::COMMAND_PARAM);
+                        const auto pos = expect(TokenType::COMMAND_PARAM);
+                        ensureInScene(cn, expr, pos);
+                        charChangeExpr(cn, expr);
+                        charMove(cn, pos);
                     }
                     expect(TokenType::NEWLINE);
                     break;
@@ -528,34 +562,20 @@ struct Scene
                             auto &c = character(cn);
                             const auto expr = expect(TokenType::CHAR_PARAM);
                             const auto pos = expect(TokenType::CHAR_PARAM);
-                            if(!c.in_scene)
-                            {
-                                output << indent << fmt::format("/* {} */ {}.enterScene({}, {});",
-                                    cn,
-                                    c.obj,
-                                    c.last_expr = expr,
-                                    c.last_pos = pos
-                                ) << endl;
-                                c.in_scene = true;
-                            }
-                            if(expr != c.last_expr)
-                                changeExpr(cn, expr);
-                            if(pos != c.last_pos)
-                                move(cn, pos);
-                            output << indent << fmt::format("/* {} */ {}.say(\"{}\"); w();",
+                            charSay(cn, expr, pos, fmt::format("/* {} */ {}.say(\"{}\"); w();",
                                 cn,
                                 c.obj,
                                 expect(TokenType::MESSAGE)
-                            ) << endl;
+                            ));
                         }
                         else
                         {
                             const auto cn = data();
-                            output << indent << fmt::format("/* {} */ {}.message(\"{}\"); w();",
+                            charMsg(cn, fmt::format("/* {} */ {}.message(\"{}\"); w();",
                                 cn,
                                 character(cn).obj,
                                 expect(TokenType::MESSAGE)
-                            ) << endl;
+                            ));
                         }
                     }
                     else
@@ -567,35 +587,21 @@ struct Scene
                             auto &c = character(real_name);
                             const auto expr = expect(TokenType::CHAR_PARAM);
                             const auto pos = expect(TokenType::CHAR_PARAM);
-                            if(!c.in_scene)
-                            {
-                                output << indent << fmt::format("/* {} */ {}.enterScene({}, {});",
-                                    real_name,
-                                    c.obj,
-                                    c.last_expr = expr,
-                                    c.last_pos = pos
-                                ) << endl;
-                                c.in_scene = true;
-                            }
-                            if(expr != c.last_expr)
-                                changeExpr(real_name, expr);
-                            if(pos != c.last_pos)
-                                move(real_name, pos);
-                            output << indent << fmt::format("/* {} */ {}.pretendSay(\"{}\", \"{}\"); w();",
+                            charSay(real_name, expr, pos, fmt::format("/* {} */ {}.pretendSay(\"{}\", \"{}\"); w();",
                                 real_name,
                                 c.obj,
                                 pretend_name,
                                 expect(TokenType::MESSAGE)
-                            ) << endl;
+                            ));
                         }
                         else
                         {
-                            output << indent << fmt::format("/* {} */ {}.pretendMessage(\"{}\", \"{}\"); w();",
+                            charMsg(real_name, fmt::format("/* {} */ {}.pretendMessage(\"{}\", \"{}\"); w();",
                                 real_name,
                                 character(real_name).obj,
                                 pretend_name,
                                 expect(TokenType::MESSAGE)
-                            ) << endl;
+                            ));
                         }
                     }
                     break;
@@ -608,7 +614,7 @@ struct Scene
                 default:
                 {
                     cout << fmt::format("Line {}: Unexpected token.", pos->line) << endl;
-                    exit(SYNTAX_ERROR);
+                    throw std::runtime_error("");
                 }
             }
             ++pos;
@@ -659,6 +665,8 @@ struct Scene
 
     void writeFile()
     {
+        cout << "Writing scene script: " << path << endl;
+
         fs::create_directories(path.parent_path());
         ofstream out(path);
         out.exceptions(ios::badbit | ios::failbit);
@@ -752,8 +760,15 @@ struct Translator
         if(reading_message)
         {
             scene->end = pos;
-            scene->parse();
-            scene->writeFile();
+            try
+            {
+                scene->parse();
+                scene->writeFile();
+            }
+            catch(...)
+            {
+                cout << "(In scene " << scene->comment_name << ")" << endl;
+            }
         }
         scene.reset();
         heading_stack.pop_back();
