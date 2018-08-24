@@ -483,6 +483,12 @@ struct Scene
         output << indent << msg_line << endl;
     }
 
+    void exitScene(Character &c)
+    {
+        output << indent << fmt::format("{}.exitScene();", c.obj) << endl;
+        c.in_scene = false;
+    }
+
     void parse()
     {
         while(pos != end)
@@ -536,8 +542,7 @@ struct Scene
                         {
                             if(c.second.in_scene)
                             {
-                                output << indent << fmt::format("{}.exit();", c.second.obj) << endl;
-                                c.second.in_scene = false;
+                                exitScene(c.second);
                             }
                         }
                     }
@@ -545,8 +550,7 @@ struct Scene
                     {
                         checkCharacterInScene(expect(TokenType::COMMAND_PARAM));
                         auto &c = characters[data()];
-                        output << indent << fmt::format("{}.exit();", c.obj) << endl;
-                        c.in_scene = false;
+                        exitScene(c);
                     }
                     else if(data() == "state")
                     {
