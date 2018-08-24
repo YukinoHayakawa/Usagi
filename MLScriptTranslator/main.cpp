@@ -686,7 +686,7 @@ struct Scene
         out.exceptions(ios::badbit | ios::failbit);
 
         out << "// " << comment_name << "\n";
-        out << "function scene_" << name << "()\n";
+        out << "function " << name << "()\n";
         out << "{\n";
         out << indent << "local scene = createScene();\n";
         out << indent << "local narrator = scene.createNarrator();\n\n";
@@ -755,6 +755,7 @@ struct Translator
     string buildSceneName()
     {
         stringstream name;
+        name << "scene_";
         for(auto &&h : heading_stack)
         {
             name << h << "_";
