@@ -301,6 +301,7 @@ struct Scene
     };
     map<string, Character> characters;
     map<int, vector<string>> code_blocks;
+    set<int> code_ids;
     stringstream output;
     map<string, string> expressions;
     map<string, string> positions;
@@ -364,7 +365,7 @@ struct Scene
         const auto i = code_blocks.find(id);
         if(i == code_blocks.end())
         {
-            output << indent << "UnimplementedCodeSegment();" << endl;
+            output << indent << fmt::format("unimplemented(\"Code block {}\");", id) << endl;
         }
         else
         {
@@ -503,7 +504,14 @@ struct Scene
                     output << indent << fmt::format("{} {}", CODE_BEGIN_TAG, id) << endl;
                     if(!expect(TokenType::CODE_COMMENT).empty())
                         output << indent << fmt::format("{} {}", CODE_COMMENT_TAG, data()) << endl;
-                    insertCodeBlock(stoi(id));
+                    const auto int_id = stoi(id);
+                    if(code_ids.find(int_id) != code_ids.end())
+                    {
+                        cout << fmt::format("Line {}: Code block id {} is already used.", pos->line, int_id) << endl;
+                        throw std::runtime_error("");
+                    }
+                    code_ids.insert(int_id);
+                    insertCodeBlock(int_id);
                     output << indent << CODE_END_TAG << endl;
                     output << endl;
                     expect(TokenType::NEWLINE);
