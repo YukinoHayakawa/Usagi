@@ -91,7 +91,9 @@ ostream & operator<<(ostream &s, const Token &t)
 
 const auto CODE_BEGIN_TAG = "#!code-begin";
 const auto CODE_END_TAG = "#!code-end";
-const auto CODE_COMMENT_TAG = "#!code-comment";
+const auto COMMENT_TAG = "#!comment";
+const auto SCENE_BEGIN_TAG = "#!scene-begin";
+const auto SCENE_END_TAG = "#!scene-end";
 
 bool is_number(const std::string &s)
 {
@@ -301,6 +303,14 @@ struct Scene
     };
     map<string, Character> characters;
     map<int, vector<string>> code_blocks;
+    enum Section
+    {
+        BEFORE_SCENE,
+        IN_SCENE,
+        AFTER_SCENE
+    } section = BEFORE_SCENE;
+    vector<string> lines_before_scene;
+    vector<string> lines_after_scene;
     set<int> code_ids;
     stringstream output;
     map<string, string> expressions;
@@ -510,7 +520,7 @@ struct Scene
                     const auto id = data();
                     output << indent << fmt::format("{} {}", CODE_BEGIN_TAG, id) << endl;
                     if(!expect(TokenType::CODE_COMMENT).empty())
-                        output << indent << fmt::format("{} {}", CODE_COMMENT_TAG, data()) << endl;
+                        output << indent << fmt::format("{} {}", COMMENT_TAG, data()) << endl;
                     const auto int_id = stoi(id);
                     if(code_ids.find(int_id) != code_ids.end())
                     {
@@ -653,29 +663,61 @@ struct Scene
         {
             stringstream s;
             s << line;
+            token.clear();
             s >> token;
-            if(block_id == INVALID_BLOCK_ID)
+            if(token == CODE_BEGIN_TAG)
             {
-                if(token == CODE_BEGIN_TAG)
-                {
-                    s >> block_id;
-                    block = &code_blocks[block_id];
-                }
+                assert(section == IN_SCENE);
+                assert(block_id == INVALID_BLOCK_ID);
+
+                s >> block_id;
+                block = &code_blocks[block_id];
+            }
+            else if(token == CODE_END_TAG)
+            {
+                assert(section == IN_SCENE);
+                assert(block_id != INVALID_BLOCK_ID);
+
+                block_id = INVALID_BLOCK_ID;
+                block = nullptr;
+            }
+            else if(token == SCENE_BEGIN_TAG)
+            {
+                assert(section == BEFORE_SCENE);
+
+                section = IN_SCENE;
+            }
+            else if(token == SCENE_END_TAG)
+            {
+                assert(section == IN_SCENE);
+
+                section = AFTER_SCENE;
+            }
+            else if(token == COMMENT_TAG)
+            {
+                // ignored. comment will be added back from the source.
             }
             else
             {
-                if(token == CODE_END_TAG)
+                switch(section)
                 {
-                    block_id = INVALID_BLOCK_ID;
-                    block = nullptr;
-                }
-                else if(token == CODE_COMMENT_TAG)
-                {
-                    // ignored. comment will be added back from the source.
-                }
-                else
-                {
-                    block->push_back(std::move(line));
+                    case BEFORE_SCENE:
+                    {
+                        lines_before_scene.push_back(std::move(line));
+                        break;
+                    }
+                    case IN_SCENE:
+                    {
+                        if(block_id != INVALID_BLOCK_ID)
+                            block->push_back(std::move(line));
+                        break;
+                    }
+                    case AFTER_SCENE:
+                    {
+                        lines_after_scene.push_back(std::move(line));
+                        break;
+                    }
+                    default: assert(false);
                 }
             }
         }
@@ -689,8 +731,13 @@ struct Scene
         ofstream out(path);
         out.exceptions(ios::badbit | ios::failbit);
 
-        out << "// " << comment_name << "\n";
-        out << "function " << name << "()\n";
+        for(auto && l : lines_before_scene)
+        {
+            out << l << "\n";
+        }
+        out << SCENE_BEGIN_TAG << "\n";
+        out << COMMENT_TAG << " " << comment_name << "\n";
+        out << "function sceneContent()\n";
         out << "{\n";
         out << indent << "local scene = createScene();\n";
         out << indent << "local narrator = scene.createNarrator();\n\n";
@@ -720,6 +767,11 @@ struct Scene
         }
         out << output.str();
         out << "}\n";
+        out << SCENE_END_TAG << "\n";
+        for(auto && l : lines_after_scene)
+        {
+            out << l << "\n";
+        }
     }
 };
 
