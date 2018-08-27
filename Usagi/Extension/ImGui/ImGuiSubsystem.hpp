@@ -3,11 +3,11 @@
 #include <memory>
 #include <set>
 
-#include <Usagi/Runtime/Graphics/RenderableSubsystem.hpp>
+#include <Usagi/Graphics/RenderableSubsystem.hpp>
 #include <Usagi/Runtime/Input/Keyboard/KeyEventListener.hpp>
 #include <Usagi/Runtime/Input/Mouse/MouseEventListener.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuImage.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuSampler.hpp>
+#include <Usagi/Runtime/Graphics/GpuImage.hpp>
+#include <Usagi/Runtime/Graphics/GpuSampler.hpp>
 #include <Usagi/Runtime/Window/WindowEventListener.hpp>
 
 struct ImGuiContext;

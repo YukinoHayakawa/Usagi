@@ -10,10 +10,10 @@
 #include <Usagi/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
 #include <Usagi/Runtime/Graphics/GpuDevice.hpp>
 #include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
-#include <Usagi/Runtime/Graphics/Resource/Framebuffer.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuImage.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuImageCreateInfo.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
+#include <Usagi/Runtime/Graphics/Framebuffer.hpp>
+#include <Usagi/Runtime/Graphics/GpuImage.hpp>
+#include <Usagi/Runtime/Graphics/GpuImageCreateInfo.hpp>
+#include <Usagi/Runtime/Graphics/GraphicsCommandList.hpp>
 #include <Usagi/Runtime/Graphics/Swapchain.hpp>
 #include <Usagi/Runtime/Input/InputManager.hpp>
 #include <Usagi/Runtime/Input/Keyboard/Keyboard.hpp>

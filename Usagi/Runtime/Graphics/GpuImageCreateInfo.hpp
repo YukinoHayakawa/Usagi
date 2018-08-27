@@ -1,8 +1,9 @@
 ﻿#pragma once
 
 #include <Usagi/Core/Math.hpp>
-#include <Usagi/Runtime/Graphics/Enum/GpuBufferFormat.hpp>
-#include <Usagi/Runtime/Graphics/Enum/GpuImageUsage.hpp>
+
+#include "Enum/GpuBufferFormat.hpp"
+#include "Enum/GpuImageUsage.hpp"
 
 namespace usagi
 {

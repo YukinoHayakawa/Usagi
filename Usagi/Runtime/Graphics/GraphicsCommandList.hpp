@@ -1,14 +1,14 @@
 ﻿#pragma once
 
 #include <Usagi/Core/Math.hpp>
-#include <Usagi/Runtime/Graphics/Enum/GpuImageLayout.hpp>
-#include <Usagi/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
-#include <Usagi/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
-#include <Usagi/Runtime/Graphics/GraphicsPipeline.hpp>
-#include <Usagi/Runtime/Graphics/Shader/ShaderStage.hpp>
 #include <Usagi/Utility/Noncopyable.hpp>
 
+#include "Enum/GpuImageLayout.hpp"
+#include "Enum/GraphicsIndexType.hpp"
+#include "Enum/GraphicsPipelineStage.hpp"
+#include "Shader/ShaderStage.hpp"
 #include "ShaderResource.hpp"
+#include "GraphicsPipeline.hpp"
 
 namespace usagi
 {
@@ -50,6 +50,11 @@ public:
     ) = 0;
     virtual void endRendering() = 0;
 
+    /**
+     * \brief Binding the same pipeline as the current one should be optimized
+     * as a no-op.
+     * \param pipeline
+     */
     virtual void bindPipeline(std::shared_ptr<GraphicsPipeline> pipeline) = 0;
 
     // Dynamic States

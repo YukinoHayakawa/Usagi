@@ -1,6 +1,6 @@
 ﻿#include "VulkanPooledImage.hpp"
 
-#include <Usagi/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
+#include <Usagi/Runtime/Graphics/GraphicsCommandList.hpp>
 
 #include "VulkanGpuDevice.hpp"
 #include "VulkanMemoryPool.hpp"

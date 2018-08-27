@@ -4,7 +4,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <Usagi/Runtime/Graphics/Resource/Framebuffer.hpp>
+#include <Usagi/Runtime/Graphics/Framebuffer.hpp>
 
 #include "VulkanBatchResource.hpp"
 

@@ -3,8 +3,8 @@
 #include <algorithm>
 
 #include <Usagi/Core/Logging.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuImageView.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
+#include <Usagi/Runtime/Graphics/GpuImageView.hpp>
+#include <Usagi/Runtime/Graphics/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Runtime/Memory/BitmapMemoryAllocator.hpp>
 #include <Usagi/Utility/Flag.hpp>
 #include <Usagi/Utility/TypeCast.hpp>

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Runtime/Graphics/Resource/GpuSampler.hpp>
+#include <Usagi/Runtime/Graphics/GpuSampler.hpp>
 
 #include "VulkanShaderResource.hpp"
 #include "VulkanBatchResource.hpp"

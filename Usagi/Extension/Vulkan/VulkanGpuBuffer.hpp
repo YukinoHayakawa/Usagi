@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <Usagi/Runtime/Graphics/Resource/GpuBuffer.hpp>
+#include <Usagi/Runtime/Graphics/GpuBuffer.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GpuBufferUsage.hpp>
 
 #include "VulkanShaderResource.hpp"

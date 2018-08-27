@@ -1,6 +1,6 @@
 ﻿#include "VulkanGpuImage.hpp"
 
-#include <Usagi/Runtime/Graphics/Resource/GpuImageViewCreateInfo.hpp>
+#include <Usagi/Runtime/Graphics/GpuImageViewCreateInfo.hpp>
 
 #include "VulkanEnumTranslation.hpp"
 #include "VulkanGpuImageView.hpp"

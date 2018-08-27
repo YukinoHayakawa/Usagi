@@ -6,15 +6,15 @@
 #include <Usagi/Runtime/Graphics/GpuDevice.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsPipelineCompiler.hpp>
 #include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
-#include <Usagi/Runtime/Graphics/Resource/Framebuffer.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuBuffer.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuCommandPool.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuImage.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuImageCreateInfo.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuImageView.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuSampler.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
+#include <Usagi/Runtime/Graphics/Framebuffer.hpp>
+#include <Usagi/Runtime/Graphics/GpuBuffer.hpp>
+#include <Usagi/Runtime/Graphics/GpuCommandPool.hpp>
+#include <Usagi/Runtime/Graphics/GpuImage.hpp>
+#include <Usagi/Runtime/Graphics/GpuImageCreateInfo.hpp>
+#include <Usagi/Runtime/Graphics/GpuImageView.hpp>
+#include <Usagi/Runtime/Graphics/GpuSampler.hpp>
+#include <Usagi/Runtime/Graphics/GpuSamplerCreateInfo.hpp>
+#include <Usagi/Runtime/Graphics/GraphicsCommandList.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Utility/TypeCast.hpp>
 

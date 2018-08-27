@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Runtime/Graphics/Enum/CompareOp.hpp>
+#include "Enum/CompareOp.hpp"
 
 namespace usagi
 {

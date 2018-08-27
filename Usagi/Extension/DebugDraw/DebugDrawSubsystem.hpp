@@ -3,7 +3,7 @@
 #include <set>
 
 #include <Usagi/Core/Math.hpp>
-#include <Usagi/Runtime/Graphics/RenderableSubsystem.hpp>
+#include <Usagi/Graphics/RenderableSubsystem.hpp>
 
 #include "DebugDraw.hpp"
 

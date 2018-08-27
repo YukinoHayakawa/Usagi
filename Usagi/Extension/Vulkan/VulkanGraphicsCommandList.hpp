@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <Usagi/Runtime/Graphics/Resource/GraphicsCommandList.hpp>
+#include <Usagi/Runtime/Graphics/GraphicsCommandList.hpp>
 
 #include "VulkanBatchResource.hpp"
 

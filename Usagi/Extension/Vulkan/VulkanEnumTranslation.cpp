@@ -7,8 +7,8 @@
 #include <Usagi/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
 #include <Usagi/Runtime/Graphics/PipelineCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuImageViewCreateInfo.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuSamplerCreateInfo.hpp>
+#include <Usagi/Runtime/Graphics/GpuImageViewCreateInfo.hpp>
+#include <Usagi/Runtime/Graphics/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/Shader/ShaderStage.hpp>
 
 using namespace usagi;

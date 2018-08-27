@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <Usagi/Runtime/Graphics/Resource/GpuCommandPool.hpp>
+#include <Usagi/Runtime/Graphics/GpuCommandPool.hpp>
 
 namespace usagi
 {

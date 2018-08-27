@@ -1,7 +1,7 @@
 ﻿#include "VulkanMemoryPool.hpp"
 
 #include <Usagi/Core/Logging.hpp>
-#include <Usagi/Runtime/Graphics/Resource/GpuImageCreateInfo.hpp>
+#include <Usagi/Runtime/Graphics/GpuImageCreateInfo.hpp>
 #include <Usagi/Utility/Rounding.hpp>
 
 #include "VulkanGpuDevice.hpp"

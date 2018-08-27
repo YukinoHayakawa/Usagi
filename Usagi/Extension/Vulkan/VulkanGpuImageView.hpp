@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <Usagi/Runtime/Graphics/Resource/GpuImageView.hpp>
+#include <Usagi/Runtime/Graphics/GpuImageView.hpp>
 
 #include "VulkanBatchResource.hpp"
 #include "VulkanShaderResource.hpp"
