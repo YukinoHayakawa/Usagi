@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <Usagi/Engine/Utility/TypeCast.hpp>
-#include <Usagi/Engine/Utility/RotateCounter.hpp>
+#include <Usagi/Utility/TypeCast.hpp>
+#include <Usagi/Utility/RotateCounter.hpp>
 
 using namespace usagi;
 

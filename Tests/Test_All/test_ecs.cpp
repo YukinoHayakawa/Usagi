@@ -10,6 +10,7 @@
 #include <Usagi/Engine/Game/Game.hpp>
 #include <Usagi/Engine/Game/ConstrainedSubsystem.hpp>
 #include <Usagi/Engine/Utility/TypeCast.hpp>
+#include <chrono>
 
 using namespace usagi;
 
@@ -46,7 +47,7 @@ class PhysicsSubsystem
     Element *mEntity = nullptr;
 
 public:
-    void update(const std::chrono::seconds &dt) override
+    void update(const TimeDuration &dt) override
     {
         if(mEntity)
         {
@@ -58,7 +59,7 @@ public:
 
     void updateRegistry(Element *element) override
     {
-        if(handles(element))
+        if(processable(element))
             mEntity = element;
     }
 
@@ -172,11 +173,11 @@ TEST(ECSTest, ConstrainedSubsystemTest)
 {
     PhysicsSubsystem s;
     Element e { nullptr };
-    EXPECT_FALSE(s.handles(&e));
+    EXPECT_FALSE(s.processable(&e));
     e.addComponent<PositionComponent>();
-    EXPECT_FALSE(s.handles(&e));
+    EXPECT_FALSE(s.processable(&e));
     e.addComponent<PhysicalComponent>();
-    EXPECT_TRUE(s.handles(&e));
+    EXPECT_TRUE(s.processable(&e));
 }
 
 TEST(ECSTest, ComponentSystemInteractionTest)
@@ -233,13 +234,13 @@ TEST(ECSTest, PolymorphicComponentTest)
 
 namespace
 {
-class StrictElement : public Element
+class StrictElement : public ElementTreeNode<Element>
 {
 public:
-	StrictElement(Element *parent)
-		: Element { parent }
-	{
-	}
+    StrictElement(Element *parent)
+        : ElementTreeNode { parent }
+    {
+    }
 
 private:
     bool acceptChild(Element *child) override

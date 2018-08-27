@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <Usagi/Engine/Runtime/Graphics/Shader/SpirvBinary.hpp>
+#include <Usagi/Runtime/Graphics/Shader/SpirvBinary.hpp>
 
 using namespace usagi;
 

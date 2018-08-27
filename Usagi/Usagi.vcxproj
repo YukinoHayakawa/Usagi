@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{4250E1C0-EA0B-4575-BC04-11E7F83C2ED4}</ProjectGuid>
+    <RootNamespace>Usagi</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\UsagiProjects.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\UsagiProjects.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Asset\Asset.cpp" />
+    <ClCompile Include="Asset\AssetPackage.cpp" />
+    <ClCompile Include="Asset\AssetRoot.cpp" />
+    <ClCompile Include="Asset\Filesystem\FilesystemAsset.cpp" />
+    <ClCompile Include="Asset\Filesystem\FilesystemAssetPackage.cpp" />
+    <ClCompile Include="Camera\ModelViewCameraController.cpp" />
+    <ClCompile Include="Camera\PerspectiveCamera.cpp" />
+    <ClCompile Include="Core\Element.cpp" />
+    <ClCompile Include="Core\Event\Event.cpp" />
+    <ClCompile Include="Core\Logging.cpp" />
+    <ClCompile Include="Extension\DebugDraw\DebugDrawImpl.cpp" />
+    <ClCompile Include="Extension\DebugDraw\DebugDrawSubsystem.cpp" />
+    <ClCompile Include="Extension\ImGui\ImGuiImpl.cpp" />
+    <ClCompile Include="Extension\ImGui\ImGuiSubsystem.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanBufferAllocation.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanEnumTranslation.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanExtensions.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanFramebuffer.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGpuBuffer.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGpuCommandPool.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGpuDevice.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGpuImage.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGpuImageView.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGraphicsCommandList.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipeline.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipelineCompiler.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanMemoryPool.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanPooledImage.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanRenderPass.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanSampler.cpp" />
+    <ClCompile Include="Extension\Vulkan\WSI\VulkanSwapchain.cpp" />
+    <ClCompile Include="Extension\Vulkan\WSI\VulkanSwapchainImage.cpp" />
+    <ClCompile Include="Extension\Vulkan\WSI\VulkanWin32WSI.cpp" />
+    <ClCompile Include="Extension\Win32\Input\Win32Gamepad.cpp" />
+    <ClCompile Include="Extension\Win32\Input\Win32InputManager.cpp" />
+    <ClCompile Include="Extension\Win32\Input\Win32Keyboard.cpp" />
+    <ClCompile Include="Extension\Win32\Input\Win32Mouse.cpp" />
+    <ClCompile Include="Extension\Win32\Input\Win32RawInputDevice.cpp" />
+    <ClCompile Include="Extension\Win32\Win32Helper.cpp" />
+    <ClCompile Include="Extension\Win32\Win32Runtime.cpp" />
+    <ClCompile Include="Extension\Win32\Window\Win32Window.cpp" />
+    <ClCompile Include="Extension\Win32\Window\Win32WindowManager.cpp" />
+    <ClCompile Include="Game\Game.cpp" />
+    <ClCompile Include="Interactive\InputMap.cpp" />
+    <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
+    <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
+    <ClCompile Include="Runtime\Input\Keyboard\KeyCode.cpp" />
+    <ClCompile Include="Runtime\Input\Mouse\Mouse.cpp" />
+    <ClCompile Include="Runtime\Input\Mouse\MouseButtonCode.cpp" />
+    <ClCompile Include="Runtime\Memory\BitmapMemoryAllocator.cpp" />
+    <ClCompile Include="Transform\TransformSubsystem.cpp" />
+    <ClCompile Include="Utility\File.cpp" />
+    <ClCompile Include="Utility\Hash.cpp" />
+    <ClCompile Include="Utility\Unicode.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Asset\Asset.hpp" />
+    <ClInclude Include="Asset\AssetPackage.hpp" />
+    <ClInclude Include="Asset\AssetRoot.hpp" />
+    <ClInclude Include="Asset\AssetType.hpp" />
+    <ClInclude Include="Asset\Filesystem\FilesystemAsset.hpp" />
+    <ClInclude Include="Asset\Filesystem\FilesystemAssetPackage.hpp" />
+    <ClInclude Include="Camera\Camera.hpp" />
+    <ClInclude Include="Camera\CameraComponent.hpp" />
+    <ClInclude Include="Camera\ModelViewCameraController.hpp" />
+    <ClInclude Include="Camera\PerspectiveCamera.hpp" />
+    <ClInclude Include="Core\Component.hpp" />
+    <ClInclude Include="Core\Element.hpp" />
+    <ClInclude Include="Core\Event\Event.hpp" />
+    <ClInclude Include="Core\Event\Library\Component\ComponentAddedEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Component\ComponentEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Component\PostComponentRemovalEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Component\PreComponentRemovalEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Element\ChildElementAddedEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Element\ChildElementEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Element\ChildElementRemovedEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Element\ElementCreatedEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Element\PreElementRemovalEvent.hpp" />
+    <ClInclude Include="Core\Event\Library\Input\MouseMoveEvent.hpp" />
+    <ClInclude Include="Core\Logging.hpp" />
+    <ClInclude Include="Core\Math.hpp" />
+    <ClInclude Include="Core\Time.hpp" />
+    <ClInclude Include="Extension\DebugDraw\DebugDraw.hpp" />
+    <ClInclude Include="Extension\DebugDraw\DebugDrawComponent.hpp" />
+    <ClInclude Include="Extension\DebugDraw\DebugDrawSubsystem.hpp" />
+    <ClInclude Include="Extension\ImGui\ImGui.hpp" />
+    <ClInclude Include="Extension\ImGui\ImGuiComponent.hpp" />
+    <ClInclude Include="Extension\ImGui\ImGuiConfig.hpp" />
+    <ClInclude Include="Extension\ImGui\ImGuiSubsystem.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanBatchResource.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanBufferAllocation.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanEnumTranslation.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanFramebuffer.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGpuBuffer.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGpuCommandPool.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGpuDevice.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGpuImage.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGpuImageView.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGraphicsCommandList.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipeline.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipelineCompiler.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanHelper.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanMemoryPool.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanPooledImage.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanRenderPass.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanResourceInfo.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanSampler.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanSemaphore.hpp" />
+    <ClInclude Include="Extension\Vulkan\VulkanShaderResource.hpp" />
+    <ClInclude Include="Extension\Vulkan\WSI\VulkanSwapchain.hpp" />
+    <ClInclude Include="Extension\Vulkan\WSI\VulkanSwapchainImage.hpp" />
+    <ClInclude Include="Extension\Win32\Input\Win32Gamepad.hpp" />
+    <ClInclude Include="Extension\Win32\Input\Win32InputManager.hpp" />
+    <ClInclude Include="Extension\Win32\Input\Win32Keyboard.hpp" />
+    <ClInclude Include="Extension\Win32\Input\Win32Mouse.hpp" />
+    <ClInclude Include="Extension\Win32\Input\Win32RawInputDevice.hpp" />
+    <ClInclude Include="Extension\Win32\ntos.h" />
+    <ClInclude Include="Extension\Win32\Win32.hpp" />
+    <ClInclude Include="Extension\Win32\Win32Helper.hpp" />
+    <ClInclude Include="Extension\Win32\Win32MacroFix.hpp" />
+    <ClInclude Include="Extension\Win32\Win32Runtime.hpp" />
+    <ClInclude Include="Extension\Win32\Window\Win32Window.hpp" />
+    <ClInclude Include="Extension\Win32\Window\Win32WindowManager.hpp" />
+    <ClInclude Include="Game\ConstrainedSubsystem.hpp" />
+    <ClInclude Include="Game\Game.hpp" />
+    <ClInclude Include="Game\Subsystem.hpp" />
+    <ClInclude Include="Interactive\InputMap.hpp" />
+    <ClInclude Include="Runtime\EventEmitter.hpp" />
+    <ClInclude Include="Runtime\Graphics\Enum\CompareOp.hpp" />
+    <ClInclude Include="Runtime\Graphics\Enum\GpuBufferFormat.hpp" />
+    <ClInclude Include="Runtime\Graphics\Enum\GpuBufferUsage.hpp" />
+    <ClInclude Include="Runtime\Graphics\Enum\GpuImageLayout.hpp" />
+    <ClInclude Include="Runtime\Graphics\Enum\GpuImageUsage.hpp" />
+    <ClInclude Include="Runtime\Graphics\Enum\GraphicsImageLayout.hpp" />
+    <ClInclude Include="Runtime\Graphics\Enum\GraphicsIndexType.hpp" />
+    <ClInclude Include="Runtime\Graphics\Enum\GraphicsPipelineStage.hpp" />
+    <ClInclude Include="Runtime\Graphics\GpuDevice.hpp" />
+    <ClInclude Include="Runtime\Graphics\GpuSemaphore.hpp" />
+    <ClInclude Include="Runtime\Graphics\GraphicsPipeline.hpp" />
+    <ClInclude Include="Runtime\Graphics\GraphicsPipelineCompiler.hpp" />
+    <ClInclude Include="Runtime\Graphics\PipelineCreateInfo.hpp" />
+    <ClInclude Include="Runtime\Graphics\RenderableSubsystem.hpp" />
+    <ClInclude Include="Runtime\Graphics\RenderPass.hpp" />
+    <ClInclude Include="Runtime\Graphics\RenderPassCreateInfo.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\Framebuffer.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\GpuBuffer.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\GpuCommandPool.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\GpuImage.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\GpuImageCreateInfo.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\GpuImageView.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\GpuImageViewCreateInfo.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\GpuSampler.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\GpuSamplerCreateInfo.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\GraphicsCommandList.hpp" />
+    <ClInclude Include="Runtime\Graphics\Resource\ShaderResource.hpp" />
+    <ClInclude Include="Runtime\Graphics\Shader\ShaderStage.hpp" />
+    <ClInclude Include="Runtime\Graphics\Shader\SpirvBinary.hpp" />
+    <ClInclude Include="Runtime\Graphics\Swapchain.hpp" />
+    <ClInclude Include="Runtime\Input\Device.hpp" />
+    <ClInclude Include="Runtime\Input\DeviceEventListener.hpp" />
+    <ClInclude Include="Runtime\Input\DeviceType.hpp" />
+    <ClInclude Include="Runtime\Input\Gamepad\Gamepad.hpp" />
+    <ClInclude Include="Runtime\Input\Gamepad\GamepadButtonCode.hpp" />
+    <ClInclude Include="Runtime\Input\Gamepad\GamepadEventListener.hpp" />
+    <ClInclude Include="Runtime\Input\InputManager.hpp" />
+    <ClInclude Include="Runtime\Input\Keyboard\Keyboard.hpp" />
+    <ClInclude Include="Runtime\Input\Keyboard\KeyCode.hpp" />
+    <ClInclude Include="Runtime\Input\Keyboard\KeyEventListener.hpp" />
+    <ClInclude Include="Runtime\Input\Mouse\Mouse.hpp" />
+    <ClInclude Include="Runtime\Input\Mouse\MouseButtonCode.hpp" />
+    <ClInclude Include="Runtime\Input\Mouse\MouseEventListener.hpp" />
+    <ClInclude Include="Runtime\Memory\BitmapMemoryAllocator.hpp" />
+    <ClInclude Include="Runtime\Runtime.hpp" />
+    <ClInclude Include="Runtime\Window\Window.hpp" />
+    <ClInclude Include="Runtime\Window\WindowEventListener.hpp" />
+    <ClInclude Include="Runtime\Window\WindowManager.hpp" />
+    <ClInclude Include="Scene\Scene.hpp" />
+    <ClInclude Include="Transform\TransformComponent.hpp" />
+    <ClInclude Include="Transform\TransformSubsystem.hpp" />
+    <ClInclude Include="Transform\Util.hpp" />
+    <ClInclude Include="Utility\BitHack.hpp" />
+    <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
+    <ClInclude Include="Utility\EnumTranslator.hpp" />
+    <ClInclude Include="Utility\File.hpp" />
+    <ClInclude Include="Utility\Flag.hpp" />
+    <ClInclude Include="Utility\Hash.hpp" />
+    <ClInclude Include="Utility\Iterator.hpp" />
+    <ClInclude Include="Utility\Math.hpp" />
+    <ClInclude Include="Utility\Noncopyable.hpp" />
+    <ClInclude Include="Utility\RAIIHelper.hpp" />
+    <ClInclude Include="Utility\RotateCounter.hpp" />
+    <ClInclude Include="Utility\Rounding.hpp" />
+    <ClInclude Include="Utility\Singleton.hpp" />
+    <ClInclude Include="Utility\TypeCast.hpp" />
+    <ClInclude Include="Utility\Unicode.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Thirdparty\Submodules\glslang\glslang\glslang.vcxproj">
+      <Project>{cfebe9ae-9cf8-30fa-8fc0-31067e861f34}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\glslang\hlsl\HLSL.vcxproj">
+      <Project>{83d45e57-0b6e-3904-b1ac-b366ad1e8a72}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\glslang\OGLCompilersDLL\OGLCompiler.vcxproj">
+      <Project>{0747be93-f3c1-397f-bfc7-2a4ababe7ba7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\glslang\SPIRV\SPIRV.vcxproj">
+      <Project>{ab744df2-2244-3bd4-984e-6c3f82756fb5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\glslang\StandAlone\glslang-default-resource-limits.vcxproj">
+      <Project>{777ca18f-9fd4-3f3b-be41-0e7f78629123}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-core.vcxproj">
+      <Project>{5a2df431-3a80-3c06-b9b1-27430b56a29e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-cpp.vcxproj">
+      <Project>{38420c6a-42c5-3ab9-a6e5-59e445ac0e5e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-glsl.vcxproj">
+      <Project>{065dc5c3-4006-3e20-a116-6b66bf3d954b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-hlsl.vcxproj">
+      <Project>{e727a94c-0b46-3335-b1ea-d79477de7681}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-msl.vcxproj">
+      <Project>{17861b06-326c-313f-b531-6698f69a7e0a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-reflect.vcxproj">
+      <Project>{383414a1-4e4e-3867-b4d1-a695d8987077}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-util.vcxproj">
+      <Project>{88cc132d-bf6f-39b4-af07-17c68a1c42c0}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,48 @@
+[submodule "Thirdparty/Submodules/utfcpp"]
+	path = Thirdparty/Submodules/utfcpp
+	url = https://github.com/nemtrif/utfcpp.git
+	ignore = untracked
+[submodule "Thirdparty/Submodules/squall"]
+	path = Thirdparty/Submodules/squall
+	url = https://github.com/jonigata/squall.git
+	ignore = untracked
+[submodule "Thirdparty/Submodules/spdlog"]
+	path = Thirdparty/Submodules/spdlog
+	url = https://github.com/gabime/spdlog.git
+	ignore = untracked
+[submodule "Thirdparty/Submodules/fmt"]
+	path = Thirdparty/Submodules/fmt
+	url = https://github.com/fmtlib/fmt.git
+	ignore = untracked
+[submodule "Thirdparty/Submodules/glslang"]
+	path = Thirdparty/Submodules/glslang
+	url = https://github.com/KhronosGroup/glslang.git
+	ignore = untracked
+[submodule "Thirdparty/Submodules/imgui"]
+	path = Thirdparty/Submodules/imgui
+	url = https://github.com/ocornut/imgui.git
+	ignore = untracked
+[submodule "Thirdparty/Submodules/SPIRV-Cross"]
+	path = Thirdparty/Submodules/SPIRV-Cross
+	url = https://github.com/KhronosGroup/SPIRV-Cross.git
+	ignore = untracked
+[submodule "Thirdparty/Submodules/debug-draw"]
+	path = Thirdparty/Submodules/debug-draw
+	url = https://github.com/glampert/debug-draw.git
+	ignore = untracked
+[submodule "Thirdparty/Submodules/hg-git"]
+	path = Thirdparty/Submodules/hg-git
+	url = https://github.com/schacon/hg-git.git
+	ignore = untracked
+[submodule "Thirdparty/Submodules/squirrel"]
+	path = Thirdparty/Submodules/squirrel
+	url = https://github.com/albertodemichelis/squirrel.git
+	ignore = untracked
+[submodule "Thirdparty/Includes/debug-draw"]
+	path = Thirdparty/Includes/debug-draw
+	url = https://github.com/glampert/debug-draw.git
+	ignore = untracked
+[submodule "Thirdparty/Includes/imgui"]
+	path = Thirdparty/Includes/imgui
+	url = https://github.com/ocornut/imgui.git
+	ignore = untracked

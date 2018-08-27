@@ -15,22 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_asset.cpp">
+    <ClCompile Include="test_enum_translation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="test_shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_ecs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test_game.cpp">
+    <ClCompile Include="test_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

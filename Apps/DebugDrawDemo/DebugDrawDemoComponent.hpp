@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Engine/Extension/DebugDraw/DebugDrawComponent.hpp>
+#include <Usagi/Extension/DebugDraw/DebugDrawComponent.hpp>
 
 namespace usagi
 {

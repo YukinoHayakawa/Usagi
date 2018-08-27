@@ -1,6 +1,6 @@
 ﻿#include <gtest/gtest.h>
 
-#include <Usagi/Engine/Utility/EnumTranslator.hpp>
+#include <Usagi/Utility/EnumTranslator.hpp>
 
 enum class A
 {

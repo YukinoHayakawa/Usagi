@@ -12,7 +12,7 @@
 #include <utfcpp/utf8.h>
 
 #ifdef _WIN32
-#include <Usagi/Engine/Extension/Win32/Win32Helper.hpp>
+#include <Usagi/Extension/Win32/Win32Helper.hpp>
 #endif
 
 using namespace boost;

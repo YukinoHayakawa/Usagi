@@ -79,9 +79,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>squirrel_static.lib;sqstdlib_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
+    <Link />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -117,7 +115,6 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>squirrel_static.lib;sqstdlib_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -125,6 +122,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Script\Squirrel.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Thirdparty\Submodules\squirrel\sqstdlib\sqstdlib_static.vcxproj">
+      <Project>{b63f26e1-8b9d-337d-a915-46d01c319da7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Thirdparty\Submodules\squirrel\squirrel\squirrel_static.vcxproj">
+      <Project>{739ba726-d701-39f7-a9fe-aaf2c233e1f0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Usagi\Usagi.vcxproj">
+      <Project>{4250e1c0-ea0b-4575-bc04-11e7f83c2ed4}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include <Usagi/Engine/Game/Game.hpp>
-#include <Usagi/Engine/Interactive/InputMap.hpp>
-#include <Usagi/Engine/Runtime/Window/WindowEventListener.hpp>
+#include <Usagi/Game/Game.hpp>
+#include <Usagi/Interactive/InputMap.hpp>
+#include <Usagi/Runtime/Window/WindowEventListener.hpp>
 
 namespace usagi
 {
