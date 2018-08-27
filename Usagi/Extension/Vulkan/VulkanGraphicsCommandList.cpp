@@ -54,12 +54,14 @@ void usagi::VulkanGraphicsCommandList::imageTransition(
     barrier.setImage(vk_image.image());
     barrier.setOldLayout(translate(old_layout));
     barrier.setNewLayout(translate(new_layout));
-    const auto queue_family_index = mCommandPool->device()->graphicsQueueFamily();
+    const auto queue_family_index =
+        mCommandPool->device()->graphicsQueueFamily();
     barrier.setSrcQueueFamilyIndex(queue_family_index);
     barrier.setDstQueueFamilyIndex(queue_family_index);
 
     // modified from
     // https://harrylovescode.gitbooks.io/vulkan-api/content/chap07/chap07.html
+    // todo: not reliable
     using vk::AccessFlagBits;
     switch(barrier.oldLayout)
     {
@@ -125,7 +127,7 @@ void usagi::VulkanGraphicsCommandList::imageTransition(
 
 void usagi::VulkanGraphicsCommandList::clearColorImage(
     GpuImage *image,
-    GpuImageLayout layout,
+    const GpuImageLayout layout,
     Color4f color)
 {
     auto &vk_image = dynamic_cast_ref<VulkanGpuImage>(image);
@@ -191,6 +193,9 @@ void usagi::VulkanGraphicsCommandList::bindPipeline(
 {
     auto vk_pipeline =
         dynamic_pointer_cast_throw<VulkanGraphicsPipeline>(pipeline);
+
+    if(mCurrentPipeline == vk_pipeline) return;
+
     mCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics,
         vk_pipeline->pipeline());
     mCurrentPipeline = vk_pipeline;
