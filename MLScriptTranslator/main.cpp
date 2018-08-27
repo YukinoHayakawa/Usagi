@@ -590,7 +590,8 @@ struct Scene
                             auto &c = character(cn);
                             const auto expr = expect(TokenType::CHAR_PARAM);
                             const auto pos = expect(TokenType::CHAR_PARAM);
-                            charSay(cn, expr, pos, fmt::format("/* {} */ {}.say(\"{}\"); w();",
+                            charSay(cn, expr, pos, fmt::format(
+                                R"(/* {} */ {}.say("{}"); w();)",
                                 cn,
                                 c.obj,
                                 expect(TokenType::MESSAGE)
@@ -599,7 +600,8 @@ struct Scene
                         else
                         {
                             const auto cn = data();
-                            charMsg(cn, fmt::format("/* {} */ {}.message(\"{}\"); w();",
+                            charMsg(cn, fmt::format(
+                                R"(/* {} */ {}.message("{}"); w();)",
                                 cn,
                                 character(cn).obj,
                                 expect(TokenType::MESSAGE)
@@ -615,7 +617,8 @@ struct Scene
                             auto &c = character(real_name);
                             const auto expr = expect(TokenType::CHAR_PARAM);
                             const auto pos = expect(TokenType::CHAR_PARAM);
-                            charSay(real_name, expr, pos, fmt::format("/* {} */ {}.pretendSay(\"{}\", \"{}\"); w();",
+                            charSay(real_name, expr, pos, fmt::format(
+                                R"(/* {} */ {}.pretendSay("{}", "{}"); w();)",
                                 real_name,
                                 c.obj,
                                 pretend_name,
@@ -624,7 +627,8 @@ struct Scene
                         }
                         else
                         {
-                            charMsg(real_name, fmt::format("/* {} */ {}.pretendMessage(\"{}\", \"{}\"); w();",
+                            charMsg(real_name, fmt::format(
+                                R"(/* {} */ {}.pretendMessage("{}", "{}"); w();)",
                                 real_name,
                                 character(real_name).obj,
                                 pretend_name,
