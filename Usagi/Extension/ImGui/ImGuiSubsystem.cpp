@@ -127,8 +127,6 @@ usagi::ImGuiSubsystem::ImGuiSubsystem(
     mWindow->addEventListener(this);
     mKeyboard->addEventListener(this);
     mMouse->addEventListener(this);
-
-    mLastFrameBufferSize = mWindow->size().cast<float>();
 }
 
 usagi::ImGuiSubsystem::~ImGuiSubsystem()
@@ -192,7 +190,8 @@ void usagi::ImGuiSubsystem::createPipeline(
     }
     // Render Pass
     {
-        render_pass_info.attachment_usages[0].layout = GpuImageLayout::COLOR_ATTACHMENT;
+        render_pass_info.attachment_usages[0].layout =
+            GpuImageLayout::COLOR_ATTACHMENT;
         mRenderPass = gpu->createRenderPass(render_pass_info);
         compiler->setRenderPass(mRenderPass);
     }
@@ -260,7 +259,6 @@ void usagi::ImGuiSubsystem::render(
     const CommandListSink &cmd_out) const
 {
     render(framebuffer, cmd_out);
-    mLastFrameBufferSize = framebuffer->size().cast<float>();
 }
 
 void usagi::ImGuiSubsystem::newFrame(const float dt)
@@ -272,11 +270,10 @@ void usagi::ImGuiSubsystem::newFrame(const float dt)
     IM_ASSERT(io.Fonts->IsBuilt());
 
     // Setup display size
-    const auto d = mWindow->size().cast<float>();
-    // mLastFrameBufferSize ./ d
-    const auto s = mLastFrameBufferSize.cwiseQuotient(d);
+    // mFrameBufferSize ./ mWindowSize
+    const auto s = mFrameBufferSize.cwiseQuotient(mWindowSize);
 
-    io.DisplaySize = { d.x(), d.y() };
+    io.DisplaySize = { mWindowSize.x(), mWindowSize.y() };
     io.DisplayFramebufferScale = { s.x(), s.y() };
 
     // Setup time step
@@ -369,8 +366,8 @@ void usagi::ImGuiSubsystem::render(
 
     // Bind Vertex And Index Buffer
     {
-        cmd_list->bindVertexBuffer(0, mVertexBuffer.get(), 0);
-        cmd_list->bindIndexBuffer(mIndexBuffer.get(), 0,
+        cmd_list->bindVertexBuffer(0, mVertexBuffer, 0);
+        cmd_list->bindIndexBuffer(mIndexBuffer, 0,
             GraphicsIndexType::UINT16
         );
         mVertexBuffer->release();

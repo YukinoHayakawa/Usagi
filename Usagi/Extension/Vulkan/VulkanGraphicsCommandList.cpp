@@ -346,11 +346,11 @@ void usagi::VulkanGraphicsCommandList::setConstant(
 }
 
 void usagi::VulkanGraphicsCommandList::bindIndexBuffer(
-	GpuBuffer *buffer,
+    const std::shared_ptr<GpuBuffer> &buffer,
 	const std::size_t offset,
 	const GraphicsIndexType type)
 {
-	auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer);
+	auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer.get());
     auto allocation = vk_buffer.allocation();
 
     mCommandBuffer->bindIndexBuffer(
@@ -363,10 +363,10 @@ void usagi::VulkanGraphicsCommandList::bindIndexBuffer(
 
 void usagi::VulkanGraphicsCommandList::bindVertexBuffer(
 	const std::uint32_t binding_index,
-	GpuBuffer *buffer,
+    const std::shared_ptr<GpuBuffer> &buffer,
 	const std::size_t offset)
 {
-	auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer);
+	auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer.get());
     auto allocation = vk_buffer.allocation();
 
 	vk::Buffer buffers[] = { allocation->pool()->buffer() };

@@ -3,7 +3,7 @@
 #include <memory>
 #include <set>
 
-#include <Usagi/Graphics/RenderableSubsystem.hpp>
+#include <Usagi/Graphics/OverlayRenderingSubsystem.hpp>
 #include <Usagi/Runtime/Input/Keyboard/KeyEventListener.hpp>
 #include <Usagi/Runtime/Input/Mouse/MouseEventListener.hpp>
 #include <Usagi/Runtime/Graphics/GpuImage.hpp>
@@ -25,7 +25,7 @@ class Mouse;
 struct ImGuiComponent;
 
 class ImGuiSubsystem
-    : public RenderableSubsystem
+    : public OverlayRenderingSubsystem
     , public KeyEventListener
     , public MouseEventListener
     , public WindowEventListener
@@ -37,7 +37,6 @@ class ImGuiSubsystem
 
     ImGuiContext *mContext = nullptr;
     bool mMouseJustPressed[5] = { };
-    mutable Vector2f mLastFrameBufferSize;
 
     std::set<Element*> mRegistry;
 

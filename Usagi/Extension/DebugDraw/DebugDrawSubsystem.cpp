@@ -37,11 +37,6 @@ void usagi::DebugDrawSubsystem::createPipelines(
     createTextPipeline();
 }
 
-void usagi::DebugDrawSubsystem::setWorldToNDC(const Projective3f &mat)
-{
-    mWorldToNDC = mat;
-}
-
 void usagi::DebugDrawSubsystem::createPointLinePipeline()
 {
     auto gpu = mGame->runtime()->gpu();
@@ -183,8 +178,6 @@ void usagi::DebugDrawSubsystem::render(
     const std::shared_ptr<Framebuffer> framebuffer,
     const CommandListSink &cmd_out) const
 {
-    mDisplaySize = framebuffer->size().cast<float>();
-
     mCurrentCmdList = mCommandPool->allocateGraphicsCommandList();
     mCurrentCmdList->beginRecording();
     mCurrentCmdList->beginRendering(mRenderPass, framebuffer);
@@ -265,7 +258,7 @@ void usagi::DebugDrawSubsystem::drawPointList(
         ShaderStage::VERTEX, "u_MvpMatrix",
         mWorldToNDC.data(), 16 * sizeof(float)
     );
-    mCurrentCmdList->bindVertexBuffer(0, mVertexBuffer.get(), 0);
+    mCurrentCmdList->bindVertexBuffer(0, mVertexBuffer, 0);
     mCurrentCmdList->drawInstanced(count, 1, 0, 0);
     mVertexBuffer->release();
 }
@@ -293,7 +286,7 @@ void usagi::DebugDrawSubsystem::drawLineList(
         ShaderStage::VERTEX, "u_MvpMatrix",
         mWorldToNDC.data(), 16 * sizeof(float)
     );
-    mCurrentCmdList->bindVertexBuffer(0, mVertexBuffer.get(), 0);
+    mCurrentCmdList->bindVertexBuffer(0, mVertexBuffer, 0);
     mCurrentCmdList->drawInstanced(count, 1, 0, 0);
     mVertexBuffer->release();
 }
@@ -312,13 +305,13 @@ void usagi::DebugDrawSubsystem::drawGlyphList(
     mCurrentCmdList->bindPipeline(mTextPipeline);
     mCurrentCmdList->setConstant(
         ShaderStage::VERTEX, "u_screenDimensions",
-        mDisplaySize.data(), 2 * sizeof(float)
+        mWindowSize.data(), 2 * sizeof(float)
     );
     mCurrentCmdList->bindResourceSet(0, {
         mFontSampler,
         reinterpret_cast<GpuImageView*>(glyph_tex)->shared_from_this()
     });
-    mCurrentCmdList->bindVertexBuffer(0, mVertexBuffer.get(), 0);
+    mCurrentCmdList->bindVertexBuffer(0, mVertexBuffer, 0);
     mCurrentCmdList->drawInstanced(count, 1, 0, 0);
     mVertexBuffer->release();
 }

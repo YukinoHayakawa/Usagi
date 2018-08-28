@@ -54,6 +54,7 @@ public:
 
     void bindPipeline(std::shared_ptr<GraphicsPipeline> pipeline) override;
 
+    // todo optimize out binding the same set of resources
     void bindResourceSet(
         std::uint32_t set_id,
         std::initializer_list<std::shared_ptr<ShaderResource>> resources
@@ -75,12 +76,12 @@ public:
         const void *data,
         std::size_t size) override;
     void bindIndexBuffer(
-        GpuBuffer *buffer,
+        const std::shared_ptr<GpuBuffer> &buffer,
         std::size_t offset,
         GraphicsIndexType type) override;
     void bindVertexBuffer(
         std::uint32_t binding_index,
-        GpuBuffer *buffer,
+        const std::shared_ptr<GpuBuffer> &buffer,
         std::size_t offset) override;
 
     void drawInstanced(

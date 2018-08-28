@@ -12,5 +12,5 @@ layout(location = 0) in struct{
 
 void main()
 {
-    fColor = In.Color * texture(sampler2D(tex, samp), In.UV.st);
+    fColor = In.Color * texture(sampler2D(tex, samp), In.UV.xy);
 }

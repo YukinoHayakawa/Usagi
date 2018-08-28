@@ -172,6 +172,7 @@ void usagi::DebugDrawDemo::run()
             // world -> camera local -> NDC
             mCamera->projectionMatrix() *
             mCameraTransform->local_to_parent.inverse());
+        mDebugDraw->setRenderSizes(mWindow->size(), framebuffer->size());
         update(dt);
 
         // Record command lists

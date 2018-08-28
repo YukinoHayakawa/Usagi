@@ -17,6 +17,10 @@ class GpuImage;
 class GpuBuffer;
 class Framebuffer;
 
+/**
+ * \brief Device states including resource bindings are reset between
+ * command lists.
+ */
 class GraphicsCommandList : Noncopyable
 {
 public:
@@ -104,7 +108,7 @@ public:
 	) = 0;
 
     virtual void bindIndexBuffer(
-        GpuBuffer *buffer,
+        const std::shared_ptr<GpuBuffer> &buffer,
         std::size_t offset,
         GraphicsIndexType type
     ) = 0;
@@ -118,7 +122,7 @@ public:
      */
     virtual void bindVertexBuffer(
         std::uint32_t binding_index,
-        GpuBuffer *buffer,
+        const std::shared_ptr<GpuBuffer> &buffer,
         std::size_t offset
     ) = 0;
 

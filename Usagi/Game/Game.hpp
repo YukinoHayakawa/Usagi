@@ -3,10 +3,10 @@
 #include <memory>
 #include <vector>
 
-#include <Usagi/Utility/Noncopyable.hpp>
 #include <Usagi/Core/Element.hpp>
-#include <Usagi/Utility/TypeCast.hpp>
 #include <Usagi/Core/Time.hpp>
+#include <Usagi/Utility/Noncopyable.hpp>
+#include <Usagi/Utility/TypeCast.hpp>
 
 namespace usagi
 {
@@ -53,10 +53,12 @@ public:
         std::string name,
         std::unique_ptr<SubsystemT> subsystem)
     {
-        return static_cast<SubsystemT*>(addSubsystemPtr(
+        auto ptr = subsystem.get();
+        addSubsystemPtr(
             std::move(name),
             unique_pointer_cast<Subsystem>(std::move(subsystem))
-        ));
+        );
+        return ptr;
     }
 
     void enableSubsystem(const std::string& subsystem_name);
