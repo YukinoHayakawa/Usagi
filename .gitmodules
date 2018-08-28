@@ -46,3 +46,9 @@
 	path = Thirdparty/Includes/imgui
 	url = https://github.com/ocornut/imgui.git
 	ignore = untracked
+[submodule "Thirdparty/Submodules/stb"]
+	path = Thirdparty/Submodules/stb
+	url = https://github.com/nothings/stb.git
+[submodule "Thirdparty/Includes/stb"]
+	path = Thirdparty/Includes/stb
+	url = https://github.com/nothings/stb.git

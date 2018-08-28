@@ -18,6 +18,11 @@ public:
     virtual std::shared_ptr<GpuImageView> createView(
         const GpuImageViewCreateInfo &info) = 0;
 
+    /**
+     * \brief Upload image data to GPU memory.
+     * \param data
+     * \param size
+     */
     virtual void upload(const void *data, std::size_t size)
     {
         throw std::runtime_error("Operation not supported.");

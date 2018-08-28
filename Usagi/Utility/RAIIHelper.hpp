@@ -6,13 +6,14 @@
 
 namespace usagi
 {
+template <typename Create, typename Release>
 class RAIIHelper : Noncopyable
 {
-    std::function<void()> mCreate, mRelease;
+    Create mCreate;
+    Release mRelease;
 
 public:
-    // todo: template params
-	RAIIHelper(std::function<void()> create, std::function<void()> release)
+	RAIIHelper(Create create, Release release)
 		: mCreate { std::move(create) }
 		, mRelease { std::move(release) }
 	{

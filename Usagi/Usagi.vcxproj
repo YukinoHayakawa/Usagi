@@ -128,6 +128,7 @@
     <ClCompile Include="Asset\AssetRoot.cpp" />
     <ClCompile Include="Asset\Filesystem\FilesystemAsset.cpp" />
     <ClCompile Include="Asset\Filesystem\FilesystemAssetPackage.cpp" />
+    <ClCompile Include="Asset\Importer\StbImage.cpp" />
     <ClCompile Include="Camera\ModelViewCameraController.cpp" />
     <ClCompile Include="Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="Core\Element.cpp" />
@@ -179,12 +180,15 @@
     <ClCompile Include="Utility\Unicode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation\AnimationComponent.hpp" />
+    <ClInclude Include="Animation\Easing.hpp" />
     <ClInclude Include="Asset\Asset.hpp" />
     <ClInclude Include="Asset\AssetPackage.hpp" />
     <ClInclude Include="Asset\AssetRoot.hpp" />
     <ClInclude Include="Asset\AssetType.hpp" />
     <ClInclude Include="Asset\Filesystem\FilesystemAsset.hpp" />
     <ClInclude Include="Asset\Filesystem\FilesystemAssetPackage.hpp" />
+    <ClInclude Include="Asset\Importer\StbImage.hpp" />
     <ClInclude Include="Camera\Camera.hpp" />
     <ClInclude Include="Camera\CameraComponent.hpp" />
     <ClInclude Include="Camera\ModelViewCameraController.hpp" />
