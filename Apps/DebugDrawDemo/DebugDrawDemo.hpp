@@ -2,27 +2,21 @@
 
 #include <Usagi/Game/Game.hpp>
 #include <Usagi/Interactive/InputMap.hpp>
-#include <Usagi/Runtime/Window/WindowEventListener.hpp>
+#include <Usagi/Game/SingleWindowGame.hpp>
 
 namespace usagi
 {
 class PerspectiveCamera;
 struct CameraComponent;
 struct TransformComponent;
-class Runtime;
 class DebugDrawSubsystem;
 class GpuImage;
-class Swapchain;
 class ModelViewCameraController;
-class Window;
 
 class DebugDrawDemo
-    : public Game
-    , public WindowEventListener
+    : public SingleWindowGame
     , public MouseEventListener
 {
-    std::shared_ptr<Window> mWindow;
-    std::shared_ptr<Swapchain> mSwapchain;
     std::shared_ptr<GpuImage> mDepthBuffer;
     DebugDrawSubsystem *mDebugDraw = nullptr;
     Element *mDebugDrawRoot = nullptr;
@@ -32,9 +26,7 @@ class DebugDrawDemo
     std::unique_ptr<ModelViewCameraController> mCameraController;
     InputMap mInputMap;
 
-    void createWindow();
     void setupInput();
-    void setupGraphics();
     void createRenderTargets();
     void setupDebugDraw();
     void setupCamera();
@@ -44,7 +36,6 @@ public:
     ~DebugDrawDemo();
 
     void onMouseButtonStateChange(const MouseButtonEvent &e) override;
-    void onWindowResizeEnd(const WindowSizeEvent &e) override;
     void run();
 };
 }

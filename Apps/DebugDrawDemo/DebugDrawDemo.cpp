@@ -27,37 +27,15 @@
 
 #include "DebugDrawDemoComponent.hpp"
 
-void usagi::DebugDrawDemo::createWindow()
-{
-    runtime()->initWindow();
-    mWindow = runtime()->windowManager()->createWindow(
-        u8"🐰 - DebugDraw Demo",
-        Vector2i { 100, 100 },
-        Vector2u32 { 1920, 1080 }
-    );
-    mWindow->addEventListener(this);
-}
-
 void usagi::DebugDrawDemo::setupInput()
 {
-    runtime()->initInput();
     const auto mouse = runtime()->inputManager()->virtualMouse();
     mouse->addEventListener(&mInputMap);
     mouse->addEventListener(this);
 }
 
-void usagi::DebugDrawDemo::setupGraphics()
-{
-    runtime()->initGpu();
-    auto gpu = runtime()->gpu();
-    mSwapchain = gpu->createSwapchain(mWindow.get());
-    createRenderTargets();
-}
-
 void usagi::DebugDrawDemo::createRenderTargets()
 {
-    mSwapchain->create(mWindow->size(), GpuBufferFormat::R8G8B8A8_UNORM);
-
     // Create depth buffer
     {
         GpuImageCreateInfo info;
@@ -70,7 +48,8 @@ void usagi::DebugDrawDemo::createRenderTargets()
 
 void usagi::DebugDrawDemo::setupDebugDraw()
 {
-    assets()->addChild<FilesystemAssetPackage>("dd", "Data/debugdraw");
+    assets()->addChild<FilesystemAssetPackage>(
+        runtime(), "dd", "Data/debugdraw");
     mDebugDraw = addSubsystem("dd", std::make_unique<DebugDrawSubsystem>(
         this
     ));
@@ -114,11 +93,15 @@ void usagi::DebugDrawDemo::setupCamera()
 }
 
 usagi::DebugDrawDemo::DebugDrawDemo(Runtime *runtime)
-    : Game { runtime }
+    : SingleWindowGame {
+        runtime,
+        u8"🐰 - DebugDraw Demo",
+        Vector2i { 100, 100 },
+        Vector2u32 { 1920, 1080 }
+    }
 {
-    createWindow();
     setupInput();
-    setupGraphics();
+    createRenderTargets();
     setupDebugDraw();
     setupCamera();
 }
@@ -131,12 +114,6 @@ void usagi::DebugDrawDemo::onMouseButtonStateChange(const MouseButtonEvent &e)
 {
     if(e.button == MouseButtonCode::RIGHT)
         e.mouse->setImmersiveMode(e.pressed);
-}
-
-void usagi::DebugDrawDemo::onWindowResizeEnd(const WindowSizeEvent &e)
-{
-    if(e.size.x() != 0 && e.size.y() != 0)
-        createRenderTargets();
 }
 
 void usagi::DebugDrawDemo::run()

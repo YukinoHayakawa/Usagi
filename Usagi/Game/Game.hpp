@@ -23,6 +23,7 @@ struct SubsystemInfo
 
 class Game : Noncopyable
 {
+protected:
     // Multiple Game may use the same runtime.
     Runtime* mRuntime = nullptr;
     std::vector<SubsystemInfo> mSubsystems;

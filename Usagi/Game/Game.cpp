@@ -32,6 +32,7 @@ usagi::Game::Game(Runtime *runtime)
 
 usagi::Game::~Game()
 {
+    // destruct Subsystems
 }
 
 std::vector<usagi::SubsystemInfo>::iterator usagi::Game::findSubsystemByName(

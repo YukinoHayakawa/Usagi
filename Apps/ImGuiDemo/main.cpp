@@ -1,8 +1,7 @@
 ﻿#include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Filesystem/FilesystemAssetPackage.hpp>
 #include <Usagi/Core/Logging.hpp>
-#include <Usagi/Game/Game.hpp>
-#include <Usagi/Runtime/Graphics/Enum/GpuBufferFormat.hpp>
+#include <Usagi/Game/SingleWindowGame.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
 #include <Usagi/Runtime/Graphics/Framebuffer.hpp>
 #include <Usagi/Runtime/Graphics/GpuDevice.hpp>
@@ -11,8 +10,6 @@
 #include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/Swapchain.hpp>
 #include <Usagi/Runtime/Input/InputManager.hpp>
-#include <Usagi/Runtime/Input/Keyboard/Keyboard.hpp>
-#include <Usagi/Runtime/Input/Mouse/Mouse.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Runtime/Window/Window.hpp>
 #include <Usagi/Runtime/Window/WindowManager.hpp>
@@ -33,39 +30,24 @@ struct ImGuiDemoComponent : ImGuiComponent
     }
 };
 
-class ImGuiDemo
-    : public Game
-    , public WindowEventListener
+class ImGuiDemo : public SingleWindowGame
 {
-    std::shared_ptr<Window> mWindow;
-    std::shared_ptr<Swapchain> mSwapchain;
     ImGuiSubsystem *mImGui = nullptr;
     RenderPassCreateInfo mAttachments;
     Element *mImGuiRoot = nullptr;
 
 public:
     explicit ImGuiDemo(Runtime *runtime)
-        : Game { runtime }
-    {
-        // Setting up window
-        runtime->initWindow();
-        mWindow = runtime->windowManager()->createWindow(
+        : SingleWindowGame {
+            runtime,
             u8"🐰 - ImGui Demo",
             Vector2i { 100, 100 },
             Vector2u32 { 1920, 1080 }
-        );
-        mWindow->addEventListener(this);
-
-        // Setting up graphics
-        runtime->initGpu();
-        mSwapchain = runtime->gpu()->createSwapchain(mWindow.get());
-        mSwapchain->create(mWindow->size(), GpuBufferFormat::R8G8B8A8_UNORM);
-
-        // Setting up input
-        runtime->initInput();
-
+        }
+    {
         // Setting up ImGui
-        assets()->addChild<FilesystemAssetPackage>("imgui", "Data/imgui");
+        assets()->addChild<FilesystemAssetPackage>(
+            runtime, "imgui", "Data/imgui");
         const auto input_manager = runtime->inputManager();
         mImGui = addSubsystem("imgui", std::make_unique<ImGuiSubsystem>(
             this,
@@ -85,12 +67,6 @@ public:
 
         mImGuiRoot = rootElement()->addChild("ImGuiRoot");
         mImGuiRoot->addComponent<ImGuiDemoComponent>();
-    }
-
-    void onWindowResizeEnd(const WindowSizeEvent &e) override
-    {
-        if(e.size.x() != 0 && e.size.y() != 0)
-            mSwapchain->resize(e.size);
     }
 
     void run()

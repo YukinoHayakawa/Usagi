@@ -167,6 +167,7 @@
     <ClCompile Include="Extension\Win32\Window\Win32Window.cpp" />
     <ClCompile Include="Extension\Win32\Window\Win32WindowManager.cpp" />
     <ClCompile Include="Game\Game.cpp" />
+    <ClCompile Include="Game\SingleWindowGame.cpp" />
     <ClCompile Include="Interactive\InputMap.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
@@ -181,7 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationComponent.hpp" />
-    <ClInclude Include="Animation\Easing.hpp" />
+    <ClInclude Include="Animation\Timing.hpp" />
     <ClInclude Include="Asset\Asset.hpp" />
     <ClInclude Include="Asset\AssetPackage.hpp" />
     <ClInclude Include="Asset\AssetRoot.hpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="Extension\Win32\Window\Win32WindowManager.hpp" />
     <ClInclude Include="Game\ConstrainedSubsystem.hpp" />
     <ClInclude Include="Game\Game.hpp" />
+    <ClInclude Include="Game\SingleWindowGame.hpp" />
     <ClInclude Include="Game\Subsystem.hpp" />
     <ClInclude Include="Geometry\GeometryComponent.hpp" />
     <ClInclude Include="Graphics\OverlayRenderingSubsystem.hpp" />

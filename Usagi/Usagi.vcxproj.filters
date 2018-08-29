@@ -180,6 +180,9 @@
     <ClCompile Include="Asset\Importer\StbImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Game\SingleWindowGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asset\Filesystem\FilesystemAsset.hpp">
@@ -611,10 +614,13 @@
     <ClInclude Include="Animation\AnimationComponent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\Easing.hpp">
+    <ClInclude Include="Asset\Importer\StbImage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Asset\Importer\StbImage.hpp">
+    <ClInclude Include="Animation\Timing.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SingleWindowGame.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
