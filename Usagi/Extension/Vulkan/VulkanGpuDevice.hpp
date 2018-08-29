@@ -48,12 +48,21 @@ class VulkanGpuDevice : public GpuDevice
     void selectPhysicalDevice();
     void createDeviceAndQueues();
 
-    // Buffer Management
+    // Memory Management
 
     using BitmapBufferPool = VulkanBufferMemoryPool<BitmapMemoryAllocator>;
+    /**
+     * \brief Used for per-frame updated buffers and resource staging.
+     */
     std::unique_ptr<BitmapBufferPool> mDynamicBufferPool;
+
     using BitmapImagePool = VulkanImageMemoryPool<BitmapMemoryAllocator>;
-    std::unique_ptr<BitmapImagePool> mHostImagePool;
+    /**
+     * \brief Used for device-local textures.
+     */
+    std::unique_ptr<BitmapImagePool> mDeviceImagePool;
+
+    vk::UniqueCommandPool mTransferCommandPool;
 
     void createMemoryPools();
 
@@ -102,5 +111,11 @@ public:
     uint32_t graphicsQueueFamily() const;
 
     vk::Queue presentQueue() const;
+
+    std::shared_ptr<VulkanBufferAllocation> allocateStageBuffer(
+        std::size_t size);
+    void copyBufferToImage(
+        const std::shared_ptr<VulkanBufferAllocation> &buffer,
+        VulkanGpuImage *image);
 };
 }

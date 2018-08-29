@@ -8,28 +8,26 @@ class VulkanMemoryPool;
 
 class VulkanPooledImage : public VulkanGpuImage
 {
-    VulkanMemoryPool *mPool = nullptr;
     vk::UniqueImage mImage;
-    std::size_t mOffset;
-    std::size_t mSize;
-    void *mMappedAddress = nullptr;
+    VulkanMemoryPool *mPool = nullptr;
+    std::size_t mBufferOffset;
+    std::size_t mBufferSize;
 
     friend class VulkanMemoryPool;
-    void createBaseView();
 
 public:
     VulkanPooledImage(
-        VulkanMemoryPool *pool,
         vk::UniqueImage vk_image,
         vk::Format format,
-        std::size_t offset,
-        std::size_t size,
-        void *mapped_address);
+        const Vector2u32 &size,
+        VulkanMemoryPool *pool,
+        std::size_t buffer_offset,
+        std::size_t buffer_size);
     ~VulkanPooledImage();
 
     void upload(const void *data, std::size_t size) override;
 
     vk::Image image() const override { return mImage.get(); }
-    std::size_t offset() const { return mOffset; }
+    std::size_t offset() const { return mBufferOffset; }
 };
 }

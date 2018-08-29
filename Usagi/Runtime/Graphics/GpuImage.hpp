@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <Usagi/Utility/Noncopyable.hpp>
+#include <Usagi/Core/Math.hpp>
 
 namespace usagi
 {
@@ -14,6 +15,7 @@ class GpuImage : Noncopyable
 public:
     virtual ~GpuImage() = default;
 
+    virtual Vector2u32 size() const = 0;
     virtual std::shared_ptr<GpuImageView> baseView() = 0;
     virtual std::shared_ptr<GpuImageView> createView(
         const GpuImageViewCreateInfo &info) = 0;

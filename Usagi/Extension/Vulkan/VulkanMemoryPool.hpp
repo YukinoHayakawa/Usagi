@@ -3,12 +3,14 @@
 #include <vulkan/vulkan.hpp>
 
 #include <Usagi/Utility/Noncopyable.hpp>
+#include <Usagi/Runtime/Graphics/GpuImageCreateInfo.hpp>
 
 #include "VulkanBufferAllocation.hpp"
 #include "VulkanPooledImage.hpp"
 
 namespace usagi
 {
+class GpuCommandPool;
 struct GpuImageCreateInfo;
 class VulkanGpuDevice;
 class VulkanBufferAllocation;
@@ -154,9 +156,8 @@ public:
         try
         {
             auto wrapper = std::make_shared<VulkanPooledImage>(
-                this,
-                std::move(image), vk_format,
-                offset, req.size, mMappedMemory + offset
+                std::move(image), vk_format, info.size,
+                this, offset, req.size
             );
             bindImageMemory(wrapper.get());
             createImageBaseView(wrapper.get());

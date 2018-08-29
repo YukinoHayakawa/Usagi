@@ -285,7 +285,7 @@ void usagi::VulkanSwapchain::getSwapchainImages()
     for(auto &&vk_image : images)
     {
         mSwapchainImages.push_back(std::make_shared<VulkanSwapchainImage>(
-            mDevice->device(), vk_image, mFormat.format));
+            mDevice->device(), vk_image, mFormat.format, mSize));
     }
     mCurrentImageIndex = INVALID_IMAGE_INDEX;
 }

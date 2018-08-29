@@ -32,7 +32,7 @@ public:
     // Setup commands
     // Cannot be used between beginRender() and endRender().
 
-    // todo: demo purpose only. too complicated.
+    // todo: demo purpose only. should be removed.
     virtual void imageTransition(
         GpuImage *image,
         GpuImageLayout old_layout,

@@ -48,10 +48,12 @@ void usagi::VulkanGpuImage::createBaseView()
 }
 
 usagi::VulkanGpuImage::VulkanGpuImage(
-    vk::Device vk_device,
-    vk::Format format)
+    const vk::Device vk_device,
+    const vk::Format format,
+    const Vector2u32 &size)
     : mDevice(vk_device)
     , mFormat(format)
+    , mSize(size)
 {
 }
 

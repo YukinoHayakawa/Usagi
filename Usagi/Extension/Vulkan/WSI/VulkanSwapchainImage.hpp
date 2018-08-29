@@ -13,7 +13,8 @@ public:
     VulkanSwapchainImage(
         vk::Device device,
         vk::Image image,
-        vk::Format format);
+        vk::Format format,
+        const Vector2u32 &size);
 
     vk::Image image() const override { return mImage; }
 };

@@ -1,11 +1,12 @@
 ﻿#include "VulkanSwapchainImage.hpp"
 
 usagi::VulkanSwapchainImage::VulkanSwapchainImage(
-    vk::Device device,
-    vk::Image image,
-    vk::Format format)
-    : VulkanGpuImage(device, format)
+    const vk::Device device,
+    const vk::Image image,
+    const vk::Format format,
+    const Vector2u32 &size)
+    : VulkanGpuImage(device, format, size)
     , mImage(image)
 {
-    createBaseView();
+    VulkanGpuImage::createBaseView();
 }

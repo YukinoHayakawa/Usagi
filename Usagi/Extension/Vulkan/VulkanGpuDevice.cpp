@@ -282,6 +282,7 @@ void usagi::VulkanGpuDevice::createMemoryPools()
         1024 * 1024 * 128, // 512MiB  todo from config
         vk::MemoryPropertyFlagBits::eHostVisible |
         vk::MemoryPropertyFlagBits::eHostCoherent,
+        vk::BufferUsageFlagBits::eTransferSrc |
         vk::BufferUsageFlagBits::eVertexBuffer |
         vk::BufferUsageFlagBits::eIndexBuffer |
         vk::BufferUsageFlagBits::eUniformBuffer,
@@ -294,11 +295,11 @@ void usagi::VulkanGpuDevice::createMemoryPools()
         }
     );
 
-    mHostImagePool = std::make_unique<BitmapImagePool>(
+    mDeviceImagePool = std::make_unique<BitmapImagePool>(
         this,
         1024 * 1024 * 128, // 512MiB  todo from config
-        vk::MemoryPropertyFlagBits::eHostVisible |
-        vk::MemoryPropertyFlagBits::eHostCoherent,
+        vk::MemoryPropertyFlagBits::eDeviceLocal,
+        vk::ImageUsageFlagBits::eTransferDst |
         vk::ImageUsageFlagBits::eSampled,
         [](const vk::MemoryRequirements &req) {
             return std::make_unique<BitmapMemoryAllocator>(
@@ -308,6 +309,14 @@ void usagi::VulkanGpuDevice::createMemoryPools()
             );
         }
     );
+
+    {
+        vk::CommandPoolCreateInfo info;
+        // todo use DMA queue
+        info.setQueueFamilyIndex(mGraphicsQueueFamilyIndex);
+        info.setFlags(vk::CommandPoolCreateFlagBits::eTransient);
+        mTransferCommandPool = mDevice->createCommandPoolUnique(info);
+    }
 }
 
 usagi::VulkanGpuDevice::VulkanGpuDevice()
@@ -374,7 +383,7 @@ std::shared_ptr<usagi::GpuImage> usagi::VulkanGpuDevice::createImage(
     const GpuImageCreateInfo &info)
 {
     // todo check format availability
-    return mHostImagePool->createPooledImage(info);
+    return mDeviceImagePool->createPooledImage(info);
 }
 
 std::shared_ptr<usagi::GpuSampler> usagi::VulkanGpuDevice::createSampler(
@@ -482,4 +491,89 @@ vk::Device usagi::VulkanGpuDevice::device() const
 vk::PhysicalDevice usagi::VulkanGpuDevice::physicalDevice() const
 {
     return mPhysicalDevice;
+}
+
+std::shared_ptr<usagi::VulkanBufferAllocation>
+usagi::VulkanGpuDevice::allocateStageBuffer(std::size_t size)
+{
+    return mDynamicBufferPool->allocate(size);
+}
+
+void usagi::VulkanGpuDevice::copyBufferToImage(
+    const std::shared_ptr<VulkanBufferAllocation> &buffer,
+    VulkanGpuImage *image)
+{
+    vk::UniqueCommandBuffer cmd;
+    {
+        vk::CommandBufferAllocateInfo info;
+        info.setCommandBufferCount(1);
+        info.setCommandPool(mTransferCommandPool.get());
+        info.setLevel(vk::CommandBufferLevel::ePrimary);
+
+        cmd = std::move(mDevice->allocateCommandBuffersUnique(info).front());
+    }
+    {
+        vk::CommandBufferBeginInfo info;
+        info.setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+        cmd->begin(info);
+    }
+    vk::ImageSubresourceRange range;
+    range.setAspectMask(vk::ImageAspectFlagBits::eColor);
+    range.setBaseArrayLayer(0);
+    range.setLayerCount(1);
+    range.setBaseMipLevel(0);
+    range.setLevelCount(1);
+    {
+        vk::ImageMemoryBarrier barrier;
+        barrier.setImage(image->image());
+        barrier.setOldLayout(vk::ImageLayout::eUndefined);
+        barrier.setNewLayout(vk::ImageLayout::eTransferDstOptimal);
+        barrier.setSrcQueueFamilyIndex(mGraphicsQueueFamilyIndex);
+        barrier.setDstQueueFamilyIndex(mGraphicsQueueFamilyIndex);
+        barrier.setSrcAccessMask(vk::AccessFlagBits::eTransferRead);
+        barrier.setDstAccessMask(vk::AccessFlagBits::eTransferWrite);
+        barrier.setSubresourceRange(range);
+        cmd->pipelineBarrier(
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eTransfer,
+            { }, { }, { }, { barrier });
+    }
+    {
+        vk::BufferImageCopy copy;
+        const auto size = image->size();
+        copy.setImageExtent({ size.x(), size.y(), 1 });
+        copy.setBufferOffset(buffer->offset());
+        copy.imageSubresource.setAspectMask(vk::ImageAspectFlagBits::eColor);
+        copy.imageSubresource.setLayerCount(1);
+        copy.imageSubresource.setBaseArrayLayer(0);
+        copy.imageSubresource.setMipLevel(0);
+        cmd->copyBufferToImage(
+            buffer->pool()->buffer(), image->image(),
+            vk::ImageLayout::eTransferDstOptimal, { copy });
+    }
+    {
+        vk::ImageMemoryBarrier barrier;
+        barrier.setImage(image->image());
+        barrier.setOldLayout(vk::ImageLayout::eTransferDstOptimal);
+        barrier.setNewLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
+        barrier.setSrcQueueFamilyIndex(mGraphicsQueueFamilyIndex);
+        barrier.setDstQueueFamilyIndex(mGraphicsQueueFamilyIndex);
+        barrier.setSrcAccessMask(vk::AccessFlagBits::eTransferWrite);
+        barrier.setDstAccessMask(vk::AccessFlagBits::eShaderRead);
+        barrier.setSubresourceRange(range);
+        cmd->pipelineBarrier(
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eFragmentShader,
+            { }, { }, { }, { barrier });
+    }
+    cmd->end();
+    {
+        vk::SubmitInfo info;
+        const auto cmd_handle = cmd.get();
+        info.setCommandBufferCount(1);
+        info.setPCommandBuffers(&cmd_handle);
+        mGraphicsQueue.submit({ info }, { });
+    }
+    // todo batch uploads & manage dependencies
+    mDevice->waitIdle();
 }
