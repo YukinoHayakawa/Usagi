@@ -3,6 +3,8 @@
 #include <fstream>
 
 #include <Usagi/Core/Logging.hpp>
+#include <Usagi/Asset/Importer/StbImage.hpp>
+#include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Runtime/Graphics/Shader/SpirvBinary.hpp>
 
 #include "FilesystemAssetPackage.hpp"
@@ -23,7 +25,9 @@ void usagi::FilesystemAsset::load()
     const auto cache_path = pkg->rootPath() / ".cache";
     const auto ext = full_path.extension();
     std::ifstream in { full_path, std::ios::binary };
-    in.exceptions(std::ios::badbit | std::ios::failbit);
+    in.exceptions(std::ios::badbit);
+
+    LOG(info, "Loading asset: {}", name());
 
     if(!in)
     {
@@ -42,6 +46,12 @@ void usagi::FilesystemAsset::load()
         mPayload = SpirvBinary::fromGlslSourceStream(
             in, ShaderStage::FRAGMENT, cache_path);
         mType = AssetType::FRAGMENT_SHADER;
+    }
+    else if(isStbImageSupportedFormat(ext.u8string()))
+    {
+        mPayload = stbImageImportAsGpuImage(
+            pkg->runtime()->gpu(), in);
+        mType = AssetType::TEXTURE;
     }
     else
     {

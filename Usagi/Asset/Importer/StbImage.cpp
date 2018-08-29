@@ -10,7 +10,7 @@
 #include <Usagi/Runtime/Graphics/GpuImageCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/GpuImage.hpp>
 
-bool usagi::isStbImageSupportedFormat(const char *file_extension)
+bool usagi::isStbImageSupportedFormat(const std::string &file_extension)
 {
     static auto supported = {
         ".jpg", ".jpeg",

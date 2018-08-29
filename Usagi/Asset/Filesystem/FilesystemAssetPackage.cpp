@@ -37,14 +37,14 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
 		    throw std::runtime_error("Path must be within the root folder.");
     }
 	// search in cache
-	if(const auto asset = findChildByName(normalized.string()))
+	if(const auto asset = findChildByName(normalized.u8string()))
 	{
 	    return static_cast<Asset*>(asset);
 	}
 	// not in cache, create a child as proxy and return it.
     // the asset won't be loaded until load() is invoked on it.
     {
-        return addChild<FilesystemAsset>(normalized.string());
+        return addChild<FilesystemAsset>(normalized.u8string());
     }
 }
 
@@ -55,9 +55,11 @@ bool usagi::FilesystemAssetPackage::acceptChild(Element *child)
 
 usagi::FilesystemAssetPackage::FilesystemAssetPackage(
     Element *parent,
+    Runtime *runtime,
     std::string name,
     std::filesystem::path root_path)
     : AssetPackage { parent, std::move(name) }
+    , mRuntime { runtime }
     , mRootPath { std::move(root_path) }
 {
 }

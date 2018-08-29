@@ -6,8 +6,11 @@
 
 namespace usagi
 {
+class Runtime;
+
 class FilesystemAssetPackage : public AssetPackage
 {
+    Runtime *mRuntime = nullptr;
     std::map<boost::uuids::uuid, std::filesystem::path> mUuidMap;
     std::filesystem::path mRootPath;
 
@@ -18,6 +21,7 @@ class FilesystemAssetPackage : public AssetPackage
 public:
     FilesystemAssetPackage(
         Element *parent,
+        Runtime *runtime,
         std::string name,
         std::filesystem::path root_path
     );
@@ -26,5 +30,6 @@ public:
     Asset * findByString(const std::string &string) override;
 
     std::filesystem::path rootPath() const { return mRootPath; }
+    Runtime * runtime() const { return mRuntime; }
 };
 }
