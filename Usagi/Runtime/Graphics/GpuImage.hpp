@@ -25,9 +25,6 @@ public:
      * \param data
      * \param size
      */
-    virtual void upload(const void *data, std::size_t size)
-    {
-        throw std::runtime_error("Operation not supported.");
-    }
+    virtual void upload(const void *data, std::size_t size) = 0;
 };
 }
