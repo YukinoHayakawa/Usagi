@@ -50,6 +50,12 @@ public:
         mRuntime->inputManager()->virtualKeyboard()->addEventListener(this);
     }
 
+    ~HelloSwapchain()
+    {
+        mWindow->removeEventListener(this);
+        mRuntime->inputManager()->virtualKeyboard()->removeEventListener(this);
+    }
+
     void onKeyStateChange(const KeyEvent &e) override
     {
         if(!e.pressed) return;

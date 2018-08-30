@@ -107,6 +107,9 @@ usagi::DebugDrawDemo::DebugDrawDemo(Runtime *runtime)
 
 usagi::DebugDrawDemo::~DebugDrawDemo()
 {
+    const auto mouse = runtime()->inputManager()->virtualMouse();
+    mouse->removeEventListener(&mInputMap);
+    mouse->removeEventListener(this);
 }
 
 void usagi::DebugDrawDemo::onMouseButtonStateChange(const MouseButtonEvent &e)

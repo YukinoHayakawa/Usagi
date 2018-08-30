@@ -32,6 +32,7 @@ public:
         const Vector2i &window_position,
         const Vector2u32 &window_size,
         GpuBufferFormat swapchain_format = GpuBufferFormat::R8G8B8A8_UNORM);
+    ~SingleWindowGame();
 
     void onWindowResizeEnd(const WindowSizeEvent &e) override;
 };

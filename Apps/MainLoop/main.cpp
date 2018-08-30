@@ -49,6 +49,7 @@ public:
         if(!gamepads.empty())
         {
             mGamepad = gamepads.front();
+            // todo not removed
             mGamepad->addEventListener(this);
         }
     }

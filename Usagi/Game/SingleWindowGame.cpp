@@ -30,6 +30,11 @@ usagi::SingleWindowGame::SingleWindowGame(
     mRuntime->initInput();
 }
 
+usagi::SingleWindowGame::~SingleWindowGame()
+{
+    mWindow->removeEventListener(this);
+}
+
 void usagi::SingleWindowGame::onWindowResizeEnd(const WindowSizeEvent &e)
 {
     if(e.size.x() != 0 && e.size.y() != 0)
