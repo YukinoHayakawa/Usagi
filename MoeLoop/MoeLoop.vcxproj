@@ -78,6 +78,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Submodules\kaguya\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link />
   </ItemDefinitionGroup>
@@ -111,6 +112,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Submodules\kaguya\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -119,16 +121,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MoeLoop.cpp" />
+    <ClCompile Include="Scene\Character.cpp" />
+    <ClCompile Include="Scene\Expression.cpp" />
+    <ClCompile Include="Scene\ImageLayer.cpp" />
+    <ClCompile Include="Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Script\Squirrel.hpp" />
+    <ClInclude Include="MoeLoop.hpp" />
+    <ClInclude Include="Scene\Character.hpp" />
+    <ClInclude Include="Scene\Expression.hpp" />
+    <ClInclude Include="Scene\ImageLayer.hpp" />
+    <ClInclude Include="Scene\Scene.hpp" />
+    <ClInclude Include="Script\Lua.hpp" />
+    <ClInclude Include="Script\LuaForwardDecl.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Thirdparty\Submodules\squirrel\sqstdlib\sqstdlib_static.vcxproj">
-      <Project>{b63f26e1-8b9d-337d-a915-46d01c319da7}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\squirrel\squirrel\squirrel_static.vcxproj">
-      <Project>{739ba726-d701-39f7-a9fe-aaf2c233e1f0}</Project>
+    <ProjectReference Include="..\Thirdparty\Submodules\lua\lua.vcxproj">
+      <Project>{d6fe911a-ac17-4db9-895e-f574011173fc}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Usagi\Usagi.vcxproj">
       <Project>{4250e1c0-ea0b-4575-bc04-11e7f83c2ed4}</Project>

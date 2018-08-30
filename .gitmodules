@@ -52,3 +52,9 @@
 [submodule "Thirdparty/Includes/stb"]
 	path = Thirdparty/Includes/stb
 	url = https://github.com/nothings/stb.git
+[submodule "Thirdparty/Submodules/kaguya"]
+	path = Thirdparty/Submodules/kaguya
+	url = https://github.com/satoren/kaguya.git
+[submodule "Thirdparty/Submodules/lua"]
+	path = Thirdparty/Submodules/lua
+	url = https://github.com/lua/lua.git
