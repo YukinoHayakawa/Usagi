@@ -2,17 +2,16 @@
 
 #include <Usagi/Core/Math.hpp>
 
+#include "CameraController.hpp"
+
 namespace usagi
 {
-struct TransformComponent;
 
 /**
  * \brief Camera always look at a target from a fixed distance.
  */
-class ModelViewCameraController
+class ModelViewCameraController : public CameraController
 {
-    TransformComponent &mTransform;
-
     Vector3f mLookAtTarget = Vector3f::Zero();
     // the radius of the spherical coordinate system
     float mDistance = 10.f;
@@ -25,10 +24,7 @@ class ModelViewCameraController
     Vector2f mSpherical = Vector2f::Zero();
 
 public:
-    ModelViewCameraController(
-        TransformComponent &transform,
-        Vector3f look_at_target,
-        float distance);
+    ModelViewCameraController(Vector3f look_at_target, float distance);
 
     /**
      * \brief

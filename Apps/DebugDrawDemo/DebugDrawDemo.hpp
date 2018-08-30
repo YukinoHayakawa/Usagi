@@ -3,14 +3,14 @@
 #include <Usagi/Game/Game.hpp>
 #include <Usagi/Interactive/InputMap.hpp>
 #include <Usagi/Game/SingleWindowGame.hpp>
+#include <Usagi/Camera/CameraMan.hpp>
 
 namespace usagi
 {
-class PerspectiveCamera;
-struct CameraComponent;
 struct TransformComponent;
 class DebugDrawSubsystem;
 class GpuImage;
+class PerspectiveCamera;
 class ModelViewCameraController;
 
 class DebugDrawDemo
@@ -20,10 +20,9 @@ class DebugDrawDemo
     std::shared_ptr<GpuImage> mDepthBuffer;
     DebugDrawSubsystem *mDebugDraw = nullptr;
     Element *mDebugDrawRoot = nullptr;
-    Element *mCameraElement = nullptr;
-    TransformComponent *mCameraTransform = nullptr;
-    std::shared_ptr<PerspectiveCamera> mCamera;
-    std::unique_ptr<ModelViewCameraController> mCameraController;
+    using ModelCameraMan =
+        CameraMan<PerspectiveCamera, ModelViewCameraController>;
+    ModelCameraMan *mCameraElement = nullptr;
     InputMap mInputMap;
 
     void setupInput();

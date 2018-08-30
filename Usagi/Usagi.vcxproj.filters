@@ -206,9 +206,6 @@
     <ClInclude Include="Camera\Camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera\CameraComponent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Camera\ModelViewCameraController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -621,6 +618,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Game\SingleWindowGame.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\CameraMan.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\CameraController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

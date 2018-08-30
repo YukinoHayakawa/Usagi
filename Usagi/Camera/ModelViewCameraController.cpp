@@ -3,11 +3,9 @@
 #include <Usagi/Transform/TransformComponent.hpp>
 
 usagi::ModelViewCameraController::ModelViewCameraController(
-    TransformComponent &transform,
     Vector3f look_at_target,
     const float distance)
-    : mTransform(transform)
-    , mLookAtTarget(std::move(look_at_target))
+    : mLookAtTarget(std::move(look_at_target))
     , mDistance(distance)
 {
 }
@@ -33,13 +31,11 @@ void usagi::ModelViewCameraController::rotate(Vector2f rel)
     mTransform.local_to_parent = lookAt(Vector3f { x, y, z } * mDistance);
     */
 
-    auto &transform = mTransform.local_to_parent;
-    transform = Affine3f::Identity();
+    auto transform = Affine3f::Identity();
     transform.rotate(AngleAxisf(
         degreesToRadians(mSpherical.x()), Vector3f::UnitZ()));
     transform.rotate(AngleAxisf(
         degreesToRadians(mSpherical.y()), Vector3f::UnitX()));
     transform.translate(Vector3f::UnitY() * -mDistance);
-
-    mTransform.needs_update = true;
+    mTransform->setOrientationPosition(transform);
 }

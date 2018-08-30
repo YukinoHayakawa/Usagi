@@ -2,7 +2,6 @@
 
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Filesystem/FilesystemAssetPackage.hpp>
-#include <Usagi/Camera/CameraComponent.hpp>
 #include <Usagi/Camera/ModelViewCameraController.hpp>
 #include <Usagi/Camera/PerspectiveCamera.hpp>
 #include <Usagi/Core/Logging.hpp>
@@ -53,8 +52,8 @@ void usagi::DebugDrawDemo::setupDebugDraw()
     mDebugDraw = addSubsystem("dd", std::make_unique<DebugDrawSubsystem>(
         this
     ));
-    RenderPassCreateInfo mAttachments;
-    mAttachments.attachment_usages.emplace_back(
+    RenderPassCreateInfo attachments;
+    attachments.attachment_usages.emplace_back(
         mSwapchain->format(),
         1,
         GpuImageLayout::UNDEFINED,
@@ -62,7 +61,7 @@ void usagi::DebugDrawDemo::setupDebugDraw()
         GpuAttachmentLoadOp::CLEAR,
         GpuAttachmentStoreOp::STORE
     ).clear_color = Color4f::Zero();
-    mAttachments.attachment_usages.emplace_back(
+    attachments.attachment_usages.emplace_back(
         GpuBufferFormat::D32_SFLOAT, // todo get from image params
         1,
         GpuImageLayout::UNDEFINED,
@@ -70,7 +69,7 @@ void usagi::DebugDrawDemo::setupDebugDraw()
         GpuAttachmentLoadOp::CLEAR,
         GpuAttachmentStoreOp::STORE
     ).clear_color = { 1, 0, 0, 0 };
-    mDebugDraw->createPipelines(mAttachments);
+    mDebugDraw->createPipelines(attachments);
 
     mDebugDrawRoot = rootElement()->addChild("DebugDrawRoot");
     mDebugDrawRoot->addComponent<DebugDrawDemoComponent>();
@@ -80,15 +79,15 @@ void usagi::DebugDrawDemo::setupCamera()
 {
     using namespace std::placeholders;
 
-    mCameraElement = rootElement()->addChild("Camera");
-    mCameraTransform = mCameraElement->addComponent<TransformComponent>();
-    mCamera = std::make_shared<PerspectiveCamera>();
-    mCameraElement->addComponent<CameraComponent>(mCamera);
-    mCameraController = std::make_unique<ModelViewCameraController>(
-        *mCameraTransform, Vector3f::Zero(), 10.f);
+    mCameraElement = rootElement()->addChild<ModelCameraMan>(
+        "Camera",
+        std::make_shared<PerspectiveCamera>(),
+        std::make_shared<ModelViewCameraController>(
+            Vector3f::Zero(), 10.f
+    ));
     mInputMap.addAnalogAction2D("Camera:Move", std::bind(
         &ModelViewCameraController::rotate,
-        mCameraController.get(), _1));
+        mCameraElement->cameraController(), _1));
     mInputMap.bindMouseRelativeMovement("Camera:Move");
 }
 
@@ -144,11 +143,12 @@ void usagi::DebugDrawDemo::run()
 
         const auto size = framebuffer->size().cast<float>();
         const auto aspect = size.x() / size.y();
-        mCamera->setMatrix(degreesToRadians(90.f), aspect, 0.5f, 100.f);
+        mCameraElement->camera()->setMatrix(
+            degreesToRadians(90.f), aspect, 0.5f, 100.f);
         mDebugDraw->setWorldToNDC(
             // world -> camera local -> NDC
-            mCamera->projectionMatrix() *
-            mCameraTransform->local_to_parent.inverse());
+            mCameraElement->camera()->projectionMatrix() *
+            mCameraElement->transform()->localToParent().inverse());
         mDebugDraw->setRenderSizes(mWindow->size(), framebuffer->size());
         update(dt);
 

@@ -191,7 +191,8 @@
     <ClInclude Include="Asset\Filesystem\FilesystemAssetPackage.hpp" />
     <ClInclude Include="Asset\Importer\StbImage.hpp" />
     <ClInclude Include="Camera\Camera.hpp" />
-    <ClInclude Include="Camera\CameraComponent.hpp" />
+    <ClInclude Include="Camera\CameraController.hpp" />
+    <ClInclude Include="Camera\CameraMan.hpp" />
     <ClInclude Include="Camera\ModelViewCameraController.hpp" />
     <ClInclude Include="Camera\PerspectiveCamera.hpp" />
     <ClInclude Include="Core\Component.hpp" />
