@@ -89,11 +89,11 @@ ostream & operator<<(ostream &s, const Token &t)
     return s;
 }
 
-const auto CODE_BEGIN_TAG = "#!code-begin";
-const auto CODE_END_TAG = "#!code-end";
-const auto COMMENT_TAG = "#!comment";
-const auto SCENE_BEGIN_TAG = "#!scene-begin";
-const auto SCENE_END_TAG = "#!scene-end";
+const auto CODE_BEGIN_TAG = "--!code-begin";
+const auto CODE_END_TAG = "--!code-end";
+const auto COMMENT_TAG = "--!comment";
+const auto SCENE_BEGIN_TAG = "--!scene-begin";
+const auto SCENE_END_TAG = "--!scene-end";
 
 bool is_number(const std::string &s)
 {
@@ -287,7 +287,6 @@ struct Scene
 {
     static constexpr int INVALID_BLOCK_ID = -1;
 
-    string indent = "    ";
     string name;
     string comment_name;
     fs::path path;
@@ -375,7 +374,7 @@ struct Scene
         const auto i = code_blocks.find(id);
         if(i == code_blocks.end())
         {
-            output << indent << fmt::format("unimplemented(\"Code block {}\");", id) << endl;
+            output << fmt::format("unimplemented(\"Code block {}\");", id) << endl;
         }
         else
         {
@@ -441,7 +440,7 @@ struct Scene
     {
         auto &c = character(cs);
         if(expr == c.last_expr) return;
-        output << indent << fmt::format("/* {},{} */ {}.changeExpression({});",
+        output << fmt::format("-- {},{}/n{}:changeExpression({});",
             cs,
             expr,
             c.obj,
@@ -454,7 +453,7 @@ struct Scene
     {
         auto &c = character(cs);
         if(pos == c.last_pos) return;
-        output << indent << fmt::format("/* {},{} */ {}.move({});",
+        output << fmt::format("-- {},{}/n{}:move({});",
             cs, pos,
             c.obj,
             positionObj(pos)
@@ -467,7 +466,7 @@ struct Scene
         auto &cc = character(c);
         if(!cc.in_scene)
         {
-            output << indent << fmt::format("/* {},{},{} */ {}.enterScene({}, {});",
+            output << fmt::format("-- {},{},{}/n{}:enterScene({}, {});",
                 c,
                 expr, pos,
                 cc.obj,
@@ -484,18 +483,18 @@ struct Scene
         ensureInScene(c, expr, pos);
         charChangeExpr(c, expr);
         charMove(c, pos);
-        output << indent << msg_line << endl;
+        output << msg_line << endl;
     }
 
     void charMsg(const string &c, const string &msg_line)
     {
         auto &cc = character(c);
-        output << indent << msg_line << endl;
+        output << msg_line << endl;
     }
 
-    void exitScene(Character &c)
+    void exitScene(const std::string &cn, Character &c)
     {
-        output << indent << fmt::format("{}.exitScene();", c.obj) << endl;
+        output << fmt::format("-- {}/n{}:exitScene();", cn, c.obj) << endl;
         c.in_scene = false;
     }
 
@@ -518,9 +517,9 @@ struct Scene
                 {
                     output << endl;
                     const auto id = data();
-                    output << indent << fmt::format("{} {}", CODE_BEGIN_TAG, id) << endl;
+                    output << fmt::format("{} {}", CODE_BEGIN_TAG, id) << endl;
                     if(!expect(TokenType::CODE_COMMENT).empty())
-                        output << indent << fmt::format("{} {}", COMMENT_TAG, data()) << endl;
+                        output << fmt::format("{} {}", COMMENT_TAG, data()) << endl;
                     const auto int_id = stoi(id);
                     if(code_ids.find(int_id) != code_ids.end())
                     {
@@ -529,7 +528,7 @@ struct Scene
                     }
                     code_ids.insert(int_id);
                     insertCodeBlock(int_id);
-                    output << indent << CODE_END_TAG << endl;
+                    output << CODE_END_TAG << endl;
                     output << endl;
                     expect(TokenType::NEWLINE);
                     break;
@@ -552,7 +551,7 @@ struct Scene
                         {
                             if(c.second.in_scene)
                             {
-                                exitScene(c.second);
+                                exitScene(c.first, c.second);
                             }
                         }
                     }
@@ -560,7 +559,7 @@ struct Scene
                     {
                         checkCharacterInScene(expect(TokenType::COMMAND_PARAM));
                         auto &c = characters[data()];
-                        exitScene(c);
+                        exitScene(data(), c);
                     }
                     else if(data() == "state")
                     {
@@ -591,7 +590,7 @@ struct Scene
                             const auto expr = expect(TokenType::CHAR_PARAM);
                             const auto pos = expect(TokenType::CHAR_PARAM);
                             charSay(cn, expr, pos, fmt::format(
-                                R"(/* {} */ {}.say("{}"); w();)",
+                                "-- {}\n{}:say(\"{}\"); w();",
                                 cn,
                                 c.obj,
                                 expect(TokenType::MESSAGE)
@@ -601,7 +600,7 @@ struct Scene
                         {
                             const auto cn = data();
                             charMsg(cn, fmt::format(
-                                R"(/* {} */ {}.message("{}"); w();)",
+                                "-- {}\n{}:say(\"{}\"); w();",
                                 cn,
                                 character(cn).obj,
                                 expect(TokenType::MESSAGE)
@@ -618,7 +617,7 @@ struct Scene
                             const auto expr = expect(TokenType::CHAR_PARAM);
                             const auto pos = expect(TokenType::CHAR_PARAM);
                             charSay(real_name, expr, pos, fmt::format(
-                                R"(/* {} */ {}.pretendSay("{}", "{}"); w();)",
+                                "-- {}\n{}:pretendSay(\"{}\", \"{}\"); w();",
                                 real_name,
                                 c.obj,
                                 pretend_name,
@@ -628,7 +627,7 @@ struct Scene
                         else
                         {
                             charMsg(real_name, fmt::format(
-                                R"(/* {} */ {}.pretendMessage("{}", "{}"); w();)",
+                                "-- {}\n{}:pretendSay(\"{}\", \"{}\"); w();",
                                 real_name,
                                 character(real_name).obj,
                                 pretend_name,
@@ -640,7 +639,7 @@ struct Scene
                 }
                 case TokenType::MESSAGE:
                 {
-                    output << indent << fmt::format("narrator.message(\"{}\"); w();", data()) << endl;
+                    output << fmt::format("narrator:say(\"{}\"); w();", data()) << endl;
                     break;
                 }
                 default:
@@ -741,15 +740,13 @@ struct Scene
         }
         out << SCENE_BEGIN_TAG << "\n";
         out << COMMENT_TAG << " " << comment_name << "\n";
-        out << "function sceneContent()\n";
-        out << "{\n";
-        out << indent << "local scene = createScene();\n";
-        out << indent << "local narrator = scene.createNarrator();\n\n";
+        out << "local scene = ml:createScene(\"\", 1920, 1080);\n\n";
+        out << "local narrator = scene:createCharacter(\"\");\n\n";
         if(!characters.empty())
         {
             for(auto &&c : characters)
             {
-                out << indent << fmt::format("local {} = scene.createCharacter(\"{}\");\n", c.second.obj, c.first);
+                out << fmt::format("local {} = scene:createCharacter(\"{}\");\n", c.second.obj, c.first);
             }
             out << "\n";
         }
@@ -757,7 +754,7 @@ struct Scene
         {
             for(auto &&e : expressions)
             {
-                out << indent << fmt::format("local {} = scene.createExpression(\"{}\");\n", e.second, e.first);
+                out << fmt::format("local {} = scene:createExpression(\"{}\");\n", e.second, e.first);
             }
             out << "\n";
         }
@@ -765,12 +762,11 @@ struct Scene
         {
             for(auto &&e : positions)
             {
-                out << indent << fmt::format("local {} = scene.createPosition(\"{}\");\n", e.second, e.first);
+                out << fmt::format("local {} = scene:createPosition(\"{}\", 0.0, 0.0, 0.0);\n", e.second, e.first);
             }
             out << "\n";
         }
         out << output.str();
-        out << "}\n";
         out << SCENE_END_TAG << "\n";
         for(auto && l : lines_after_scene)
         {
@@ -900,7 +896,7 @@ struct Translator
                     nextLine();
                     const auto name = buildSceneName();
                     auto path = output_dir / name;
-                    path += ".nut";
+                    path += ".lua";
                     scene.reset(new Scene(path, pos));
                     scene->name = name;
                     scene->comment_name = comment_name;
