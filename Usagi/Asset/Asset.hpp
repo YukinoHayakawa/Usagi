@@ -6,17 +6,21 @@
 #include <Usagi/Core/Element.hpp>
 #include <Usagi/Utility/TypeCast.hpp>
 
-#include "AssetType.hpp"
-
 namespace usagi
 {
 class Asset : public Element
 {
-    void checkLoaded() const;
-
 protected:
     const boost::uuids::uuid mUuid;
-    std::any mPayload;
+
+    /**
+     * \brief Different types of resources may be derived from a single asset.
+     * For example, a JSON may be used to load a scene or a character.
+     * This map stores weak references to the asset as a cache. An external
+     * strong reference must be held to retain the loaded status of the
+     * subresource.
+     */
+    std::map<std::type_index, std::any> mSubresources;
 
 public:
     Asset(
@@ -25,31 +29,25 @@ public:
         boost::uuids::uuid uuid = boost::uuids::nil_uuid()
 	);
 
+    virtual std::unique_ptr<std::istream> open() = 0;
+
     boost::uuids::uuid uuid() const { return mUuid; }
-    virtual AssetType assetType();
 
-    virtual bool loaded() const { return mPayload.has_value(); }
-    virtual void load() { }
-    virtual void unload() { }
-
-    /**
-     * \brief Cast payload to stored type. AssetT must match the resource
-     * type exactly, same as typically the base type of the resource.
-     * \tparam AssetT
-     * \return
-     */
-    template <typename AssetT>
-    std::shared_ptr<AssetT> as()
+    template <typename SubresourceT>
+    std::shared_ptr<SubresourceT> subresource() const
     {
-        checkLoaded();
-        return std::any_cast<std::shared_ptr<AssetT>>(mPayload);
+        const auto i = mSubresources.find(typeid(SubresourceT));
+        if(i == mSubresources.end()) return { };
+        return std::any_cast<std::weak_ptr<SubresourceT>>(i->second).lock();
     }
 
-	template <typename AssetT, typename DerivedAssetT>
-	std::shared_ptr<DerivedAssetT> as()
-	{
-        checkLoaded();
-        return dynamic_pointer_cast_throw<DerivedAssetT>(as<AssetT>());
-	}
+    template <typename SubresourceT>
+    void addSubresource(std::shared_ptr<SubresourceT> res)
+    {
+        const auto i = mSubresources.insert({
+            typeid(SubresourceT), std::weak_ptr<SubresourceT>(res)
+        });
+        assert(i.second);
+    }
 };
 }

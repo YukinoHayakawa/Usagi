@@ -55,11 +55,9 @@ bool usagi::FilesystemAssetPackage::acceptChild(Element *child)
 
 usagi::FilesystemAssetPackage::FilesystemAssetPackage(
     Element *parent,
-    Runtime *runtime,
     std::string name,
     std::filesystem::path root_path)
     : AssetPackage { parent, std::move(name) }
-    , mRuntime { runtime }
     , mRootPath { std::move(root_path) }
 {
 }

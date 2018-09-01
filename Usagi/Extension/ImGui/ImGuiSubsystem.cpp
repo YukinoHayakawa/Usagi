@@ -1,6 +1,7 @@
 ﻿#include "ImGuiSubsystem.hpp"
 
 #include <Usagi/Asset/AssetRoot.hpp>
+#include <Usagi/Asset/Converter/SpirvAssetConverter.hpp>
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Game/Game.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
@@ -149,10 +150,12 @@ void usagi::ImGuiSubsystem::createPipeline(
     // Shaders
     {
         compiler->setShader(ShaderStage::VERTEX,
-            assets->find<SpirvBinary>("imgui:shaders/glsl_shader.vert")
+            assets->find<SpirvAssetConverter>(
+                "imgui:shaders/glsl_shader.vert", ShaderStage::VERTEX)
         );
         compiler->setShader(ShaderStage::FRAGMENT,
-            assets->find<SpirvBinary>("imgui:shaders/glsl_shader.frag")
+            assets->find<SpirvAssetConverter>(
+                "imgui:shaders/glsl_shader.frag", ShaderStage::FRAGMENT)
         );
     }
     // Vertex Inputs

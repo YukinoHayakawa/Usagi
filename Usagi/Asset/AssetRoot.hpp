@@ -19,16 +19,47 @@ class AssetRoot : public Element
 
     bool acceptChild(Element *child) override;
 
+    template <
+        typename ConvertorT,
+        typename DecoderT = typename ConvertorT::DefaultDecoder,
+        typename... Args
+    >
+    struct FindHelper
+    {
+        using ReturnT = decltype(std::declval<ConvertorT>()(
+            std::declval<decltype(std::declval<DecoderT>()(
+                std::declval<std::istream&>()))&>(),
+            std::declval<Args>()...
+        ));
+        using SubresourceT = typename ReturnT::element_type;
+    };
+
 public:
     explicit AssetRoot(Element *parent);
 
-    template <typename AssetType, typename DerivedType = AssetType>
-    std::shared_ptr<DerivedType> find(const std::string &locator)
+    template <
+        typename ConvertorT,
+        typename DecoderT = typename ConvertorT::DefaultDecoder,
+        typename... Args
+    >
+    auto find(const std::string &locator, Args &&...convertor_args)
+        -> typename FindHelper<ConvertorT, DecoderT, Args...>::ReturnT
     {
-        if constexpr(std::is_same_v<AssetType, DerivedType>)
-            return findAsset(locator)->as<AssetType>();
-		else
-            return findAsset(locator)->as<AssetType, DerivedType>();
+        const auto asset = findAsset(locator);
+
+        // found in cache
+        if(auto res = asset->subresource<
+            typename FindHelper<ConvertorT, DecoderT, Args...>::SubresourceT
+        >())
+            return std::move(res);
+
+        // load from stream
+        const auto in = asset->open();
+        auto res = ConvertorT()(
+            DecoderT()(*in),
+            std::forward<Args>(convertor_args)...);
+        asset->addSubresource(res);
+        return std::move(res);
     }
 };
 }

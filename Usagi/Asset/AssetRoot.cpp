@@ -83,7 +83,5 @@ usagi::Asset * usagi::AssetRoot::findAsset(std::string locator) const
         asset = findAssetByString(std::move(locator));
     if(asset == nullptr)
         throw std::runtime_error("Asset not found.");
-    if(!asset->loaded())
-        asset->load();
     return asset;
 }

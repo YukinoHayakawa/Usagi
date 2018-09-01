@@ -15,12 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Asset\Filesystem\FilesystemAsset.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Asset\Filesystem\FilesystemAssetPackage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Asset\Asset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -177,20 +171,26 @@
     <ClCompile Include="Utility\Unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Asset\Importer\StbImage.cpp">
+    <ClCompile Include="Game\SingleWindowGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Game\SingleWindowGame.cpp">
+    <ClCompile Include="Asset\Decoder\StbImageAssetDecoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Asset\Converter\SpirvAssetConverter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Asset\Converter\GpuImageAssetConverter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Asset\Package\Filesystem\FilesystemAsset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Asset\Package\Filesystem\FilesystemAssetPackage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Asset\Filesystem\FilesystemAsset.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Asset\Filesystem\FilesystemAssetPackage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Asset\Asset.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -198,9 +198,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Asset\AssetRoot.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Asset\AssetType.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera\Camera.hpp">
@@ -611,9 +608,6 @@
     <ClInclude Include="Animation\AnimationComponent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Asset\Importer\StbImage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Animation\Timing.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -624,6 +618,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera\CameraController.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Functional.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset\Decoder\StbImageAssetDecoder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset\Decoder\ImageBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset\Decoder\RawAssetDecoder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset\Converter\SpirvAssetConverter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset\Converter\GpuImageAssetConverter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset\Package\Filesystem\FilesystemAsset.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset\Package\Filesystem\FilesystemAssetPackage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

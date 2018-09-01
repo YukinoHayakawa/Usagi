@@ -312,9 +312,11 @@ vk::ComponentSwizzle translate(const GpuImageComponentSwizzle swizzle)
 }
 }
 
-USAGI_ENUM_TRANSLATION_NS(usagi::vulkan, GpuBufferFormat, vk::Format, 11,
+USAGI_ENUM_TRANSLATION_NS(usagi::vulkan, GpuBufferFormat, vk::Format, 14,
     (
         GpuBufferFormat::R8_UNORM,
+        GpuBufferFormat::R8G8_UNORM,
+        GpuBufferFormat::R8G8B8_UNORM,
         GpuBufferFormat::R8G8B8A8_UNORM,
         GpuBufferFormat::R32_SFLOAT,
         GpuBufferFormat::R32G32_SFLOAT,
@@ -328,6 +330,8 @@ USAGI_ENUM_TRANSLATION_NS(usagi::vulkan, GpuBufferFormat, vk::Format, 11,
     ),
     (
         vk::Format::eR8Unorm,
+        vk::Format::eR8G8Unorm,
+        vk::Format::eR8G8B8Unorm,
         vk::Format::eR8G8B8A8Unorm,
         vk::Format::eR32Sfloat,
         vk::Format::eR32G32Sfloat,

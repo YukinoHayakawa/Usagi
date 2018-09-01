@@ -1,7 +1,7 @@
 ﻿#include "DebugDrawDemo.hpp"
 
 #include <Usagi/Asset/AssetRoot.hpp>
-#include <Usagi/Asset/Filesystem/FilesystemAssetPackage.hpp>
+#include <Usagi/Asset/Package/Filesystem/FilesystemAssetPackage.hpp>
 #include <Usagi/Camera/ModelViewCameraController.hpp>
 #include <Usagi/Camera/PerspectiveCamera.hpp>
 #include <Usagi/Core/Logging.hpp>

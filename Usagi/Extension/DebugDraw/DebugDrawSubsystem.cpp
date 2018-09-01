@@ -1,6 +1,7 @@
 ﻿#include "DebugDrawSubsystem.hpp"
 
 #include <Usagi/Asset/AssetRoot.hpp>
+#include <Usagi/Asset/Converter/SpirvAssetConverter.hpp>
 #include <Usagi/Core/Element.hpp>
 #include <Usagi/Game/Game.hpp>
 #include <Usagi/Runtime/Graphics/GpuDevice.hpp>
@@ -49,10 +50,12 @@ void usagi::DebugDrawSubsystem::createPointLinePipeline()
     // Shaders
     {
         compiler->setShader(ShaderStage::VERTEX,
-            assets->find<SpirvBinary>("dd:shaders/pointline.vert")
+            assets->find<SpirvAssetConverter>(
+                "dd:shaders/pointline.vert", ShaderStage::VERTEX)
         );
         compiler->setShader(ShaderStage::FRAGMENT,
-            assets->find<SpirvBinary>("dd:shaders/pointline.frag")
+            assets->find<SpirvAssetConverter>(
+                "dd:shaders/pointline.frag", ShaderStage::FRAGMENT)
         );
     }
     // Vertex Inputs
@@ -105,10 +108,12 @@ void usagi::DebugDrawSubsystem::createTextPipeline()
     // Shaders
     {
         compiler->setShader(ShaderStage::VERTEX,
-            assets->find<SpirvBinary>("dd:shaders/text.vert")
+            assets->find<SpirvAssetConverter>(
+                "dd:shaders/text.vert", ShaderStage::VERTEX)
         );
         compiler->setShader(ShaderStage::FRAGMENT,
-            assets->find<SpirvBinary>("dd:shaders/text.frag")
+            assets->find<SpirvAssetConverter>(
+                "dd:shaders/text.frag", ShaderStage::FRAGMENT)
         );
     }
     // Vertex Inputs

@@ -30,6 +30,7 @@ public:
 
     virtual void setRenderPass(std::shared_ptr<RenderPass> render_pass) = 0;
 
+    // todo get stage from SpirvBinary/split into set{Vertex/Fragment|...}Shader
     virtual void setShader(
         ShaderStage stage,
         std::shared_ptr<SpirvBinary> shader) = 0;
