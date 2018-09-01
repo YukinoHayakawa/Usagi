@@ -69,7 +69,7 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
         GetRawInputDeviceInfoW(device.hDevice, RIDI_DEVICEINFO,
             &info, &size);
 
-        LOG(info, "Path               : {}", u16to8(path));
+        LOG(info, "Path               : {}", utf16To8(path));
 
         try
         {
@@ -80,7 +80,7 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
                 // https://superuser.com/questions/884347/win32-and-the-global-namespace
                 path = L"\\GLOBAL??" + path.substr(3);
                 const auto dev_obj_name =
-                    u16to8(win32::resolveNtSymbolicLink(path));
+                    utf16To8(win32::resolveNtSymbolicLink(path));
                 LOG(info, "Name               : {}",
                     Win32InputManager::deviceFriendlyName(dev_obj_name));
             }

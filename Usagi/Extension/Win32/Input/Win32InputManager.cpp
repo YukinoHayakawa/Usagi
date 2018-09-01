@@ -192,15 +192,15 @@ void usagi::Win32InputManager::updateDeviceNames()
 
     for(DWORD i = 0; SetupDiEnumDeviceInfo(dev_info, i, &device_info_data); i++)
     {
-        const auto device_obj = u16to8(getDeviceRegistryProperty(
+        const auto device_obj = utf16To8(getDeviceRegistryProperty(
             dev_info, device_info_data, SPDRP_PHYSICAL_DEVICE_OBJECT_NAME));
 
         if(device_obj.empty()) continue;
 
-        auto name = u16to8(getDeviceRegistryProperty(
+        auto name = utf16To8(getDeviceRegistryProperty(
             dev_info, device_info_data, SPDRP_FRIENDLYNAME));
         if(name.empty())
-            name = u16to8(getDeviceRegistryProperty(
+            name = utf16To8(getDeviceRegistryProperty(
                 dev_info, device_info_data, SPDRP_DEVICEDESC));
 
         LOG(info, "{:24}: {}", device_obj, name);

@@ -53,7 +53,7 @@ usagi::Win32Window::Win32Window(
 {
     LOG(info, "Creating window: {}", mTitle);
 
-    auto window_title_wide = u8to16(mTitle);
+    auto window_title_wide = utf8To16(mTitle);
 
     const auto window_rect = getWindowRect();
 
@@ -138,7 +138,7 @@ std::string usagi::Win32Window::title() const
 void usagi::Win32Window::setTitle(std::string title)
 {
     mTitle = std::move(title);
-    SetWindowTextW(mHandle, u8to16(mTitle).c_str());
+    SetWindowTextW(mHandle, utf8To16(mTitle).c_str());
 }
 
 usagi::Vector2i usagi::Win32Window::position() const
@@ -207,7 +207,7 @@ std::string usagi::Win32Window::getClipboardText()
 
     CloseClipboard();
 
-    return u16to8(str);
+    return utf16To8(str);
 }
 
 void usagi::Win32Window::setClipboardText(const std::string &text)
@@ -218,7 +218,7 @@ void usagi::Win32Window::setClipboardText(const std::string &text)
         return;
     }
 
-    const auto wstr = u8to16(text);
+    const auto wstr = utf8To16(text);
     const auto hmem = GlobalAlloc(
         GHND | GMEM_SHARE, (wstr.size()  + 1) * sizeof(wchar_t));
 

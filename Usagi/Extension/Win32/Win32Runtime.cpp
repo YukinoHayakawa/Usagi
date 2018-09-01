@@ -27,7 +27,7 @@ void usagi::Win32Runtime::writeMiniDump(
     PEXCEPTION_POINTERS p_exception_info) const
 {
     // Open the file
-    const auto h_file = CreateFileW(u8to16(mMinidumpPath).c_str(),
+    const auto h_file = CreateFileW(utf8To16(mMinidumpPath).c_str(),
         GENERIC_READ | GENERIC_WRITE, 0,
         nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
@@ -109,7 +109,7 @@ void usagi::Win32Runtime::enableCrashHandler(
 void usagi::Win32Runtime::displayErrorDialog(const std::string &msg)
 {
     LOG(error, msg);
-    MessageBoxW(nullptr, u8to16(msg).c_str(), L"Error", MB_OK | MB_ICONERROR);
+    MessageBoxW(nullptr, utf8To16(msg).c_str(), L"Error", MB_OK | MB_ICONERROR);
 }
 
 usagi::GpuDevice * usagi::Win32Runtime::gpu() const

@@ -40,7 +40,7 @@ std::string usagi::win32::getErrorMessage(const DWORD error_code)
     const std::wstring msg { msg_buf, num_char };
     LocalFree(msg_buf);
 
-    return u16to8(msg);
+    return utf16To8(msg);
 }
 
 // http://blogs.microsoft.co.il/pavely/2014/02/05/creating-a-winobj-like-tool/
@@ -132,7 +132,7 @@ int ConsoleStreamBufWin32::sync()
     {
         if(mBuffer.empty()) { return 0; }
 
-        const auto wide_buffer = usagi::u8to16(mBuffer);
+        const auto wide_buffer = usagi::utf8To16(mBuffer);
         DWORD written_size;
         WriteConsoleW(mHandle, wide_buffer.c_str(),
             static_cast<DWORD>(wide_buffer.size()), &written_size, nullptr);
@@ -155,7 +155,7 @@ ConsoleStreamBufWin32::int_type ConsoleStreamBufWin32::underflow()
             &read_size, nullptr)) { return traits_type::eof(); }
 
         wide_buffer[read_size] = L'\0';
-        mBuffer = usagi::u16to8(wide_buffer);
+        mBuffer = usagi::utf16To8(wide_buffer);
 
         setg(&mBuffer[0], &mBuffer[0], &mBuffer[0] + mBuffer.size());
 
