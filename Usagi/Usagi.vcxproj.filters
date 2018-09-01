@@ -482,9 +482,6 @@
     <ClInclude Include="Runtime\Runtime.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Scene.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Transform\TransformComponent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

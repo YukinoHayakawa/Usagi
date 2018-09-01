@@ -1,5 +1,7 @@
 ﻿#include "VulkanGraphicsPipeline.hpp"
 
+#include <Usagi/Core/Logging.hpp>
+
 #include "VulkanRenderPass.hpp"
 
 usagi::VulkanRenderPass * usagi::VulkanGraphicsPipeline::renderPass() const
@@ -8,8 +10,14 @@ usagi::VulkanRenderPass * usagi::VulkanGraphicsPipeline::renderPass() const
 }
 
 vk::DescriptorSetLayout usagi::VulkanGraphicsPipeline::descriptorSetLayout(
-    std::uint32_t set_id) const
+    const std::uint32_t set_id) const
 {
+    const auto i = mLayouts.find(set_id);
+    if(i == mLayouts.end())
+    {
+        LOG(error, "Nonexisting descriptor set id = {}", set_id);
+        throw std::logic_error("Referenced invalid resource.");
+    }
     return mLayouts.find(set_id)->second.get();
 }
 
@@ -35,5 +43,6 @@ usagi::VulkanPushConstantField usagi::VulkanGraphicsPipeline::queryConstantInfo(
     ShaderStage stage,
     const std::string &name) const
 {
+    // todo error handling
     return mConstantFieldMap.at(stage).at(name);
 }

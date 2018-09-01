@@ -55,8 +55,16 @@ T radiansToDegrees(const T radians)
 
 // Transformation
 
+using Quaternionf = Eigen::Quaternionf;
+
 using Matrix3f = Eigen::Matrix3f;
 using Matrix4f = Eigen::Matrix4f;
 using Affine3f = Eigen::Affine3f;
 using Projective3f = Eigen::Projective3f;
+
+// Bounding Box
+
+using AlignedBox2i = Eigen::AlignedBox2i;
+using AlignedBox2f = Eigen::AlignedBox2f;
+using AlignedBox3f = Eigen::AlignedBox3f;
 }

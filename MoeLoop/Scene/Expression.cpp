@@ -2,6 +2,11 @@
 
 namespace usagi::moeloop
 {
+Expression::Expression(Element *parent, std::string name)
+    : Element(parent, std::move(name))
+{
+}
+
 std::string Expression::name()
 {
     return {};

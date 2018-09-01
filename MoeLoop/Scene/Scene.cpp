@@ -1,54 +1,65 @@
 ﻿#include "Scene.hpp"
 
+#include <Usagi/Asset/AssetRoot.hpp>
+
 #include <MoeLoop/Script/Lua.hpp>
+#include <MoeLoop/JSON/JsonAssetConverter.hpp>
 
 #include "Expression.hpp"
 #include "ImageLayer.hpp"
 #include "Character.hpp"
+#include "SceneConfig.hpp"
 
 namespace usagi::moeloop
 {
 Scene::Scene(
     Element *parent,
-    std::string name,
-    const std::uint32_t width,
-    const std::uint32_t height)
-    : Element(parent, std::move(name))
-    , mSize(width, height)
+    std::string asset_locator,
+    Runtime *runtime,
+    AssetRoot *asset)
+    : Element(parent, std::move(asset_locator))
+    , mRuntime(runtime)
+    , mAsset(asset)
 {
+    mCharacters = addChild("Characters");
+    mExpressions = addChild("Expressions");
+    mImageLayers = addChild("ImageLayers");
+
+    load();
+}
+
+void Scene::load()
+{
+    mConfig = mAsset->find<JsonAssetConverter<SceneConfig>>(name());
 }
 
 ImageLayer * Scene::createImageLayer(const std::string &name, float y_pos)
 {
-    return addChild<ImageLayer>(name, y_pos);
+    return mImageLayers->addChild<ImageLayer>(name, y_pos, this);
 }
 
-Character * Scene::createCharacter(const std::string &name)
+Character * Scene::loadCharacter(const std::string &asset_locator)
 {
-    return addChild<Character>(name);
+    return mCharacters->addChild<Character>(asset_locator);
 }
 
-std::shared_ptr<Expression> Scene::createExpression(const std::string &name)
+Expression * Scene::loadExpression(const std::string &asset_locator)
 {
-    return std::make_shared<Expression>(name);
+    return mExpressions->addChild<Expression>(asset_locator);
 }
 
-Vector3f Scene::createPosition(
-    const std::string &name,
-    const float x,
-    const float y,
-    const float z)
+Vector3f Scene::getPosition(const std::string &name) const
 {
-    return { x, y, z };
+    return mConfig->positions.at(name);
 }
 
 void Scene::exportScript(kaguya::State &vm)
 {
     vm["Scene"].setClass(kaguya::UserdataMetatable<Scene>()
         .addFunction("createImageLayer", &Scene::createImageLayer)
-        .addFunction("createCharacter", &Scene::createCharacter)
-        .addFunction("createExpression", &Scene::createExpression)
-        .addFunction("createPosition", &Scene::createPosition)
+        .addFunction("loadCharacter", &Scene::loadCharacter)
+        .addFunction("loadExpression", &Scene::loadExpression)
+        .addFunction("getPosition", &Scene::getPosition)
     );
 }
 }

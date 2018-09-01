@@ -19,9 +19,9 @@ Character::Character(Element *parent, std::string name)
     mAnimation = addComponent<AnimationComponent>();
 }
 
-void Character::changeExpression(std::shared_ptr<Expression> expr)
+void Character::changeExpression(Expression *expr)
 {
-    mCurrentExpression = std::move(expr);
+    mCurrentExpression = expr;
     const auto o = mCurrentExpression->origin();
     mTransform->setOffset({ o.x(), 0, o.y() });
     mSprite->texture = mCurrentExpression->texture();
@@ -49,10 +49,10 @@ void Character::say(const std::string &text)
 }
 
 void Character::enterScene(
-    std::shared_ptr<Expression> expr,
+    Expression *expr,
     const Vector3f &position)
 {
-    changeExpression(std::move(expr));
+    changeExpression(expr);
     mSprite->show = true;
     mTransform->setPosition(position);
 }

@@ -42,7 +42,7 @@ public:
     }
 
     template <typename SubresourceT>
-    void addSubresource(std::shared_ptr<SubresourceT> res)
+    void addSubresource(std::shared_ptr<SubresourceT> &res)
     {
         const auto i = mSubresources.insert({
             typeid(SubresourceT), std::weak_ptr<SubresourceT>(res)

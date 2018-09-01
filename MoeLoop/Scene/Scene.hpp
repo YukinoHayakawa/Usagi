@@ -5,27 +5,44 @@
 
 #include <MoeLoop/Script/LuaForwardDecl.hpp>
 
+namespace usagi
+{
+class Runtime;
+class AssetRoot;
+}
+
 namespace usagi::moeloop
 {
+struct SceneConfig;
 class Expression;
 class Character;
 class ImageLayer;
 
 class Scene : public Element
 {
-    Vector2u32 mSize;
+    Runtime *mRuntime = nullptr;
+    AssetRoot *mAsset = nullptr;
+    Element *mCharacters = nullptr;
+    Element *mExpressions = nullptr;
+    Element *mImageLayers = nullptr;
+    std::shared_ptr<SceneConfig> mConfig;
 
 public:
     Scene(
         Element *parent,
-        std::string name,
-        std::uint32_t width,
-        std::uint32_t height);
+        std::string asset_locator,
+        Runtime *runtime,
+        AssetRoot *asset);
+
+    void load();
 
     ImageLayer * createImageLayer(const std::string &name, float y_pos);
-    Character * createCharacter(const std::string &name);
-    std::shared_ptr<Expression> createExpression(const std::string &name);
-    Vector3f createPosition(const std::string &name, float x, float y, float z);
+    Character * loadCharacter(const std::string &asset_locator);
+    Expression * loadExpression(const std::string &asset_locator);
+    Vector3f getPosition(const std::string &name) const;
+
+    Runtime * runtime() const { return mRuntime; }
+    AssetRoot * asset() const { return mAsset; }
 
     static void exportScript(kaguya::State &vm);
 };

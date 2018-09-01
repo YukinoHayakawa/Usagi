@@ -3,6 +3,7 @@
 #include <string>
 
 #include <Usagi/Core/Math.hpp>
+#include <Usagi/Core/Element.hpp>
 
 namespace usagi
 {
@@ -11,16 +12,12 @@ class GpuImage;
 
 namespace usagi::moeloop
 {
-class Expression
+class Expression : public Element
 {
     Vector2f mOrigin;
-    std::string mName;
 
 public:
-    Expression(std::string name)
-        : mName(std::move(name))
-    {
-    }
+    Expression(Element *parent, std::string name);
 
     std::string name();
     Vector2f origin() const { return mOrigin; }

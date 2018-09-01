@@ -4,15 +4,29 @@
 
 #include <MoeLoop/Script/LuaForwardDecl.hpp>
 
+namespace usagi
+{
+struct TransformComponent;
+class AssetRoot;
+}
+
 namespace usagi::moeloop
 {
+class Scene;
+struct SpriteComponent;
+
 class ImageLayer : public Element
 {
-public:
-    ImageLayer(Element *parent, std::string name, float y_pos);
+    Scene *mScene = nullptr;
+    TransformComponent *mTransform = nullptr;
+    SpriteComponent *mSprite = nullptr;
 
-    void changeImage(const std::string &name);
+public:
+    ImageLayer(Element *parent, std::string name, float y_pos, Scene *scene);
+
+    void changeImage(const std::string &asset_locator);
 
     static void exportScript(kaguya::State &vm);
 };
 }
+

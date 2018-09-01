@@ -58,3 +58,6 @@
 [submodule "Thirdparty/Submodules/lua"]
 	path = Thirdparty/Submodules/lua
 	url = https://github.com/lua/lua.git
+[submodule "Thirdparty/Submodules/json"]
+	path = Thirdparty/Submodules/json
+	url = https://github.com/nlohmann/json.git

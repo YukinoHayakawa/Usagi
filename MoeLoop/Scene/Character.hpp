@@ -24,7 +24,7 @@ class Character : public Element
     TransformComponent *mTransform = nullptr;
     SpriteComponent *mSprite = nullptr;
     AnimationComponent *mAnimation = nullptr;
-    std::shared_ptr<Expression> mCurrentExpression;
+    Expression *mCurrentExpression = nullptr;
 
 public:
     // todo load json config file
@@ -33,9 +33,9 @@ public:
     void showName(bool show);
     void showAvatar(bool show);
 
-    void enterScene(std::shared_ptr<Expression> expr, const Vector3f &position);
+    void enterScene(Expression *expr, const Vector3f &position);
     void exitScene();
-    void changeExpression(std::shared_ptr<Expression> expr);
+    void changeExpression(Expression *expr);
     void move(const Vector3f &position);
     void say(const std::string &text);
     void pretendSay(const std::string &fake_name, const std::string &text);

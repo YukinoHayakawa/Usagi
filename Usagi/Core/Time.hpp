@@ -5,4 +5,5 @@
 namespace usagi
 {
 using TimeDuration = std::chrono::duration<double>;
+using TimePoint = double;
 }

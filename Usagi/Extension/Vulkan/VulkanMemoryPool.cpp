@@ -130,17 +130,17 @@ void usagi::VulkanMemoryPool::allocateDeviceMemoryForImage(
 {
     vk::ImageCreateInfo vk_info;
     vk_info.setImageType(vk::ImageType::e2D);
-    vk_info.setFormat(vk::Format::eB8G8R8A8Snorm);
-    vk_info.extent.width = 1;
-    vk_info.extent.height = 1;
+    vk_info.setFormat(vk::Format::eR32G32B32A32Sfloat);
+    vk_info.extent.width = 2048;
+    vk_info.extent.height = 2048;
     vk_info.extent.depth = 1;
     vk_info.setMipLevels(1);
     vk_info.setArrayLayers(1);
     vk_info.setSamples(vk::SampleCountFlagBits::e1);
-    vk_info.setTiling(vk::ImageTiling::eLinear);
+    vk_info.setTiling(vk::ImageTiling::eOptimal);
     vk_info.setUsage(usages);
     vk_info.setSharingMode(vk::SharingMode::eExclusive);
-    vk_info.setInitialLayout(vk::ImageLayout::ePreinitialized);
+    vk_info.setInitialLayout(vk::ImageLayout::eUndefined);
 
     auto vk_device = mDevice->device();
     auto dummy_image = vk_device.createImageUnique(vk_info);

@@ -314,7 +314,6 @@
     <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Runtime\Window\WindowEventListener.hpp" />
     <ClInclude Include="Runtime\Window\WindowManager.hpp" />
-    <ClInclude Include="Scene\Scene.hpp" />
     <ClInclude Include="Transform\TransformComponent.hpp" />
     <ClInclude Include="Transform\TransformSubsystem.hpp" />
     <ClInclude Include="Transform\Util.hpp" />
