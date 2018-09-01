@@ -17,7 +17,7 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByUuid(
 usagi::Asset * usagi::FilesystemAssetPackage::findByString(
     const std::string &string)
 {
-    return findByFilesystemPath(string);
+    return findByFilesystemPath(std::filesystem::u8path(string));
 }
 
 usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(

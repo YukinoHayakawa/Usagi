@@ -18,11 +18,13 @@ usagi::FilesystemAsset::FilesystemAsset(
 std::unique_ptr<std::istream> usagi::FilesystemAsset::open()
 {
     const auto pkg = static_cast<FilesystemAssetPackage*>(parent());
-    const auto full_path = pkg->rootPath() / name();
+    const auto full_path = pkg->rootPath() / std::filesystem::u8path(name());
 
     LOG(info, "Loading asset: {}", name());
 
-    auto in = std::make_unique<std::ifstream>(full_path, std::ios::binary);
+    auto in = std::make_unique<std::ifstream>(
+        full_path,
+        std::ios_base::binary | std::ios_base::in);
     in->exceptions(std::ios::badbit);
 
     if(!*in)
