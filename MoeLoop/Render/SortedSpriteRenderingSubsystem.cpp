@@ -42,7 +42,7 @@ void SortedSpriteRenderingSubsystem::createBuffers()
     incices[0] = 0;
     incices[1] = 2;
     incices[2] = 1;
-    incices[4] = 3;
+    incices[3] = 3;
     mIndexBuffer->flush();
 }
 
@@ -133,9 +133,16 @@ void SortedSpriteRenderingSubsystem::update(const TimeDuration &dt)
     for(auto &&e : mElements)
     {
         const auto sprite = e->getComponent<SpriteComponent>();
+        if(!sprite->texture)
+        {
+            vert_idx += 4;
+            continue;
+        }
 
         // size of the texture rect
-        const Vector2f size = sprite->uv_rect.sizes();
+        const Vector2f size =
+            sprite->uv_rect.sizes()
+            .cwiseProduct(sprite->texture->size().cast<float>());
         const auto min = sprite->uv_rect.min();
         const auto max = sprite->uv_rect.max();
         // top-left

@@ -46,8 +46,6 @@ private:
 
     void createBuffers();
 
-    Projective3f mWorldToNDC;
-
 public:
     SortedSpriteRenderingSubsystem(Game *game, CompareFunc compare_func);
 

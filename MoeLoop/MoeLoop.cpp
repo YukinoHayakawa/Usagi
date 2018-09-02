@@ -35,7 +35,7 @@ void MoeLoop::setupCamera()
         "Camera",
         std::make_shared<PerspectiveCamera>(),
         std::make_shared<ModelViewCameraController>(
-            Vector3f::Zero(), 10.f
+            Vector3f::Zero(), 2000.f
         ));
     mInputMap.addAnalogAction2D("Camera:Move", std::bind(
         &ModelViewCameraController::rotate,
@@ -142,11 +142,11 @@ void MoeLoop::mainLoop()
         const auto size = framebuffer->size().cast<float>();
         const auto aspect = size.x() / size.y();
         mCameraElement->camera()->setMatrix(
-            degreesToRadians(90.f), aspect, 0.5f, 100.f);
+            degreesToRadians(90.f), aspect, 100, 10000);
         mSpriteRender->setWorldToNDC(
             // world -> camera local -> NDC
             mCameraElement->camera()->projectionMatrix() *
-            mCameraElement->transform()->localToParent().inverse());
+            mCameraElement->transform()->localToWorld().inverse());
         update(dt);
 
         // Record command lists

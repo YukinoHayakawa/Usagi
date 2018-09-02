@@ -17,5 +17,5 @@ void main()
         sampler2D(sprite_texture, sprite_sampler), 
         tex_coords
     );
-    out_FragColor.a *= pc.fade;
+    // out_FragColor.a *= pc.fade;
 }
