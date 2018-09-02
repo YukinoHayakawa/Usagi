@@ -46,8 +46,7 @@ public:
         }
     {
         // Setting up ImGui
-        assets()->addChild<FilesystemAssetPackage>(
-            runtime, "imgui", "Data/imgui");
+        assets()->addChild<FilesystemAssetPackage>("imgui", "Data/imgui");
         const auto input_manager = runtime->inputManager();
         mImGui = addSubsystem("imgui", std::make_unique<ImGuiSubsystem>(
             this,

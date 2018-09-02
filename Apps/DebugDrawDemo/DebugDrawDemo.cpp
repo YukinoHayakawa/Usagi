@@ -47,8 +47,7 @@ void usagi::DebugDrawDemo::createRenderTargets()
 
 void usagi::DebugDrawDemo::setupDebugDraw()
 {
-    assets()->addChild<FilesystemAssetPackage>(
-        runtime(), "dd", "Data/debugdraw");
+    assets()->addChild<FilesystemAssetPackage>("dd", "Data/debugdraw");
     mDebugDraw = addSubsystem("dd", std::make_unique<DebugDrawSubsystem>(
         this
     ));
