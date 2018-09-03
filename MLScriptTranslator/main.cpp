@@ -740,8 +740,8 @@ struct Scene
         }
         out << SCENE_BEGIN_TAG << "\n";
         out << COMMENT_TAG << " " << comment_name << "\n";
-        out << "local scene = ml:loadScene(\"\", 1920, 1080);\n\n";
-        out << "local narrator = scene:loadCharacter(\"\");\n\n";
+        out << "local scene = ml:loadScene(\"" << name << "\", 1920, 1080);\n\n";
+        out << "local narrator = scene:loadCharacter(\"Narrator\");\n\n";
         if(!characters.empty())
         {
             for(auto &&c : characters)
