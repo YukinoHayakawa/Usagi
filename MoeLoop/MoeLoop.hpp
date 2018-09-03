@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Camera/CameraMan.hpp>
+#include <Usagi/Camera/Controller/CameraMan.hpp>
 #include <Usagi/Game/SingleWindowGame.hpp>
 #include <Usagi/Runtime/Input/Mouse/MouseEventListener.hpp>
 #include <Usagi/Interactive/InputMap.hpp>
@@ -10,8 +10,8 @@
 namespace usagi
 {
 class GpuImage;
-class ModelViewCameraController;
-class PerspectiveCamera;
+class StaticCameraController;
+class OrthogonalCamera;
 }
 
 namespace usagi::moeloop
@@ -23,8 +23,6 @@ class MoeLoop
     : public SingleWindowGame
     , public MouseEventListener
 {
-    Element *mSceneRoot = nullptr;
-
     std::shared_ptr<GpuImage> mDepthBuffer;
     SortedSpriteRenderingSubsystem *mSpriteRender = nullptr;
 
@@ -32,13 +30,17 @@ class MoeLoop
     kaguya::LuaThread mCurrentScript;
 
     using ModelCameraMan =
-        CameraMan<PerspectiveCamera, ModelViewCameraController>;
+        CameraMan<OrthogonalCamera, StaticCameraController>;
     ModelCameraMan *mCameraElement = nullptr;
     InputMap mInputMap;
 
     void bindScript();
 
+    Element *mSceneRoot = nullptr;
+    Scene *mCurrentScene = nullptr;
+
     Scene * createScene(const std::string &name);
+    void setCurrentScene(Scene *scene);
     static void unimplemented(const std::string &msg);
     void continueScript();
 
@@ -52,6 +54,7 @@ public:
 
     void mainLoop();
 
+    void onWindowResizeEnd(const WindowSizeEvent &e) override;
     void onMouseButtonStateChange(const MouseButtonEvent &e) override;
     void onMouseWheelScroll(const MouseWheelEvent &e) override;
 };

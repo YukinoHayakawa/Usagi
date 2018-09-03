@@ -24,9 +24,6 @@
     <ClCompile Include="Asset\AssetRoot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera\ModelViewCameraController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Camera\PerspectiveCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -189,6 +186,12 @@
     <ClCompile Include="Asset\Package\Filesystem\FilesystemAssetPackage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Camera\OrthogonalCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\Controller\ModelViewCameraController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asset\Asset.hpp">
@@ -201,9 +204,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera\Camera.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\ModelViewCameraController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera\PerspectiveCamera.hpp">
@@ -611,12 +611,6 @@
     <ClInclude Include="Game\SingleWindowGame.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera\CameraMan.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\CameraController.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Utility\Functional.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -639,6 +633,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Asset\Package\Filesystem\FilesystemAssetPackage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\OrthogonalCamera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\Controller\CameraController.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\Controller\ModelViewCameraController.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\Controller\StaticCameraController.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\Controller\CameraMan.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

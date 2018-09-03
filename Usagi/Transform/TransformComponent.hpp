@@ -25,9 +25,9 @@ private:
     /**
     * \brief A flag indicating whether mLocalToParent should be re-calculated.
     */
-    bool mLTPNeedsUpdate = false;
+    mutable bool mLTPNeedsUpdate = false;
 
-    Affine3f mLocalToParent = Affine3f::Identity();
+    mutable Affine3f mLocalToParent = Affine3f::Identity();
 
     /**
     * \brief Transform from local coordinates to world coordinates.
@@ -37,7 +37,7 @@ private:
     * The calculation cascade towards the root element and is cached if
     * localToParent() is not changed.
     */
-    Affine3f mLocalToWorld = Affine3f::Identity();
+    mutable Affine3f mLocalToWorld = Affine3f::Identity();
 
 public:
     Vector3f position() const { return mPosition; }
@@ -79,11 +79,11 @@ public:
         mLTPNeedsUpdate = true;
     }
 
-    Affine3f localToParent()
+    Affine3f localToParent() const
     {
         if(mLTPNeedsUpdate)
         {
-            mLocalToParent = Affine3f::Identity();
+            mLocalToParent.setIdentity();
             mLocalToParent.scale(mScale);
             mLocalToParent.rotate(mOrientation);
             mLocalToParent.pretranslate(mPosition + mOffset);
@@ -94,12 +94,17 @@ public:
 
     TransformComponent * parent = nullptr;
 
-    Affine3f localToWorld()
+    Affine3f localToWorld() const
     {
         // todo cache
         return parent
             ? parent->localToWorld() * localToParent()
             : localToParent();
+    }
+
+    Affine3f worldToLocal() const
+    {
+        return localToWorld().inverse();
     }
 
     const std::type_info & baseType() override

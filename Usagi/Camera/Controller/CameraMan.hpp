@@ -6,6 +6,11 @@ namespace usagi
 {
 struct TransformComponent;
 
+/**
+ * \brief A camera controlling element for attaching to other objects.
+ * \tparam CameraT
+ * \tparam CameraControllerT
+ */
 template <typename CameraT, typename CameraControllerT>
 class CameraMan : public Element
 {

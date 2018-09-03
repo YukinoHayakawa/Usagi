@@ -74,6 +74,7 @@ vk::UniqueImage usagi::VulkanMemoryPool::createImage(
     vk_info.setMipLevels(info.mip_levels);
     vk_info.setArrayLayers(1);
     vk_info.setSamples(translateSampleCount(info.sample_count));
+    // todo check is the format is supported by vkGetPhysicalDeviceImageFormatProperties
     vk_info.setTiling(vk::ImageTiling::eOptimal);
     vk_info.setUsage(
         translate(info.usage) |
@@ -86,7 +87,7 @@ vk::UniqueImage usagi::VulkanMemoryPool::createImage(
 }
 
 vk::MemoryRequirements usagi::VulkanMemoryPool::getImageRequirements(
-    vk::Image image) const
+    const vk::Image image) const
 {
     return mDevice->device().getImageMemoryRequirements(image);
 }

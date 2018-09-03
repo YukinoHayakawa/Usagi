@@ -2,8 +2,8 @@
 
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Package/Filesystem/FilesystemAssetPackage.hpp>
-#include <Usagi/Camera/ModelViewCameraController.hpp>
-#include <Usagi/Camera/PerspectiveCamera.hpp>
+#include <Usagi/Camera/Controller/StaticCameraController.hpp>
+#include <Usagi/Camera/OrthogonalCamera.hpp>
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GpuImageUsage.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
@@ -32,15 +32,13 @@ void MoeLoop::setupCamera()
     using namespace std::placeholders;
 
     mCameraElement = rootElement()->addChild<ModelCameraMan>(
-        "Camera",
-        std::make_shared<PerspectiveCamera>(),
-        std::make_shared<ModelViewCameraController>(
-            Vector3f::Zero(), 2000.f
-        ));
-    mInputMap.addAnalogAction2D("Camera:Move", std::bind(
+        "CameraMan",
+        std::make_shared<OrthogonalCamera>(),
+        std::make_shared<StaticCameraController>());
+    /*mInputMap.addAnalogAction2D("Camera:Move", std::bind(
         &ModelViewCameraController::rotate,
         mCameraElement->cameraController(), _1));
-    mInputMap.bindMouseRelativeMovement("Camera:Move");
+    mInputMap.bindMouseRelativeMovement("Camera:Move");*/
 }
 
 void MoeLoop::setupGraphics()
@@ -140,12 +138,11 @@ void MoeLoop::mainLoop()
         );
 
         const auto size = framebuffer->size().cast<float>();
-        const auto aspect = size.x() / size.y();
-        mCameraElement->camera()->setMatrix(
-            degreesToRadians(90.f), aspect, 100, 10000);
+        mCameraElement->camera()->setOrthogonal(
+            0, size.x(), 0, size.y(), -100, 100);
         mSpriteRender->setWorldToNDC(
             // world -> camera local -> NDC
-            mCameraElement->camera()->projectionMatrix() *
+            mCameraElement->camera()->localToNDC() *
             mCameraElement->transform()->localToWorld().inverse());
         update(dt);
 
@@ -184,6 +181,12 @@ void MoeLoop::mainLoop()
     }
 }
 
+void MoeLoop::onWindowResizeEnd(const WindowSizeEvent &e)
+{
+    SingleWindowGame::onWindowResizeEnd(e);
+    createRenderTargets();
+}
+
 void MoeLoop::onMouseButtonStateChange(const MouseButtonEvent &e)
 {
     if(e.button == MouseButtonCode::LEFT && e.pressed)
@@ -204,6 +207,7 @@ void MoeLoop::bindScript()
 
     mLuaContext["MoeLoop"].setClass(kaguya::UserdataMetatable<MoeLoop>()
         .addFunction("createScene", &MoeLoop::createScene)
+        .addFunction("setCurrentScene", &MoeLoop::setCurrentScene)
     );
     mLuaContext["ml"] = this;
 
@@ -215,6 +219,13 @@ void MoeLoop::bindScript()
 Scene * MoeLoop::createScene(const std::string &name)
 {
     return rootElement()->addChild<Scene>(name, runtime(), assets());
+}
+
+void MoeLoop::setCurrentScene(Scene *scene)
+{
+    assert(mSceneRoot->hasChild(scene));
+
+    mCurrentScene = scene;
 }
 
 void MoeLoop::unimplemented(const std::string &msg)

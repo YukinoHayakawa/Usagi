@@ -1,14 +1,15 @@
 ﻿#pragma once
 
-#include <vector>
-#include <memory>
-#include <map>
-#include <functional>
-#include <typeinfo>
-#include <typeindex>
-#include <any>
-#include <type_traits>
 #include <algorithm>
+#include <any>
+#include <cassert>
+#include <functional>
+#include <map>
+#include <memory>
+#include <type_traits>
+#include <typeindex>
+#include <typeinfo>
+#include <vector>
 
 #include <Usagi/Utility/Noncopyable.hpp>
 
@@ -107,6 +108,7 @@ public:
 		auto c = std::make_unique<ElementType>(
 			this, std::forward<Args>(args)...
 		);
+        assert(c);
         // ElementCreatedEvent is fired before acceptance test, so it gets
         // a change to pass the test. (todo: is this a good idea?)
         c->template fireEvent<ElementCreatedEvent>();
@@ -125,6 +127,15 @@ public:
             [&](auto &&c) { return c->name() == name; }
         );
         return iter == childrenEnd() ? nullptr : iter->get();
+    }
+
+    template <typename ChildT>
+    bool hasChild(ChildT *e) const
+    {
+        static_assert(std::is_base_of_v<Element, ChildT>);
+        return std::any_of(mChildren.begin(), mChildren.end(), [e](auto &&c) {
+            return c.get() == static_cast<Element*>(e);
+        });
     }
 
     void removeChild(Element *child);

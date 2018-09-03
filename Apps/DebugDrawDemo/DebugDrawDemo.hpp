@@ -3,7 +3,7 @@
 #include <Usagi/Game/Game.hpp>
 #include <Usagi/Interactive/InputMap.hpp>
 #include <Usagi/Game/SingleWindowGame.hpp>
-#include <Usagi/Camera/CameraMan.hpp>
+#include <Usagi/Camera/Controller/CameraMan.hpp>
 
 namespace usagi
 {

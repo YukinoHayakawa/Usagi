@@ -131,7 +131,8 @@
     <ClCompile Include="Asset\Package\Filesystem\FilesystemAsset.cpp" />
     <ClCompile Include="Asset\Package\Filesystem\FilesystemAssetPackage.cpp" />
     <ClCompile Include="Asset\Decoder\StbImageAssetDecoder.cpp" />
-    <ClCompile Include="Camera\ModelViewCameraController.cpp" />
+    <ClCompile Include="Camera\Controller\ModelViewCameraController.cpp" />
+    <ClCompile Include="Camera\OrthogonalCamera.cpp" />
     <ClCompile Include="Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="Core\Element.cpp" />
     <ClCompile Include="Core\Event\Event.cpp" />
@@ -196,9 +197,11 @@
     <ClInclude Include="Asset\Package\Filesystem\FilesystemAssetPackage.hpp" />
     <ClInclude Include="Asset\Decoder\StbImageAssetDecoder.hpp" />
     <ClInclude Include="Camera\Camera.hpp" />
-    <ClInclude Include="Camera\CameraController.hpp" />
-    <ClInclude Include="Camera\CameraMan.hpp" />
-    <ClInclude Include="Camera\ModelViewCameraController.hpp" />
+    <ClInclude Include="Camera\Controller\CameraController.hpp" />
+    <ClInclude Include="Camera\Controller\CameraMan.hpp" />
+    <ClInclude Include="Camera\Controller\ModelViewCameraController.hpp" />
+    <ClInclude Include="Camera\Controller\StaticCameraController.hpp" />
+    <ClInclude Include="Camera\OrthogonalCamera.hpp" />
     <ClInclude Include="Camera\PerspectiveCamera.hpp" />
     <ClInclude Include="Core\Component.hpp" />
     <ClInclude Include="Core\Element.hpp" />

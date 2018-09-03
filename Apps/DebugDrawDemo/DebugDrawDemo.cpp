@@ -2,7 +2,7 @@
 
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Package/Filesystem/FilesystemAssetPackage.hpp>
-#include <Usagi/Camera/ModelViewCameraController.hpp>
+#include <Usagi/Camera/Controller/ModelViewCameraController.hpp>
 #include <Usagi/Camera/PerspectiveCamera.hpp>
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GpuBufferFormat.hpp>
@@ -145,11 +145,11 @@ void usagi::DebugDrawDemo::run()
 
         const auto size = framebuffer->size().cast<float>();
         const auto aspect = size.x() / size.y();
-        mCameraElement->camera()->setMatrix(
+        mCameraElement->camera()->setPerspective(
             degreesToRadians(90.f), aspect, 0.5f, 100.f);
         mDebugDraw->setWorldToNDC(
             // world -> camera local -> NDC
-            mCameraElement->camera()->projectionMatrix() *
+            mCameraElement->camera()->localToNDC() *
             mCameraElement->transform()->localToParent().inverse());
         mDebugDraw->setRenderSizes(mWindow->size(), framebuffer->size());
         update(dt);

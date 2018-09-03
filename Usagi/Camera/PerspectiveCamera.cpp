@@ -6,15 +6,17 @@ usagi::PerspectiveCamera::PerspectiveCamera(
     const float near,
     const float far)
 {
-    setMatrix(fov_y_radians, aspect, near, far);
+    setPerspective(fov_y_radians, aspect, near, far);
 }
 
-void usagi::PerspectiveCamera::setMatrix(
+void usagi::PerspectiveCamera::setPerspective(
     const float fov_y_radians,
     const float aspect,
     const float near,
     const float far)
 {
+    assert(aspect > 0.f);
+    assert(far > near);
     // Deriving the projection matrix:
     // http://ogldev.atspace.co.uk/www/tutorial12/tutorial12.html
     // Note that the division by depth is performed by vertex post-processing
