@@ -47,7 +47,7 @@ void MoeLoop::setupGraphics()
         "sprite",
         std::make_unique<SortedSpriteRenderingSubsystem>(
             this, [](Element *l, Element *r) {
-                return l->getComponent<TransformComponent>()->position().y() <
+                return l->getComponent<TransformComponent>()->position().y() >
                     r->getComponent<TransformComponent>()->position().y();
             }
     ));
