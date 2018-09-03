@@ -9,11 +9,14 @@
 
 namespace usagi
 {
+class AssetRoot;
+
 struct SpirvAssetConverter
 {
     using DefaultDecoder = RawAssetDecoder;
 
     std::shared_ptr<SpirvBinary> operator()(
+        AssetRoot *assets,
         std::istream &in,
         ShaderStage stage,
         const std::optional<std::filesystem::path> & cache_folder =

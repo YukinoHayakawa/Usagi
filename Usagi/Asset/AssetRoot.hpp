@@ -27,6 +27,7 @@ class AssetRoot : public Element
     struct FindHelper
     {
         using ReturnT = decltype(std::declval<ConverterT>()(
+            std::declval<AssetRoot*>(),
             std::declval<decltype(std::declval<DecoderT>()(
                 std::declval<std::istream&>()))&>(),
             std::declval<Args>()...
@@ -56,6 +57,8 @@ public:
         // load from stream
         const auto in = asset->open();
         auto res = ConverterT()(
+            // converter can access asset root to request additional resources
+            this,
             DecoderT()(*in),
             std::forward<Args>(converter_args)...);
         asset->addSubresource(res);
