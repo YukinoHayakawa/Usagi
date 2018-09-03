@@ -440,25 +440,25 @@ struct Scene
     {
         auto &c = character(cs);
         if(expr == c.last_expr) return;
-        output << fmt::format("-- {},{}/n{}:changeExpression({});",
+        output << fmt::format("-- {},{}\n{}:changeExpression({});",
             cs,
             expr,
             c.obj,
             expressionObj(expr)
         ) << endl;
-        c.last_expr = cs;
+        c.last_expr = expr;
     }
 
     void charMove(const string & cs, const string & pos)
     {
         auto &c = character(cs);
         if(pos == c.last_pos) return;
-        output << fmt::format("-- {},{}/n{}:move({});",
+        output << fmt::format("-- {},{}\n{}:move({});",
             cs, pos,
             c.obj,
             positionObj(pos)
         ) << endl;
-        c.last_pos = cs;
+        c.last_pos = pos;
     }
 
     void ensureInScene(const string &c, const string &expr, const string &pos)
@@ -466,7 +466,7 @@ struct Scene
         auto &cc = character(c);
         if(!cc.in_scene)
         {
-            output << fmt::format("-- {},{},{}/n{}:enterScene({}, {});",
+            output << fmt::format("-- {},{},{}\n{}:enterScene({}, {});",
                 c,
                 expr, pos,
                 cc.obj,
@@ -494,7 +494,7 @@ struct Scene
 
     void exitScene(const std::string &cn, Character &c)
     {
-        output << fmt::format("-- {}/n{}:exitScene();", cn, c.obj) << endl;
+        output << fmt::format("-- {}\n{}:exitScene();", cn, c.obj) << endl;
         c.in_scene = false;
     }
 
@@ -740,13 +740,13 @@ struct Scene
         }
         out << SCENE_BEGIN_TAG << "\n";
         out << COMMENT_TAG << " " << comment_name << "\n";
-        out << "local scene = ml:createScene(\"\", 1920, 1080);\n\n";
-        out << "local narrator = scene:createCharacter(\"\");\n\n";
+        out << "local scene = ml:loadScene(\"\", 1920, 1080);\n\n";
+        out << "local narrator = scene:loadCharacter(\"\");\n\n";
         if(!characters.empty())
         {
             for(auto &&c : characters)
             {
-                out << fmt::format("local {} = scene:createCharacter(\"{}\");\n", c.second.obj, c.first);
+                out << fmt::format("local {} = scene:loadCharacter(\"{}\");\n", c.second.obj, c.first);
             }
             out << "\n";
         }
@@ -754,7 +754,7 @@ struct Scene
         {
             for(auto &&e : expressions)
             {
-                out << fmt::format("local {} = scene:createExpression(\"{}\");\n", e.second, e.first);
+                out << fmt::format("local {} = scene:loadExpression(\"{}\");\n", e.second, e.first);
             }
             out << "\n";
         }
@@ -762,7 +762,7 @@ struct Scene
         {
             for(auto &&e : positions)
             {
-                out << fmt::format("local {} = scene:createPosition(\"{}\", 0.0, 0.0, 0.0);\n", e.second, e.first);
+                out << fmt::format("local {} = scene:getPosition(\"{}\");\n", e.second, e.first);
             }
             out << "\n";
         }
