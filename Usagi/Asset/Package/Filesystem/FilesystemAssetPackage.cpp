@@ -28,8 +28,6 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
     {
 		if(normalized.empty())
 			throw std::runtime_error("Empty path.");
-        if(!normalized.has_extension())
-            throw std::runtime_error("File extension is missing.");
         const auto &first_component = *normalized.begin();
 		if(first_component == ".")
 		    throw std::runtime_error("Path does not point to a file.");

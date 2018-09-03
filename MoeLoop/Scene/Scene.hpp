@@ -38,7 +38,7 @@ public:
 
     ImageLayer * createImageLayer(const std::string &name, float y_pos);
     Character * loadCharacter(const std::string &asset_locator);
-    Expression * loadExpression(const std::string &asset_locator);
+    Expression * loadExpression(const std::string &name);
     Vector3f getPosition(const std::string &name) const;
 
     Runtime * runtime() const { return mRuntime; }

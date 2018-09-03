@@ -39,7 +39,7 @@ class MoeLoop
     Element *mSceneRoot = nullptr;
     Scene *mCurrentScene = nullptr;
 
-    Scene * createScene(const std::string &name);
+    Scene * loadScene(const std::string &name);
     void setCurrentScene(Scene *scene);
     static void unimplemented(const std::string &msg);
     void continueScript();

@@ -1,6 +1,8 @@
 ﻿#include "Scene.hpp"
 
 #include <Usagi/Asset/AssetRoot.hpp>
+#include <Usagi/Asset/Converter/GpuImageAssetConverter.hpp>
+#include <Usagi/Runtime/Runtime.hpp>
 
 #include <MoeLoop/Script/Lua.hpp>
 #include <MoeLoop/JSON/JsonAssetConverter.hpp>
@@ -43,9 +45,11 @@ Character * Scene::loadCharacter(const std::string &asset_locator)
     return mCharacters->addChild<Character>(asset_locator);
 }
 
-Expression * Scene::loadExpression(const std::string &asset_locator)
+Expression * Scene::loadExpression(const std::string &name)
 {
-    return mExpressions->addChild<Expression>(asset_locator);
+    return mExpressions->addChild<Expression>(
+        name, mAsset->find<GpuImageAssetConverter>(
+            "expressions/" + name, mRuntime->gpu()));
 }
 
 Vector3f Scene::getPosition(const std::string &name) const

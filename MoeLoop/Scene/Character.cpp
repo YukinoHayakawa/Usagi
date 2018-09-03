@@ -45,7 +45,10 @@ void Character::move(const Vector3f &position)
 
 void Character::say(const std::string &text)
 {
-    LOG(info, "{}({}): {}", name(), mCurrentExpression->name(), text);
+    if(mCurrentExpression)
+        LOG(info, "{}({}): {}", name(), mCurrentExpression->name(), text);
+    else
+        LOG(info, "{}: {}", name(), text);
 }
 
 void Character::enterScene(
@@ -59,6 +62,7 @@ void Character::enterScene(
 
 void Character::exitScene()
 {
+    mSprite->show = false;
     LOG(info, "{} exits scene", name());
 }
 

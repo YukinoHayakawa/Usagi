@@ -24,9 +24,9 @@ class ImageLayer : public Element
 public:
     ImageLayer(Element *parent, std::string name, float y_pos, Scene *scene);
 
+    // todo pass in texture by scene
     void changeImage(const std::string &asset_locator);
 
     static void exportScript(kaguya::State &vm);
 };
 }
-

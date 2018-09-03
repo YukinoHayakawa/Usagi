@@ -171,10 +171,16 @@ bool SortedSpriteRenderingSubsystem::processable(Element *element)
 void SortedSpriteRenderingSubsystem::updateRegistry(Element *element)
 {
     if(processable(element))
-        mElements.push_back(element);
+    {
+        if(std::find(mElements.begin(), mElements.end(), element) ==
+            mElements.end())
+            mElements.push_back(element);
+    }
     else
+    {
         mElements.erase(std::remove(
             mElements.begin(), mElements.end(), element), mElements.end());
+    }
 }
 
 void SortedSpriteRenderingSubsystem::render(

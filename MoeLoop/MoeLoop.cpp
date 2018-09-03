@@ -206,7 +206,7 @@ void MoeLoop::bindScript()
     mLuaContext["unimplemented"].setFunction(&MoeLoop::unimplemented);
 
     mLuaContext["MoeLoop"].setClass(kaguya::UserdataMetatable<MoeLoop>()
-        .addFunction("createScene", &MoeLoop::createScene)
+        .addFunction("loadScene", &MoeLoop::loadScene)
         .addFunction("setCurrentScene", &MoeLoop::setCurrentScene)
     );
     mLuaContext["ml"] = this;
@@ -216,7 +216,7 @@ void MoeLoop::bindScript()
     ImageLayer::exportScript(mLuaContext);
 }
 
-Scene * MoeLoop::createScene(const std::string &name)
+Scene * MoeLoop::loadScene(const std::string &name)
 {
     return rootElement()->addChild<Scene>(name, runtime(), assets());
 }
