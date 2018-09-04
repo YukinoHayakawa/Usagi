@@ -74,7 +74,7 @@ vk::UniqueImage usagi::VulkanMemoryPool::createImage(
     vk_info.setMipLevels(info.mip_levels);
     vk_info.setArrayLayers(1);
     vk_info.setSamples(translateSampleCount(info.sample_count));
-    // todo check is the format is supported by vkGetPhysicalDeviceImageFormatProperties
+    // todo optimal tiling support have to be checked using vkGetPhysicalDeviceImageFormatProperties before use
     vk_info.setTiling(vk::ImageTiling::eOptimal);
     vk_info.setUsage(
         translate(info.usage) |
