@@ -52,10 +52,10 @@ stbi_io_callbacks gCallbacks
 usagi::ImageBuffer usagi::StbImageAssetDecoder::operator()(
     std::istream &in) const
 {
-    int x, y, channels;
+    int x, y, channels, force_channels = 4;
     // todo 4 channels is forced, as the support for 3 channel images is not implemented yet.
     auto *data = stbi_load_from_callbacks(
-        &gCallbacks, &in, &x, &y, &channels, 4);
+        &gCallbacks, &in, &x, &y, &channels, force_channels);
     if(data == nullptr)
     {
         LOG(error, "Failed to load image: {}", stbi_failure_reason());
@@ -67,9 +67,9 @@ usagi::ImageBuffer usagi::StbImageAssetDecoder::operator()(
     img.buffer = {
         reinterpret_cast<ImageBuffer::Byte*>(data), stbi_image_free
     };
-    img.buffer_size = x * y * channels * sizeof(std::uint8_t);
+    img.buffer_size = x * y * force_channels * sizeof(std::uint8_t);
     img.image_size = { x, y };
-    img.channels = 4; // channels;
+    img.channels = force_channels; // channels;
     img.format = ImageBuffer::ChannelFormat::UINT8;
     // img.hdr = false;
 
