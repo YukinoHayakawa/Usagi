@@ -27,11 +27,9 @@ std::string usagi::FilesystemAsset::path() const
 
 std::string usagi::FilesystemAsset::parentPath() const
 {
-    const auto path = name();
-    const auto sep = path.find_last_of('/');
-    if(sep == std::string::npos) // not in any directory
-        return fmt::format("{}:", package()->name());
-    return fmt::format("{}:{}", package()->name(), path.substr(sep + 1));
+    const auto path = std::filesystem::u8path(name());
+    return fmt::format("{}:{}/",
+        package()->name(), path.parent_path().u8string());
 }
 
 std::unique_ptr<std::istream> usagi::FilesystemAsset::open()

@@ -26,12 +26,12 @@ ImageLayer::ImageLayer(
     mSprite = addComponent<SpriteComponent>();
 }
 
-void ImageLayer::changeImage(const std::string &asset_locator)
+void ImageLayer::changeImage(const std::string &name)
 {
-    LOG(info, "ImageLayer::changeImage {}", asset_locator);
+    LOG(info, "ImageLayer::changeImage {}", name);
     mSprite->texture =
-        mScene->asset()->find<GpuImageAssetConverter>(
-            asset_locator, mScene->runtime()->gpu());
+        mScene->asset()->res<GpuImageAssetConverter>(
+            "images/" + name, mScene->runtime()->gpu());
 }
 
 void ImageLayer::exportScript(kaguya::State &vm)

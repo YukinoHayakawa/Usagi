@@ -39,9 +39,10 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
 	{
 	    return static_cast<Asset*>(asset);
 	}
-	// not in cache, create a child as proxy and return it.
-    // the asset won't be loaded until load() is invoked on it.
+	// not in cache, create a child and return it if the file exists.
     {
+        if(!std::filesystem::exists(mRootPath / normalized))
+            throw std::runtime_error("Non-existing file.");
         return addChild<FilesystemAsset>(normalized.u8string());
     }
 }

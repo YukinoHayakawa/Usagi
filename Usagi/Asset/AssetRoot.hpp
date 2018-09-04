@@ -27,14 +27,24 @@ class AssetRoot : public Element
     struct FindHelper
     {
         using ReturnT = decltype(std::declval<ConverterT>()(
-            std::declval<AssetRoot*>(),
+            std::declval<AssetLoadingContext*>(),
             std::declval<decltype(std::declval<DecoderT>()(
                 std::declval<std::istream&>()))&>(),
             std::declval<Args>()...
         ));
-        using SubresourceT = typename ReturnT::element_type;
     };
 
+    /**
+     * \brief Note that uncached loading may return any value, but cached
+     * loading may only return a shared_ptr in order to store in the cache.
+     * \tparam ConverterT
+     * \tparam DecoderT
+     * \tparam Cached
+     * \tparam Args
+     * \param locator
+     * \param converter_args
+     * \return
+     */
     template <
         typename ConverterT,
         typename DecoderT,
@@ -54,16 +64,19 @@ class AssetRoot : public Element
         // found in cache
         if constexpr(Cached)
         {
-            if(auto res = ctx.asset->subresource<
-                typename FindHelper<ConverterT, DecoderT, Args...>::SubresourceT
+            if(auto res = ctx.asset->subresource<typename FindHelper<
+                ConverterT, DecoderT, Args...>::ReturnT::element_type
             >()) return std::move(res);
         }
 
         // load from stream
+        // not using Asset::decode() so the lifetime of opened istream is in
+        // our control
+        const auto in = ctx.asset->open();
         auto res = ConverterT()(
             // converter can use the context to request additional resources
             &ctx,
-            ctx.asset->decode<DecoderT>(),
+            DecoderT()(*in),
             std::forward<Args>(converter_args)...);
         if constexpr(Cached) ctx.asset->addSubresource(res);
         return std::move(res);

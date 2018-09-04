@@ -124,6 +124,8 @@ void SortedSpriteRenderingSubsystem::createPipeline(
 
 void SortedSpriteRenderingSubsystem::update(const TimeDuration &dt)
 {
+    if(mElements.empty()) return;
+
     std::sort(mElements.begin(), mElements.end(), mCompareFunc);
 
     mVertexBuffer->allocate(mElements.size() * sizeof(SpriteIn) * 4);
@@ -145,17 +147,17 @@ void SortedSpriteRenderingSubsystem::update(const TimeDuration &dt)
             .cwiseProduct(sprite->texture->size().cast<float>());
         const auto min = sprite->uv_rect.min();
         const auto max = sprite->uv_rect.max();
-        // top-left
-        verts[vert_idx].pos = { 0, 0, size.y() };
+        // top-left (default origin)
+        verts[vert_idx].pos = { 0, 0, 0 };
         verts[vert_idx++].uv = min;
         // top-right
-        verts[vert_idx].pos = { size.x(), 0, size.y() };
+        verts[vert_idx].pos = { size.x(), 0, 0 };
         verts[vert_idx++].uv = { max.x(), min.y() };
         // bottom-left
-        verts[vert_idx].pos = { 0, 0, 0 };
+        verts[vert_idx].pos = { 0, 0, -size.y() };
         verts[vert_idx++].uv = { min.x(), max.y() };
         // bottom-right
-        verts[vert_idx].pos = { size.x(), 0, 0 };
+        verts[vert_idx].pos = { size.x(), 0, -size.y() };
         verts[vert_idx++].uv = max;
     }
 
@@ -188,6 +190,8 @@ void SortedSpriteRenderingSubsystem::render(
     std::shared_ptr<Framebuffer> framebuffer,
     const CommandListSink &cmd_out) const
 {
+    if(mElements.empty()) return;
+
     auto cmd_list = mCommandPool->allocateGraphicsCommandList();
 
     cmd_list->beginRecording();

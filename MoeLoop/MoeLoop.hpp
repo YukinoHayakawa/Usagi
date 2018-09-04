@@ -39,6 +39,7 @@ class MoeLoop
     Element *mSceneRoot = nullptr;
     Scene *mCurrentScene = nullptr;
 
+    void addFilesystemPackage(std::string name, const std::string &path);
     Scene * loadScene(const std::string &name);
     void setCurrentScene(Scene *scene);
     static void unimplemented(const std::string &msg);

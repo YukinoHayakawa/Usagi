@@ -4,6 +4,7 @@
 #include <Usagi/Core/Math.hpp>
 
 #include <MoeLoop/Script/LuaForwardDecl.hpp>
+#include <MoeLoop/JSON/JSONForwardDecl.hpp>
 
 namespace usagi
 {
@@ -13,7 +14,6 @@ class AssetRoot;
 
 namespace usagi::moeloop
 {
-struct SceneConfig;
 class Expression;
 class Character;
 class ImageLayer;
@@ -21,20 +21,22 @@ class ImageLayer;
 class Scene : public Element
 {
     Runtime *mRuntime = nullptr;
-    AssetRoot *mAsset = nullptr;
+    AssetRoot *mAssets = nullptr;
     Element *mCharacters = nullptr;
     Element *mExpressions = nullptr;
     Element *mImageLayers = nullptr;
-    std::shared_ptr<SceneConfig> mConfig;
+
+    AlignedBox3f mBound;
+    std::map<std::string, Vector3f> mPositions;
 
 public:
     Scene(
         Element *parent,
-        std::string asset_locator,
+        std::string name,
         Runtime *runtime,
         AssetRoot *asset);
 
-    void load();
+    void load(const json &j);
 
     ImageLayer * createImageLayer(const std::string &name, float y_pos);
     Character * loadCharacter(const std::string &asset_locator);
@@ -42,7 +44,7 @@ public:
     Vector3f getPosition(const std::string &name) const;
 
     Runtime * runtime() const { return mRuntime; }
-    AssetRoot * asset() const { return mAsset; }
+    AssetRoot * asset() const { return mAssets; }
 
     static void exportScript(kaguya::State &vm);
 };

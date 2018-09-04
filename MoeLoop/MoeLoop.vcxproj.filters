@@ -36,13 +36,10 @@
     <ClCompile Include="Render\SortedSpriteRenderingSubsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\SceneConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="JSON\JsonAssetDecoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="JSON\JsonAssetConverter.cpp">
+    <ClCompile Include="JSON\JsonPropertySheetAssetConverter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -83,13 +80,13 @@
     <ClInclude Include="JSON\Math.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\SceneConfig.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="JSON\JsonAssetDecoder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="JSON\JsonAssetConverter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JSON\JsonPropertySheetAssetConverter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

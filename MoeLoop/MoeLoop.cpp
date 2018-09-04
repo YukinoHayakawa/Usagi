@@ -24,6 +24,7 @@
 #include "Scene/Character.hpp"
 #include "Scene/ImageLayer.hpp"
 #include "Render/SortedSpriteRenderingSubsystem.hpp"
+#include "JSON/JsonPropertySheetAssetConverter.hpp"
 
 namespace usagi::moeloop
 {
@@ -203,11 +204,18 @@ void MoeLoop::bindScript()
 {
     using namespace std::placeholders;
 
+    mLuaContext.setErrorHandler([](const int error, const char *msg) {
+        LOG(error, "Lua error {}: {}", error, msg);
+        throw std::runtime_error("Script error");
+    });
+
     mLuaContext["unimplemented"].setFunction(&MoeLoop::unimplemented);
 
     mLuaContext["MoeLoop"].setClass(kaguya::UserdataMetatable<MoeLoop>()
         .addFunction("loadScene", &MoeLoop::loadScene)
+        // todo not useful
         .addFunction("setCurrentScene", &MoeLoop::setCurrentScene)
+        .addFunction("addFilesystemPackage", &MoeLoop::addFilesystemPackage)
     );
     mLuaContext["ml"] = this;
 
@@ -216,9 +224,21 @@ void MoeLoop::bindScript()
     ImageLayer::exportScript(mLuaContext);
 }
 
+void MoeLoop::addFilesystemPackage(std::string name, const std::string &path)
+{
+    assets()->addChild<FilesystemAssetPackage>(
+        std::move(name), std::filesystem::u8path(path));
+}
+
 Scene * MoeLoop::loadScene(const std::string &name)
 {
-    return rootElement()->addChild<Scene>(name, runtime(), assets());
+    LOG(info, "Loading scene: {}", name);
+    const auto data = assets()->uncachedRes<JsonPropertySheetAssetConverter>(
+        fmt::format("scenes/{}.json", name)
+    );
+    auto scene = rootElement()->addChild<Scene>(name, runtime(), assets());
+    scene->load(data);
+    return scene;
 }
 
 void MoeLoop::setCurrentScene(Scene *scene)

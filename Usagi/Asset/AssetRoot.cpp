@@ -59,7 +59,7 @@ usagi::Asset * usagi::AssetRoot::findAssetByString(
         catch(const std::exception &e)
         {
             LOG(error,
-                "An exception was thrown while searching package %s: %s",
+                "An exception was thrown while searching package {}: {}",
                 pkg->name(), e.what()
             );
         }

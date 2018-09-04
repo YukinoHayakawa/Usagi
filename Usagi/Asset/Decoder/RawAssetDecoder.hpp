@@ -9,7 +9,7 @@ namespace usagi
  */
 struct RawAssetDecoder
 {
-    std::istream& operator()(std::istream &in) const
+    std::istream & operator()(std::istream &in) const
     {
         return in;
     }

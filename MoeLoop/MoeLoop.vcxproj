@@ -120,8 +120,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="JSON\JsonAssetConverter.cpp" />
     <ClCompile Include="JSON\JsonAssetDecoder.cpp" />
+    <ClCompile Include="JSON\JsonPropertySheetAssetConverter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoeLoop.cpp" />
     <ClCompile Include="Render\SortedSpriteRenderingSubsystem.cpp" />
@@ -129,12 +129,12 @@
     <ClCompile Include="Scene\Expression.cpp" />
     <ClCompile Include="Scene\ImageLayer.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
-    <ClCompile Include="Scene\SceneConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="JSON\JSON.hpp" />
     <ClInclude Include="JSON\JsonAssetConverter.hpp" />
     <ClInclude Include="JSON\JsonAssetDecoder.hpp" />
+    <ClInclude Include="JSON\JsonPropertySheetAssetConverter.hpp" />
     <ClInclude Include="JSON\JSONForwardDecl.hpp" />
     <ClInclude Include="JSON\Math.hpp" />
     <ClInclude Include="MoeLoop.hpp" />
@@ -144,7 +144,6 @@
     <ClInclude Include="Scene\Expression.hpp" />
     <ClInclude Include="Scene\ImageLayer.hpp" />
     <ClInclude Include="Scene\Scene.hpp" />
-    <ClInclude Include="Scene\SceneConfig.hpp" />
     <ClInclude Include="Script\Lua.hpp" />
     <ClInclude Include="Script\LuaForwardDecl.hpp" />
   </ItemGroup>

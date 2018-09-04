@@ -13,7 +13,7 @@ usagi::Game::Game(Runtime *runtime)
     : mRuntime { runtime }
 {
     const auto subsys_listener = [&](auto &&e) {
-        for (auto &&s : mSubsystems)
+        for(auto &&s : mSubsystems)
         {
             s.subsystem->updateRegistry(e.source());
         }
@@ -40,9 +40,7 @@ std::vector<usagi::SubsystemInfo>::iterator usagi::Game::findSubsystemByName(
 {
     return std::find_if(
         mSubsystems.begin(), mSubsystems.end(),
-        [&](auto &s) {
-            return s.name == subsystem_name;
-        }
+        [&](auto &s) { return s.name == subsystem_name; }
     );
 }
 
@@ -55,7 +53,7 @@ usagi::Subsystem * usagi::Game::addSubsystemPtr(
     info.subsystem = std::move(subsystem);
 
     // check that no existing subsystem is using the same name
-    if (findSubsystemByName(info.name) != mSubsystems.end())
+    if(findSubsystemByName(info.name) != mSubsystems.end())
     {
         throw std::runtime_error("Subsystem name already used.");
     }
@@ -76,19 +74,19 @@ void usagi::Game::disableSubsystem(const std::string &subsystem_name)
 
 void usagi::Game::setSubsystemEnabled(
     const std::string &subsystem_name,
-    bool enabled)
+    const bool enabled)
 {
     const auto iter = findSubsystemByName(subsystem_name);
-    if (iter == mSubsystems.end())
+    if(iter == mSubsystems.end())
         throw std::runtime_error("No such subsystem");
     iter->enabled = enabled;
 }
 
 void usagi::Game::update(const TimeDuration &dt)
 {
-    for (auto &&s : mSubsystems)
+    for(auto &&s : mSubsystems)
     {
-        if (s.enabled)
+        if(s.enabled)
             s.subsystem->update(dt);
     }
 }
