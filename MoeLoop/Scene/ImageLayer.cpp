@@ -32,6 +32,9 @@ void ImageLayer::changeImage(const std::string &name)
     mSprite->texture =
         mScene->asset()->res<GpuImageAssetConverter>(
             "images/" + name, mScene->runtime()->gpu());
+    mTransform->setOffset({
+        0, 0, static_cast<float>(mSprite->texture->size().y())
+    });
 }
 
 void ImageLayer::exportScript(kaguya::State &vm)

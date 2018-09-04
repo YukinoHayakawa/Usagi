@@ -23,7 +23,7 @@ void Character::changeExpression(Expression *expr)
 {
     mCurrentExpression = expr;
     const auto o = mCurrentExpression->origin();
-    mTransform->setOffset({ o.x(), 0, o.y() });
+    mTransform->setOffset({ -o.x(), 0, o.y() });
     mSprite->texture = mCurrentExpression->texture();
     mSprite->uv_rect = mCurrentExpression->textureUvRect();
 }
