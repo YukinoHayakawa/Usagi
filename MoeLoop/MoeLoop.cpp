@@ -47,9 +47,9 @@ void MoeLoop::setupGraphics()
     mSpriteRender = addSubsystem(
         "sprite",
         std::make_unique<SortedSpriteRenderingSubsystem>(
-            this, [](Element *l, Element *r) {
-                return l->getComponent<TransformComponent>()->position().y() >
-                    r->getComponent<TransformComponent>()->position().y();
+            this, [](TransformComponent *lt, SpriteComponent *ls,
+                TransformComponent *rt, SpriteComponent *rs) {
+                return lt->position().y() > rt->position().y();
             }
     ));
     RenderPassCreateInfo attachments;

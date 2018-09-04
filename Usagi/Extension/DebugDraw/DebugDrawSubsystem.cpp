@@ -2,7 +2,6 @@
 
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Converter/SpirvAssetConverter.hpp>
-#include <Usagi/Core/Element.hpp>
 #include <Usagi/Game/Game.hpp>
 #include <Usagi/Runtime/Graphics/GpuDevice.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsPipelineCompiler.hpp>
@@ -17,9 +16,6 @@
 #include <Usagi/Runtime/Graphics/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsCommandList.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
-#include <Usagi/Utility/TypeCast.hpp>
-
-#include "DebugDrawComponent.hpp"
 
 void usagi::DebugDrawSubsystem::createPipelines(
     RenderPassCreateInfo &render_pass_info)
@@ -174,7 +170,7 @@ void usagi::DebugDrawSubsystem::update(const TimeDuration &dt)
 {
     for(auto &&e : mRegistry)
     {
-        e->getComponent<DebugDrawComponent>()->draw(mContext);
+        std::get<DebugDrawComponent*>(e.second)->draw(mContext);
     }
 }
 
@@ -193,19 +189,6 @@ void usagi::DebugDrawSubsystem::render(
     mCurrentCmdList->endRendering();
     mCurrentCmdList->endRecording();
     cmd_out(std::move(mCurrentCmdList));
-}
-
-bool usagi::DebugDrawSubsystem::processable(Element *element)
-{
-    return is_instance_of<DebugDrawComponent>(element);
-}
-
-void usagi::DebugDrawSubsystem::updateRegistry(Element *element)
-{
-    if(element->hasComponent<DebugDrawComponent>())
-        mRegistry.insert(element);
-    else
-        mRegistry.erase(element);
 }
 
 dd::GlyphTextureHandle usagi::DebugDrawSubsystem::createGlyphTexture(

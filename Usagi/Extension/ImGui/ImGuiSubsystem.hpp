@@ -1,19 +1,22 @@
 ﻿#pragma once
 
 #include <memory>
-#include <set>
 
 #include <Usagi/Graphics/OverlayRenderingSubsystem.hpp>
 #include <Usagi/Runtime/Input/Keyboard/KeyEventListener.hpp>
 #include <Usagi/Runtime/Input/Mouse/MouseEventListener.hpp>
-#include <Usagi/Runtime/Graphics/GpuImage.hpp>
-#include <Usagi/Runtime/Graphics/GpuSampler.hpp>
 #include <Usagi/Runtime/Window/WindowEventListener.hpp>
+#include <Usagi/Game/CollectionSubsystem.hpp>
+
+#include "ImGuiComponent.hpp"
 
 struct ImGuiContext;
 
 namespace usagi
 {
+class GpuSampler;
+class GpuImageView;
+class GpuImage;
 struct RenderPassCreateInfo;
 class RenderPass;
 class Window;
@@ -22,10 +25,10 @@ class GpuCommandPool;
 class GpuBuffer;
 class GraphicsPipeline;
 class Mouse;
-struct ImGuiComponent;
 
 class ImGuiSubsystem
     : public OverlayRenderingSubsystem
+    , public CollectionSubsystem<ImGuiComponent>
     , public KeyEventListener
     , public MouseEventListener
     , public WindowEventListener
@@ -37,8 +40,6 @@ class ImGuiSubsystem
 
     ImGuiContext *mContext = nullptr;
     bool mMouseJustPressed[5] = { };
-
-    std::set<Element*> mRegistry;
 
     void setupInput();
 
@@ -89,8 +90,5 @@ public:
         const TimeDuration &dt,
         std::shared_ptr<Framebuffer> framebuffer,
         const CommandListSink &cmd_out) const override;
-
-    bool processable(Element *element) override;
-    void updateRegistry(Element *element) override;
 };
 }

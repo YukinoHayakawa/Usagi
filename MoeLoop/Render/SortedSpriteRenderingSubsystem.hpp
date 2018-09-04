@@ -2,10 +2,13 @@
 
 #include <vector>
 
-#include <Usagi/Core/Math.hpp>
+#include <Usagi/Game/CollectionSubsystem.hpp>
 #include <Usagi/Graphics/ProjectiveRenderingSubsystem.hpp>
 #include <Usagi/Runtime/Graphics/GpuCommandPool.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsPipeline.hpp>
+#include <Usagi/Transform/TransformComponent.hpp>
+
+#include "SpriteComponent.hpp"
 
 namespace usagi
 {
@@ -25,15 +28,20 @@ namespace usagi::moeloop
  * Sprites are rendered using the texture color as output (unlit material).
  * Prior to rendering, sprites are sorted using provided compare function.
  */
-class SortedSpriteRenderingSubsystem : public ProjectiveRenderingSubsystem
+class SortedSpriteRenderingSubsystem
+    : public ProjectiveRenderingSubsystem
+    , public CollectionSubsystem<TransformComponent, SpriteComponent>
 {
 public:
-    typedef std::function<bool(Element *l, Element *r)> CompareFunc;
+    typedef std::function<bool(
+        TransformComponent *lt, SpriteComponent *ls,
+        TransformComponent *rt, SpriteComponent *rs
+    )> CompareFunc;
 
 private:
     Game *mGame;
     CompareFunc mCompareFunc;
-    std::vector<Element*> mElements;
+    std::vector<Registry::const_iterator> mSortedElements;
     std::shared_ptr<RenderPass> mRenderPass;
     std::shared_ptr<GraphicsPipeline> mPipeline;
     std::shared_ptr<GpuCommandPool> mCommandPool;
@@ -52,8 +60,6 @@ public:
     void createPipeline(RenderPassCreateInfo render_pass_info);
 
     void update(const TimeDuration &dt) override;
-    bool processable(Element *element) override;
-    void updateRegistry(Element *element) override;
     void render(
         const TimeDuration &dt,
         std::shared_ptr<Framebuffer> framebuffer,

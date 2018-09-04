@@ -1,12 +1,11 @@
 ﻿#pragma once
 
-#include <set>
-
-#include <Usagi/Core/Math.hpp>
 #include <Usagi/Graphics/ProjectiveRenderingSubsystem.hpp>
 #include <Usagi/Graphics/OverlayRenderingSubsystem.hpp>
+#include <Usagi/Game/CollectionSubsystem.hpp>
 
 #include "DebugDraw.hpp"
+#include "DebugDrawComponent.hpp"
 
 namespace usagi
 {
@@ -22,11 +21,11 @@ class GpuBuffer;
 class DebugDrawSubsystem
     : public ProjectiveRenderingSubsystem
     , public OverlayRenderingSubsystem
+    , public CollectionSubsystem<DebugDrawComponent>
     , public dd::RenderInterface
 {
     Game *mGame = nullptr;
     dd::ContextHandle mContext = nullptr;
-    std::set<Element*> mRegistry;
 
     std::shared_ptr<RenderPass> mRenderPass;
     std::shared_ptr<GraphicsPipeline> mPointDepthEnabledPipeline;
@@ -54,8 +53,6 @@ public:
         const TimeDuration &dt,
         std::shared_ptr<Framebuffer> framebuffer,
         const CommandListSink &cmd_out) const override;
-    bool processable(Element *element) override;
-    void updateRegistry(Element *element) override;
 
     dd::GlyphTextureHandle createGlyphTexture(
         int width,

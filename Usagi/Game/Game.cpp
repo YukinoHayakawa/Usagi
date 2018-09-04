@@ -15,7 +15,7 @@ usagi::Game::Game(Runtime *runtime)
     const auto subsys_listener = [&](auto &&e) {
         for(auto &&s : mSubsystems)
         {
-            s.subsystem->updateRegistry(e.source());
+            s.subsystem->onElementComponentChanged(e.source());
         }
     };
 
@@ -23,7 +23,7 @@ usagi::Game::Game(Runtime *runtime)
     // entities with updated component configurations.
     // todo: directly pass the events to the subsystems?
     mRootElement.addEventListener<ComponentAddedEvent>(subsys_listener);
-    mRootElement.addEventListener<PreComponentRemovalEvent>(subsys_listener);
+    //mRootElement.addEventListener<PreComponentRemovalEvent>(subsys_listener);
     mRootElement.addEventListener<PostComponentRemovalEvent>(subsys_listener);
 
     mRootElement.setName("ElementRoot");

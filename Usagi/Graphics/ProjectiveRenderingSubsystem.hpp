@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <Usagi/Core/Math.hpp>
+
 #include "RenderableSubsystem.hpp"
 
 namespace usagi

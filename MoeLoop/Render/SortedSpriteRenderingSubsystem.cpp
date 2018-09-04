@@ -1,7 +1,5 @@
 ﻿#include "SortedSpriteRenderingSubsystem.hpp"
 
-#include <algorithm>
-
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Converter/SpirvAssetConverter.hpp>
 #include <Usagi/Game/Game.hpp>
@@ -17,9 +15,6 @@
 #include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/Shader/SpirvBinary.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
-#include <Usagi/Transform/TransformComponent.hpp>
-
-#include "SpriteComponent.hpp"
 
 namespace usagi::moeloop
 {
@@ -124,17 +119,31 @@ void SortedSpriteRenderingSubsystem::createPipeline(
 
 void SortedSpriteRenderingSubsystem::update(const TimeDuration &dt)
 {
-    if(mElements.empty()) return;
+    mSortedElements.clear();
+    mSortedElements.reserve(mRegistry.size());
+    for(auto i = mRegistry.begin(); i != mRegistry.end(); ++i)
+    {
+        mSortedElements.push_back(i);
+    }
+    if(mSortedElements.empty()) return;
 
-    std::sort(mElements.begin(), mElements.end(), mCompareFunc);
+    std::sort(mSortedElements.begin(), mSortedElements.end(),
+        [&](auto &&l, auto &&r) {
+            return mCompareFunc(
+                std::get<TransformComponent*>(l->second),
+                std::get<SpriteComponent*>(l->second),
+                std::get<TransformComponent*>(r->second),
+                std::get<SpriteComponent*>(r->second)
+            );
+        });
 
-    mVertexBuffer->allocate(mElements.size() * sizeof(SpriteIn) * 4);
+    mVertexBuffer->allocate(mSortedElements.size() * sizeof(SpriteIn) * 4);
 
     const auto verts = mVertexBuffer->mappedMemory<SpriteIn>();
     std::size_t vert_idx = 0;
-    for(auto &&e : mElements)
+    for(auto &&e : mSortedElements)
     {
-        const auto sprite = e->getComponent<SpriteComponent>();
+        const auto sprite = std::get<SpriteComponent*>(e->second);
         if(!sprite->texture)
         {
             vert_idx += 4;
@@ -164,33 +173,12 @@ void SortedSpriteRenderingSubsystem::update(const TimeDuration &dt)
     mVertexBuffer->flush();
 }
 
-bool SortedSpriteRenderingSubsystem::processable(Element *element)
-{
-    return element->hasComponent<SpriteComponent>() &&
-        element->hasComponent<TransformComponent>();
-}
-
-void SortedSpriteRenderingSubsystem::updateRegistry(Element *element)
-{
-    if(processable(element))
-    {
-        if(std::find(mElements.begin(), mElements.end(), element) ==
-            mElements.end())
-            mElements.push_back(element);
-    }
-    else
-    {
-        mElements.erase(std::remove(
-            mElements.begin(), mElements.end(), element), mElements.end());
-    }
-}
-
 void SortedSpriteRenderingSubsystem::render(
     const TimeDuration &dt,
     std::shared_ptr<Framebuffer> framebuffer,
     const CommandListSink &cmd_out) const
 {
-    if(mElements.empty()) return;
+    if(mSortedElements.empty()) return;
 
     auto cmd_list = mCommandPool->allocateGraphicsCommandList();
 
@@ -203,12 +191,12 @@ void SortedSpriteRenderingSubsystem::render(
     cmd_list->bindVertexBuffer(0, mVertexBuffer, 0);
     cmd_list->bindIndexBuffer(mIndexBuffer, 0, GraphicsIndexType::UINT16);
 
-    for(std::size_t i = 0; i < mElements.size(); ++i)
+    for(std::size_t i = 0; i < mSortedElements.size(); ++i)
     {
-        const auto s = mElements[i]->getComponent<SpriteComponent>();
+        const auto s = std::get<SpriteComponent*>(mSortedElements[i]->second);
         // ignore unloaded sprites
         if(!s->texture) continue;
-        const auto t = mElements[i]->getComponent<TransformComponent>();
+        const auto t = std::get<TransformComponent*>(mSortedElements[i]->second);
         cmd_list->bindResourceSet(1, { s->texture->baseView() });
         cmd_list->setConstant(ShaderStage::VERTEX, "mvp_matrix",
             (mWorldToNDC * t->localToWorld()).data(), sizeof(float) * 16);

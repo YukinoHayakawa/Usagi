@@ -13,7 +13,7 @@ class GraphicsCommandList;
 /**
  * \brief Subsystem that uses GPU to draw.
  */
-class RenderableSubsystem : public Subsystem
+class RenderableSubsystem : virtual public Subsystem
 {
 public:
     using CommandListSink =

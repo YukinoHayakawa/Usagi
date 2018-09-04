@@ -5,24 +5,25 @@
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Game/Game.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
-#include <Usagi/Runtime/Graphics/GpuDevice.hpp>
-#include <Usagi/Runtime/Graphics/GraphicsPipelineCompiler.hpp>
-#include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/Framebuffer.hpp>
 #include <Usagi/Runtime/Graphics/GpuBuffer.hpp>
 #include <Usagi/Runtime/Graphics/GpuCommandPool.hpp>
+#include <Usagi/Runtime/Graphics/GpuDevice.hpp>
+#include <Usagi/Runtime/Graphics/GpuImage.hpp>
 #include <Usagi/Runtime/Graphics/GpuImageCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/GpuImageView.hpp>
 #include <Usagi/Runtime/Graphics/GpuImageViewCreateInfo.hpp>
+#include <Usagi/Runtime/Graphics/GpuSampler.hpp>
 #include <Usagi/Runtime/Graphics/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsCommandList.hpp>
+#include <Usagi/Runtime/Graphics/GraphicsPipelineCompiler.hpp>
+#include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
 #include <Usagi/Runtime/Input/Keyboard/Keyboard.hpp>
 #include <Usagi/Runtime/Input/Mouse/Mouse.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Runtime/Window/Window.hpp>
 
 #include "ImGui.hpp"
-#include "ImGuiComponent.hpp"
 
 void usagi::ImGuiSubsystem::setup()
 {
@@ -324,7 +325,7 @@ void usagi::ImGuiSubsystem::updateMouse()
 void usagi::ImGuiSubsystem::processElements(const TimeDuration &dt)
 {
     for(auto &e : mRegistry)
-        e->getComponent<ImGuiComponent>()->draw(dt);
+        std::get<ImGuiComponent*>(e.second)->draw(dt);
 }
 
 void usagi::ImGuiSubsystem::render(
@@ -450,20 +451,6 @@ void usagi::ImGuiSubsystem::render(
     cmd_list->endRecording();
 
     cmd_out(std::move(cmd_list));
-}
-
-bool usagi::ImGuiSubsystem::processable(Element *element)
-{
-    return false;
-}
-
-void usagi::ImGuiSubsystem::updateRegistry(Element *element)
-{
-    // todo better approach...?
-    if(element->hasComponent<ImGuiComponent>())
-        mRegistry.insert(element);
-    else
-        mRegistry.erase(element);
 }
 
 void usagi::ImGuiSubsystem::onKeyStateChange(const KeyEvent &e)
