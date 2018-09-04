@@ -33,6 +33,26 @@ public:
 
     boost::uuids::uuid uuid() const { return mUuid; }
 
+    /**
+     * \brief The human-friendly string for locating the asset, including
+     * the package name.
+     * \return
+     */
+    virtual std::string path() const = 0;
+
+    /**
+     * \brief A path that can be used to locate assets in the same directory
+     * by appending the target asset name. i.e. trailing space is included.
+     * \return
+     */
+    virtual std::string parentPath() const = 0;
+
+    template <typename DecoderT>
+    auto decode()
+    {
+        return DecoderT()(*open());
+    }
+
     template <typename SubresourceT>
     std::shared_ptr<SubresourceT> subresource() const
     {

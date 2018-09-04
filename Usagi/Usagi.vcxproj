@@ -187,6 +187,7 @@
     <ClInclude Include="Animation\AnimationComponent.hpp" />
     <ClInclude Include="Animation\Timing.hpp" />
     <ClInclude Include="Asset\Asset.hpp" />
+    <ClInclude Include="Asset\AssetLoadingContext.hpp" />
     <ClInclude Include="Asset\AssetPackage.hpp" />
     <ClInclude Include="Asset\AssetRoot.hpp" />
     <ClInclude Include="Asset\Converter\GpuImageAssetConverter.hpp" />

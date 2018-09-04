@@ -9,7 +9,7 @@
 
 std::shared_ptr<usagi::GpuImage>
 usagi::GpuImageAssetConverter::operator()(
-    AssetRoot *assets,
+    AssetLoadingContext *ctx,
     const ImageBuffer &buffer,
     GpuDevice *device) const
 {

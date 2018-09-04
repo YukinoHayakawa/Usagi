@@ -150,11 +150,11 @@ void usagi::ImGuiSubsystem::createPipeline(
     // Shaders
     {
         compiler->setShader(ShaderStage::VERTEX,
-            assets->find<SpirvAssetConverter>(
+            assets->res<SpirvAssetConverter>(
                 "imgui:shaders/glsl_shader.vert", ShaderStage::VERTEX)
         );
         compiler->setShader(ShaderStage::FRAGMENT,
-            assets->find<SpirvAssetConverter>(
+            assets->res<SpirvAssetConverter>(
                 "imgui:shaders/glsl_shader.frag", ShaderStage::FRAGMENT)
         );
     }

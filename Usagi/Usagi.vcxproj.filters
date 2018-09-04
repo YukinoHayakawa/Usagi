@@ -650,5 +650,8 @@
     <ClInclude Include="Camera\Controller\CameraMan.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Asset\AssetLoadingContext.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

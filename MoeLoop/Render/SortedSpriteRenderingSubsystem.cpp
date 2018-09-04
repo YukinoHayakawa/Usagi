@@ -67,11 +67,11 @@ void SortedSpriteRenderingSubsystem::createPipeline(
     // Shaders
     {
         compiler->setShader(ShaderStage::VERTEX,
-            assets->find<SpirvAssetConverter>(
+            assets->res<SpirvAssetConverter>(
                 "moeloop:shaders/sprite.vert", ShaderStage::VERTEX)
         );
         compiler->setShader(ShaderStage::FRAGMENT,
-            assets->find<SpirvAssetConverter>(
+            assets->res<SpirvAssetConverter>(
                 "moeloop:shaders/sprite.frag", ShaderStage::FRAGMENT)
         );
     }

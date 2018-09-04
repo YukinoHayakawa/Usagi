@@ -15,10 +15,29 @@ usagi::FilesystemAsset::FilesystemAsset(
     assert(is_instance_of<FilesystemAssetPackage>(parent));
 }
 
+usagi::FilesystemAssetPackage * usagi::FilesystemAsset::package() const
+{
+    return static_cast<FilesystemAssetPackage*>(parent());
+}
+
+std::string usagi::FilesystemAsset::path() const
+{
+    return fmt::format("{}:{}", package()->name(), name());
+}
+
+std::string usagi::FilesystemAsset::parentPath() const
+{
+    const auto path = name();
+    const auto sep = path.find_last_of('/');
+    if(sep == std::string::npos) // not in any directory
+        return fmt::format("{}:", package()->name());
+    return fmt::format("{}:{}", package()->name(), path.substr(sep + 1));
+}
+
 std::unique_ptr<std::istream> usagi::FilesystemAsset::open()
 {
-    const auto pkg = static_cast<FilesystemAssetPackage*>(parent());
-    const auto full_path = pkg->rootPath() / std::filesystem::u8path(name());
+    const auto full_path =
+        package()->rootPath() / std::filesystem::u8path(name());
 
     LOG(info, "Loading asset: {}", name());
 

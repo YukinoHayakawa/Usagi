@@ -7,7 +7,7 @@
 
 namespace usagi
 {
-class AssetRoot;
+struct AssetLoadingContext;
 struct ImageBuffer;
 class GpuDevice;
 
@@ -16,7 +16,7 @@ struct GpuImageAssetConverter
     using DefaultDecoder = StbImageAssetDecoder;
 
     std::shared_ptr<GpuImage> operator()(
-        AssetRoot *assets,
+        AssetLoadingContext *ctx,
         const ImageBuffer &buffer,
         GpuDevice *device) const;
 };

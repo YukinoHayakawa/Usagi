@@ -5,6 +5,7 @@
 #include <Usagi/Core/Element.hpp>
 
 #include "Asset.hpp"
+#include "AssetLoadingContext.hpp"
 
 namespace usagi
 {
@@ -13,7 +14,6 @@ class AssetPath;
 
 class AssetRoot : public Element
 {
-    Asset * findAsset(std::string locator) const;
     Asset * findAssetByUuid(const boost::uuids::uuid &uuid) const;
     Asset * findAssetByString(std::string string) const;
 
@@ -35,34 +35,69 @@ class AssetRoot : public Element
         using SubresourceT = typename ReturnT::element_type;
     };
 
+    template <
+        typename ConverterT,
+        typename DecoderT,
+        bool Cached,
+        typename... Args
+    >
+    auto locateSubresource(
+        const std::string &locator,
+        Args &&...converter_args)
+        -> typename FindHelper<ConverterT, DecoderT, Args...>::ReturnT
+    {
+        AssetLoadingContext ctx;
+        ctx.asset_root = this;
+        ctx.locator = locator;
+        ctx.asset = findAsset(locator);
+
+        // found in cache
+        if constexpr(Cached)
+        {
+            if(auto res = ctx.asset->subresource<
+                typename FindHelper<ConverterT, DecoderT, Args...>::SubresourceT
+            >()) return std::move(res);
+        }
+
+        // load from stream
+        auto res = ConverterT()(
+            // converter can use the context to request additional resources
+            &ctx,
+            ctx.asset->decode<DecoderT>(),
+            std::forward<Args>(converter_args)...);
+        if constexpr(Cached) ctx.asset->addSubresource(res);
+        return std::move(res);
+    }
+
 public:
     explicit AssetRoot(Element *parent);
+
+    Asset * findAsset(std::string locator) const;
 
     template <
         typename ConverterT,
         typename DecoderT = typename ConverterT::DefaultDecoder,
         typename... Args
     >
-    auto find(const std::string &locator, Args &&...converter_args)
-        -> typename FindHelper<ConverterT, DecoderT, Args...>::ReturnT
+    auto res(const std::string &locator, Args &&...converter_args)
     {
-        const auto asset = findAsset(locator);
+        return locateSubresource<ConverterT, DecoderT, true>(
+            locator,
+            std::forward<Args>(converter_args)...
+        );
+    }
 
-        // found in cache
-        if(auto res = asset->subresource<
-            typename FindHelper<ConverterT, DecoderT, Args...>::SubresourceT
-        >())
-            return std::move(res);
-
-        // load from stream
-        const auto in = asset->open();
-        auto res = ConverterT()(
-            // converter can access asset root to request additional resources
-            this,
-            DecoderT()(*in),
-            std::forward<Args>(converter_args)...);
-        asset->addSubresource(res);
-        return std::move(res);
+    template <
+        typename ConverterT,
+        typename DecoderT = typename ConverterT::DefaultDecoder,
+        typename... Args
+    >
+    auto uncachedRes(const std::string &locator, Args &&...converter_args)
+    {
+        return locateSubresource<ConverterT, DecoderT, false>(
+            locator,
+            std::forward<Args>(converter_args)...
+        );
     }
 };
 }

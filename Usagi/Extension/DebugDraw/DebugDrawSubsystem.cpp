@@ -50,11 +50,11 @@ void usagi::DebugDrawSubsystem::createPointLinePipeline()
     // Shaders
     {
         compiler->setShader(ShaderStage::VERTEX,
-            assets->find<SpirvAssetConverter>(
+            assets->res<SpirvAssetConverter>(
                 "dd:shaders/pointline.vert", ShaderStage::VERTEX)
         );
         compiler->setShader(ShaderStage::FRAGMENT,
-            assets->find<SpirvAssetConverter>(
+            assets->res<SpirvAssetConverter>(
                 "dd:shaders/pointline.frag", ShaderStage::FRAGMENT)
         );
     }
@@ -108,11 +108,11 @@ void usagi::DebugDrawSubsystem::createTextPipeline()
     // Shaders
     {
         compiler->setShader(ShaderStage::VERTEX,
-            assets->find<SpirvAssetConverter>(
+            assets->res<SpirvAssetConverter>(
                 "dd:shaders/text.vert", ShaderStage::VERTEX)
         );
         compiler->setShader(ShaderStage::FRAGMENT,
-            assets->find<SpirvAssetConverter>(
+            assets->res<SpirvAssetConverter>(
                 "dd:shaders/text.frag", ShaderStage::FRAGMENT)
         );
     }
