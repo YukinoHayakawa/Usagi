@@ -324,7 +324,7 @@ void usagi::VulkanGraphicsCommandList::setLineWidth(float width)
 }
 
 void usagi::VulkanGraphicsCommandList::setConstant(
-    ShaderStage stage,
+    const ShaderStage stage,
     const char *name,
     const void *data,
     const std::size_t size)
@@ -339,7 +339,7 @@ void usagi::VulkanGraphicsCommandList::setConstant(
 
     mCommandBuffer->pushConstants(
         mCurrentPipeline->layout(),
-        vk::ShaderStageFlagBits::eAll,
+        translate(stage),
         constant_info.offset, constant_info.size,
         data
     );
