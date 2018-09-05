@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <Usagi/Camera/Controller/CameraMan.hpp>
-#include <Usagi/Game/SingleWindowGame.hpp>
+#include <Usagi/Game/GraphicalGame.hpp>
 #include <Usagi/Runtime/Input/Mouse/MouseEventListener.hpp>
 #include <Usagi/Interactive/InputMap.hpp>
 
@@ -20,7 +20,7 @@ class SortedSpriteRenderingSubsystem;
 class Scene;
 
 class MoeLoop
-    : public SingleWindowGame
+    : public GraphicalGame
     , public MouseEventListener
 {
     std::shared_ptr<GpuImage> mDepthBuffer;

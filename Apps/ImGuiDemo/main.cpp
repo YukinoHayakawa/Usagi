@@ -1,7 +1,7 @@
 ﻿#include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Package/Filesystem/FilesystemAssetPackage.hpp>
 #include <Usagi/Core/Logging.hpp>
-#include <Usagi/Game/SingleWindowGame.hpp>
+#include <Usagi/Game/GraphicalGame.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GraphicsPipelineStage.hpp>
 #include <Usagi/Runtime/Graphics/Framebuffer.hpp>
 #include <Usagi/Runtime/Graphics/GpuDevice.hpp>
@@ -23,14 +23,14 @@ using namespace usagi;
 
 struct ImGuiDemoComponent : ImGuiComponent
 {
-    void draw(const TimeDuration &dt) override
+    void draw(const Clock &clock) override
     {
         ImGui::ShowDemoWindow();
         ImGui::ShowMetricsWindow();
     }
 };
 
-class ImGuiDemo : public SingleWindowGame
+class ImGuiDemo : public GraphicalGame
 {
     ImGuiSubsystem *mImGui = nullptr;
     RenderPassCreateInfo mAttachments;
@@ -38,7 +38,7 @@ class ImGuiDemo : public SingleWindowGame
 
 public:
     explicit ImGuiDemo(Runtime *runtime)
-        : SingleWindowGame {
+        : GraphicalGame {
             runtime,
             u8"🐰 - ImGui Demo",
             Vector2i { 100, 100 },
@@ -70,12 +70,6 @@ public:
 
     void run()
     {
-        using Clock = std::chrono::high_resolution_clock;
-        if constexpr(!Clock::is_steady)
-            LOG(warn, "std::chrono::high_resolution_clock is not steady!");
-
-        auto start = Clock::now();
-        TimeDuration dt { 0 };
         while(mWindow->isOpen())
         {
             auto gpu = runtime()->gpu();
@@ -95,14 +89,14 @@ public:
 
             mImGui->setRenderSizes(mWindow->size(), framebuffer->size());
 
-            update(dt);
+            update(mMasterClock);
 
             // Record command lists
             std::vector<std::shared_ptr<GraphicsCommandList>> cmd_lists;
             const auto cmd_inserter = [&](auto cmd_list) {
                 cmd_lists.push_back(std::move(cmd_list));
             };
-            mImGui->render(dt, framebuffer, cmd_inserter);
+            mImGui->render(mMasterClock, framebuffer, cmd_inserter);
 
             // Submit jobs
             const auto wait_stages = {
@@ -126,9 +120,7 @@ public:
             gpu->reclaimResources();
 
             // Calculate elapsed time
-            const auto end = Clock::now();
-            dt = std::chrono::duration_cast<TimeDuration>(end - start);
-            start = end;
+            mMasterClock.tick();
         }
     }
 };

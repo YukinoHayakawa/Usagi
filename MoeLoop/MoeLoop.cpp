@@ -87,7 +87,7 @@ void MoeLoop::createRenderTargets()
 }
 
 MoeLoop::MoeLoop(Runtime *runtime)
-    : SingleWindowGame(runtime, u8"MoeLoop", { 100, 100 }, { 1920, 1080 })
+    : GraphicalGame(runtime, u8"MoeLoop", { 100, 100 }, { 1920, 1080 })
 {
     mSceneRoot = rootElement()->addChild("SceneRoot");
     assets()->addChild<FilesystemAssetPackage>("moeloop", "Data/moeloop");
@@ -113,12 +113,6 @@ void MoeLoop::mainLoop()
     mCurrentScript = mLuaContext.newThread();
     auto scene_function = mLuaContext.loadfile("init.lua");
 
-    using Clock = std::chrono::high_resolution_clock;
-    if constexpr(!Clock::is_steady)
-        LOG(warn, "std::chrono::high_resolution_clock is not steady!");
-
-    auto start = Clock::now();
-    TimeDuration dt { 0 };
     mCurrentScript(scene_function);
     while(mWindow->isOpen())
     {
@@ -145,14 +139,14 @@ void MoeLoop::mainLoop()
             // world -> camera local -> NDC
             mCameraElement->camera()->localToNDC() *
             mCameraElement->transform()->localToWorld().inverse());
-        update(dt);
+        update(mMasterClock);
 
         // Record command lists
         std::vector<std::shared_ptr<GraphicsCommandList>> cmd_lists;
         const auto cmd_inserter = [&](auto cmd_list) {
             cmd_lists.push_back(std::move(cmd_list));
         };
-        mSpriteRender->render(dt, framebuffer, cmd_inserter);
+        mSpriteRender->render(mMasterClock, framebuffer, cmd_inserter);
 
         // Submit jobs
         const auto wait_stages = {
@@ -176,15 +170,13 @@ void MoeLoop::mainLoop()
         gpu->reclaimResources();
 
         // Calculate elapsed time
-        const auto end = Clock::now();
-        dt = std::chrono::duration_cast<TimeDuration>(end - start);
-        start = end;
+        mMasterClock.tick();
     }
 }
 
 void MoeLoop::onWindowResizeEnd(const WindowSizeEvent &e)
 {
-    SingleWindowGame::onWindowResizeEnd(e);
+    GraphicalGame::onWindowResizeEnd(e);
     createRenderTargets();
 }
 

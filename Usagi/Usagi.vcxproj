@@ -123,6 +123,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation\AnimationComponent.cpp" />
+    <ClCompile Include="Animation\AnimationSubsystem.cpp" />
+    <ClCompile Include="Animation\TimingFunctions.cpp" />
     <ClCompile Include="Asset\Asset.cpp" />
     <ClCompile Include="Asset\AssetPackage.cpp" />
     <ClCompile Include="Asset\AssetRoot.cpp" />
@@ -134,6 +137,7 @@
     <ClCompile Include="Camera\Controller\ModelViewCameraController.cpp" />
     <ClCompile Include="Camera\OrthogonalCamera.cpp" />
     <ClCompile Include="Camera\PerspectiveCamera.cpp" />
+    <ClCompile Include="Core\Clock.cpp" />
     <ClCompile Include="Core\Element.cpp" />
     <ClCompile Include="Core\Event\Event.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
@@ -170,7 +174,7 @@
     <ClCompile Include="Extension\Win32\Window\Win32Window.cpp" />
     <ClCompile Include="Extension\Win32\Window\Win32WindowManager.cpp" />
     <ClCompile Include="Game\Game.cpp" />
-    <ClCompile Include="Game\SingleWindowGame.cpp" />
+    <ClCompile Include="Game\GraphicalGame.cpp" />
     <ClCompile Include="Interactive\InputMap.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
@@ -185,7 +189,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationComponent.hpp" />
-    <ClInclude Include="Animation\Timing.hpp" />
+    <ClInclude Include="Animation\AnimationSubsystem.hpp" />
+    <ClInclude Include="Animation\TimingFunctions.hpp" />
     <ClInclude Include="Asset\Asset.hpp" />
     <ClInclude Include="Asset\AssetLoadingContext.hpp" />
     <ClInclude Include="Asset\AssetPackage.hpp" />
@@ -204,6 +209,7 @@
     <ClInclude Include="Camera\Controller\StaticCameraController.hpp" />
     <ClInclude Include="Camera\OrthogonalCamera.hpp" />
     <ClInclude Include="Camera\PerspectiveCamera.hpp" />
+    <ClInclude Include="Core\Clock.hpp" />
     <ClInclude Include="Core\Component.hpp" />
     <ClInclude Include="Core\Element.hpp" />
     <ClInclude Include="Core\Event\Event.hpp" />
@@ -219,7 +225,6 @@
     <ClInclude Include="Core\Event\Library\Input\MouseMoveEvent.hpp" />
     <ClInclude Include="Core\Logging.hpp" />
     <ClInclude Include="Core\Math.hpp" />
-    <ClInclude Include="Core\Time.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDraw.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDrawComponent.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDrawSubsystem.hpp" />
@@ -261,9 +266,9 @@
     <ClInclude Include="Extension\Win32\Win32Runtime.hpp" />
     <ClInclude Include="Extension\Win32\Window\Win32Window.hpp" />
     <ClInclude Include="Extension\Win32\Window\Win32WindowManager.hpp" />
-    <ClInclude Include="Game\ConstrainedSubsystem.hpp" />
+    <ClInclude Include="Game\CollectionSubsystem.hpp" />
     <ClInclude Include="Game\Game.hpp" />
-    <ClInclude Include="Game\SingleWindowGame.hpp" />
+    <ClInclude Include="Game\GraphicalGame.hpp" />
     <ClInclude Include="Game\Subsystem.hpp" />
     <ClInclude Include="Geometry\GeometryComponent.hpp" />
     <ClInclude Include="Graphics\OverlayRenderingSubsystem.hpp" />

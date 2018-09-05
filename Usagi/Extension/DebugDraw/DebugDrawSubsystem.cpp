@@ -166,7 +166,7 @@ usagi::DebugDrawSubsystem::~DebugDrawSubsystem()
     mContext = nullptr;
 }
 
-void usagi::DebugDrawSubsystem::update(const TimeDuration &dt)
+void usagi::DebugDrawSubsystem::update(const Clock &clock)
 {
     for(auto &&e : mRegistry)
     {
@@ -175,7 +175,7 @@ void usagi::DebugDrawSubsystem::update(const TimeDuration &dt)
 }
 
 void usagi::DebugDrawSubsystem::render(
-    const TimeDuration &dt,
+    const Clock &clock,
     const std::shared_ptr<Framebuffer> framebuffer,
     const CommandListSink &cmd_out) const
 {

@@ -2,7 +2,7 @@
 
 #include <Usagi/Game/Game.hpp>
 #include <Usagi/Interactive/InputMap.hpp>
-#include <Usagi/Game/SingleWindowGame.hpp>
+#include <Usagi/Game/GraphicalGame.hpp>
 #include <Usagi/Camera/Controller/CameraMan.hpp>
 
 namespace usagi
@@ -14,7 +14,7 @@ class PerspectiveCamera;
 class ModelViewCameraController;
 
 class DebugDrawDemo
-    : public SingleWindowGame
+    : public GraphicalGame
     , public MouseEventListener
 {
     std::shared_ptr<GpuImage> mDepthBuffer;

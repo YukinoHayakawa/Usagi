@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include <Usagi/Core/Time.hpp>
 #include <Usagi/Utility/Noncopyable.hpp>
 
 namespace usagi
 {
+class Clock;
 class Element;
 
 class Subsystem : Noncopyable
@@ -14,9 +14,9 @@ public:
 
     /**
      * \brief Update the state of subsystem based on provided time step.
-     * \param dt
+     * \param clock
      */
-    virtual void update(const TimeDuration &dt) = 0;
+    virtual void update(const Clock &clock) = 0;
 
     /**
      * \brief Called every time when a component is added or removed.

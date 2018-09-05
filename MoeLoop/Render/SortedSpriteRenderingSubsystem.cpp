@@ -117,7 +117,7 @@ void SortedSpriteRenderingSubsystem::createPipeline(
     mSampler = gpu->createSampler({ });
 }
 
-void SortedSpriteRenderingSubsystem::update(const TimeDuration &dt)
+void SortedSpriteRenderingSubsystem::update(const Clock &clock)
 {
     mSortedElements.clear();
     mSortedElements.reserve(mRegistry.size());
@@ -174,7 +174,7 @@ void SortedSpriteRenderingSubsystem::update(const TimeDuration &dt)
 }
 
 void SortedSpriteRenderingSubsystem::render(
-    const TimeDuration &dt,
+    const Clock &clock,
     std::shared_ptr<Framebuffer> framebuffer,
     const CommandListSink &cmd_out) const
 {

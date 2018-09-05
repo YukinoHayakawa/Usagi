@@ -91,7 +91,7 @@ void usagi::DebugDrawDemo::setupCamera()
 }
 
 usagi::DebugDrawDemo::DebugDrawDemo(Runtime *runtime)
-    : SingleWindowGame {
+    : GraphicalGame {
         runtime,
         u8"🐰 - DebugDraw Demo",
         Vector2i { 100, 100 },
@@ -119,12 +119,6 @@ void usagi::DebugDrawDemo::onMouseButtonStateChange(const MouseButtonEvent &e)
 
 void usagi::DebugDrawDemo::run()
 {
-    using Clock = std::chrono::high_resolution_clock;
-    if constexpr(!Clock::is_steady)
-        LOG(warn, "std::chrono::high_resolution_clock is not steady!");
-
-    auto start = Clock::now();
-    TimeDuration dt { 0 };
     while(mWindow->isOpen())
     {
         auto gpu = runtime()->gpu();
@@ -152,14 +146,14 @@ void usagi::DebugDrawDemo::run()
             mCameraElement->camera()->localToNDC() *
             mCameraElement->transform()->localToParent().inverse());
         mDebugDraw->setRenderSizes(mWindow->size(), framebuffer->size());
-        update(dt);
+        update(mMasterClock);
 
         // Record command lists
         std::vector<std::shared_ptr<GraphicsCommandList>> cmd_lists;
         const auto cmd_inserter = [&](auto cmd_list) {
             cmd_lists.push_back(std::move(cmd_list));
         };
-        mDebugDraw->render(dt, framebuffer, cmd_inserter);
+        mDebugDraw->render(mMasterClock, framebuffer, cmd_inserter);
 
         // Submit jobs
         const auto wait_stages = {
@@ -183,8 +177,6 @@ void usagi::DebugDrawDemo::run()
         gpu->reclaimResources();
 
         // Calculate elapsed time
-        const auto end = Clock::now();
-        dt = std::chrono::duration_cast<TimeDuration>(end - start);
-        start = end;
+        mMasterClock.tick();
     }
 }

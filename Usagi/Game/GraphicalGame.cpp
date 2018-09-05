@@ -1,4 +1,4 @@
-﻿#include "SingleWindowGame.hpp"
+﻿#include "GraphicalGame.hpp"
 
 #include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Runtime/Window/WindowManager.hpp>
@@ -6,7 +6,7 @@
 #include <Usagi/Runtime/Graphics/GpuDevice.hpp>
 #include <Usagi/Runtime/Graphics/Swapchain.hpp>
 
-usagi::SingleWindowGame::SingleWindowGame(
+usagi::GraphicalGame::GraphicalGame(
     Runtime *runtime,
     const std::string &window_title,
     const Vector2i &window_position,
@@ -30,12 +30,12 @@ usagi::SingleWindowGame::SingleWindowGame(
     mRuntime->initInput();
 }
 
-usagi::SingleWindowGame::~SingleWindowGame()
+usagi::GraphicalGame::~GraphicalGame()
 {
     mWindow->removeEventListener(this);
 }
 
-void usagi::SingleWindowGame::onWindowResizeEnd(const WindowSizeEvent &e)
+void usagi::GraphicalGame::onWindowResizeEnd(const WindowSizeEvent &e)
 {
     if(e.size.x() != 0 && e.size.y() != 0)
         mSwapchain->resize(e.size);

@@ -44,7 +44,7 @@ class ImGuiSubsystem
     void setupInput();
 
     void newFrame(float dt);
-    void processElements(const TimeDuration &dt);
+    void processElements(const Clock &clock);
     void render(
         const std::shared_ptr<Framebuffer> &framebuffer,
         const CommandListSink &cmd_out
@@ -85,9 +85,9 @@ public:
     void onMouseWheelScroll(const MouseWheelEvent &e) override;
     void onWindowCharInput(const WindowCharEvent &e) override;
 
-    void update(const TimeDuration &dt) override;
+    void update(const Clock &clock) override;
     void render(
-        const TimeDuration &dt,
+        const Clock &clock,
         std::shared_ptr<Framebuffer> framebuffer,
         const CommandListSink &cmd_out) const override;
 };

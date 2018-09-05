@@ -48,9 +48,9 @@ public:
 
     void createPipelines(RenderPassCreateInfo &render_pass_info);
 
-    void update(const TimeDuration &dt) override;
+    void update(const Clock &clock) override;
     void render(
-        const TimeDuration &dt,
+        const Clock &clock,
         std::shared_ptr<Framebuffer> framebuffer,
         const CommandListSink &cmd_out) const override;
 

@@ -82,11 +82,11 @@ void usagi::Game::setSubsystemEnabled(
     iter->enabled = enabled;
 }
 
-void usagi::Game::update(const TimeDuration &dt)
+void usagi::Game::update(const Clock &clock)
 {
     for(auto &&s : mSubsystems)
     {
         if(s.enabled)
-            s.subsystem->update(dt);
+            s.subsystem->update(clock);
     }
 }

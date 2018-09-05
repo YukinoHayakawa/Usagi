@@ -4,12 +4,12 @@
 #include <vector>
 
 #include <Usagi/Core/Element.hpp>
-#include <Usagi/Core/Time.hpp>
 #include <Usagi/Utility/Noncopyable.hpp>
 #include <Usagi/Utility/TypeCast.hpp>
 
 namespace usagi
 {
+class Clock;
 class Runtime;
 class Subsystem;
 class AssetRoot;
@@ -25,19 +25,19 @@ class Game : Noncopyable
 {
 protected:
     // Multiple Game may use the same runtime.
-    Runtime* mRuntime = nullptr;
+    Runtime *mRuntime = nullptr;
     std::vector<SubsystemInfo> mSubsystems;
     Element mRootElement { nullptr };
-    AssetRoot* mAssetRoot = nullptr;
+    AssetRoot *mAssetRoot = nullptr;
 
     std::vector<SubsystemInfo>::iterator findSubsystemByName(
-        const std::string& subsystem_name);
+        const std::string &subsystem_name);
 
     void setSubsystemEnabled(
-        const std::string& subsystem_name,
+        const std::string &subsystem_name,
         bool enabled);
 
-    Subsystem* addSubsystemPtr(
+    Subsystem * addSubsystemPtr(
         std::string name,
         std::unique_ptr<Subsystem> subsystem);
 
@@ -62,8 +62,8 @@ public:
         return ptr;
     }
 
-    void enableSubsystem(const std::string& subsystem_name);
-    void disableSubsystem(const std::string& subsystem_name);
+    void enableSubsystem(const std::string &subsystem_name);
+    void disableSubsystem(const std::string &subsystem_name);
 
     Runtime * runtime() const { return mRuntime; }
     Element * rootElement() { return &mRootElement; }
@@ -72,8 +72,8 @@ public:
     /**
     * \brief Invoke update methods on each enabled subsystem by the order
     * of their registration.
-    * \param dt The elapsed time from last frame.
+    * \param clock The elapsed time from last frame.
     */
-    void update(const TimeDuration& dt);
+    void update(const Clock &clock);
 };
 }

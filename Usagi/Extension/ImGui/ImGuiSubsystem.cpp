@@ -2,6 +2,7 @@
 
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Converter/SpirvAssetConverter.hpp>
+#include <Usagi/Core/Clock.hpp>
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Game/Game.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
@@ -249,16 +250,16 @@ void usagi::ImGuiSubsystem::setupInput()
     io.ClipboardUserData = mWindow.get();
 }
 
-void usagi::ImGuiSubsystem::update(const TimeDuration &dt)
+void usagi::ImGuiSubsystem::update(const Clock &clock)
 {
     ImGui::SetCurrentContext(mContext);
 
-    newFrame(static_cast<float>(dt.count()));
-    processElements(dt);
+    newFrame(static_cast<float>(clock.elapsed()));
+    processElements(clock);
 }
 
 void usagi::ImGuiSubsystem::render(
-    const TimeDuration &dt,
+    const usagi::Clock &clock,
     const std::shared_ptr<Framebuffer> framebuffer,
     const CommandListSink &cmd_out) const
 {
@@ -322,10 +323,10 @@ void usagi::ImGuiSubsystem::updateMouse()
     // todo: update cursor
 }
 
-void usagi::ImGuiSubsystem::processElements(const TimeDuration &dt)
+void usagi::ImGuiSubsystem::processElements(const Clock &clock)
 {
     for(auto &e : mRegistry)
-        std::get<ImGuiComponent*>(e.second)->draw(dt);
+        std::get<ImGuiComponent*>(e.second)->draw(clock);
 }
 
 void usagi::ImGuiSubsystem::render(
