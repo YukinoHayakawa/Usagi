@@ -6,7 +6,7 @@ void usagi::Animation::finish()
 {
     animation_func(timing_func(1.f));
     if(finish_callback) finish_callback(this);
-    LOG(debug, "Animation finished: {}", name);
+    LOG(info, "Animation finished: {}", name);
 }
 
 void usagi::AnimationComponent::finishAll()

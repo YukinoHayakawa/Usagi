@@ -67,4 +67,10 @@ using Projective3f = Eigen::Projective3f;
 using AlignedBox2i = Eigen::AlignedBox2i;
 using AlignedBox2f = Eigen::AlignedBox2f;
 using AlignedBox3f = Eigen::AlignedBox3f;
+
+template <typename T, typename V>
+V lerp(T t, V v0, V v1)
+{
+    return (1 - t) * v0 + t * v1;
+}
 }

@@ -14,11 +14,13 @@ struct Animation
 {
     std::string name;
 
-    TimePoint start_time = 0;
+    constexpr static TimePoint ASAP = 0;
+    TimePoint start_time = ASAP;
     TimeDuration duration = 0;
 
     // used by AnimationSubsystem
 
+    bool started = false;
     // normalized 0~1
     TimePoint animation_time = 0;
     // loop counter
@@ -36,7 +38,7 @@ struct Animation
      * be used to call animation_func, generally should be in 0 to 1, but can
      * slightly exceed the range for achieving special effects.
      */
-    TimingFunction timing_func;
+    TimingFunction timing_func = timing_functions::LINEAR;
 
     using AnimationFunction = std::function<void(double t)>;
 
