@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Core/Element.hpp>
+#include <Usagi/Core/PredefinedElement.hpp>
 
 namespace usagi
 {
@@ -12,11 +12,10 @@ struct TransformComponent;
  * \tparam CameraControllerT
  */
 template <typename CameraT, typename CameraControllerT>
-class CameraMan : public Element
+class CameraMan : public PredefinedElement<TransformComponent>
 {
     std::shared_ptr<CameraT> mCamera;
     std::shared_ptr<CameraControllerT> mCameraController;
-    TransformComponent *mTransform = nullptr;
 
 public:
     CameraMan(
@@ -24,12 +23,11 @@ public:
         std::string name,
         std::shared_ptr<CameraT> camera,
         std::shared_ptr<CameraControllerT> camera_controller)
-        : Element(parent, std::move(name))
+        : PredefinedElement(parent, std::move(name))
         , mCamera(std::move(camera))
         , mCameraController(std::move(camera_controller))
     {
-        mTransform = addComponent<TransformComponent>();
-        mCameraController->setTransform(mTransform);
+        mCameraController->setTransform(comp<TransformComponent>());
     }
 
     CameraT * camera() const { return mCamera.get(); }
@@ -38,7 +36,5 @@ public:
     {
         return mCameraController.get();
     }
-
-    TransformComponent * transform() const { return mTransform; }
 };
 }

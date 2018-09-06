@@ -3,7 +3,7 @@
 namespace usagi
 {
 /**
- * \brief Remove the implicit copy constructor and assgnment operators
+ * \brief Remove the implicit copy constructor and assignment operators
  * from derived class.
  * Derive privately to prevent unintended casts toward this class and
  * avoid unnecessary virtual destructors.
