@@ -25,6 +25,13 @@ usagi::TimeDuration usagi::Clock::tick()
 {
     const auto this_tick = ClockT::now();
     mSinceLastTick = this_tick - mLastTick;
+
+    using namespace std::chrono_literals;
+    if(mSinceLastTick > 1s)
+    {
+        mSinceLastTick = 16ms;
+        LOG(warn, "Tick time > 1s. Set to 16ms.");
+    }
     mLastTick = this_tick;
     mTillLastTick = mLastTick - mStart;
     return elapsed();
