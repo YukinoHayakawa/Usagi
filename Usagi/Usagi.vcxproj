@@ -225,6 +225,7 @@
     <ClInclude Include="Core\Event\Library\Input\MouseMoveEvent.hpp" />
     <ClInclude Include="Core\Logging.hpp" />
     <ClInclude Include="Core\Math.hpp" />
+    <ClInclude Include="Core\PredefinedElement.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDraw.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDrawComponent.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDrawSubsystem.hpp" />

@@ -15,5 +15,7 @@ using TimingFunction = std::function<double(double t)>;
 namespace timing_functions
 {
 extern const TimingFunction LINEAR;
+
+TimingFunction get(const std::string &name);
 }
 }
