@@ -1,5 +1,6 @@
 ﻿#include "MoeLoop.hpp"
 
+#include <Usagi/Animation/AnimationSubsystem.hpp>
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Package/Filesystem/FilesystemAssetPackage.hpp>
 #include <Usagi/Camera/Controller/StaticCameraController.hpp>
@@ -95,6 +96,8 @@ MoeLoop::MoeLoop(Runtime *runtime)
     mouse->addEventListener(this);
     mouse->addEventListener(&mInputMap);
 
+    addSubsystem("animation", std::make_unique<AnimationSubsystem>());
+
     setupCamera();
     setupGraphics();
 }
@@ -138,7 +141,7 @@ void MoeLoop::mainLoop()
         mSpriteRender->setWorldToNDC(
             // world -> camera local -> NDC
             mCameraElement->camera()->localToNDC() *
-            mCameraElement->transform()->localToWorld().inverse());
+            mCameraElement->comp<TransformComponent>()->worldToLocal());
         update(mMasterClock);
 
         // Record command lists

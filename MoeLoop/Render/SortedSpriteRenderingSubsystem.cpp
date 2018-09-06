@@ -111,6 +111,10 @@ void SortedSpriteRenderingSubsystem::createPipeline(
         mRenderPass = gpu->createRenderPass(render_pass_info);
         compiler->setRenderPass(mRenderPass);
     }
+    // Depth
+    {
+        compiler->omSetDepthEnabled(false);
+    }
 
     mPipeline = compiler->compile();
 

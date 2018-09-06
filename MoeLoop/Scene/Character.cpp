@@ -8,24 +8,27 @@
 #include <MoeLoop/Script/Lua.hpp>
 
 #include "Expression.hpp"
+#include "ImageFrame.hpp"
 
 namespace usagi::moeloop
 {
 Character::Character(Element *parent, std::string name)
-    : Element(parent, std::move(name))
+    : TransitionableImage(parent, std::move(name))
 {
-    mTransform = addComponent<TransformComponent>();
-    mSprite = addComponent<SpriteComponent>();
-    mAnimation = addComponent<AnimationComponent>();
+}
+
+void Character::setPosition(const Vector3f &position)
+{
+    currentImage()->comp<TransformComponent>()->setPosition(position);
+    targetImage()->comp<TransformComponent>()->setPosition(position);
 }
 
 void Character::changeExpression(Expression *expr)
 {
-    mCurrentExpression = expr;
-    const auto o = mCurrentExpression->origin();
-    mTransform->setOffset({ -o.x(), 0, o.y() });
-    mSprite->texture = mCurrentExpression->texture();
-    mSprite->uv_rect = mCurrentExpression->textureUvRect();
+    // todo use scene default
+    switchImage(1.0, "linear", expr->texture());
+    const auto o = expr->origin();
+    targetImage()->comp<TransformComponent>()->setOffset({ -o.x(), 0, o.y() });
 }
 
 void Character::showName(bool show)
@@ -40,15 +43,21 @@ void Character::showAvatar(bool show)
 
 void Character::move(const Vector3f &position)
 {
-    mTransform->setPosition(position);
+    Animation ani;
+    ani.duration = 0.5;
+    ani.animation_func = [
+        this,
+        start_pos = currentImage()->comp<TransformComponent>()->position(),
+        position
+    ](const double t) {
+        setPosition(lerp(t, start_pos, position));
+    };
+    comp<AnimationComponent>()->add(std::move(ani));
 }
 
 void Character::say(const std::string &text)
 {
-    if(mCurrentExpression)
-        LOG(info, "{}({}): {}", name(), mCurrentExpression->name(), text);
-    else
-        LOG(info, "{}: {}", name(), text);
+    LOG(info, "{}: {}", name(), text);
 }
 
 void Character::enterScene(
@@ -56,21 +65,20 @@ void Character::enterScene(
     const Vector3f &position)
 {
     changeExpression(expr);
-    mSprite->show = true;
-    mTransform->setPosition(position);
+    // move(position);
+    setPosition(position);
 }
 
 void Character::exitScene()
 {
-    mSprite->show = false;
-    LOG(info, "{} exits scene", name());
+    switchImage(1.0, "linear", { });
 }
 
 void Character::pretendSay(
     const std::string &fake_name,
     const std::string &text)
 {
-    LOG(info, "{}({}): {}", fake_name, mCurrentExpression->name(), text);
+    LOG(info, "{}({}): {}", fake_name, name(), text);
 }
 
 void Character::exportScript(kaguya::State &vm)

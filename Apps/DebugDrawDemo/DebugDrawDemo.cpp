@@ -144,7 +144,7 @@ void usagi::DebugDrawDemo::run()
         mDebugDraw->setWorldToNDC(
             // world -> camera local -> NDC
             mCameraElement->camera()->localToNDC() *
-            mCameraElement->transform()->localToParent().inverse());
+            mCameraElement->comp<TransformComponent>()->worldToLocal());
         mDebugDraw->setRenderSizes(mWindow->size(), framebuffer->size());
         update(mMasterClock);
 

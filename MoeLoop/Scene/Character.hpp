@@ -5,26 +5,18 @@
 
 #include <MoeLoop/Script/LuaForwardDecl.hpp>
 
-namespace usagi
-{
-struct AnimationComponent;
-struct TransformComponent;
-}
+#include "TransitionableImage.hpp"
 
 namespace usagi::moeloop
 {
 class Expression;
-struct SpriteComponent;
 
-class Character : public Element
+class Character : public TransitionableImage
 {
     bool mShowName = true;
     bool mShowAvatar = true;
 
-    TransformComponent *mTransform = nullptr;
-    SpriteComponent *mSprite = nullptr;
-    AnimationComponent *mAnimation = nullptr;
-    Expression *mCurrentExpression = nullptr;
+    void setPosition(const Vector3f &position);
 
 public:
     // todo load json config file

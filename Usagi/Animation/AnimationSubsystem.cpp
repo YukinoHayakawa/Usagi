@@ -35,7 +35,8 @@ void usagi::AnimationSubsystem::update(const Clock &clock)
                 i->animation_time = std::modf(i->animation_time, &iteration);
                 if(iteration > i->iteration) // entered next iteration
                 {
-                    LOG(info, "Animation looped: {}", i->name);
+                    LOG(info, "Animation iteraton #{}: {}",
+                        static_cast<std::size_t>(iteration), i->name);
                     if(i->loop_callback) i->loop_callback(&*i);
                 }
                 i->iteration = static_cast<std::size_t>(iteration);
