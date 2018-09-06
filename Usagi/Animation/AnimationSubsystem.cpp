@@ -22,6 +22,7 @@ void usagi::AnimationSubsystem::update(const Clock &clock)
 
             const auto finished = i->animation_time > 1.0;
 
+            if(!i->started) i->start();
             // set animated object to final state and remove the animation
             if(finished && !i->loop)
             {
@@ -32,12 +33,6 @@ void usagi::AnimationSubsystem::update(const Clock &clock)
             {
                 double iteration;
                 i->animation_time = std::modf(i->animation_time, &iteration);
-                if(!i->started)
-                {
-                    LOG(info, "Animation started: {}", i->name);
-                    if(i->begin_callback) i->begin_callback(&*i);
-                    i->started = true;
-                }
                 if(iteration > i->iteration) // entered next iteration
                 {
                     LOG(info, "Animation looped: {}", i->name);

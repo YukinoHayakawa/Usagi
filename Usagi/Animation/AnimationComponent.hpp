@@ -54,6 +54,7 @@ struct Animation
     Callback loop_callback;
     Callback finish_callback;
 
+    void start();
     void finish();
 };
 
