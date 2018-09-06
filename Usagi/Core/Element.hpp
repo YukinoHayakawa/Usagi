@@ -48,7 +48,7 @@ class Element : Noncopyable
 	);
 
 	template <typename CompBaseT>
-	ComponentMap::iterator getComponentIter(bool throws = true)
+	ComponentMap::iterator getComponentIter(const bool throws = true)
 	{
 		auto iter = mComponents.find(typeid(CompBaseT));
         if(iter == mComponents.end() && throws)
@@ -156,7 +156,7 @@ public:
     template <typename CompBaseT, typename CompCastT = CompBaseT>
 	CompCastT * getComponent()
     {
-        auto iter = getComponentIter<CompBaseT>();
+        const auto iter = getComponentIter<CompBaseT>();
         if constexpr(std::is_same_v<CompBaseT, CompCastT>)
             return static_cast<CompCastT*>(iter->second.get());
 		else
@@ -166,7 +166,7 @@ public:
     template <typename CompBaseT, typename CompCastT = CompBaseT>
     CompCastT * findComponent()
     {
-        auto iter = mComponents.find(typeid(CompBaseT));
+        const auto iter = mComponents.find(typeid(CompBaseT));
         if(iter == mComponents.end())
             return nullptr;
         if constexpr(std::is_same_v<CompBaseT, CompCastT>)

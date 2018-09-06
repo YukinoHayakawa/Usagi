@@ -1,6 +1,7 @@
 ﻿#include "Element.hpp"
 
 #include "Component.hpp"
+#include "Logging.hpp"
 #include "Event/Library/Component/ComponentAddedEvent.hpp"
 #include "Event/Library/Component/PreComponentRemovalEvent.hpp"
 #include "Event/Library/Component/PostComponentRemovalEvent.hpp"
@@ -19,7 +20,7 @@ usagi::Element::~Element()
     // can only be done here.
 
     // todo: need someway to notify the subsystems that an element has been
-    // destoryed. maybe listen on removeChild?
+    // destroyed. maybe listen on removeChild?
     // Erase all components and notify the subsystems
     //for(auto i = mComponents.begin(); i != mComponents.end();
     //    i = eraseComponent(i));
@@ -49,7 +50,12 @@ void usagi::Element::insertComponent(const std::type_info &type,
     std::unique_ptr<Component> component)
 {
     auto p = component.get();
-    mComponents.insert({ type, std::move(component) });
+    const auto r = mComponents.insert({ type, std::move(component) });
+    if(!r.second)
+    {
+        LOG(error, "An element cannot have two components of the same type!");
+        throw std::runtime_error("Conflicted components.");
+    }
     fireEvent<ComponentAddedEvent>(type, p);
 }
 
