@@ -33,11 +33,11 @@ void SortedSpriteRenderingSubsystem::createBuffers()
 
     mIndexBuffer->allocate(sizeof(uint16_t) * 4);
     // draw a quad using triangle strip. refer to update() for vertex order.
-    const auto incices = mIndexBuffer->mappedMemory<uint16_t>();
-    incices[0] = 0;
-    incices[1] = 2;
-    incices[2] = 1;
-    incices[3] = 3;
+    const auto indices = mIndexBuffer->mappedMemory<uint16_t>();
+    indices[0] = 0;
+    indices[1] = 2;
+    indices[2] = 1;
+    indices[3] = 3;
     mIndexBuffer->flush();
 }
 
@@ -144,7 +144,7 @@ void SortedSpriteRenderingSubsystem::update(const Clock &clock)
     for(auto &&e : mSortedElements)
     {
         const auto sprite = std::get<SpriteComponent*>(e->second);
-        if(!sprite->texture)
+        if(!sprite->texture || !sprite->show)
         {
             vert_idx += 4;
             continue;
@@ -194,8 +194,8 @@ void SortedSpriteRenderingSubsystem::render(
     for(std::size_t i = 0; i < mSortedElements.size(); ++i)
     {
         const auto s = std::get<SpriteComponent*>(mSortedElements[i]->second);
-        // ignore unloaded sprites
-        if(!s->texture) continue;
+        // ignore unloaded / hidden sprites
+        if(!s->texture || !s->show) continue;
         const auto t = std::get<TransformComponent*>(mSortedElements[i]->second);
         cmd_list->bindResourceSet(1, { s->texture->baseView() });
         cmd_list->setConstant(ShaderStage::VERTEX, "mvp_matrix",
