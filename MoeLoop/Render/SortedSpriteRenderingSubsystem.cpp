@@ -1,5 +1,7 @@
 ﻿#include "SortedSpriteRenderingSubsystem.hpp"
 
+#include <array>
+
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Converter/SpirvAssetConverter.hpp>
 #include <Usagi/Game/Game.hpp>
@@ -21,7 +23,7 @@ namespace usagi::moeloop
 struct SortedSpriteRenderingSubsystem::SpriteIn
 {
     Vector3f pos;
-    Vector2f uv;
+    Vector2f uv[SpriteComponent::NUM_LAYERS];
 };
 
 void SortedSpriteRenderingSubsystem::createBuffers()
@@ -79,8 +81,12 @@ void SortedSpriteRenderingSubsystem::createPipeline(
             offsetof(SpriteIn, pos), GpuBufferFormat::R32G32B32_SFLOAT
         );
         compiler->setVertexAttribute(
-            "in_uv", 0,
-            offsetof(SpriteIn, uv), GpuBufferFormat::R32G32_SFLOAT
+            "in_uv0", 0,
+            offsetof(SpriteIn, uv[0]), GpuBufferFormat::R32G32_SFLOAT
+        );
+        compiler->setVertexAttribute(
+            "in_uv1", 0,
+            offsetof(SpriteIn, uv[1]), GpuBufferFormat::R32G32_SFLOAT
         );
 
         compiler->iaSetPrimitiveTopology(PrimitiveTopology::TRIANGLE_STRIP);
@@ -147,31 +153,50 @@ void SortedSpriteRenderingSubsystem::update(const Clock &clock)
     std::size_t vert_idx = 0;
     for(auto &&e : mSortedElements)
     {
-        const auto sprite = std::get<SpriteComponent*>(e->second);
-        if(!sprite->texture || !sprite->show)
+        const auto s = std::get<SpriteComponent*>(e->second);
+        if(!s->show)
         {
             vert_idx += 4;
             continue;
         }
 
-        // size of the texture rect
-        const Vector2f size =
-            sprite->uv_rect.sizes()
-            .cwiseProduct(sprite->texture->size().cast<float>());
-        const auto min = sprite->uv_rect.min();
-        const auto max = sprite->uv_rect.max();
-        // top-left (default origin)
-        verts[vert_idx].pos = { 0, 0, 0 };
-        verts[vert_idx++].uv = min;
-        // top-right
-        verts[vert_idx].pos = { size.x(), 0, 0 };
-        verts[vert_idx++].uv = { max.x(), min.y() };
-        // bottom-left
-        verts[vert_idx].pos = { 0, 0, -size.y() };
-        verts[vert_idx++].uv = { min.x(), max.y() };
-        // bottom-right
-        verts[vert_idx].pos = { size.x(), 0, -size.y() };
-        verts[vert_idx++].uv = max;
+        static_assert(SpriteComponent::NUM_LAYERS > 0);
+
+        std::array<AlignedBox2f, SpriteComponent::NUM_LAYERS> box;
+        for(std::size_t i = 0; i < box.size(); ++i)
+        {
+            if(s->layers[i].texture)
+                box[i] = s->layers[i].quad();
+        }
+        auto bbox = box[0];
+        for(std::size_t i = 1; i < box.size(); ++i)
+        {
+            if(s->layers[i].texture)
+                bbox = bbox.merged(box[i]);
+        }
+        std::array<AlignedBox2f, SpriteComponent::NUM_LAYERS> uv;
+        for(std::size_t i = 0; i < uv.size(); ++i)
+        {
+            if(s->layers[i].texture)
+                uv[i] = s->layers[i].toUV(bbox);
+        }
+
+        const std::array<AlignedBox2f::CornerType, 4> corners = {
+            AlignedBox2f::TopLeft,
+            AlignedBox2f::TopRight,
+            AlignedBox2f::BottomLeft,
+            AlignedBox2f::BottomRight
+        };
+
+        const auto converter = [](const Vector2f &v) {
+            return Vector3f { v.x(), 0, -v.y() };
+        };
+        for(std::size_t i = 0; i < corners.size(); ++i, ++vert_idx)
+        {
+            verts[vert_idx].pos = converter(bbox.corner(corners[i]));
+            for(std::size_t j = 0; j < uv.size(); ++j)
+                verts[vert_idx].uv[j] = uv[j].corner(corners[i]);
+        }
     }
 
     mVertexBuffer->flush();
@@ -191,21 +216,36 @@ void SortedSpriteRenderingSubsystem::render(
     cmd_list->setViewport(0, { 0, 0 }, framebuffer->size().cast<float>());
     cmd_list->setScissor(0, { 0, 0 }, framebuffer->size());
     cmd_list->bindPipeline(mPipeline);
-    cmd_list->bindResourceSet(0, { mSampler });
     cmd_list->bindVertexBuffer(0, mVertexBuffer, 0);
     cmd_list->bindIndexBuffer(mIndexBuffer, 0, GraphicsIndexType::UINT16);
+    cmd_list->bindResourceSet(0, { mSampler });
 
     for(std::size_t i = 0; i < mSortedElements.size(); ++i)
     {
         const auto s = std::get<SpriteComponent*>(mSortedElements[i]->second);
-        // ignore unloaded / hidden sprites
-        if(!s->texture || !s->show) continue;
+        // ignore hidden sprites
+        if(!s->show) continue;
+        if(!s->layers[0].texture && !s->layers[1].texture) continue;
         const auto t = std::get<TransformComponent*>(mSortedElements[i]->second);
-        cmd_list->bindResourceSet(1, { s->texture->baseView() });
+
+        // todo more elements?
+
+        const auto fallback = mGame->runtime()->gpu()->fallbackTexture();
+        cmd_list->bindResourceSet(1, {
+            s->layers[0].texture ?
+                s->layers[0].texture->baseView() : fallback->baseView(),
+            s->layers[1].texture ?
+                s->layers[1].texture->baseView() : fallback->baseView(),
+        });
+
         cmd_list->setConstant(ShaderStage::VERTEX, "mvp_matrix",
             (mWorldToNDC * t->localToWorld()).data(), sizeof(float) * 16);
-        cmd_list->setConstant(ShaderStage::FRAGMENT, "fade",
-            &s->fade, sizeof(s->fade));
+
+        cmd_list->setConstant(ShaderStage::FRAGMENT, "layer0",
+            &s->layers[0].uv_rect, sizeof(float) * 5);
+        cmd_list->setConstant(ShaderStage::FRAGMENT, "layer1",
+            &s->layers[1].uv_rect, sizeof(float) * 5);
+
         cmd_list->drawIndexedInstanced(
             4, 1, 0, static_cast<std::uint32_t>(4 * i), 0);
     }

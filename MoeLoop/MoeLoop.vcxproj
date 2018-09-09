@@ -125,11 +125,11 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoeLoop.cpp" />
     <ClCompile Include="Render\SortedSpriteRenderingSubsystem.cpp" />
+    <ClCompile Include="Render\SpriteComponent.cpp" />
     <ClCompile Include="Scene\Character.cpp" />
     <ClCompile Include="Scene\Expression.cpp" />
     <ClCompile Include="Scene\ImageLayer.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
-    <ClCompile Include="Scene\ImageFrame.cpp" />
     <ClCompile Include="Scene\TransitionableImage.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -146,7 +146,6 @@
     <ClInclude Include="Scene\Expression.hpp" />
     <ClInclude Include="Scene\ImageLayer.hpp" />
     <ClInclude Include="Scene\Scene.hpp" />
-    <ClInclude Include="Scene\ImageFrame.hpp" />
     <ClInclude Include="Scene\TransitionableImage.hpp" />
     <ClInclude Include="Script\Lua.hpp" />
     <ClInclude Include="Script\LuaForwardDecl.hpp" />

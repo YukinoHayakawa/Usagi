@@ -319,6 +319,15 @@ void usagi::VulkanGpuDevice::createMemoryPools()
     }
 }
 
+void usagi::VulkanGpuDevice::createFallbackTexture()
+{
+    GpuImageCreateInfo info;
+    info.format = GpuBufferFormat::R8G8B8A8_UNORM;
+    info.size = { 16, 16 };
+    info.usage = GpuImageUsage::SAMPLED;
+    mFallbackTexture = createImage(info);
+}
+
 usagi::VulkanGpuDevice::VulkanGpuDevice()
 {
     createInstance();
@@ -326,6 +335,7 @@ usagi::VulkanGpuDevice::VulkanGpuDevice()
     selectPhysicalDevice();
     createDeviceAndQueues();
     createMemoryPools();
+    createFallbackTexture();
 }
 
 usagi::VulkanGpuDevice::~VulkanGpuDevice()
@@ -399,6 +409,12 @@ std::shared_ptr<usagi::GpuSampler> usagi::VulkanGpuDevice::createSampler(
     // vk_info.setBorderColor({ });
     return std::make_shared<VulkanSampler>(
         mDevice->createSamplerUnique(vk_info));
+}
+
+std::shared_ptr<usagi::GpuImage>
+usagi::VulkanGpuDevice::fallbackTexture() const
+{
+    return mFallbackTexture;
 }
 
 void usagi::VulkanGpuDevice::submitGraphicsJobs(

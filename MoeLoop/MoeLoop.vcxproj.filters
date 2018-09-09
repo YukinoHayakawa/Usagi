@@ -45,7 +45,7 @@
     <ClCompile Include="Scene\TransitionableImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\ImageFrame.cpp">
+    <ClCompile Include="Render\SpriteComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -96,9 +96,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scene\TransitionableImage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\ImageFrame.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

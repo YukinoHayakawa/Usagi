@@ -4,18 +4,22 @@
 
 namespace usagi
 {
+struct TransformComponent;
 struct AnimationComponent;
 class GpuImage;
 }
 
 namespace usagi::moeloop
 {
-class ImageFrame;
+struct SpriteComponent;
 
-class TransitionableImage : public PredefinedElement<AnimationComponent>
+class TransitionableImage
+    : public PredefinedElement<
+        TransformComponent,
+        SpriteComponent,
+        AnimationComponent
+    >
 {
-    ImageFrame *mCurrentImage, *mTargetImage;
-
 public:
     TransitionableImage(Element *parent, std::string name);
 
@@ -23,8 +27,5 @@ public:
         double duration,
         const std::string &easing,
         std::shared_ptr<GpuImage> image);
-
-    ImageFrame * currentImage() const { return mCurrentImage; }
-    ImageFrame * targetImage() const { return mTargetImage; }
 };
 }

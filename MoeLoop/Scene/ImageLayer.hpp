@@ -4,6 +4,8 @@
 
 #include <MoeLoop/Script/LuaForwardDecl.hpp>
 
+#include "TransitionableImage.hpp"
+
 namespace usagi
 {
 struct TransformComponent;
@@ -15,11 +17,9 @@ namespace usagi::moeloop
 class Scene;
 struct SpriteComponent;
 
-class ImageLayer : public Element
+class ImageLayer : public TransitionableImage
 {
     Scene *mScene = nullptr;
-    TransformComponent *mTransform = nullptr;
-    SpriteComponent *mSprite = nullptr;
 
 public:
     ImageLayer(Element *parent, std::string name, float y_pos, Scene *scene);

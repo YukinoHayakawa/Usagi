@@ -18,22 +18,20 @@ ImageLayer::ImageLayer(
     std::string name,
     float y_pos,
     Scene *scene)
-    : Element(parent, std::move(name))
+    : TransitionableImage(parent, std::move(name))
     , mScene(scene)
 {
-    mTransform = addComponent<TransformComponent>();
-    mTransform->setPosition({ 0, y_pos, 0 });
-    mSprite = addComponent<SpriteComponent>();
+    comp<TransformComponent>()->setPosition({ 0, y_pos, 0 });
 }
 
 void ImageLayer::changeImage(const std::string &name)
 {
     LOG(info, "ImageLayer::changeImage {}", name);
-    mSprite->texture =
-        mScene->asset()->res<GpuImageAssetConverter>(
-            "images/" + name, mScene->runtime()->gpu());
-    mTransform->setOffset({
-        0, 0, static_cast<float>(mSprite->texture->size().y())
+    const auto texture = mScene->asset()->res<GpuImageAssetConverter>(
+        "images/" + name, mScene->runtime()->gpu());
+    switchImage(1.0, "linear", texture);
+    comp<TransformComponent>()->setOffset({
+        0, 0, static_cast<float>(texture->size().y())
     });
 }
 

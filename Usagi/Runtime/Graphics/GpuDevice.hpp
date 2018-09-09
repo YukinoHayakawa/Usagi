@@ -44,6 +44,7 @@ public:
     virtual std::shared_ptr<GpuSemaphore> createSemaphore() = 0;
     virtual std::shared_ptr<GpuImage> createImage(
         const GpuImageCreateInfo &info) = 0;
+    virtual std::shared_ptr<GpuImage> fallbackTexture() const = 0;
 
     /**
      * \brief Memory is not allocated until GpuBuffer::allocate() is called.

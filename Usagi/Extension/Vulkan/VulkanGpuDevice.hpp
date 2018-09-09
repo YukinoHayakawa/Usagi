@@ -66,6 +66,9 @@ class VulkanGpuDevice : public GpuDevice
 
     void createMemoryPools();
 
+    std::shared_ptr<GpuImage> mFallbackTexture;
+    void createFallbackTexture();
+
     // Resource Tracking
 
     struct BatchResourceList
@@ -95,6 +98,7 @@ public:
         override;
     std::shared_ptr<GpuSampler> createSampler(const GpuSamplerCreateInfo &info)
         override;
+    std::shared_ptr<GpuImage> fallbackTexture() const override;
 
     void submitGraphicsJobs(
         std::vector<std::shared_ptr<GraphicsCommandList>> jobs,

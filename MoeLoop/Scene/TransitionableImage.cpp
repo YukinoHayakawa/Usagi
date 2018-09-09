@@ -1,20 +1,17 @@
 ﻿#include "TransitionableImage.hpp"
 
 #include <Usagi/Animation/AnimationComponent.hpp>
+#include <Usagi/Transform/TransformComponent.hpp>
 #include <Usagi/Core/Math.hpp>
 #include <Usagi/Core/Logging.hpp>
 
 #include <MoeLoop/Render/SpriteComponent.hpp>
-
-#include "ImageFrame.hpp"
 
 namespace usagi::moeloop
 {
 TransitionableImage::TransitionableImage(Element *parent, std::string name)
     : PredefinedElement(parent, std::move(name))
 {
-    mCurrentImage = addChild<ImageFrame>("current");
-    mTargetImage = addChild<ImageFrame>("next");
 }
 
 void TransitionableImage::switchImage(
@@ -27,23 +24,21 @@ void TransitionableImage::switchImage(
     ani.duration = duration;
     ani.timing_func = timing_functions::get(easing);
     ani.animation_func = [&](const double t) {
-        const auto current = mCurrentImage->comp<SpriteComponent>();
-        const auto next = mTargetImage->comp<SpriteComponent>();
-        next->fade = static_cast<float>(lerp(t, 0.0, 1.0));
-        current->fade = 1.f - next->fade;
-        LOG(info, "c: {} {}, t: {} {}",
-            current->show, current->fade, next->show, next->fade);
+        const auto s = comp<SpriteComponent>();
+        // fade in next image
+        s->layers[1].factor = static_cast<float>(lerp(t, 0.0, 1.0));
+        // fade out current image
+        s->layers[0].factor = 1.f - s->layers[1].factor;
     };
     ani.begin_callback = [&, image](Animation *ani) {
-        const auto next_sprite = mTargetImage->comp<SpriteComponent>();
-        next_sprite->show = mCurrentImage->comp<SpriteComponent>()->show = true;
-        next_sprite->texture = std::move(image);
+        const auto s = comp<SpriteComponent>();
+        s->show = true;
+        s->layers[1].texture = std::move(image);
     };
     ani.finish_callback = [&](Animation *ani) {
-        std::swap(mCurrentImage, mTargetImage);
-        const auto next_sprite = mTargetImage->comp<SpriteComponent>();
-        next_sprite->texture.reset();
-        next_sprite->show = false;
+        const auto s = comp<SpriteComponent>();
+        // make next image current
+        s->layers[0] = std::move(s->layers[1]);
     };
     comp<AnimationComponent>()->add(std::move(ani));
 }
