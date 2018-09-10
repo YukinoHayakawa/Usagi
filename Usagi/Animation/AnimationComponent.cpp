@@ -9,6 +9,12 @@ void usagi::Animation::start()
     LOG(info, "Animation started: {}", name);
 }
 
+void usagi::Animation::restart(const TimePoint time)
+{
+    start_time = time;
+    start();
+}
+
 void usagi::Animation::finish()
 {
     animation_func(timing_func(1.f));

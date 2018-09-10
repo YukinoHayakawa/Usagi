@@ -14,8 +14,16 @@ struct Animation
 {
     std::string name;
 
-    constexpr static TimePoint ASAP = 0;
-    TimePoint start_time = ASAP;
+    enum class StartPolicy
+    {
+        // as soon as the animation system processes this animation
+        IMMEDIATELY,
+        // immediately after the time point specified by start_time pasts
+        TIME_POINT,
+        // immediately after last animation finishes in the insertion order
+        SEQUENTIAL,
+    } policy = StartPolicy::IMMEDIATELY;
+    TimePoint start_time = 0;
     TimeDuration duration = 0;
 
     // used by AnimationSubsystem
@@ -55,6 +63,7 @@ struct Animation
     Callback finish_callback;
 
     void start();
+    void restart(TimePoint time);
     void finish();
 };
 
