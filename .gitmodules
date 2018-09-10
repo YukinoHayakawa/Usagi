@@ -2,10 +2,6 @@
 	path = Thirdparty/Submodules/utfcpp
 	url = https://github.com/nemtrif/utfcpp.git
 	ignore = untracked
-[submodule "Thirdparty/Submodules/squall"]
-	path = Thirdparty/Submodules/squall
-	url = https://github.com/jonigata/squall.git
-	ignore = untracked
 [submodule "Thirdparty/Submodules/spdlog"]
 	path = Thirdparty/Submodules/spdlog
 	url = https://github.com/gabime/spdlog.git
@@ -33,10 +29,6 @@
 [submodule "Thirdparty/Submodules/hg-git"]
 	path = Thirdparty/Submodules/hg-git
 	url = https://github.com/schacon/hg-git.git
-	ignore = untracked
-[submodule "Thirdparty/Submodules/squirrel"]
-	path = Thirdparty/Submodules/squirrel
-	url = https://github.com/albertodemichelis/squirrel.git
 	ignore = untracked
 [submodule "Thirdparty/Includes/debug-draw"]
 	path = Thirdparty/Includes/debug-draw
