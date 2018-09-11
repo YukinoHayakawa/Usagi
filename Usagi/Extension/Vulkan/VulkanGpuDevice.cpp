@@ -279,7 +279,7 @@ void usagi::VulkanGpuDevice::createMemoryPools()
 {
     mDynamicBufferPool = std::make_unique<BitmapBufferPool>(
         this,
-        1024 * 1024 * 128, // 512MiB  todo from config
+        1024 * 1024 * 512, // 512MiB  todo from config
         vk::MemoryPropertyFlagBits::eHostVisible |
         vk::MemoryPropertyFlagBits::eHostCoherent,
         vk::BufferUsageFlagBits::eTransferSrc |
@@ -297,7 +297,7 @@ void usagi::VulkanGpuDevice::createMemoryPools()
 
     mDeviceImagePool = std::make_unique<BitmapImagePool>(
         this,
-        1024 * 1024 * 128, // 512MiB  todo from config
+        1024 * 1024 * 512, // 512MiB  todo from config
         vk::MemoryPropertyFlagBits::eDeviceLocal,
         vk::ImageUsageFlagBits::eTransferDst |
         vk::ImageUsageFlagBits::eSampled,

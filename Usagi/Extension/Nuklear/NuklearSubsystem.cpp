@@ -59,15 +59,30 @@ void usagi::NuklearSubsystem::setup()
 
         nk_font_atlas_init_default(&mAtlas);
         nk_font_atlas_begin(&mAtlas);
-        // todo from asset system
+        // todo font file from asset system
         // todo unified font cache with imgui
-        auto sans = nk_font_atlas_add_from_file(&mAtlas,
-            "Data/fonts/SourceHanSansCN-Normal.ttf", 14, nullptr);
-
+        auto config = nk_font_config(0);
+        static const nk_rune RANGES[] =
+        {
+            0x0020, 0x007F, // Basic Latin
+            0x00A0, 0x00FF, // Latin-1 Supplement
+            0x2000, 0x206F, // General Punctuation
+            0x3000, 0x303F, // CJK Symbols and Punctuation
+            0x3040, 0x309F, // Hiragana
+            0x30A0, 0x30FF, // Katakana
+            0x31F0, 0x31FF, // Katakana Phonetic Extensions
+            0x4E00, 0x9FFF, // CJK Unified Ideographs
+            0xFF00, 0xFFEF, // Halfwidth and Fullwidth Forms
+            0,
+        };
+        config.range = RANGES;
+        auto sans = nk_font_atlas_add_from_file(
+            &mAtlas,
+            "Data/fonts/SourceHanSansCN-Normal.ttf", 32, &config);
         int w, h;
         const auto image = nk_font_atlas_bake(
             &mAtlas, &w, &h, NK_FONT_ATLAS_ALPHA8);
-        const auto upload_size = w * h * sizeof(char);
+        const auto upload_size = w * h * sizeof(std::uint8_t);
 
         GpuImageCreateInfo info;
         info.format = GpuBufferFormat::R8_UNORM;

@@ -25,8 +25,7 @@ usagi::VulkanPooledImage::~VulkanPooledImage()
 
 void usagi::VulkanPooledImage::upload(const void *data, const std::size_t size)
 {
-    // todo check size
-    // assert(size <= mBufferSize);
+    assert(size <= mBufferSize);
 
     auto device = mPool->device();
     const auto buffer = device->allocateStageBuffer(size);

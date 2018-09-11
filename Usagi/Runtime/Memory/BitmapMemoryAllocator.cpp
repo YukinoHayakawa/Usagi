@@ -11,7 +11,9 @@ std::size_t BitmapMemoryAllocator::getAddressBlock(
 {
     assert(address >= mBase);
     const auto rel = address - mBase;
-    return rel / mBlockSize;
+    const auto block = rel / mBlockSize;
+    assert(block < mBitmap.size());
+    return block;
 }
 
 BitmapMemoryAllocator::BitmapMemoryAllocator(void *base,
