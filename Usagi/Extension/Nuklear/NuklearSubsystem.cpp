@@ -490,5 +490,6 @@ void usagi::NuklearSubsystem::onMouseWheelScroll(const MouseWheelEvent &e)
 
 void usagi::NuklearSubsystem::onWindowCharInput(const WindowCharEvent &e)
 {
-    nk_input_unicode(&mContext, e.utf32);
+    if(e.utf32 >= 32)
+        nk_input_unicode(&mContext, e.utf32);
 }
