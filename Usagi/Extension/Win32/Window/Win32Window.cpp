@@ -201,7 +201,7 @@ std::string usagi::Win32Window::getClipboardText()
         };
         str = {
             reinterpret_cast<wchar_t*>(pmem),
-            GlobalSize(hmem) / sizeof(wchar_t)
+            GlobalSize(hmem) / sizeof(wchar_t) - 1
         };
     }
 
