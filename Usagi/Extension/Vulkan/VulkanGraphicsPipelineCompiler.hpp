@@ -92,7 +92,7 @@ public:
     void iaSetPrimitiveTopology(PrimitiveTopology topology) override;
     void setInputAssemblyState(const InputAssemblyState &state) override;
 
-    void rsSetPolygonmode(PolygonMode mode) override;
+    void rsSetPolygonMode(PolygonMode mode) override;
     void rsSetFaceCullingMode(FaceCullingMode mode) override;
     void rsSetFrontFace(FrontFace face) override;
     void setRasterizationState(const RasterizationState &state) override;

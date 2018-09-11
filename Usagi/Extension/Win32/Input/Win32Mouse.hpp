@@ -27,8 +27,13 @@ class Win32Mouse
     bool mMouseButtonDown[static_cast<std::size_t>(MouseButtonCode::ENUM_COUNT)]
         = { false };
 
-    void sendButtonEvent(MouseButtonCode button, bool pressed);
-    void sendWheelEvent(const Vector2f &distance);
+    void sendButtonEvent(
+        MouseButtonCode button,
+        bool pressed,
+        const Vector2f &pos);
+    void sendWheelEvent(
+        const Vector2f &distance,
+        const Vector2f &pos);
 
     void recaptureCursor();
 

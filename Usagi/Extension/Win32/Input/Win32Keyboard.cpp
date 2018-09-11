@@ -287,7 +287,7 @@ std::string usagi::Win32Keyboard::name() const
     return mName;
 }
 
-bool usagi::Win32Keyboard::isKeyPressed(KeyCode key)
+bool usagi::Win32Keyboard::isKeyPressed(KeyCode key) const
 {
     return mKeyPressed.count(key) != 0;
 }

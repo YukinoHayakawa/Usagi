@@ -72,7 +72,7 @@ void usagi::DebugDrawSubsystem::createPointLinePipeline()
         );
     }
     compiler->iaSetPrimitiveTopology(PrimitiveTopology::POINT_LIST);
-    compiler->rsSetPolygonmode(PolygonMode::POINT);
+    compiler->rsSetPolygonMode(PolygonMode::POINT);
     compiler->rsSetFaceCullingMode(FaceCullingMode::NONE);
     compiler->omSetDepthEnabled(true);
     compiler->omSetColorBlendEnabled(false);
@@ -87,7 +87,7 @@ void usagi::DebugDrawSubsystem::createPointLinePipeline()
     // ~~ Line Pipelines ~~
 
     compiler->iaSetPrimitiveTopology(PrimitiveTopology::LINE_LIST);
-    compiler->rsSetPolygonmode(PolygonMode::LINE);
+    compiler->rsSetPolygonMode(PolygonMode::LINE);
     mLineDepthDisabledPipeline = compiler->compile();
 
     compiler->omSetDepthEnabled(true);
@@ -136,7 +136,7 @@ void usagi::DebugDrawSubsystem::createTextPipeline()
         );
     }
     compiler->iaSetPrimitiveTopology(PrimitiveTopology::TRIANGLE_LIST);
-    compiler->rsSetPolygonmode(PolygonMode::FILL);
+    compiler->rsSetPolygonMode(PolygonMode::FILL);
     compiler->rsSetFaceCullingMode(FaceCullingMode::NONE);
     compiler->omSetDepthEnabled(false);
 

@@ -204,6 +204,12 @@
     <ClCompile Include="Animation\AnimationComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Extension\Nuklear\NuklearImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Nuklear\NuklearSubsystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asset\Asset.hpp">
@@ -246,9 +252,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Event\Library\Element\PreElementRemovalEvent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Event\Library\Input\MouseMoveEvent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Event\Event.hpp">
@@ -669,6 +672,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\PredefinedElement.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Nuklear\Nuklear.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Nuklear\NuklearSubsystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Nuklear\NuklearComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Event\Library\Input\MousePositionEvent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

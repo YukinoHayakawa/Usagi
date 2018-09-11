@@ -32,6 +32,6 @@ public:
 
     std::string name() const override;
 
-    bool isKeyPressed(KeyCode key) override;
+    bool isKeyPressed(KeyCode key) const override;
 };
 }

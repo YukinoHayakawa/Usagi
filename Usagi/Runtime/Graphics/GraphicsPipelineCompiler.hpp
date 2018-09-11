@@ -53,7 +53,7 @@ public:
     virtual void iaSetPrimitiveTopology(PrimitiveTopology topology) = 0;
     virtual void setInputAssemblyState(const InputAssemblyState &state) = 0;
 
-    virtual void rsSetPolygonmode(PolygonMode mode) = 0;
+    virtual void rsSetPolygonMode(PolygonMode mode) = 0;
     virtual void rsSetFaceCullingMode(FaceCullingMode mode) = 0;
     virtual void rsSetFrontFace(FrontFace face) = 0;
     virtual void setRasterizationState(const RasterizationState &state) = 0;

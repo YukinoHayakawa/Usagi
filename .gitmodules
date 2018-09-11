@@ -53,3 +53,6 @@
 [submodule "Thirdparty/Submodules/json"]
 	path = Thirdparty/Submodules/json
 	url = https://github.com/nlohmann/json.git
+[submodule "Thirdparty/Submodules/nuklear"]
+	path = Thirdparty/Submodules/nuklear
+	url = https://github.com/vurtun/nuklear.git

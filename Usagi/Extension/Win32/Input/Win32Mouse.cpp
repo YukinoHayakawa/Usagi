@@ -4,7 +4,10 @@
 #include <Usagi/Extension/Win32/Window/Win32WindowManager.hpp>
 #include <Usagi/Extension/Win32/Window/Win32Window.hpp>
 
-void usagi::Win32Mouse::sendButtonEvent(MouseButtonCode button, bool pressed)
+void usagi::Win32Mouse::sendButtonEvent(
+    MouseButtonCode button,
+    const bool pressed,
+    const Vector2f &pos)
 {
     auto &prev_pressed = mMouseButtonDown[static_cast<std::size_t>(button)];
 
@@ -19,6 +22,7 @@ void usagi::Win32Mouse::sendButtonEvent(MouseButtonCode button, bool pressed)
 
     MouseButtonEvent e;
     e.mouse = this;
+    e.position = pos;
     e.button = button;
     e.pressed = pressed;
     forEachListener([&](auto h) {
@@ -26,10 +30,13 @@ void usagi::Win32Mouse::sendButtonEvent(MouseButtonCode button, bool pressed)
     });
 }
 
-void usagi::Win32Mouse::sendWheelEvent(const Vector2f &distance)
+void usagi::Win32Mouse::sendWheelEvent(
+    const Vector2f &distance,
+    const Vector2f &pos)
 {
     MouseWheelEvent e;
     e.mouse = this;
+    e.position = pos;
     e.distance = distance;
     forEachListener([&](auto h) {
         h->onMouseWheelScroll(e);
@@ -63,6 +70,8 @@ void usagi::Win32Mouse::handleRawInput(RAWINPUT *raw)
     // see https://stackoverflow.com/questions/14113303/raw-input-device-rawmouse-usage
     if(mouse.usFlags != MOUSE_MOVE_RELATIVE) return;
 
+    const auto cursor = cursorPositionInActiveWindow();
+
     // when in GUI mode, only processes events inside the window rect
     // todo since we use raw input, we receive the mouse messages even if the
     // part of window is covered, in which case the user might perform
@@ -70,7 +79,7 @@ void usagi::Win32Mouse::handleRawInput(RAWINPUT *raw)
     if(!isImmersiveMode())
     {
         const auto win_size = window->size();
-        const auto cursor = cursorPositionInActiveWindow();
+        // todo process the input if any mouse button is pressed (dragging)
         if(cursor.x() < 0 || cursor.y() < 0 ||
             cursor.x() >= win_size.x() || cursor.y() >= win_size.y())
             return;
@@ -81,12 +90,14 @@ void usagi::Win32Mouse::handleRawInput(RAWINPUT *raw)
     {
         MousePositionEvent e;
         e.mouse = this;
+        // todo absolute position of the event
+        e.position = cursor;
         e.distance = { mouse.lLastX, mouse.lLastY };
         forEachListener([&](auto h) {
             h->onMouseMove(e);
         });
     }
-    // proces mouse buttons & scrolling
+    // process mouse buttons & scrolling
     if(mouse.usButtonFlags)
     {
         // process mouse buttons
@@ -96,9 +107,9 @@ void usagi::Win32Mouse::handleRawInput(RAWINPUT *raw)
         // however this is not the case for the keyboard.
 #define MOUSE_BTN_EVENT(native_code, code) \
         if(mouse.usButtonFlags & RI_MOUSE_##native_code##_DOWN) \
-            sendButtonEvent(MouseButtonCode::code, true); \
+            sendButtonEvent(MouseButtonCode::code, true, cursor); \
         else if(mouse.usButtonFlags & RI_MOUSE_##native_code##_UP) \
-            sendButtonEvent(MouseButtonCode::code, false) \
+            sendButtonEvent(MouseButtonCode::code, false, cursor) \
 /**/
         MOUSE_BTN_EVENT(LEFT_BUTTON, LEFT);
         MOUSE_BTN_EVENT(MIDDLE_BUTTON, MIDDLE);
@@ -111,13 +122,13 @@ void usagi::Win32Mouse::handleRawInput(RAWINPUT *raw)
         if(mouse.usButtonFlags & RI_MOUSE_WHEEL)
             sendWheelEvent({
                 0, static_cast<short>(mouse.usButtonData) / WHEEL_DELTA
-            });
+            }, cursor);
         // horizontal scrolling, which seems to be undocumented.
         // found here: https://stackoverflow.com/questions/7942307/horizontal-mouse-wheel-messages-from-windows-raw-input
         if(mouse.usButtonFlags & RI_MOUSE_HWHEEL)
             sendWheelEvent({
                 static_cast<short>(mouse.usButtonData) / WHEEL_DELTA, 0
-            });
+            }, cursor);
     }
 }
 

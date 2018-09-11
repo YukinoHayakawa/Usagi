@@ -72,6 +72,7 @@ void usagi::VulkanGraphicsPipelineCompiler::setupVertexInput()
 
 void usagi::VulkanGraphicsPipelineCompiler::setupDynamicStates()
 {
+    // todo optional
     // Viewport and scissor should be set after binding the pipeline
     mDynamicStates = {
 		vk::DynamicState::eViewport,
@@ -485,7 +486,7 @@ void usagi::VulkanGraphicsPipelineCompiler::setInputAssemblyState(
     iaSetPrimitiveTopology(state.topology);
 }
 
-void usagi::VulkanGraphicsPipelineCompiler::rsSetPolygonmode(
+void usagi::VulkanGraphicsPipelineCompiler::rsSetPolygonMode(
     const PolygonMode mode)
 {
     mRasterizationStateCreateInfo.setPolygonMode(translate(mode));
@@ -507,7 +508,7 @@ void usagi::VulkanGraphicsPipelineCompiler::setRasterizationState(
     const RasterizationState &state)
 {
     mRasterizationStateCreateInfo.setDepthBiasEnable(false);
-    rsSetPolygonmode(state.polygon_mode);
+    rsSetPolygonMode(state.polygon_mode);
     rsSetFaceCullingMode(state.face_culling_mode);
     rsSetFrontFace(state.front_face);
     mRasterizationStateCreateInfo.setLineWidth(1.f);
