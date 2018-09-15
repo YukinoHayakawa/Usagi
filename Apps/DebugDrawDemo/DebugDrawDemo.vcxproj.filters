@@ -24,12 +24,18 @@
     <ClCompile Include="DebugDrawDemo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DebugDrawGameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DebugDrawDemoComponent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DebugDrawDemo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugDrawGameState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

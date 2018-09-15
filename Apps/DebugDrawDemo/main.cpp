@@ -8,6 +8,6 @@ int main(int argc, char *argv[])
 {
     auto runtime = Runtime::create();
     runtime->enableCrashHandler("DebugDrawDemoErrorDump");
-    DebugDrawDemo demo(runtime.get());
-    demo.run();
+    DebugDrawDemo demo(runtime);
+    demo.mainLoop();
 }
