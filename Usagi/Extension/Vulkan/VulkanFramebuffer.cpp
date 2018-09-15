@@ -34,5 +34,6 @@ void usagi::VulkanFramebuffer::create(
     fb_info.setHeight(mSize.y());
     fb_info.setLayers(1);
 
+    mRenderPass = std::move(render_pass);
     mFramebuffer = mDevice->device().createFramebufferUnique(fb_info);
 }
