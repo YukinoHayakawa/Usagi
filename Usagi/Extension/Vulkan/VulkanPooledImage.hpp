@@ -18,7 +18,7 @@ class VulkanPooledImage : public VulkanGpuImage
 public:
     VulkanPooledImage(
         vk::UniqueImage vk_image,
-        vk::Format format,
+        GpuImageFormat format,
         const Vector2u32 &size,
         VulkanMemoryPool *pool,
         std::size_t buffer_offset,

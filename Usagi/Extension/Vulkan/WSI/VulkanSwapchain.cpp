@@ -282,10 +282,11 @@ void usagi::VulkanSwapchain::getSwapchainImages()
 
     mSwapchainImages.clear();
     mSwapchainImages.reserve(images.size());
+    const GpuImageFormat format { translate(mFormat.format), 1 };
     for(auto &&vk_image : images)
     {
         mSwapchainImages.push_back(std::make_shared<VulkanSwapchainImage>(
-            mDevice->device(), vk_image, mFormat.format, mSize));
+            format, mSize, mDevice->device(), vk_image));
     }
     mCurrentImageIndex = INVALID_IMAGE_INDEX;
 }

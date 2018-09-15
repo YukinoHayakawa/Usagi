@@ -32,7 +32,7 @@ public:
      * \param report_file_path Without file extension.
      */
     virtual void enableCrashHandler(const std::string &report_file_path) = 0;
-    virtual void displayErrorDialog(const std::string & msg) = 0;
+    virtual void displayErrorDialog(const std::string &msg) = 0;
 
     virtual GpuDevice * gpu() const = 0;
     virtual InputManager * inputManager() const = 0;

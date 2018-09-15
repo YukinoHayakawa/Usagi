@@ -17,7 +17,8 @@ protected:
 
 public:
     /**
-     * \brief Must be called before calling update() and render().
+     * \brief Inject render size information.
+     * Must be called before calling update() and render().
      * \param window_size
      * \param framebuffer_size
      */

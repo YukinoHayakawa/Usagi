@@ -1,92 +1,46 @@
 ﻿#include "Game.hpp"
 
-#include <algorithm>
-
-#include <Usagi/Core/Event/Library/Component/ComponentAddedEvent.hpp>
-#include <Usagi/Core/Event/Library/Component/PreComponentRemovalEvent.hpp>
-#include <Usagi/Core/Event/Library/Component/PostComponentRemovalEvent.hpp>
 #include <Usagi/Asset/AssetRoot.hpp>
+#include <Usagi/Runtime/Runtime.hpp>
+#include <Usagi/Runtime/Window/WindowManager.hpp>
+#include <Usagi/Runtime/Input/InputManager.hpp>
 
-#include "Subsystem.hpp"
+#include "GameState.hpp"
+#include "GameStateManager.hpp"
 
-usagi::Game::Game(Runtime *runtime)
-    : mRuntime { runtime }
+usagi::Game::Game(std::shared_ptr<Runtime> runtime)
+    : mRuntime(std::move(runtime))
 {
-    const auto subsys_listener = [&](auto &&e) {
-        for(auto &&s : mSubsystems)
-        {
-            s.subsystem->onElementComponentChanged(e.source());
-        }
-    };
+    mAssetRoot = mRootElement.addChild<AssetRoot>("Assets");
+    mStateManager = mRootElement.addChild<GameStateManager>("States");
 
-    // add listeners at root entity to allow each subsystem to examine
-    // entities with updated component configurations.
-    // todo: directly pass the events to the subsystems?
-    mRootElement.addEventListener<ComponentAddedEvent>(subsys_listener);
-    //mRootElement.addEventListener<PreComponentRemovalEvent>(subsys_listener);
-    mRootElement.addEventListener<PostComponentRemovalEvent>(subsys_listener);
-
-    mRootElement.setName("ElementRoot");
-    mAssetRoot = mRootElement.addChild<AssetRoot>();
+    mRuntime->initWindow();
+    mRuntime->initInput();
 }
 
-usagi::Game::~Game()
+void usagi::Game::processInput()
 {
-    // destruct Subsystems
+    // Process window/input events
+    runtime()->windowManager()->processEvents();
+    runtime()->inputManager()->processEvents();
 }
 
-std::vector<usagi::SubsystemInfo>::iterator usagi::Game::findSubsystemByName(
-    const std::string &subsystem_name)
+void usagi::Game::updateClock()
 {
-    return std::find_if(
-        mSubsystems.begin(), mSubsystems.end(),
-        [&](auto &s) { return s.name == subsystem_name; }
-    );
+    mMasterClock.tick();
 }
 
-usagi::Subsystem * usagi::Game::addSubsystemPtr(
-    std::string name,
-    std::unique_ptr<Subsystem> subsystem)
+void usagi::Game::frame()
 {
-    SubsystemInfo info;
-    info.name = std::move(name);
-    info.subsystem = std::move(subsystem);
+    processInput();
+    mStateManager->update(mMasterClock);
+    updateClock();
+}
 
-    // check that no existing subsystem is using the same name
-    if(findSubsystemByName(info.name) != mSubsystems.end())
+void usagi::Game::mainLoop()
+{
+    while(continueGame())
     {
-        throw std::runtime_error("Subsystem name already used.");
-    }
-    const auto ret = info.subsystem.get();
-    mSubsystems.push_back(std::move(info));
-    return ret;
-}
-
-void usagi::Game::enableSubsystem(const std::string &subsystem_name)
-{
-    setSubsystemEnabled(subsystem_name, true);
-}
-
-void usagi::Game::disableSubsystem(const std::string &subsystem_name)
-{
-    setSubsystemEnabled(subsystem_name, false);
-}
-
-void usagi::Game::setSubsystemEnabled(
-    const std::string &subsystem_name,
-    const bool enabled)
-{
-    const auto iter = findSubsystemByName(subsystem_name);
-    if(iter == mSubsystems.end())
-        throw std::runtime_error("No such subsystem");
-    iter->enabled = enabled;
-}
-
-void usagi::Game::update(const Clock &clock)
-{
-    for(auto &&s : mSubsystems)
-    {
-        if(s.enabled)
-            s.subsystem->update(clock);
+        frame();
     }
 }

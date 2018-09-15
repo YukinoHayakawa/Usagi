@@ -5,12 +5,12 @@
 
 usagi::VulkanPooledImage::VulkanPooledImage(
     vk::UniqueImage vk_image,
-    const vk::Format format,
+    GpuImageFormat format,
     const Vector2u32 &size,
     VulkanMemoryPool *pool,
     const std::size_t buffer_offset,
     const std::size_t buffer_size)
-    : VulkanGpuImage(vk_image.getOwner(), format, size)
+    : VulkanGpuImage(format, size, vk_image.getOwner())
     , mImage(std::move(vk_image))
     , mPool(pool)
     , mBufferOffset(buffer_offset)

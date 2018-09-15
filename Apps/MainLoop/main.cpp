@@ -106,7 +106,8 @@ public:
                     {
                         mMouse->removeEventListener(this);
                         LOG(info, "Mouse listener removed");
-                    } else
+                    }
+                    else
                     {
                         mMouse->addEventListener(this);
                         LOG(info, "Mouse listener added");

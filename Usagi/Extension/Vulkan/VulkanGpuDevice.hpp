@@ -91,7 +91,7 @@ public:
         const RenderPassCreateInfo &info) override;
     std::shared_ptr<Framebuffer> createFramebuffer(
         const Vector2u32 &size,
-        std::initializer_list<std::shared_ptr<GpuImageView>> views) override;
+        std::vector<std::shared_ptr<GpuImageView>> views) override;
     std::shared_ptr<GpuSemaphore> createSemaphore() override;
     std::shared_ptr<GpuBuffer> createBuffer(GpuBufferUsage usage) override;
     std::shared_ptr<GpuImage> createImage(const GpuImageCreateInfo &info)
@@ -101,7 +101,7 @@ public:
     std::shared_ptr<GpuImage> fallbackTexture() const override;
 
     void submitGraphicsJobs(
-        std::vector<std::shared_ptr<GraphicsCommandList>> jobs,
+        const std::vector<std::shared_ptr<GraphicsCommandList>> &jobs,
         std::initializer_list<std::shared_ptr<GpuSemaphore>> wait_semaphores,
         std::initializer_list<GraphicsPipelineStage> wait_stages,
         std::initializer_list<std::shared_ptr<GpuSemaphore>> signal_semaphores

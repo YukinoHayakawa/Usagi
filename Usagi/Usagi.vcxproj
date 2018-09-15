@@ -148,7 +148,10 @@
     <ClCompile Include="Extension\Nuklear\NuklearSubsystem.cpp" />
     <ClCompile Include="Extension\Nuklear\NuklearImpl.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanBufferAllocation.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanEnumTranslation.cpp" />
+    <ClCompile Include="Extension\Vulkan\VulkanEnumTranslation.cpp">
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ShowIncludes>
+    </ClCompile>
     <ClCompile Include="Extension\Vulkan\VulkanExtensions.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanFramebuffer.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanGpuBuffer.cpp" />
@@ -176,7 +179,17 @@
     <ClCompile Include="Extension\Win32\Window\Win32Window.cpp" />
     <ClCompile Include="Extension\Win32\Window\Win32WindowManager.cpp" />
     <ClCompile Include="Game\Game.cpp" />
-    <ClCompile Include="Game\GraphicalGame.cpp" />
+    <ClCompile Include="Game\GameState.cpp" />
+    <ClCompile Include="Game\GameStateManager.cpp" />
+    <ClCompile Include="Graphics\Game\GraphicalGame.cpp" />
+    <ClCompile Include="Graphics\Game\GraphicalGameState.cpp" />
+    <ClCompile Include="Graphics\Game\ImageTransitionSubsystem.cpp" />
+    <ClCompile Include="Graphics\RenderTarget\RenderTarget.cpp" />
+    <ClCompile Include="Graphics\RenderTarget\RenderTargetDescriptor.cpp" />
+    <ClCompile Include="Graphics\RenderTarget\RenderTargetProvider.cpp" />
+    <ClCompile Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.cpp" />
+    <ClCompile Include="Graphics\RenderTarget\Source\SwapchainRenderTargetSource.cpp" />
+    <ClCompile Include="Graphics\RenderWindow.cpp" />
     <ClCompile Include="Interactive\InputMap.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
@@ -274,14 +287,27 @@
     <ClInclude Include="Extension\Win32\Window\Win32WindowManager.hpp" />
     <ClInclude Include="Game\CollectionSubsystem.hpp" />
     <ClInclude Include="Game\Game.hpp" />
-    <ClInclude Include="Game\GraphicalGame.hpp" />
+    <ClInclude Include="Game\GameState.hpp" />
+    <ClInclude Include="Game\GameStateManager.hpp" />
+    <ClInclude Include="Graphics\Game\GraphicalGame.hpp" />
+    <ClInclude Include="Graphics\Game\GraphicalGameState.hpp" />
     <ClInclude Include="Game\Subsystem.hpp" />
     <ClInclude Include="Geometry\GeometryComponent.hpp" />
-    <ClInclude Include="Graphics\OverlayRenderingSubsystem.hpp" />
-    <ClInclude Include="Graphics\ProjectiveRenderingSubsystem.hpp" />
+    <ClInclude Include="Graphics\Game\ImageTransitionSubsystem.hpp" />
+    <ClInclude Include="Graphics\Game\OverlayRenderingSubsystem.hpp" />
+    <ClInclude Include="Graphics\Game\ProjectiveRenderingSubsystem.hpp" />
+    <ClInclude Include="Graphics\RenderTarget\RenderTarget.hpp" />
+    <ClInclude Include="Graphics\RenderTarget\RenderTargetDescriptor.hpp" />
+    <ClInclude Include="Graphics\RenderTarget\RenderTargetProvider.hpp" />
+    <ClInclude Include="Graphics\RenderTarget\RenderTargetSource.hpp" />
+    <ClInclude Include="Runtime\Graphics\GpuAttachmentOps.hpp" />
+    <ClInclude Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.hpp" />
+    <ClInclude Include="Graphics\RenderTarget\Source\SwapchainRenderTargetSource.hpp" />
+    <ClInclude Include="Graphics\RenderWindow.hpp" />
     <ClInclude Include="Interactive\InputMap.hpp" />
     <ClInclude Include="Runtime\EventEmitter.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\CompareOp.hpp" />
+    <ClInclude Include="Runtime\Graphics\Enum\GpuAttachmentOp.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuBufferFormat.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuBufferUsage.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuImageLayout.hpp" />
@@ -290,11 +316,12 @@
     <ClInclude Include="Runtime\Graphics\Enum\GraphicsIndexType.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GraphicsPipelineStage.hpp" />
     <ClInclude Include="Runtime\Graphics\GpuDevice.hpp" />
+    <ClInclude Include="Runtime\Graphics\GpuImageFormat.hpp" />
     <ClInclude Include="Runtime\Graphics\GpuSemaphore.hpp" />
     <ClInclude Include="Runtime\Graphics\GraphicsPipeline.hpp" />
     <ClInclude Include="Runtime\Graphics\GraphicsPipelineCompiler.hpp" />
     <ClInclude Include="Runtime\Graphics\PipelineCreateInfo.hpp" />
-    <ClInclude Include="Graphics\RenderableSubsystem.hpp" />
+    <ClInclude Include="Graphics\Game\RenderableSubsystem.hpp" />
     <ClInclude Include="Runtime\Graphics\RenderPass.hpp" />
     <ClInclude Include="Runtime\Graphics\RenderPassCreateInfo.hpp" />
     <ClInclude Include="Runtime\Graphics\Framebuffer.hpp" />

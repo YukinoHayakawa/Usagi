@@ -29,8 +29,7 @@ protected:
 
     void allocateDeviceMemory(const vk::MemoryPropertyFlags &mem_properties);
 
-    vk::UniqueImage createImage(
-        const GpuImageCreateInfo &info, vk::Format &format) const;
+    vk::UniqueImage createImage(const GpuImageCreateInfo &info) const;
     vk::MemoryRequirements getImageRequirements(vk::Image image) const;
     void bindImageMemory(VulkanPooledImage *image);
     static void createImageBaseView(VulkanPooledImage *image);
@@ -148,15 +147,15 @@ public:
     std::shared_ptr<VulkanPooledImage> createPooledImage(
         const GpuImageCreateInfo &info)
     {
-        vk::Format vk_format;
-        auto image = createImage(info, vk_format);
+        auto image = createImage(info);
         const auto req = getImageRequirements(image.get());
         auto offset = reinterpret_cast<std::size_t>(mAllocator->allocate(
             req.size, req.alignment));
         try
         {
             auto wrapper = std::make_shared<VulkanPooledImage>(
-                std::move(image), vk_format, info.size,
+                std::move(image),
+                GpuImageFormat { info.format, info.sample_count }, info.size,
                 this, offset, req.size
             );
             bindImageMemory(wrapper.get());

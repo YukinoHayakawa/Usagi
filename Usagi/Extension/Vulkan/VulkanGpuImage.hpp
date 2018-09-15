@@ -17,20 +17,17 @@ class VulkanGpuImage
 {
 protected:
     vk::Device mDevice;
-    vk::Format mFormat;
     std::shared_ptr<VulkanGpuImageView> mBaseView;
-    Vector2u32 mSize;
 
     vk::ImageAspectFlags getAspectsFromFormat() const;
     virtual void createBaseView();
 
 public:
     VulkanGpuImage(
-        vk::Device vk_device,
-        vk::Format format,
-        const Vector2u32 &size);
+        GpuImageFormat format,
+        const Vector2u32 &size,
+        vk::Device vk_device);
 
-    Vector2u32 size() const override { return mSize; }
     std::shared_ptr<GpuImageView> baseView() override;
     std::shared_ptr<GpuImageView> createView(
         const GpuImageViewCreateInfo &info) override;

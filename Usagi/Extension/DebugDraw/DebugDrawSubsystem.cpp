@@ -3,30 +3,33 @@
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Converter/SpirvAssetConverter.hpp>
 #include <Usagi/Game/Game.hpp>
-#include <Usagi/Runtime/Graphics/GpuDevice.hpp>
-#include <Usagi/Runtime/Graphics/GraphicsPipelineCompiler.hpp>
-#include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
+#include <Usagi/Graphics/RenderTarget/RenderTarget.hpp>
+#include <Usagi/Graphics/RenderTarget/RenderTargetDescriptor.hpp>
 #include <Usagi/Runtime/Graphics/Framebuffer.hpp>
 #include <Usagi/Runtime/Graphics/GpuBuffer.hpp>
 #include <Usagi/Runtime/Graphics/GpuCommandPool.hpp>
+#include <Usagi/Runtime/Graphics/GpuDevice.hpp>
 #include <Usagi/Runtime/Graphics/GpuImage.hpp>
 #include <Usagi/Runtime/Graphics/GpuImageCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/GpuImageView.hpp>
 #include <Usagi/Runtime/Graphics/GpuSampler.hpp>
 #include <Usagi/Runtime/Graphics/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsCommandList.hpp>
+#include <Usagi/Runtime/Graphics/GraphicsPipelineCompiler.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
 
-void usagi::DebugDrawSubsystem::createPipelines(
-    RenderPassCreateInfo &render_pass_info)
+void usagi::DebugDrawSubsystem::createRenderTarget(
+    RenderTargetDescriptor &descriptor)
 {
-    render_pass_info.attachment_usages[0].layout
-        = GpuImageLayout::COLOR_ATTACHMENT;
-    render_pass_info.attachment_usages[1].layout
-        = GpuImageLayout::DEPTH_STENCIL_ATTACHMENT;
+    descriptor.sharedColorTarget("debugdraw");
+    descriptor.depthTarget();
+    mRenderTarget = descriptor.finish();
+}
 
+void usagi::DebugDrawSubsystem::createPipelines()
+{
     auto gpu = mGame->runtime()->gpu();
-    mRenderPass = gpu->createRenderPass(render_pass_info);
+    mRenderPass = mRenderTarget->renderPass();
     mCommandPool = gpu->createCommandPool();
     mVertexBuffer = gpu->createBuffer(GpuBufferUsage::VERTEX);
 
@@ -174,11 +177,11 @@ void usagi::DebugDrawSubsystem::update(const Clock &clock)
     }
 }
 
-void usagi::DebugDrawSubsystem::render(
-    const Clock &clock,
-    const std::shared_ptr<Framebuffer> framebuffer,
-    const CommandListSink &cmd_out) const
+std::shared_ptr<usagi::GraphicsCommandList> usagi::DebugDrawSubsystem::render(
+    const Clock &clock)
 {
+    const auto framebuffer = mRenderTarget->createFramebuffer();
+
     mCurrentCmdList = mCommandPool->allocateGraphicsCommandList();
     mCurrentCmdList->beginRecording();
     mCurrentCmdList->beginRendering(mRenderPass, framebuffer);
@@ -188,7 +191,8 @@ void usagi::DebugDrawSubsystem::render(
     dd::flush(mContext);
     mCurrentCmdList->endRendering();
     mCurrentCmdList->endRecording();
-    cmd_out(std::move(mCurrentCmdList));
+
+    return std::move(mCurrentCmdList);
 }
 
 dd::GlyphTextureHandle usagi::DebugDrawSubsystem::createGlyphTexture(

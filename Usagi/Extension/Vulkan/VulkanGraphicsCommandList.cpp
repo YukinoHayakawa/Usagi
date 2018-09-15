@@ -125,6 +125,8 @@ void usagi::VulkanGraphicsCommandList::imageTransition(
     );
 }
 
+// note: bad performance on tile-based GPUs
+// https://developer.samsung.com/game/usage#clearingattachments
 void usagi::VulkanGraphicsCommandList::clearColorImage(
     GpuImage *image,
     const GpuImageLayout layout,
@@ -257,6 +259,7 @@ vk::DescriptorSet usagi::VulkanGraphicsCommandList::
     }
 }
 
+// todo performance
 void usagi::VulkanGraphicsCommandList::bindResourceSet(
     const std::uint32_t set_id,
     std::initializer_list<std::shared_ptr<ShaderResource>> resources)

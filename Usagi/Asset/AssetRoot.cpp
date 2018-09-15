@@ -8,8 +8,8 @@
 #include "AssetPackage.hpp"
 #include "Asset.hpp"
 
-usagi::AssetRoot::AssetRoot(Element *parent)
-    : Element { parent, "AssetRoot" }
+usagi::AssetRoot::AssetRoot(Element *parent, std::string name)
+    : Element(parent, std::move(name))
 {
 }
 

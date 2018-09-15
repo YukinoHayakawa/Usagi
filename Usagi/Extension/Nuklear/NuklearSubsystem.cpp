@@ -5,6 +5,8 @@
 #include <Usagi/Core/Clock.hpp>
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Game/Game.hpp>
+#include <Usagi/Graphics/RenderTarget/RenderTarget.hpp>
+#include <Usagi/Graphics/RenderTarget/RenderTargetDescriptor.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
 #include <Usagi/Runtime/Graphics/Framebuffer.hpp>
 #include <Usagi/Runtime/Graphics/GpuBuffer.hpp>
@@ -144,8 +146,7 @@ usagi::NuklearSubsystem::~NuklearSubsystem()
     nk_free(&mContext);
 }
 
-void usagi::NuklearSubsystem::createPipeline(
-    RenderPassCreateInfo render_pass_info)
+void usagi::NuklearSubsystem::createPipelines()
 {
     auto gpu = mGame->runtime()->gpu();
     auto assets = mGame->assets();
@@ -201,14 +202,7 @@ void usagi::NuklearSubsystem::createPipeline(
         state.setBlendingOperation(BlendingOperation::ADD);
         compiler->setColorBlendState(state);
     }
-    // Render Pass
-    {
-        render_pass_info.attachment_usages[0].layout =
-            GpuImageLayout::COLOR_ATTACHMENT;
-        mRenderPass = gpu->createRenderPass(render_pass_info);
-        compiler->setRenderPass(mRenderPass);
-    }
-
+    compiler->setRenderPass(mRenderTarget->renderPass());
     mPipeline = compiler->compile();
 }
 
@@ -236,13 +230,11 @@ void usagi::NuklearSubsystem::update(const Clock &clock)
     processElements(clock);
 }
 
-void usagi::NuklearSubsystem::render(
-    const Clock &clock,
-    const std::shared_ptr<Framebuffer> framebuffer,
-    const CommandListSink &cmd_out) const
+void usagi::NuklearSubsystem::createRenderTarget(
+    RenderTargetDescriptor &descriptor)
 {
-    render(framebuffer, cmd_out);
-    nk_input_begin(&mContext);
+    descriptor.sharedColorTarget("nuklear");
+    mRenderTarget = descriptor.finish();
 }
 
 void usagi::NuklearSubsystem::processElements(const Clock &clock)
@@ -251,10 +243,8 @@ void usagi::NuklearSubsystem::processElements(const Clock &clock)
         std::get<NuklearComponent*>(e.second)->draw(clock, &mContext);
 }
 
-void usagi::NuklearSubsystem::render(
-    const std::shared_ptr<Framebuffer> &framebuffer,
-    const std::function<void(std::shared_ptr<GraphicsCommandList>)> &cmd_out
-) const
+std::shared_ptr<usagi::GraphicsCommandList> usagi::NuklearSubsystem::render(
+    const Clock &clock)
 {
     /* fill converting configuration */
     {
@@ -298,7 +288,10 @@ void usagi::NuklearSubsystem::render(
     // Render Command List
     auto cmd_list = mCommandPool->allocateGraphicsCommandList();
     cmd_list->beginRecording();
-    cmd_list->beginRendering(mRenderPass, framebuffer);
+    cmd_list->beginRendering(
+        mRenderTarget->renderPass(),
+        mRenderTarget->createFramebuffer()
+    );
     cmd_list->bindPipeline(mPipeline);
     cmd_list->bindResourceSet(0, { mSampler });
 
@@ -366,7 +359,9 @@ void usagi::NuklearSubsystem::render(
     cmd_list->endRendering();
     cmd_list->endRecording();
 
-    cmd_out(std::move(cmd_list));
+    nk_input_begin(&mContext);
+
+    return std::move(cmd_list);
 }
 
 void usagi::NuklearSubsystem::onKeyStateChange(const KeyEvent &e)

@@ -83,7 +83,7 @@ class AssetRoot : public Element
     }
 
 public:
-    explicit AssetRoot(Element *parent);
+    AssetRoot(Element *parent, std::string name);
 
     Asset * findAsset(std::string locator) const;
 

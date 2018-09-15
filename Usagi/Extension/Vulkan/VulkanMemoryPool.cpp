@@ -63,7 +63,7 @@ void usagi::VulkanMemoryPool::allocateDeviceMemory(
 }
 
 vk::UniqueImage usagi::VulkanMemoryPool::createImage(
-    const GpuImageCreateInfo &info, vk::Format &format) const
+    const GpuImageCreateInfo &info) const
 {
     vk::ImageCreateInfo vk_info;
     vk_info.setImageType(vk::ImageType::e2D);
@@ -82,7 +82,6 @@ vk::UniqueImage usagi::VulkanMemoryPool::createImage(
     vk_info.setSharingMode(vk::SharingMode::eExclusive);
     vk_info.setInitialLayout(vk::ImageLayout::eUndefined);
 
-    format = vk_info.format;
     return mDevice->device().createImageUnique(vk_info);
 }
 

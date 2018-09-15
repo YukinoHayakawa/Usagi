@@ -21,22 +21,23 @@ usagi::VulkanRenderPass::VulkanRenderPass(
     for(auto &&u : info.attachment_usages)
     {
         vk::AttachmentDescription d;
-        d.setFormat(translate(u.format));
-        d.setSamples(translateSampleCount(u.sample_count));
+        d.setFormat(translate(u.format.format));
+        d.setSamples(translateSampleCount(u.format.sample_count));
         d.setInitialLayout(translate(u.initial_layout));
         d.setFinalLayout(translate(u.final_layout));
-        d.setLoadOp(translate(u.load_op));
-        d.setStoreOp(translate(u.store_op));
+        d.setLoadOp(translate(u.op.load_op));
+        d.setStoreOp(translate(u.op.store_op));
         attachment_descriptions.push_back(d);
         mClearValues.emplace_back(std::array<float, 4> {
-            u.clear_color.x(), u.clear_color.y(),
-            u.clear_color.z(), u.clear_color.w()
+            u.op.clear_color.x(), u.op.clear_color.y(),
+            u.op.clear_color.z(), u.op.clear_color.w()
         });
     }
     vk_info.setAttachmentCount(
         static_cast<uint32_t>(attachment_descriptions.size()));
     vk_info.setPAttachments(attachment_descriptions.data());
 
+    // todo unused attachments? / one framebuffer per subsystem?
     vk::SubpassDescription subpass;
     std::vector<vk::AttachmentReference> color_refs;
     vk::AttachmentReference ds_ref;
@@ -46,7 +47,7 @@ usagi::VulkanRenderPass::VulkanRenderPass(
         if(a.layout == GpuImageLayout::DEPTH_STENCIL_ATTACHMENT)
         {
             if(subpass.pDepthStencilAttachment)
-                LOG(error, "Only one depth stencil attachmend may be used.");
+                LOG(error, "Only one depth stencil attachment may be used.");
             ds_ref.setAttachment(static_cast<uint32_t>(i));
             ds_ref.setLayout(translate(a.layout));
             subpass.setPDepthStencilAttachment(&ds_ref);

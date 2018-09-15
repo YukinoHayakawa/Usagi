@@ -12,5 +12,6 @@ enum class GpuImageLayout
     DEPTH_STENCIL_ATTACHMENT,
     SHADER_READ_ONLY,
     PREINITIALIZED,
+    AUTO,
 };
 }

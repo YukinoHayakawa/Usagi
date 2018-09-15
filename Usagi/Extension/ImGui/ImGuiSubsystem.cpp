@@ -5,6 +5,8 @@
 #include <Usagi/Core/Clock.hpp>
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Game/Game.hpp>
+#include <Usagi/Graphics/RenderTarget/RenderTarget.hpp>
+#include <Usagi/Graphics/RenderTarget/RenderTargetDescriptor.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
 #include <Usagi/Runtime/Graphics/Framebuffer.hpp>
 #include <Usagi/Runtime/Graphics/GpuBuffer.hpp>
@@ -18,7 +20,6 @@
 #include <Usagi/Runtime/Graphics/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsCommandList.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsPipelineCompiler.hpp>
-#include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
 #include <Usagi/Runtime/Input/Keyboard/Keyboard.hpp>
 #include <Usagi/Runtime/Input/Mouse/Mouse.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
@@ -142,8 +143,14 @@ usagi::ImGuiSubsystem::~ImGuiSubsystem()
     ImGui::DestroyContext();
 }
 
-void usagi::ImGuiSubsystem::createPipeline(
-    RenderPassCreateInfo render_pass_info)
+void usagi::ImGuiSubsystem::createRenderTarget(
+    RenderTargetDescriptor &descriptor)
+{
+    descriptor.sharedColorTarget("imgui");
+    mRenderTarget = descriptor.finish();
+}
+
+void usagi::ImGuiSubsystem::createPipelines()
 {
     auto gpu = mGame->runtime()->gpu();
     auto assets = mGame->assets();
@@ -193,13 +200,7 @@ void usagi::ImGuiSubsystem::createPipeline(
         state.setBlendingOperation(BlendingOperation::ADD);
         compiler->setColorBlendState(state);
     }
-    // Render Pass
-    {
-        render_pass_info.attachment_usages[0].layout =
-            GpuImageLayout::COLOR_ATTACHMENT;
-        mRenderPass = gpu->createRenderPass(render_pass_info);
-        compiler->setRenderPass(mRenderPass);
-    }
+    compiler->setRenderPass(mRenderTarget->renderPass());
 
     mPipeline = compiler->compile();
 }
@@ -256,14 +257,6 @@ void usagi::ImGuiSubsystem::update(const Clock &clock)
 
     newFrame(static_cast<float>(clock.elapsed()));
     processElements(clock);
-}
-
-void usagi::ImGuiSubsystem::render(
-    const usagi::Clock &clock,
-    const std::shared_ptr<Framebuffer> framebuffer,
-    const CommandListSink &cmd_out) const
-{
-    render(framebuffer, cmd_out);
 }
 
 void usagi::ImGuiSubsystem::newFrame(const float dt)
@@ -329,16 +322,14 @@ void usagi::ImGuiSubsystem::processElements(const Clock &clock)
         std::get<ImGuiComponent*>(e.second)->draw(clock);
 }
 
-void usagi::ImGuiSubsystem::render(
-    const std::shared_ptr<Framebuffer> &framebuffer,
-    const std::function<void(std::shared_ptr<GraphicsCommandList>)> &cmd_out
-) const
+std::shared_ptr<usagi::GraphicsCommandList> usagi::ImGuiSubsystem::render(
+    const Clock &clock)
 {
     ImGui::Render();
 
     const auto draw_data = ImGui::GetDrawData();
     if(draw_data->TotalVtxCount == 0)
-        return;
+        return { };
 
     // Upload Vertex and index Data
     {
@@ -365,7 +356,10 @@ void usagi::ImGuiSubsystem::render(
     // Render Command List
     auto cmd_list = mCommandPool->allocateGraphicsCommandList();
     cmd_list->beginRecording();
-    cmd_list->beginRendering(mRenderPass, framebuffer);
+    cmd_list->beginRendering(
+        mRenderTarget->renderPass(),
+        mRenderTarget->createFramebuffer()
+    );
     cmd_list->bindPipeline(mPipeline);
     cmd_list->bindResourceSet(0, { mSampler });
 
@@ -451,7 +445,7 @@ void usagi::ImGuiSubsystem::render(
     cmd_list->endRendering();
     cmd_list->endRecording();
 
-    cmd_out(std::move(cmd_list));
+    return std::move(cmd_list);
 }
 
 void usagi::ImGuiSubsystem::onKeyStateChange(const KeyEvent &e)

@@ -10,7 +10,7 @@ using namespace usagi::vulkan;
 vk::ImageAspectFlags usagi::VulkanGpuImage::getAspectsFromFormat() const
 {
     vk::ImageAspectFlags aspects;
-    switch(mFormat) {
+    switch(translate(mFormat.format)) {
         case vk::Format::eD16Unorm:
         case vk::Format::eD32Sfloat:
             aspects = vk::ImageAspectFlagBits::eDepth;
@@ -33,7 +33,7 @@ void usagi::VulkanGpuImage::createBaseView()
     vk::ImageViewCreateInfo info;
     info.setImage(image());
     info.setViewType(vk::ImageViewType::e2D);
-    info.setFormat(mFormat);
+    info.setFormat(translate(mFormat.format));
     info.setComponents(vk::ComponentMapping { });
     vk::ImageSubresourceRange subresource_range;
     subresource_range.setAspectMask(getAspectsFromFormat());
@@ -48,12 +48,11 @@ void usagi::VulkanGpuImage::createBaseView()
 }
 
 usagi::VulkanGpuImage::VulkanGpuImage(
-    const vk::Device vk_device,
-    const vk::Format format,
-    const Vector2u32 &size)
-    : mDevice(vk_device)
-    , mFormat(format)
-    , mSize(size)
+    GpuImageFormat format,
+    const Vector2u32 &size,
+    vk::Device vk_device)
+    : GpuImage(format, size)
+    , mDevice(vk_device)
 {
 }
 
@@ -68,7 +67,7 @@ std::shared_ptr<usagi::GpuImageView> usagi::VulkanGpuImage::createView(
     vk::ImageViewCreateInfo vk_info;
     vk_info.setImage(image());
     vk_info.setViewType(vk::ImageViewType::e2D);
-    vk_info.setFormat(mFormat);
+    vk_info.setFormat(translate(mFormat.format));
     vk_info.components.r = translate(info.components.r);
     vk_info.components.g = translate(info.components.g);
     vk_info.components.b = translate(info.components.b);

@@ -40,7 +40,7 @@ public:
         const RenderPassCreateInfo &info) = 0;
     virtual std::shared_ptr<Framebuffer> createFramebuffer(
         const Vector2u32 &size,
-        std::initializer_list<std::shared_ptr<GpuImageView>> views) = 0;
+        std::vector<std::shared_ptr<GpuImageView>> views) = 0;
     virtual std::shared_ptr<GpuSemaphore> createSemaphore() = 0;
     virtual std::shared_ptr<GpuImage> createImage(
         const GpuImageCreateInfo &info) = 0;
@@ -55,7 +55,7 @@ public:
         const GpuSamplerCreateInfo &info) = 0;
 
     virtual void submitGraphicsJobs(
-        std::vector<std::shared_ptr<GraphicsCommandList>> jobs,
+        const std::vector<std::shared_ptr<GraphicsCommandList>> &jobs,
         std::initializer_list<std::shared_ptr<GpuSemaphore>> wait_semaphores,
         std::initializer_list<GraphicsPipelineStage> wait_stages,
         std::initializer_list<std::shared_ptr<GpuSemaphore>> signal_semaphores

@@ -27,7 +27,7 @@ public:
             (... && (std::get<RequiredComponents*>(vec) != nullptr));
         if(processable)
         {
-            mRegistry[element] = std::move(vec);
+            mRegistry.insert_or_assign(element, std::move(vec));
         }
         else
         {

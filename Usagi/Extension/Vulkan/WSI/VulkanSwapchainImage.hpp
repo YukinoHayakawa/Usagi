@@ -11,10 +11,10 @@ class VulkanSwapchainImage : public VulkanGpuImage
 
 public:
     VulkanSwapchainImage(
-        vk::Device device,
-        vk::Image image,
-        vk::Format format,
-        const Vector2u32 &size);
+        GpuImageFormat format,
+        const Vector2u32 &size,
+        vk::Device vk_device,
+        vk::Image vk_image);
 
     vk::Image image() const override { return mImage; }
 

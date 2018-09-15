@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include <Usagi/Graphics/ProjectiveRenderingSubsystem.hpp>
-#include <Usagi/Graphics/OverlayRenderingSubsystem.hpp>
+#include <Usagi/Graphics/Game/ProjectiveRenderingSubsystem.hpp>
+#include <Usagi/Graphics/Game/OverlayRenderingSubsystem.hpp>
 #include <Usagi/Game/CollectionSubsystem.hpp>
 
 #include "DebugDraw.hpp"
@@ -46,13 +46,10 @@ public:
     explicit DebugDrawSubsystem(Game *game);
     ~DebugDrawSubsystem();
 
-    void createPipelines(RenderPassCreateInfo &render_pass_info);
-
+    void createRenderTarget(RenderTargetDescriptor &descriptor) override;
+    void createPipelines() override;
     void update(const Clock &clock) override;
-    void render(
-        const Clock &clock,
-        std::shared_ptr<Framebuffer> framebuffer,
-        const CommandListSink &cmd_out) const override;
+    std::shared_ptr<GraphicsCommandList> render(const Clock &clock) override;
 
     dd::GlyphTextureHandle createGlyphTexture(
         int width,

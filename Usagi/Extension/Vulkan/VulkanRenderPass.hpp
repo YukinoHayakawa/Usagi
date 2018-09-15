@@ -3,7 +3,6 @@
 #include <vulkan/vulkan.hpp>
 
 #include <Usagi/Runtime/Graphics/RenderPass.hpp>
-#include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
 
 namespace usagi
 {

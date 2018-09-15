@@ -365,7 +365,7 @@ std::shared_ptr<usagi::RenderPass> usagi::VulkanGpuDevice::createRenderPass(
 
 std::shared_ptr<usagi::Framebuffer> usagi::VulkanGpuDevice::createFramebuffer(
     const Vector2u32 &size,
-    std::initializer_list<std::shared_ptr<GpuImageView>> views)
+    std::vector<std::shared_ptr<GpuImageView>> views)
 {
     auto vk_views = transformObjects(views,
         [&](auto &&v) {
@@ -418,7 +418,7 @@ usagi::VulkanGpuDevice::fallbackTexture() const
 }
 
 void usagi::VulkanGpuDevice::submitGraphicsJobs(
-    std::vector<std::shared_ptr<GraphicsCommandList>> jobs,
+    const std::vector<std::shared_ptr<GraphicsCommandList>> &jobs,
     std::initializer_list<std::shared_ptr<GpuSemaphore>> wait_semaphores,
     std::initializer_list<GraphicsPipelineStage> wait_stages,
     std::initializer_list<std::shared_ptr<GpuSemaphore>> signal_semaphores)
