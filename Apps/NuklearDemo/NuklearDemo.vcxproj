@@ -117,12 +117,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="NuklearDemo.cpp" />
+    <ClCompile Include="NuklearDemoState.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Usagi\Usagi.vcxproj">
       <Project>{4250e1c0-ea0b-4575-bc04-11e7f83c2ed4}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="NuklearDemo.hpp" />
+    <ClInclude Include="NuklearDemoState.hpp" />
+    <ClInclude Include="NuklearDemoComponent.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
