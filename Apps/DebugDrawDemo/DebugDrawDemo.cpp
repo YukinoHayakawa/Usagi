@@ -17,8 +17,8 @@ usagi::DebugDrawDemo::DebugDrawDemo(std::shared_ptr<Runtime> runtime)
         Vector2i { 100, 100 },
         Vector2u32 { 1920, 1080 }
     );
-    mMainWindow.window()->addEventListener(this);
-    setupRenderTargets();
+    mMainWindow.window->addEventListener(this);
+    setupRenderTargets(true);
 
     mStateManager->pushState(mStateManager->addChild<DebugDrawGameState>(
         "DebugDraw", this));
@@ -26,5 +26,5 @@ usagi::DebugDrawDemo::DebugDrawDemo(std::shared_ptr<Runtime> runtime)
 
 usagi::DebugDrawDemo::~DebugDrawDemo()
 {
-    mMainWindow.window()->removeEventListener(this);
+    mMainWindow.window->removeEventListener(this);
 }

@@ -27,7 +27,7 @@ protected:
     std::unique_ptr<ImageTransitionSubsystem> mPostRender;
     std::vector<std::shared_ptr<GraphicsCommandList>> mPendingJobs;
 
-    void setupRenderTargets();
+    void setupRenderTargets(bool depth);
 
     bool continueGame() const override;
     void frame() override;

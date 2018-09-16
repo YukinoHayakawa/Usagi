@@ -63,7 +63,7 @@ usagi::DebugDrawGameState::~DebugDrawGameState()
 void usagi::DebugDrawGameState::update(const Clock &clock)
 {
     // todo auto set all render sizes
-    const auto framebuffer_size = mGame->mainWindow().swapchain()->size();
+    const auto framebuffer_size = mGame->mainWindow().swapchain->size();
     const auto aspect =
         static_cast<float>(framebuffer_size.x()) / framebuffer_size.y();
     mCameraElement->camera()->setPerspective(
@@ -73,7 +73,7 @@ void usagi::DebugDrawGameState::update(const Clock &clock)
         mCameraElement->camera()->localToNDC() *
         mCameraElement->comp<TransformComponent>()->worldToLocal());
     mDebugDraw->setRenderSizes(
-        mGame->mainWindow().window()->size(),
+        mGame->mainWindow().window->size(),
         framebuffer_size);
 
     GraphicalGameState::update(clock);

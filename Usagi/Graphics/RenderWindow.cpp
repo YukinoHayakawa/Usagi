@@ -16,9 +16,9 @@ void usagi::RenderWindow::create(
     runtime->initWindow();
     runtime->initGpu();
 
-    mWindow = runtime->windowManager()->createWindow(
+    window = runtime->windowManager()->createWindow(
         window_title, window_position, window_size);
 
-    mSwapchain = runtime->gpu()->createSwapchain(mWindow.get());
-    mSwapchain->create(mWindow->size(), swapchain_format);
+    swapchain = runtime->gpu()->createSwapchain(window.get());
+    swapchain->create(window->size(), swapchain_format);
 }

@@ -12,21 +12,22 @@
 #include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Runtime/Window/Window.hpp>
 
-void usagi::GraphicalGame::setupRenderTargets()
+void usagi::GraphicalGame::setupRenderTargets(const bool depth)
 {
-    mSize = mMainWindow.swapchain()->size();
+    mSize = mMainWindow.swapchain->size();
 
     // add default color output target
-    addSharedSource("color",
-        std::make_shared<SwapchainRenderTargetSource>(mMainWindow.swapchain()));
+    addSharedSource("color", std::make_shared<SwapchainRenderTargetSource>(
+        mMainWindow.swapchain.get()));
     // add depth target
+    if(depth)
     {
         GpuImageCreateInfo info;
-        info.size = mMainWindow.window()->size();
+        info.size = mMainWindow.window->size();
         info.format = GpuBufferFormat::D32_SFLOAT;
         info.usage = GpuImageUsage::DEPTH_STENCIL_ATTACHMENT;
-        addSharedSource("depth",
-            std::make_shared<ImageRenderTargetSource>(mRuntime->gpu(), info));
+        addSharedSource("depth", std::make_shared<ImageRenderTargetSource>(
+            mRuntime->gpu(), info));
     }
 
     // clear images & perform transitions
@@ -39,6 +40,7 @@ void usagi::GraphicalGame::setupRenderTargets()
             u.op.load_op = GpuAttachmentLoadOp::CLEAR;
             desc.sharedColorTarget("swapchain", u);
         }
+        if(depth)
         {
             GpuAttachmentUsage u;
             u.initial_layout = GpuImageLayout::UNDEFINED;
@@ -63,7 +65,7 @@ void usagi::GraphicalGame::setupRenderTargets()
 
 bool usagi::GraphicalGame::continueGame() const
 {
-    return mMainWindow.window()->isOpen();
+    return mMainWindow.window->isOpen();
 }
 
 usagi::GraphicalGame::GraphicalGame(std::shared_ptr<Runtime> runtime)
@@ -87,7 +89,7 @@ void usagi::GraphicalGame::frame()
     processInput();
 
     // switch swapchain image
-    const auto wait_semaphores = { mMainWindow.swapchain()->acquireNextImage() };
+    const auto wait_semaphores = { mMainWindow.swapchain->acquireNextImage() };
 
     // update states & gather render jobs
     mPendingJobs.push_back(mPreRender->render(mMasterClock));
@@ -115,7 +117,7 @@ void usagi::GraphicalGame::frame()
     mPendingJobs.clear();
 
     // Present image
-    mMainWindow.swapchain()->present({ rendering_finished_sem });
+    mMainWindow.swapchain->present({ rendering_finished_sem });
 
     // collect unused resources from previous frames
     gpu_device->reclaimResources();

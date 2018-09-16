@@ -97,14 +97,12 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
 {
     LOG(info, "Compiling {} shader...", to_string(stage));
 
-    std::string hash;
     std::filesystem::path cache_file;
     if(cache_folder)
     {
-        hash = sha256(glsl_source_code);
         cache_file = cache_folder.value();
         create_directories(cache_file);
-        cache_file /= hash;
+        cache_file /= sha256(glsl_source_code);
         cache_file += ".spv";
 
         // try loading from cache

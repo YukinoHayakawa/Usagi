@@ -15,7 +15,6 @@
 #include "VulkanGraphicsPipeline.hpp"
 #include "VulkanGpuImageView.hpp"
 #include "VulkanShaderResource.hpp"
-#include "VulkanRenderPass.hpp"
 
 using namespace usagi::vulkan;
 
