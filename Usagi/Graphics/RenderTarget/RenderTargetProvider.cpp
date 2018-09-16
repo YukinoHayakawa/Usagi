@@ -18,6 +18,7 @@ void usagi::RenderTargetProvider::resize(const Vector2u32 &size)
     {
         s.second->resize(size);
     }
+    mSize = size;
 }
 
 void usagi::RenderTargetProvider::addSharedSource(
