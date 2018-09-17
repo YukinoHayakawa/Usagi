@@ -44,20 +44,20 @@ VkBool32 usagi::VulkanGpuDevice::debugMessengerCallback(
     const vk::DebugUtilsMessageTypeFlagsEXT &message_type,
     const vk::DebugUtilsMessengerCallbackDataEXT *callback_data) const
 {
-    spdlog::level::level_enum level;
+    LoggingLevel level;
     using Severity = vk::DebugUtilsMessageSeverityFlagBitsEXT;
     if(message_severity & Severity::eVerbose)
-        level = spdlog::level::debug;
+        level = LoggingLevel::debug;
     else if(message_severity & Severity::eInfo)
-        level = spdlog::level::info;
+        level = LoggingLevel::info;
     else if(message_severity & Severity::eWarning)
-        level = spdlog::level::warn;
+        level = LoggingLevel::warn;
     else if(message_severity & Severity::eError)
-        level = spdlog::level::err;
+        level = LoggingLevel::error;
     else
-        level = spdlog::level::info;
+        level = LoggingLevel::info;
 
-    LOG(log, level,
+    log(level,
         "[Vulkan] {} [{}][ID={}]: {}",
         to_string(message_type),
         callback_data->pMessageIdName
@@ -71,7 +71,7 @@ VkBool32 usagi::VulkanGpuDevice::debugMessengerCallback(
         for(uint32_t i = 0; i < callback_data->objectCount; ++i)
         {
             const auto &object = callback_data->pObjects[i];
-            LOG(log, level, "Object #{}: Handle {}, Type {}, Name \"{}\"",
+            log(level, "Object #{}: Handle {}, Type {}, Name \"{}\"",
                 i,
                 object.objectHandle,
                 to_string(object.objectType),
@@ -84,7 +84,7 @@ VkBool32 usagi::VulkanGpuDevice::debugMessengerCallback(
             callback_data->cmdBufLabelCount);
         for(uint32_t i = 0; i < callback_data->cmdBufLabelCount; ++i)
         {
-            LOG(log, level,
+            log(level,
                 "Label #{}: {} {{ {}, {}, {}, {} }}\n",
                 i,
                 callback_data->pCmdBufLabels[i].pLabelName,

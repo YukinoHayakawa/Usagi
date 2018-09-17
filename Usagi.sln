@@ -79,6 +79,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua", "Thirdparty\Submodule
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NuklearDemo", "Apps\NuklearDemo\NuklearDemo.vcxproj", "{8295B2F1-76E8-4625-AAB5-59F049DE2EC3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fmt", "Thirdparty\Submodules\fmt\fmt.vcxproj", "{65806822-06B5-3679-AC9F-629EA69ADAF1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -435,6 +437,18 @@ Global
 		{8295B2F1-76E8-4625-AAB5-59F049DE2EC3}.RelWithDebInfo|x64.Build.0 = Release|x64
 		{8295B2F1-76E8-4625-AAB5-59F049DE2EC3}.RelWithDebInfo|x86.ActiveCfg = Release|Win32
 		{8295B2F1-76E8-4625-AAB5-59F049DE2EC3}.RelWithDebInfo|x86.Build.0 = Release|Win32
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.Debug|x64.ActiveCfg = Debug|x64
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.Debug|x64.Build.0 = Debug|x64
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.Debug|x86.ActiveCfg = Debug|x64
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.MinSizeRel|x86.ActiveCfg = MinSizeRel|x64
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.Release|x64.ActiveCfg = Release|x64
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.Release|x64.Build.0 = Release|x64
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.Release|x86.ActiveCfg = Release|x64
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{65806822-06B5-3679-AC9F-629EA69ADAF1}.RelWithDebInfo|x86.ActiveCfg = RelWithDebInfo|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -473,6 +487,7 @@ Global
 		{91606143-B511-4163-BE27-26D1436A982A} = {56323773-AFAE-4E14-9105-2856DE6ECCDF}
 		{D6FE911A-AC17-4DB9-895E-F574011173FC} = {91606143-B511-4163-BE27-26D1436A982A}
 		{8295B2F1-76E8-4625-AAB5-59F049DE2EC3} = {9C0C4AB0-D161-492E-9FD6-99BC71760DBF}
+		{65806822-06B5-3679-AC9F-629EA69ADAF1} = {56323773-AFAE-4E14-9105-2856DE6ECCDF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {95FEE4E3-D5D8-4023-8005-336F8A91186A}

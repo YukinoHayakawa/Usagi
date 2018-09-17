@@ -148,10 +148,7 @@
     <ClCompile Include="Extension\Nuklear\NuklearSubsystem.cpp" />
     <ClCompile Include="Extension\Nuklear\NuklearImpl.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanBufferAllocation.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanEnumTranslation.cpp">
-      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ShowIncludes>
-      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ShowIncludes>
-    </ClCompile>
+    <ClCompile Include="Extension\Vulkan\VulkanEnumTranslation.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanExtensions.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanFramebuffer.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanGpuBuffer.cpp" />
@@ -377,6 +374,9 @@
     <ClInclude Include="Utility\Unicode.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Thirdparty\Submodules\fmt\fmt.vcxproj">
+      <Project>{65806822-06b5-3679-ac9f-629ea69adaf1}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Thirdparty\Submodules\glslang\glslang\glslang.vcxproj">
       <Project>{cfebe9ae-9cf8-30fa-8fc0-31067e861f34}</Project>
     </ProjectReference>
