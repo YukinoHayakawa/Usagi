@@ -4,6 +4,7 @@
 #include <Usagi/Graphics/RenderTarget/RenderTargetProvider.hpp>
 #include <Usagi/Graphics/RenderWindow.hpp>
 #include <Usagi/Runtime/Window/WindowEventListener.hpp>
+#include <Usagi/Runtime/Graphics/Enum/GpuBufferFormat.hpp>
 
 #include "ImageTransitionSubsystem.hpp"
 
@@ -27,6 +28,11 @@ protected:
     std::unique_ptr<ImageTransitionSubsystem> mPostRender;
     std::vector<std::shared_ptr<GraphicsCommandList>> mPendingJobs;
 
+    void createMainWindow(
+        const std::string &window_title,
+        const Vector2i &window_position,
+        const Vector2u32 &window_size,
+        GpuBufferFormat swapchain_format = GpuBufferFormat::R8G8B8A8_UNORM);
     void setupRenderTargets(bool depth);
 
     bool continueGame() const override;
@@ -34,6 +40,7 @@ protected:
 
 public:
     explicit GraphicalGame(std::shared_ptr<Runtime> runtime);
+    ~GraphicalGame();
 
     /**
      * \brief The content of the vector will be removed.

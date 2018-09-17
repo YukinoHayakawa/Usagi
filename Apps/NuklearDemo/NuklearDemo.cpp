@@ -11,19 +11,13 @@ usagi::NuklearDemo::NuklearDemo(std::shared_ptr<Runtime> runtime)
     : GraphicalGame(std::move(runtime))
 {
     assets()->addChild<FilesystemAssetPackage>("nuklear", "Data/nuklear");
-    mMainWindow.create(
-        mRuntime.get(),
+    createMainWindow(
         u8"🐰 - Nuklear Demo",
         Vector2i { 100, 100 },
         Vector2u32 { 1920, 1080 }
     );
-    mMainWindow.window->addEventListener(this);
     setupRenderTargets(false);
 
     mStateManager->pushState(mStateManager->addChild<NuklearDemoState>(
         "NuklearDemo", this));
-}
-
-usagi::NuklearDemo::~NuklearDemo()
-{
 }

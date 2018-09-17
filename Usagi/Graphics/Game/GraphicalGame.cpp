@@ -12,6 +12,24 @@
 #include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Runtime/Window/Window.hpp>
 
+void usagi::GraphicalGame::createMainWindow(
+    const std::string &window_title,
+    const Vector2i &window_position,
+    const Vector2u32 &window_size,
+    const GpuBufferFormat swapchain_format)
+{
+    assert(!mMainWindow.window);
+
+    mMainWindow.create(
+        mRuntime.get(),
+        window_title,
+        window_position,
+        window_size,
+        swapchain_format
+    );
+    mMainWindow.window->addEventListener(this);
+}
+
 void usagi::GraphicalGame::setupRenderTargets(const bool depth)
 {
     mSize = mMainWindow.swapchain->size();
@@ -75,6 +93,12 @@ usagi::GraphicalGame::GraphicalGame(std::shared_ptr<Runtime> runtime)
 
     mPreRender = std::make_unique<ImageTransitionSubsystem>(mRuntime->gpu());
     mPostRender = std::make_unique<ImageTransitionSubsystem>(mRuntime->gpu());
+}
+
+usagi::GraphicalGame::~GraphicalGame()
+{
+    if(mMainWindow.window)
+        mMainWindow.window->removeEventListener(this);
 }
 
 void usagi::GraphicalGame::submitGraphicsJobs(

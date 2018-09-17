@@ -11,20 +11,13 @@ usagi::ImGuiDemo::ImGuiDemo(std::shared_ptr<Runtime> runtime)
     : GraphicalGame(std::move(runtime))
 {
     assets()->addChild<FilesystemAssetPackage>("imgui", "Data/imgui");
-    mMainWindow.create(
-        mRuntime.get(),
+    createMainWindow(
         u8"🐰 - ImGui Demo",
         Vector2i { 100, 100 },
         Vector2u32 { 1920, 1080 }
     );
-    mMainWindow.window->addEventListener(this);
     setupRenderTargets(false);
 
     mStateManager->pushState(mStateManager->addChild<ImGuiDemoState>(
         "ImGuiDemo", this));
-}
-
-usagi::ImGuiDemo::~ImGuiDemo()
-{
-    mMainWindow.window->removeEventListener(this);
 }

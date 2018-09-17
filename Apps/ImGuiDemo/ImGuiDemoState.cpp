@@ -21,7 +21,7 @@ usagi::ImGuiDemoState::ImGuiDemoState(
         mGame->mainWindow().window,
         input_manager->virtualKeyboard(),
         input_manager->virtualMouse()
-        ));
+    ));
     addChild("ImGuiRoot")->addComponent<ImGuiDemoComponent>();
 }
 

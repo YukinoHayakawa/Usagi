@@ -29,7 +29,6 @@ void usagi::DebugDrawSubsystem::createRenderTarget(
 void usagi::DebugDrawSubsystem::createPipelines()
 {
     auto gpu = mGame->runtime()->gpu();
-    mRenderPass = mRenderTarget->renderPass();
     mCommandPool = gpu->createCommandPool();
     mVertexBuffer = gpu->createBuffer(GpuBufferUsage::VERTEX);
 
@@ -45,7 +44,7 @@ void usagi::DebugDrawSubsystem::createPointLinePipeline()
 
     // ~~ Point Pipelines ~~
 
-    compiler->setRenderPass(mRenderPass);
+    compiler->setRenderPass(mRenderTarget->renderPass());
     // Shaders
     {
         compiler->setShader(ShaderStage::VERTEX,
@@ -103,7 +102,7 @@ void usagi::DebugDrawSubsystem::createTextPipeline()
     auto assets = mGame->assets();
     auto compiler = gpu->createPipelineCompiler();
 
-    compiler->setRenderPass(mRenderPass);
+    compiler->setRenderPass(mRenderTarget->renderPass());
     // Shaders
     {
         compiler->setShader(ShaderStage::VERTEX,
@@ -184,7 +183,7 @@ std::shared_ptr<usagi::GraphicsCommandList> usagi::DebugDrawSubsystem::render(
 
     mCurrentCmdList = mCommandPool->allocateGraphicsCommandList();
     mCurrentCmdList->beginRecording();
-    mCurrentCmdList->beginRendering(mRenderPass, framebuffer);
+    mCurrentCmdList->beginRendering(mRenderTarget->renderPass(), framebuffer);
     mCurrentCmdList->setViewport(
         0, { 0, 0 }, framebuffer->size().cast<float>());
     mCurrentCmdList->setScissor(0, { 0, 0 }, framebuffer->size());

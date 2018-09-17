@@ -8,6 +8,5 @@ class NuklearDemo : public GraphicalGame
 {
 public:
     explicit NuklearDemo(std::shared_ptr<Runtime> runtime);
-    ~NuklearDemo();
 };
 }

@@ -27,7 +27,6 @@ class DebugDrawSubsystem
     Game *mGame = nullptr;
     dd::ContextHandle mContext = nullptr;
 
-    std::shared_ptr<RenderPass> mRenderPass;
     std::shared_ptr<GraphicsPipeline> mPointDepthEnabledPipeline;
     std::shared_ptr<GraphicsPipeline> mPointDepthDisabledPipeline;
     std::shared_ptr<GraphicsPipeline> mLineDepthEnabledPipeline;
