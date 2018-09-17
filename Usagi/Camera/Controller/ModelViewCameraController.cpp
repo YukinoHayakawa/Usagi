@@ -18,7 +18,7 @@ void usagi::ModelViewCameraController::rotate(Vector2f rel)
     // maintain numerical accuracy
     mSpherical.x() = std::fmod(mSpherical.x(), 360.f);
     // prevent gimbal lock
-    mSpherical.y() = std::clamp(mSpherical.y(), -85.f, 85.f);
+    mSpherical.y() = std::clamp(mSpherical.y(), -89.f, 89.f);
 
     /* not tested
     const auto theta = degreesToRadians(mSpherical.y());
