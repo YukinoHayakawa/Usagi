@@ -359,6 +359,7 @@
     <ClInclude Include="Transform\Util.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
+    <ClInclude Include="Utility\DummyDeleter.hpp" />
     <ClInclude Include="Utility\EnumTranslator.hpp" />
     <ClInclude Include="Utility\File.hpp" />
     <ClInclude Include="Utility\Flag.hpp" />

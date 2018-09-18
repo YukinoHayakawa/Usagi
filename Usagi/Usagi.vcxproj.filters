@@ -761,5 +761,8 @@
     <ClInclude Include="Interactive\InputMapping.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\DummyDeleter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

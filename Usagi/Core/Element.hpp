@@ -32,19 +32,19 @@ class Component;
 class Element : Noncopyable
 {
     Element *mParent;
-    using ChildrenArray = std::vector<std::unique_ptr<Element>>;
+    using ChildrenArray = std::vector<std::shared_ptr<Element>>;
     ChildrenArray mChildren;
 
     std::string mName;
 
 	using ComponentMap = std::unordered_map<
-		std::type_index, std::unique_ptr<Component>
+		std::type_index, std::shared_ptr<Component>
     >;
 	ComponentMap mComponents;
 
 	void insertComponent(
 		const std::type_info &type,
-		std::unique_ptr<Component> component
+		std::shared_ptr<Component> component
 	);
 
 	template <typename CompBaseT>
@@ -142,16 +142,29 @@ public:
 
     // Component
 
+    /**
+     * \brief Add managed component. The created component is owned by the
+     * element.
+     * \tparam CompT
+     * \tparam Args
+     * \param args
+     * \return
+     */
     template <typename CompT, typename... Args>
     CompT * addComponent(Args &&... args)
     {
-        auto comp = std::make_unique<CompT>(std::forward<Args>(args)...);
+        auto comp = std::make_shared<CompT>(std::forward<Args>(args)...);
         const auto r = comp.get();
         insertComponent(comp->baseType(), std::move(comp));
         return r;
     }
 
-    void addComponent(std::unique_ptr<Component> component);
+    /**
+     * \brief Add unmanaged component. The caller is responsible for its
+     * lifetime.
+     * \param component
+     */
+    void addComponent(Component *component);
 
     template <typename CompBaseT, typename CompCastT = CompBaseT>
 	CompCastT * getComponent()

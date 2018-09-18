@@ -1,5 +1,7 @@
 ﻿#include "Element.hpp"
 
+#include <Usagi/Utility/DummyDeleter.hpp>
+
 #include "Component.hpp"
 #include "Logging.hpp"
 #include "Event/Library/Component/ComponentAddedEvent.hpp"
@@ -40,14 +42,14 @@ void usagi::Element::removeChild(Element *child)
     fireEvent<ChildElementRemovedEvent>();
 }
 
-void usagi::Element::addComponent(std::unique_ptr<Component> component)
+void usagi::Element::addComponent(Component *component)
 {
     auto &info = component->baseType();
-    insertComponent(info, std::move(component));
+    insertComponent(info, { component, DummyDeleter() });
 }
 
 void usagi::Element::insertComponent(const std::type_info &type,
-    std::unique_ptr<Component> component)
+    std::shared_ptr<Component> component)
 {
     auto p = component.get();
     const auto r = mComponents.insert({ type, std::move(component) });
