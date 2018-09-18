@@ -51,6 +51,6 @@ public:
     GpuDevice * gpu() const override;
     void onWindowResizeEnd(const WindowSizeEvent &e) override;
 
-    RenderWindow & mainWindow() { return mMainWindow; }
+    RenderWindow * mainWindow() { return &mMainWindow; }
 };
 }

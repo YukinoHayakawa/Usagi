@@ -1,33 +1,36 @@
 ﻿#pragma once
 
+#include <functional>
+
 #include <Usagi/Core/Math.hpp>
 
 #include "RenderableSubsystem.hpp"
 
 namespace usagi
 {
+class RenderWindow;
+
 /**
  * \brief Draw in 2D screen coordinates.
  */
 class OverlayRenderingSubsystem : virtual public RenderableSubsystem
 {
 protected:
-    Vector2f mWindowSize = Vector2f::Zero();
-    Vector2f mFrameBufferSize = Vector2f::Zero();
+    using SizeFunc = std::function<Vector2f()>;
+    SizeFunc mWindowSizeFunc;
+    SizeFunc mFrameBufferSizeFunc;
 
 public:
-    /**
-     * \brief Inject render size information.
-     * Must be called before calling update() and render().
-     * \param window_size
-     * \param framebuffer_size
-     */
-    void setRenderSizes(
-        const Vector2u32 &window_size,
-        const Vector2u32 &framebuffer_size)
+    void setWindowSizeFunc(SizeFunc func)
     {
-        mWindowSize = window_size.cast<float>();
-        mFrameBufferSize = framebuffer_size.cast<float>();
+        mWindowSizeFunc = std::move(func);
     }
+
+    void setFrameBufferSizeFunc(SizeFunc func)
+    {
+        mFrameBufferSizeFunc = std::move(func);
+    }
+
+    void setSizeFunctionsFromRenderWindow(RenderWindow *render_window);
 };
 }

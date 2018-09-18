@@ -146,6 +146,8 @@ void usagi::GraphicalGame::frame()
     // collect unused resources from previous frames
     gpu_device->reclaimResources();
 
+    performDeferredActions();
+
     updateClock();
 }
 

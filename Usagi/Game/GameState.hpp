@@ -70,5 +70,9 @@ public:
      * \param clock
      */
     virtual void update(const Clock &clock);
+
+    // todo also pause the clock
+    virtual void pause() { }
+    virtual void resume() { }
 };
 }

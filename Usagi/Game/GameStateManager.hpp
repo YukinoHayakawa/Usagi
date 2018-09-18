@@ -4,11 +4,15 @@
 
 namespace usagi
 {
+class Game;
 class Clock;
 class GameState;
 
 class GameStateManager : public Element
 {
+    Game *mGame = nullptr;
+    bool mUpdating = false;
+
     GameState *mTopState = nullptr;
 
     /**
@@ -17,7 +21,7 @@ class GameStateManager : public Element
     GameState *mDebugState = nullptr;
 
 public:
-    GameStateManager(Element *parent, std::string name);
+    GameStateManager(Element *parent, std::string name, Game *game);
 
     // create state using addChild
 

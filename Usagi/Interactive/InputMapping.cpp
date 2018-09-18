@@ -1,8 +1,8 @@
-﻿#include "InputMap.hpp"
+﻿#include "InputMapping.hpp"
 
 #include <Usagi/Core/Logging.hpp>
 
-void usagi::InputMap::addAnalogAction2D(
+void usagi::InputMapping::addAnalogAction2D(
     std::string name,
     AnalogAction2DHandler handler)
 {
@@ -15,12 +15,12 @@ void usagi::InputMap::addAnalogAction2D(
     }
 }
 
-void usagi::InputMap::bindMouseRelativeMovement(std::string name)
+void usagi::InputMapping::bindMouseRelativeMovement(std::string name)
 {
     mMouseRelativeMoveBindings.insert(std::move(name));
 }
 
-void usagi::InputMap::onMouseMove(const MousePositionEvent &e)
+void usagi::InputMapping::onMouseMove(const MousePositionEvent &e)
 {
     const auto rel = e.distance.cast<float>();
     for(auto &&b : mMouseRelativeMoveBindings)

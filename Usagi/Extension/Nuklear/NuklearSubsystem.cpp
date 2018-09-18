@@ -20,7 +20,6 @@
 #include <Usagi/Runtime/Graphics/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsCommandList.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsPipelineCompiler.hpp>
-#include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
 #include <Usagi/Runtime/Input/Keyboard/Keyboard.hpp>
 #include <Usagi/Runtime/Input/Mouse/Mouse.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
@@ -305,15 +304,17 @@ std::shared_ptr<usagi::GraphicsCommandList> usagi::NuklearSubsystem::render(
         mIndexBuffer->release();
     }
 
+    const auto fs = mFrameBufferSizeFunc();
+
     // Setup viewport
     {
-        cmd_list->setViewport(0, { 0, 0 }, mFrameBufferSize);
+        cmd_list->setViewport(0, { 0, 0 }, fs);
     }
 
     // Setup scale and translation
     {
         Vector2f scale { 2, 2 };
-        scale = scale.cwiseQuotient(mFrameBufferSize);
+        scale = scale.cwiseQuotient(fs);
         Vector2f translate = { -1, -1 };
         cmd_list->setConstant(ShaderStage::VERTEX,
             "scale", scale.data(), sizeof(scale));
@@ -332,12 +333,12 @@ std::shared_ptr<usagi::GraphicsCommandList> usagi::NuklearSubsystem::render(
         cmd_list->setScissor(0,
             // deal with stupid nk_null_rect
             {
-                std::clamp(cmd->clip_rect.x, 0.f, mFrameBufferSize.x()),
-                std::clamp(cmd->clip_rect.y, 0.f, mFrameBufferSize.y())
+                std::clamp(cmd->clip_rect.x, 0.f, fs.x()),
+                std::clamp(cmd->clip_rect.y, 0.f, fs.y())
             },
             {
-                std::clamp(cmd->clip_rect.w, 0.f, mFrameBufferSize.x()),
-                std::clamp(cmd->clip_rect.h, 0.f, mFrameBufferSize.y())
+                std::clamp(cmd->clip_rect.w, 0.f, fs.x()),
+                std::clamp(cmd->clip_rect.h, 0.f, fs.y())
             }
         );
 

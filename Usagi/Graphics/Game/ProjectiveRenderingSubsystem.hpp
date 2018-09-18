@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <functional>
+
 #include <Usagi/Core/Math.hpp>
 
 #include "RenderableSubsystem.hpp"
@@ -17,16 +19,13 @@ protected:
     * \brief The matrix for transforming from world coordinates to
     * clip space.
     */
-    Projective3f mWorldToNDC = Projective3f::Identity();
+    using WorldToNdcFunc = std::function<Projective3f()>;
+    WorldToNdcFunc mWorldToNdcFunc;
 
 public:
-    /**
-     * \brief Must be called before calling update() and render().
-     * \param mat
-     */
-    void setWorldToNDC(const Projective3f &mat)
+    void setWorldToNdcFunc(WorldToNdcFunc func)
     {
-        mWorldToNDC = mat;
+        mWorldToNdcFunc = std::move(func);
     }
 };
 }

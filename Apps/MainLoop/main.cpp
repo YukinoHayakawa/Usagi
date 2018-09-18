@@ -1,4 +1,6 @@
-﻿#include <Usagi/Core/Logging.hpp>
+﻿#include <chrono>
+
+#include <Usagi/Core/Logging.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Runtime/Window/Window.hpp>
 #include <Usagi/Runtime/Window/WindowManager.hpp>

@@ -12,10 +12,15 @@ usagi::Game::Game(std::shared_ptr<Runtime> runtime)
     : mRuntime(std::move(runtime))
 {
     mAssetRoot = mRootElement.addChild<AssetRoot>("Assets");
-    mStateManager = mRootElement.addChild<GameStateManager>("States");
+    mStateManager = mRootElement.addChild<GameStateManager>("States", this);
 
     mRuntime->initWindow();
     mRuntime->initInput();
+}
+
+void usagi::Game::addDeferredAction(DeferredAction action)
+{
+    mDeferredActions.push_back(std::move(action));
 }
 
 void usagi::Game::processInput()
@@ -30,10 +35,20 @@ void usagi::Game::updateClock()
     mMasterClock.tick();
 }
 
+void usagi::Game::performDeferredActions()
+{
+    for(auto &&a : mDeferredActions)
+    {
+        a();
+    }
+    mDeferredActions.clear();
+}
+
 void usagi::Game::frame()
 {
     processInput();
     mStateManager->update(mMasterClock);
+    performDeferredActions();
     updateClock();
 }
 

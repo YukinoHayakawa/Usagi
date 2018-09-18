@@ -181,13 +181,14 @@
     <ClCompile Include="Graphics\Game\GraphicalGame.cpp" />
     <ClCompile Include="Graphics\Game\GraphicalGameState.cpp" />
     <ClCompile Include="Graphics\Game\ImageTransitionSubsystem.cpp" />
+    <ClCompile Include="Graphics\Game\OverlayRenderingSubsystem.cpp" />
     <ClCompile Include="Graphics\RenderTarget\RenderTarget.cpp" />
     <ClCompile Include="Graphics\RenderTarget\RenderTargetDescriptor.cpp" />
     <ClCompile Include="Graphics\RenderTarget\RenderTargetProvider.cpp" />
     <ClCompile Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.cpp" />
     <ClCompile Include="Graphics\RenderTarget\Source\SwapchainRenderTargetSource.cpp" />
     <ClCompile Include="Graphics\RenderWindow.cpp" />
-    <ClCompile Include="Interactive\InputMap.cpp" />
+    <ClCompile Include="Interactive\InputMapping.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
     <ClCompile Include="Runtime\Input\Keyboard\KeyCode.cpp" />
@@ -301,7 +302,7 @@
     <ClInclude Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.hpp" />
     <ClInclude Include="Graphics\RenderTarget\Source\SwapchainRenderTargetSource.hpp" />
     <ClInclude Include="Graphics\RenderWindow.hpp" />
-    <ClInclude Include="Interactive\InputMap.hpp" />
+    <ClInclude Include="Interactive\InputMapping.hpp" />
     <ClInclude Include="Runtime\EventEmitter.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\CompareOp.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuAttachmentOp.hpp" />

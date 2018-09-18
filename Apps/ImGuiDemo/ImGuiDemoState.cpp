@@ -1,12 +1,10 @@
 ﻿#include "ImGuiDemoState.hpp"
 
-#include <Usagi/Extension/ImGui/ImGuiSubsystem.hpp>
 #include <Usagi/Graphics/Game/GraphicalGame.hpp>
-#include <Usagi/Runtime/Window/Window.hpp>
-#include <Usagi/Runtime/Graphics/Swapchain.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Runtime/Input/InputManager.hpp>
 
+#include <Usagi/Extension/ImGui/ImGuiSubsystem.hpp>
 #include "ImGuiDemoComponent.hpp"
 
 usagi::ImGuiDemoState::ImGuiDemoState(
@@ -16,21 +14,12 @@ usagi::ImGuiDemoState::ImGuiDemoState(
     : GraphicalGameState(parent, std::move(name), game)
 {
     const auto input_manager = mGame->runtime()->inputManager();
-    mImGui = addSubsystem("imgui", std::make_unique<ImGuiSubsystem>(
+    const auto imgui = addSubsystem("imgui", std::make_unique<ImGuiSubsystem>(
         mGame,
-        mGame->mainWindow().window,
+        mGame->mainWindow()->window,
         input_manager->virtualKeyboard(),
         input_manager->virtualMouse()
     ));
+    imgui->setSizeFunctionsFromRenderWindow(mGame->mainWindow());
     addChild("ImGuiRoot")->addComponent<ImGuiDemoComponent>();
-}
-
-void usagi::ImGuiDemoState::update(const Clock &clock)
-{
-    mImGui->setRenderSizes(
-        mGame->mainWindow().window->size(),
-        mGame->mainWindow().swapchain->size()
-    );
-
-    GraphicalGameState::update(clock);
 }

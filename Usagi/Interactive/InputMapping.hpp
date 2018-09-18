@@ -21,7 +21,7 @@ enum class KeyState
     ANY = PRESSED | REPEATED | RELEASED,
 };
 
-class InputMap
+class InputMapping
     : public KeyEventListener
     , public MouseEventListener
 {

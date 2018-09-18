@@ -8,7 +8,6 @@
 #include <Usagi/Graphics/RenderTarget/RenderTarget.hpp>
 #include <Usagi/Graphics/RenderTarget/RenderTargetDescriptor.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GraphicsIndexType.hpp>
-#include <Usagi/Runtime/Graphics/Framebuffer.hpp>
 #include <Usagi/Runtime/Graphics/GpuBuffer.hpp>
 #include <Usagi/Runtime/Graphics/GpuCommandPool.hpp>
 #include <Usagi/Runtime/Graphics/GpuDevice.hpp>
@@ -268,11 +267,13 @@ void usagi::ImGuiSubsystem::newFrame(const float dt)
     IM_ASSERT(io.Fonts->IsBuilt());
 
     // Setup display size
-    // mFrameBufferSize ./ mWindowSize
-    const auto s = mFrameBufferSize.cwiseQuotient(mWindowSize);
+    const Vector2f ws = mWindowSizeFunc();
+    const Vector2f fs = mFrameBufferSizeFunc();
+    // FrameBufferSize ./ WindowSize
+    const Vector2f scale = mFrameBufferSizeFunc().cwiseQuotient(ws);
 
-    io.DisplaySize = { mWindowSize.x(), mWindowSize.y() };
-    io.DisplayFramebufferScale = { s.x(), s.y() };
+    io.DisplaySize = { fs.x(), fs.y() };
+    io.DisplayFramebufferScale = { scale.x(), scale.y() };
 
     // Setup time step
     io.DeltaTime = dt;

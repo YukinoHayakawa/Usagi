@@ -2,16 +2,15 @@
 
 #include <Usagi/Camera/Controller/ModelViewCameraController.hpp>
 #include <Usagi/Camera/PerspectiveCamera.hpp>
-#include <Usagi/Extension/DebugDraw/DebugDrawSubsystem.hpp>
 #include <Usagi/Graphics/Game/GraphicalGame.hpp>
 #include <Usagi/Graphics/RenderTarget/RenderTargetDescriptor.hpp>
 #include <Usagi/Runtime/Graphics/Swapchain.hpp>
 #include <Usagi/Runtime/Input/InputManager.hpp>
 #include <Usagi/Runtime/Input/Mouse/Mouse.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
-#include <Usagi/Runtime/Window/Window.hpp>
 #include <Usagi/Transform/TransformComponent.hpp>
 
+#include <Usagi/Extension/DebugDraw/DebugDrawSubsystem.hpp>
 #include "DebugDrawDemoComponent.hpp"
 
 void usagi::DebugDrawGameState::setupInput()
@@ -45,7 +44,15 @@ usagi::DebugDrawGameState::DebugDrawGameState(
 {
     // this RenderableSubsystem will be registered by subsystemFilter()
     // of GraphicalGameState
-    mDebugDraw = addSubsystem("dd", std::make_unique<DebugDrawSubsystem>(game));
+    const auto dd = addSubsystem(
+        "dd",
+        std::make_unique<DebugDrawSubsystem>(game));
+    dd->setSizeFunctionsFromRenderWindow(mGame->mainWindow());
+    dd->setWorldToNdcFunc([=]() {
+        // world -> camera local -> NDC
+        return mCameraElement->camera()->localToNDC() *
+            mCameraElement->comp<TransformComponent>()->worldToLocal();
+    });
     mDebugDrawRoot = addChild("DebugDrawRoot");
     mDebugDrawRoot->addComponent<DebugDrawDemoComponent>();
 
@@ -62,19 +69,11 @@ usagi::DebugDrawGameState::~DebugDrawGameState()
 
 void usagi::DebugDrawGameState::update(const Clock &clock)
 {
-    // todo auto set all render sizes
-    const auto framebuffer_size = mGame->mainWindow().swapchain->size();
-    const auto aspect =
-        static_cast<float>(framebuffer_size.x()) / framebuffer_size.y();
+    // todo better way?
     mCameraElement->camera()->setPerspective(
-        degreesToRadians(90.f), aspect, 0.5f, 100.f);
-    mDebugDraw->setWorldToNDC(
-        // world -> camera local -> NDC
-        mCameraElement->camera()->localToNDC() *
-        mCameraElement->comp<TransformComponent>()->worldToLocal());
-    mDebugDraw->setRenderSizes(
-        mGame->mainWindow().window->size(),
-        framebuffer_size);
+        degreesToRadians(90.f),
+        mGame->mainWindow()->swapchain->aspectRatio(),
+        0.5f, 100.f);
 
     GraphicalGameState::update(clock);
 }

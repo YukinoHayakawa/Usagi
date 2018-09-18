@@ -2,7 +2,7 @@
 
 #include <Usagi/Camera/Controller/CameraMan.hpp>
 #include <Usagi/Graphics/Game/GraphicalGameState.hpp>
-#include <Usagi/Interactive/InputMap.hpp>
+#include <Usagi/Interactive/InputMapping.hpp>
 
 namespace usagi
 {
@@ -14,12 +14,11 @@ class DebugDrawGameState
     : public GraphicalGameState
     , public MouseEventListener
 {
-    DebugDrawSubsystem *mDebugDraw = nullptr;
     Element *mDebugDrawRoot = nullptr;
     using ModelCameraMan =
         CameraMan<PerspectiveCamera, ModelViewCameraController>;
     ModelCameraMan *mCameraElement = nullptr;
-    InputMap mInputMap;
+    InputMapping mInputMap;
 
     void setupInput();
     void setupCamera();

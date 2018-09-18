@@ -42,6 +42,12 @@ public:
     virtual GpuBufferFormat format() const = 0;
     virtual Vector2u32 size() const = 0;
 
+    float aspectRatio() const
+    {
+        const auto s = size();
+        return static_cast<float>(s.x()) / s.y();
+    }
+
     /**
      * \brief A semaphore signaled when the image becomes available.
      * Must not be destroyed until signaled.

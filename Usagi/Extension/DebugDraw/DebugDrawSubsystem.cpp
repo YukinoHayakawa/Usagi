@@ -247,7 +247,7 @@ void usagi::DebugDrawSubsystem::drawPointList(
     );
     mCurrentCmdList->setConstant(
         ShaderStage::VERTEX, "u_MvpMatrix",
-        mWorldToNDC.data(), 16 * sizeof(float)
+        mWorldToNdcFunc().data(), 16 * sizeof(float)
     );
     mCurrentCmdList->bindVertexBuffer(0, mVertexBuffer, 0);
     mCurrentCmdList->drawInstanced(count, 1, 0, 0);
@@ -275,7 +275,7 @@ void usagi::DebugDrawSubsystem::drawLineList(
     mCurrentCmdList->setLineWidth(1.f);
     mCurrentCmdList->setConstant(
         ShaderStage::VERTEX, "u_MvpMatrix",
-        mWorldToNDC.data(), 16 * sizeof(float)
+        mWorldToNdcFunc().data(), 16 * sizeof(float)
     );
     mCurrentCmdList->bindVertexBuffer(0, mVertexBuffer, 0);
     mCurrentCmdList->drawInstanced(count, 1, 0, 0);
@@ -296,7 +296,7 @@ void usagi::DebugDrawSubsystem::drawGlyphList(
     mCurrentCmdList->bindPipeline(mTextPipeline);
     mCurrentCmdList->setConstant(
         ShaderStage::VERTEX, "u_screenDimensions",
-        mWindowSize.data(), 2 * sizeof(float)
+        mWindowSizeFunc().data(), 2 * sizeof(float)
     );
     mCurrentCmdList->bindResourceSet(0, {
         mFontSampler,
