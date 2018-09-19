@@ -4,8 +4,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_PropertySheetDisplayName>Usagi Projects</_PropertySheetDisplayName>
-    <IncludePath>E:\Projects\CoreLibraries\Usagi;E:\Projects\CoreLibraries\Usagi\Thirdparty\Includes;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>E:\Projects\CoreLibraries\Usagi\Thirdparty\Libs\$(Configuration);E:\Projects\CoreLibraries\Usagi\Thirdparty\Libs;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)\Thirdparty\Includes;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Thirdparty\Libs\$(Configuration);$(SolutionDir)\Thirdparty\Libs;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
