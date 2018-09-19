@@ -28,6 +28,7 @@ public:
     void pushState(GameState *state);
     void changeState(GameState *state);
     void popState();
+    GameState *topState() const { return mTopState; }
 
     void update(const Clock &clock);
 };

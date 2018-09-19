@@ -14,13 +14,14 @@ class OrthogonalCamera;
 
 namespace usagi::moeloop
 {
-class SortedSpriteRenderingSubsystem;
+class Scene;
 
 class SceneState : public MoeLoopGameState
 {
-    SortedSpriteRenderingSubsystem *mSpriteRenderer = nullptr;
+    Scene *mScene = nullptr;
+    kaguya::LuaThread mSceneThread;
+    kaguya::LuaFunction mSceneScript;
 
-    kaguya::LuaThread mSceneScript;
     using ModelCameraMan =
         CameraMan<OrthogonalCamera, StaticCameraController>;
     ModelCameraMan *mCameraElement = nullptr;
@@ -28,14 +29,9 @@ class SceneState : public MoeLoopGameState
     void continueScript();
 
 public:
-
-    SceneState(
-        Element *parent,
-        std::string name,
-        MoeLoopGame *game,
-        kaguya::LuaThread lua_state);
-
     SceneState(Element *parent, std::string name, MoeLoopGame *game);
+
+    Scene * scene() const { return mScene; }
 
     void update(const Clock &clock) override;
 };

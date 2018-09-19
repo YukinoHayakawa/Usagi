@@ -29,7 +29,7 @@ void usagi::DebugDrawGameState::setupCamera()
         std::make_shared<PerspectiveCamera>(),
         std::make_shared<ModelViewCameraController>(
             Vector3f::Zero(), 10.f
-            ));
+        ));
     mInputMap.addAnalogAction2D("Camera:Move", std::bind(
         &ModelViewCameraController::rotate,
         mCameraElement->cameraController(), _1));

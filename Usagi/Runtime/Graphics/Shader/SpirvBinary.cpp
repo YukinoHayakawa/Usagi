@@ -13,6 +13,7 @@
 #include <Usagi/Utility/RAIIHelper.hpp>
 #include <Usagi/Utility/File.hpp>
 #include <Usagi/Utility/Hash.hpp>
+#include <Usagi/Utility/Stream.hpp>
 
 // See https://www.khronos.org/registry/spir-v/papers/WhitePaper.html for
 // SPIR-V format.

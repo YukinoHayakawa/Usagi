@@ -12,6 +12,7 @@
 #include "Scene/Character.hpp"
 #include "Scene/ImageLayer.hpp"
 #include "Game/GameInitState.hpp"
+#include "Game/SceneState.hpp"
 
 namespace usagi::moeloop
 {
@@ -51,6 +52,8 @@ void MoeLoopGame::bindScript()
         .addFunction("changeState", &MoeLoopGame::changeState)
         .addFunction("pushState", &MoeLoopGame::pushState)
         .addFunction("popState", &MoeLoopGame::popState)
+        .addFunction("createSceneState", &MoeLoopGame::createSceneState)
+        .addFunction("currentScene", &MoeLoopGame::currentScene)
     );
 
     Scene::exportScript(mLuaContext);
@@ -72,14 +75,14 @@ void MoeLoopGame::addFilesystemPackage(
         std::move(name), std::filesystem::u8path(path));
 }
 
-void MoeLoopGame::changeState(const std::string &name)
+void MoeLoopGame::changeState(GameState *state)
 {
-    mStateManager->changeState(creteState(name));
+    mStateManager->changeState(state);
 }
 
-void MoeLoopGame::pushState(const std::string &name)
+void MoeLoopGame::pushState(GameState *state)
 {
-    mStateManager->pushState(creteState(name));
+    mStateManager->pushState(state);
 }
 
 void MoeLoopGame::popState()
@@ -87,14 +90,12 @@ void MoeLoopGame::popState()
     mStateManager->popState();
 }
 
-/*Scene * MoeLoopGame::loadScene(const std::string &name)
+Scene * MoeLoopGame::currentScene() const
 {
-    LOG(info, "Loading scene: {}", name);
-    const auto data = assets()->uncachedRes<JsonPropertySheetAssetConverter>(
-        fmt::format("scenes/{}.json", name)
-    );
-    auto scene = rootElement()->addChild<Scene>(name, runtime(), assets());
-    scene->load(data);
-    return scene;
-}*/
+    if(const auto state = dynamic_cast<SceneState*>(mStateManager->topState()))
+    {
+        return state->scene();
+    }
+    return nullptr;
+}
 }

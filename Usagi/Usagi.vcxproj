@@ -131,6 +131,7 @@
     <ClCompile Include="Asset\AssetRoot.cpp" />
     <ClCompile Include="Asset\Converter\GpuImageAssetConverter.cpp" />
     <ClCompile Include="Asset\Converter\SpirvAssetConverter.cpp" />
+    <ClCompile Include="Asset\Converter\Uncached\StringAssetConverter.cpp" />
     <ClCompile Include="Asset\Package\Filesystem\FilesystemAsset.cpp" />
     <ClCompile Include="Asset\Package\Filesystem\FilesystemAssetPackage.cpp" />
     <ClCompile Include="Asset\Decoder\StbImageAssetDecoder.cpp" />
@@ -207,6 +208,7 @@
     <ClCompile Include="Transform\TransformSubsystem.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClCompile Include="Utility\Hash.cpp" />
+    <ClCompile Include="Utility\Stream.cpp" />
     <ClCompile Include="Utility\Unicode.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -219,6 +221,7 @@
     <ClInclude Include="Asset\AssetRoot.hpp" />
     <ClInclude Include="Asset\Converter\GpuImageAssetConverter.hpp" />
     <ClInclude Include="Asset\Converter\SpirvAssetConverter.hpp" />
+    <ClInclude Include="Asset\Converter\Uncached\StringAssetConverter.hpp" />
     <ClInclude Include="Asset\Decoder\ImageBuffer.hpp" />
     <ClInclude Include="Asset\Decoder\RawAssetDecoder.hpp" />
     <ClInclude Include="Asset\Package\Filesystem\FilesystemAsset.hpp" />
@@ -381,6 +384,7 @@
     <ClInclude Include="Utility\RotateCounter.hpp" />
     <ClInclude Include="Utility\Rounding.hpp" />
     <ClInclude Include="Utility\Singleton.hpp" />
+    <ClInclude Include="Utility\Stream.hpp" />
     <ClInclude Include="Utility\TypeCast.hpp" />
     <ClInclude Include="Utility\Unicode.hpp" />
   </ItemGroup>

@@ -12,6 +12,9 @@ class GameState;
 
 namespace usagi::moeloop
 {
+class Scene;
+class SceneState;
+
 class MoeLoopGame : public GraphicalGame
 {
 protected:
@@ -20,14 +23,6 @@ protected:
     InputMapping mInputMapping;
 
     void bindScript();
-
-    static void unimplemented(const std::string &msg);
-    void addFilesystemPackage(std::string name, const std::string &path);
-
-    virtual GameState * creteState(const std::string &name) = 0;
-    void changeState(const std::string &name);
-    void pushState(const std::string &name);
-    void popState();
 
 public:
     explicit MoeLoopGame(std::shared_ptr<Runtime> runtime);
@@ -39,5 +34,15 @@ public:
     virtual void init();
 
     kaguya::State & luaContext() { return mLuaContext; }
+
+    static void unimplemented(const std::string &msg);
+    void addFilesystemPackage(std::string name, const std::string &path);
+
+    void changeState(GameState *state);
+    void pushState(GameState *state);
+    void popState();
+
+    virtual SceneState * createSceneState(const std::string &name) = 0;
+    Scene *currentScene() const;
 };
 }

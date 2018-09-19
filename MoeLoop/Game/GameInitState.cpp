@@ -1,6 +1,9 @@
 ﻿#include "GameInitState.hpp"
 
 #include <Usagi/Core/Logging.hpp>
+#include <Usagi/Asset/AssetRoot.hpp>
+#include <Usagi/Asset/Converter/Uncached/StringAssetConverter.hpp>
+
 #include <MoeLoop/MoeLoopGame.hpp>
 
 namespace usagi::moeloop
@@ -12,7 +15,6 @@ GameInitState::GameInitState(
     : MoeLoopGameState(parent, std::move(name), game)
 {
     LOG(info, "Loading init.lua");
-    // todo load from asset system
     mInit = game->luaContext().loadfile("init.lua");
 }
 
