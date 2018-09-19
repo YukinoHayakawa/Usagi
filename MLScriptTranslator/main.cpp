@@ -590,8 +590,8 @@ struct Scene
                             const auto expr = expect(TokenType::CHAR_PARAM);
                             const auto pos = expect(TokenType::CHAR_PARAM);
                             charSay(cn, expr, pos, fmt::format(
-                                "-- {}\n{}:say(\"{}\"); w();",
-                                cn,
+                                "-- {},{}\n{}:say(\"{}\"); w();",
+                                cn, pos,
                                 c.obj,
                                 expect(TokenType::MESSAGE)
                             ));
@@ -740,7 +740,7 @@ struct Scene
         }
         out << SCENE_BEGIN_TAG << "\n";
         out << COMMENT_TAG << " " << comment_name << "\n";
-        out << "local scene = ml:loadScene(\"" << name << "\", 1920, 1080);\n\n";
+        out << "local scene = game:currentScene();\n\n";
         out << "local narrator = scene:loadCharacter(\"Narrator\");\n\n";
         if(!characters.empty())
         {
