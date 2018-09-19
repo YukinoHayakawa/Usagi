@@ -56,7 +56,7 @@ void usagi::NuklearSubsystem::setup()
 
     // fonts
     {
-        LOG(info, "Nuklear: Building font atlas");
+        LOG(info, "Nuklear: Start building font atlas");
 
         nk_font_atlas_init_default(&mAtlas);
         nk_font_atlas_begin(&mAtlas);
@@ -84,6 +84,7 @@ void usagi::NuklearSubsystem::setup()
         const auto image = nk_font_atlas_bake(
             &mAtlas, &w, &h, NK_FONT_ATLAS_ALPHA8);
         const auto upload_size = w * h * sizeof(std::uint8_t);
+        LOG(info, "Nuklear: Finish building font atlas");
 
         GpuImageCreateInfo info;
         info.format = GpuBufferFormat::R8_UNORM;

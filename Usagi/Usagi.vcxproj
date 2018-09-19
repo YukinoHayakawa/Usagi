@@ -141,12 +141,21 @@
     <ClCompile Include="Core\Element.cpp" />
     <ClCompile Include="Core\Event\Event.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
-    <ClCompile Include="Extension\DebugDraw\DebugDrawImpl.cpp" />
+    <ClCompile Include="Extension\DebugDraw\DebugDrawImpl.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
     <ClCompile Include="Extension\DebugDraw\DebugDrawSubsystem.cpp" />
-    <ClCompile Include="Extension\ImGui\ImGuiImpl.cpp" />
+    <ClCompile Include="Extension\ImGui\ImGuiImpl.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
     <ClCompile Include="Extension\ImGui\ImGuiSubsystem.cpp" />
     <ClCompile Include="Extension\Nuklear\NuklearSubsystem.cpp" />
-    <ClCompile Include="Extension\Nuklear\NuklearImpl.cpp" />
+    <ClCompile Include="Extension\Nuklear\NuklearImpl.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
     <ClCompile Include="Extension\Vulkan\VulkanBufferAllocation.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanEnumTranslation.cpp" />
     <ClCompile Include="Extension\Vulkan\VulkanExtensions.cpp" />

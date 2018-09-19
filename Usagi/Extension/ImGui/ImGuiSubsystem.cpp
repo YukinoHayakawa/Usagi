@@ -58,7 +58,7 @@ void usagi::ImGuiSubsystem::setup()
 
     // fonts
     {
-        LOG(info, "ImGui: Building font atlas");
+        LOG(info, "ImGui: Start building font atlas");
 
         const auto size = 12 * scale;
         // todo fetch from asset system
@@ -95,6 +95,8 @@ void usagi::ImGuiSubsystem::setup()
         info.usage = GpuImageUsage::SAMPLED;
         mFontTexture = gpu->createImage(info);
         mFontTexture->upload(pixels, upload_size);
+
+        LOG(info, "ImGui: Finish building font atlas");
     }
     {
         GpuImageViewCreateInfo info;
