@@ -2,7 +2,6 @@
 
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Asset/AssetRoot.hpp>
-#include <Usagi/Asset/Converter/Uncached/StringAssetConverter.hpp>
 
 #include <MoeLoop/MoeLoopGame.hpp>
 
@@ -15,7 +14,7 @@ GameInitState::GameInitState(
     : MoeLoopGameState(parent, std::move(name), game)
 {
     LOG(info, "Loading init.lua");
-    mInit = game->luaContext().loadfile("init.lua");
+    mInit = game->luaContext()->loadfile("init.lua");
 }
 
 void GameInitState::update(const Clock &clock)

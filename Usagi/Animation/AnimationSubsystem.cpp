@@ -36,6 +36,7 @@ struct Sentry
 
 void usagi::AnimationSubsystem::update(const Clock &clock)
 {
+    mActiveCount = 0;
     for(auto &&e : mRegistry)
     {
         const auto ani = std::get<AnimationComponent*>(e.second);
@@ -71,6 +72,9 @@ void usagi::AnimationSubsystem::update(const Clock &clock)
                 last_finished = false;
                 continue;
             }
+
+            mActiveCount++;
+
             // start TIME_POINT animation
             if(!i->started) i->start();
 
@@ -82,6 +86,7 @@ void usagi::AnimationSubsystem::update(const Clock &clock)
             if(finished && !i->loop) // finish animation
             {
                 i->finish();
+                mActiveCount--;
 
                 last_finished = true;
             }

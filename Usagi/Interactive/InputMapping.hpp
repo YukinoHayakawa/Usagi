@@ -13,45 +13,38 @@
 
 namespace usagi
 {
-enum class KeyState
-{
-    PRESSED = 0b001,
-    REPEATED = 0b010,
-    RELEASED = 0b100,
-    ANY = PRESSED | REPEATED | RELEASED,
-};
-
 class InputMapping
     : public KeyEventListener
     , public MouseEventListener
 {
 public:
-    using DiscreteActionHandler = std::function<void(bool active)>;
+    using BinaryActionHandler = std::function<void(bool active)>;
     using AnalogAction1DHandler = std::function<void(float value)>;
     // input handlers typically manipulates the values, thus it is passed
     // by value.
     using AnalogAction2DHandler = std::function<void(Vector2f value)>;
 
 private:
+    std::map<std::string, BinaryActionHandler> mBinaryActions;
+    std::map<KeyCode, std::string> mKeyBindings;
+    std::map<MouseButtonCode, std::string> mMouseButtonBindings;
+
+    void performBinaryAction(const std::string &name, bool active);
+
     std::map<std::string, AnalogAction2DHandler> mAnalogActions2D;
     std::set<std::string> mMouseRelativeMoveBindings;
 
 public:
-    /*
-    void addDiscreteAction(std::string name, DiscreteActionHandler handler);
+    // --- 1D Binary Actions ---
 
-    void bindKey(
-        const std::string &action,
-        KeyCode code,
-        KeyState state);
-    void bindMouseButton(
-        const std::string &action,
-        MouseButtonCode code,
-        KeyState state);
+    void addBinaryAction(std::string name, BinaryActionHandler handler);
 
-    void addAnalogAction1D(std::string name, AnalogAction1DHandler handler);
-    */
+    void bindKey(std::string action, KeyCode code);
+    void bindMouseButton(std::string action, MouseButtonCode code);
 
+    // void addAnalogAction1D(std::string name, AnalogAction1DHandler handler);
+
+    // --- 2D Analog Actions ---
 
     void addAnalogAction2D(std::string name, AnalogAction2DHandler handler);
 
@@ -61,7 +54,10 @@ public:
      */
     void bindMouseRelativeMovement(std::string name);
 
+    // --- Event Listeners ---
 
     void onMouseMove(const MousePositionEvent &e) override;
+    void onKeyStateChange(const KeyEvent &e) override;
+    void onMouseButtonStateChange(const MouseButtonEvent &e) override;
 };
 }

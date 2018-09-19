@@ -24,7 +24,7 @@ void Character::setPosition(const Vector3f &position)
 void Character::changeExpression(Expression *expr)
 {
     // todo use scene default
-    switchImage(1.0, "linear", expr->texture());
+    switchImage(0.5, "linear", expr->texture());
     const auto o = expr->origin();
     comp<SpriteComponent>()->layers[1].offset = -o;
 }

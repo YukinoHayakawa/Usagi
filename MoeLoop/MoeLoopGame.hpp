@@ -23,6 +23,7 @@ protected:
     InputMapping mInputMapping;
 
     void bindScript();
+    void setupInput();
 
 public:
     explicit MoeLoopGame(std::shared_ptr<Runtime> runtime);
@@ -33,7 +34,8 @@ public:
      */
     virtual void init();
 
-    kaguya::State & luaContext() { return mLuaContext; }
+    InputMapping * inputMapping() { return &mInputMapping; }
+    kaguya::State * luaContext() { return &mLuaContext; }
 
     static void unimplemented(const std::string &msg);
     void addFilesystemPackage(std::string name, const std::string &path);

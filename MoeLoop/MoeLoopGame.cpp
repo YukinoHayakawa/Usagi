@@ -5,6 +5,7 @@
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Runtime/Input/InputManager.hpp>
 #include <Usagi/Runtime/Input/Mouse/Mouse.hpp>
+#include <Usagi/Runtime/Input/Keyboard/Keyboard.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Game/GameStateManager.hpp>
 
@@ -20,13 +21,17 @@ MoeLoopGame::MoeLoopGame(std::shared_ptr<Runtime> runtime)
     : GraphicalGame(std::move(runtime))
 {
     auto mouse = mRuntime->inputManager()->virtualMouse();
+    auto kb = mRuntime->inputManager()->virtualKeyboard();
     mouse->addEventListener(&mInputMapping);
+    kb->addEventListener(&mInputMapping);
 }
 
 MoeLoopGame::~MoeLoopGame()
 {
     auto mouse = mRuntime->inputManager()->virtualMouse();
+    auto kb = mRuntime->inputManager()->virtualKeyboard();
     mouse->removeEventListener(&mInputMapping);
+    kb->removeEventListener(&mInputMapping);
 
     // remove all states that may reference this game instance.
     mRootElement.removeChild(mStateManager);
@@ -59,6 +64,10 @@ void MoeLoopGame::bindScript()
     Scene::exportScript(mLuaContext);
     Character::exportScript(mLuaContext);
     ImageLayer::exportScript(mLuaContext);
+}
+
+void MoeLoopGame::setupInput()
+{
 }
 
 void MoeLoopGame::init()

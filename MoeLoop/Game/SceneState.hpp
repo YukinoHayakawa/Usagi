@@ -8,6 +8,7 @@
 
 namespace usagi
 {
+class AnimationSubsystem;
 class StaticCameraController;
 class OrthogonalCamera;
 }
@@ -26,6 +27,14 @@ class SceneState : public MoeLoopGameState
         CameraMan<OrthogonalCamera, StaticCameraController>;
     ModelCameraMan *mCameraElement = nullptr;
 
+    AnimationSubsystem *mAnimation = nullptr;
+
+    void loadScene();
+    void createCamera();
+    void setupRenderer();
+    void setupAnimation();
+    void setupInput();
+
     void continueScript();
 
 public:
@@ -34,5 +43,7 @@ public:
     Scene * scene() const { return mScene; }
 
     void update(const Clock &clock) override;
+
+    void playerContinueScript(bool yes);
 };
 }
