@@ -137,7 +137,7 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
     {
     }
 
-    void reflectFieldPushConstant(
+    void reflectPushConstantField(
         const Resource &resource, const SPIRType &type, unsigned i)
     {
         const auto &member_name =
@@ -169,7 +169,7 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
         push_constant_fields[member_name] = field;
     }
 
-    std::size_t reflectBufferPushConstants(
+    std::size_t reflectPushConstantBuffer(
         const Resource &resource)
     {
         const auto &type = compiler.get_type(resource.base_type_id);
@@ -177,7 +177,7 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
 
         const auto member_count = type.member_types.size();
         for(unsigned i = 0; i < member_count; i++)
-            reflectFieldPushConstant(resource, type, i);
+            reflectPushConstantField(resource, type, i);
 
         return size;
     }
@@ -185,13 +185,15 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
     void reflectPushConstantRanges()
     {
         for(const auto &resource : resources.push_constant_buffers)
-            push_constant_size += reflectBufferPushConstants(resource);
+            push_constant_size += reflectPushConstantBuffer(resource);
 
         if(push_constant_size == 0) return;
 
         vk::PushConstantRange range;
+        // todo allow multiple stages in one shader source
         range.setOffset(static_cast<uint32_t>(push_constant_offset));
-        range.setSize(static_cast<uint32_t>(push_constant_size));
+        range.setSize(static_cast<uint32_t>(
+            push_constant_size - push_constant_offset));
         range.setStageFlags(translate(shader.first));
         ctx.push_constants.push_back(range);
 
