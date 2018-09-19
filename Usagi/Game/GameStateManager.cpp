@@ -57,7 +57,6 @@ void usagi::GameStateManager::changeState(GameState *state)
 
 void usagi::GameStateManager::popState()
 {
-    // todo remove from children?
     assert(mTopState);
     if(mUpdating)
     {
@@ -73,6 +72,7 @@ void usagi::GameStateManager::popState()
         const auto old_top = mTopState;
         mTopState = mTopState->mPreviousState;
         old_top->mPreviousState = nullptr;
+        removeChild(old_top);
     }
 }
 

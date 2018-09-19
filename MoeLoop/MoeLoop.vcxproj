@@ -39,13 +39,13 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -120,10 +120,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\GameInitState.cpp" />
+    <ClCompile Include="Game\MoeLoopGameState.cpp" />
+    <ClCompile Include="Game\SceneState.cpp" />
     <ClCompile Include="JSON\JsonAssetDecoder.cpp" />
     <ClCompile Include="JSON\JsonPropertySheetAssetConverter.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="MoeLoop.cpp" />
+    <ClCompile Include="MoeLoopGame.cpp" />
     <ClCompile Include="Render\SortedSpriteRenderingSubsystem.cpp" />
     <ClCompile Include="Render\SpriteComponent.cpp" />
     <ClCompile Include="Scene\Character.cpp" />
@@ -133,13 +135,16 @@
     <ClCompile Include="Scene\TransitionableImage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\GameInitState.hpp" />
+    <ClInclude Include="Game\MoeLoopGameState.hpp" />
+    <ClInclude Include="Game\SceneState.hpp" />
     <ClInclude Include="JSON\JSON.hpp" />
     <ClInclude Include="JSON\JsonAssetConverter.hpp" />
     <ClInclude Include="JSON\JsonAssetDecoder.hpp" />
     <ClInclude Include="JSON\JsonPropertySheetAssetConverter.hpp" />
     <ClInclude Include="JSON\JSONForwardDecl.hpp" />
     <ClInclude Include="JSON\Math.hpp" />
-    <ClInclude Include="MoeLoop.hpp" />
+    <ClInclude Include="MoeLoopGame.hpp" />
     <ClInclude Include="Render\SortedSpriteRenderingSubsystem.hpp" />
     <ClInclude Include="Render\SpriteComponent.hpp" />
     <ClInclude Include="Scene\Character.hpp" />

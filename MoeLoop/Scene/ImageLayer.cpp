@@ -7,7 +7,6 @@
 #include <Usagi/Runtime/Runtime.hpp>
 
 #include <MoeLoop/Script/Lua.hpp>
-#include <MoeLoop/Render/SpriteComponent.hpp>
 
 #include "Scene.hpp"
 

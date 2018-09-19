@@ -5,8 +5,11 @@
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Converter/SpirvAssetConverter.hpp>
 #include <Usagi/Game/Game.hpp>
+#include <Usagi/Graphics/RenderTarget/RenderTarget.hpp>
+#include <Usagi/Graphics/RenderTarget/RenderTargetDescriptor.hpp>
 #include <Usagi/Runtime/Graphics/Framebuffer.hpp>
 #include <Usagi/Runtime/Graphics/GpuBuffer.hpp>
+#include <Usagi/Runtime/Graphics/GpuCommandPool.hpp>
 #include <Usagi/Runtime/Graphics/GpuDevice.hpp>
 #include <Usagi/Runtime/Graphics/GpuImage.hpp>
 #include <Usagi/Runtime/Graphics/GpuImageView.hpp>
@@ -14,9 +17,11 @@
 #include <Usagi/Runtime/Graphics/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsCommandList.hpp>
 #include <Usagi/Runtime/Graphics/GraphicsPipelineCompiler.hpp>
-#include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/Shader/SpirvBinary.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
+#include <Usagi/Transform/TransformComponent.hpp>
+
+#include "SpriteComponent.hpp"
 
 namespace usagi::moeloop
 {
@@ -54,8 +59,15 @@ SortedSpriteRenderingSubsystem::SortedSpriteRenderingSubsystem(
     mCommandPool = gpu->createCommandPool();
 }
 
-void SortedSpriteRenderingSubsystem::createPipeline(
-    RenderPassCreateInfo render_pass_info)
+void SortedSpriteRenderingSubsystem::createRenderTarget(
+    RenderTargetDescriptor &descriptor)
+{
+    descriptor.sharedColorTarget("mlsprite");
+    // descriptor.depthTarget();
+    mRenderTarget = descriptor.finish();
+}
+
+void SortedSpriteRenderingSubsystem::createPipelines()
 {
     auto gpu = mGame->runtime()->gpu();
     auto assets = mGame->assets();
@@ -107,16 +119,7 @@ void SortedSpriteRenderingSubsystem::createPipeline(
         state.setBlendingOperation(BlendingOperation::ADD);
         compiler->setColorBlendState(state);
     }
-    // Render Pass
-    {
-        render_pass_info.attachment_usages[0].layout =
-            GpuImageLayout::COLOR_ATTACHMENT;
-        // todo unused. rework attachment negotiation
-        render_pass_info.attachment_usages[1].layout =
-            GpuImageLayout::DEPTH_STENCIL_ATTACHMENT;
-        mRenderPass = gpu->createRenderPass(render_pass_info);
-        compiler->setRenderPass(mRenderPass);
-    }
+    compiler->setRenderPass(mRenderTarget->renderPass());
     // Depth
     {
         compiler->omSetDepthEnabled(false);
@@ -202,18 +205,18 @@ void SortedSpriteRenderingSubsystem::update(const Clock &clock)
     mVertexBuffer->flush();
 }
 
-void SortedSpriteRenderingSubsystem::render(
-    const Clock &clock,
-    std::shared_ptr<Framebuffer> framebuffer,
-    const CommandListSink &cmd_out) const
+std::shared_ptr<GraphicsCommandList> SortedSpriteRenderingSubsystem::render(
+    const Clock &clock)
 {
-    if(mSortedElements.empty()) return;
+    if(mSortedElements.empty()) return { };
 
     auto cmd_list = mCommandPool->allocateGraphicsCommandList();
+    const auto framebuffer = mRenderTarget->createFramebuffer();
 
     cmd_list->beginRecording();
-    cmd_list->beginRendering(mRenderPass, framebuffer);
-    cmd_list->setViewport(0, { 0, 0 }, framebuffer->size().cast<float>());
+    cmd_list->beginRendering(mRenderTarget->renderPass(), framebuffer);
+    cmd_list->setViewport(
+        0, { 0, 0 }, framebuffer->size().cast<float>());
     cmd_list->setScissor(0, { 0, 0 }, framebuffer->size());
     cmd_list->bindPipeline(mPipeline);
     cmd_list->bindVertexBuffer(0, mVertexBuffer, 0);
@@ -239,7 +242,7 @@ void SortedSpriteRenderingSubsystem::render(
         });
 
         cmd_list->setConstant(ShaderStage::VERTEX, "mvp_matrix",
-            (mWorldToNDC * t->localToWorld()).data(), sizeof(float) * 16);
+            (mWorldToNdcFunc() * t->localToWorld()).data(), sizeof(float) * 16);
 
         cmd_list->setConstant(ShaderStage::FRAGMENT, "layer0",
             &s->layers[0].uv_rect, sizeof(float) * 5);
@@ -253,6 +256,6 @@ void SortedSpriteRenderingSubsystem::render(
     cmd_list->endRendering();
     cmd_list->endRecording();
 
-    cmd_out(std::move(cmd_list));
+    return std::move(cmd_list);
 }
 }

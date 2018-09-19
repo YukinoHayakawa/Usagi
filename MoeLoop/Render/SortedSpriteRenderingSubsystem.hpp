@@ -3,17 +3,14 @@
 #include <vector>
 
 #include <Usagi/Game/CollectionSubsystem.hpp>
-#include <Usagi/Graphics/ProjectiveRenderingSubsystem.hpp>
-#include <Usagi/Runtime/Graphics/GpuCommandPool.hpp>
-#include <Usagi/Runtime/Graphics/GraphicsPipeline.hpp>
-#include <Usagi/Transform/TransformComponent.hpp>
-
-#include "SpriteComponent.hpp"
+#include <Usagi/Graphics/Game/ProjectiveRenderingSubsystem.hpp>
 
 namespace usagi
 {
+struct TransformComponent;
+class GpuCommandPool;
+class GraphicsPipeline;
 class Camera;
-struct RenderPassCreateInfo;
 class GpuBuffer;
 class GpuSampler;
 class Game;
@@ -21,6 +18,8 @@ class Game;
 
 namespace usagi::moeloop
 {
+struct SpriteComponent;
+
 /**
  * \brief
  * Requires elements to have TransformComponent and SpriteComponent.
@@ -40,9 +39,9 @@ public:
 
 private:
     Game *mGame;
+    // todo is this really useful?
     CompareFunc mCompareFunc;
     std::vector<Registry::const_iterator> mSortedElements;
-    std::shared_ptr<RenderPass> mRenderPass;
     std::shared_ptr<GraphicsPipeline> mPipeline;
     std::shared_ptr<GpuCommandPool> mCommandPool;
     std::shared_ptr<GpuSampler> mSampler;
@@ -57,12 +56,10 @@ private:
 public:
     SortedSpriteRenderingSubsystem(Game *game, CompareFunc compare_func);
 
-    void createPipeline(RenderPassCreateInfo render_pass_info);
+    void createRenderTarget(RenderTargetDescriptor &descriptor) override;
+    void createPipelines() override;
 
     void update(const Clock &clock) override;
-    void render(
-        const Clock &clock,
-        std::shared_ptr<Framebuffer> framebuffer,
-        const CommandListSink &cmd_out) const override;
+    std::shared_ptr<GraphicsCommandList> render(const Clock &clock) override;
 };
 }
