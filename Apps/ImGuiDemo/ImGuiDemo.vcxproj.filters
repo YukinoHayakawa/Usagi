@@ -29,9 +29,6 @@
     <ClInclude Include="ImGuiDemoState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImGuiDemoComponent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImGuiDemo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -4,8 +4,9 @@
 #include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Runtime/Input/InputManager.hpp>
 
+#include <Usagi/Extension/ImGui/ImGui.hpp>
 #include <Usagi/Extension/ImGui/ImGuiSubsystem.hpp>
-#include "ImGuiDemoComponent.hpp"
+#include <Usagi/Extension/ImGui/DelegatedImGuiComponent.hpp>
 
 usagi::ImGuiDemoState::ImGuiDemoState(
     Element *parent,
@@ -21,5 +22,9 @@ usagi::ImGuiDemoState::ImGuiDemoState(
         input_manager->virtualMouse()
     ));
     imgui->setSizeFunctionsFromRenderWindow(mGame->mainWindow());
-    addChild("ImGuiRoot")->addComponent<ImGuiDemoComponent>();
+    addChild("ImGuiRoot")->addComponent<DelegatedImGuiComponent>(
+        [](const Clock &clock) {
+            ImGui::ShowDemoWindow();
+            ImGui::ShowMetricsWindow();
+        });
 }

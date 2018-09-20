@@ -776,5 +776,11 @@
     <ClInclude Include="Utility\Stream.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Extension\ImGui\DelegatedImGuiComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Nuklear\DelegatedImGuiComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

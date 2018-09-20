@@ -128,7 +128,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGuiDemo.hpp" />
-    <ClInclude Include="ImGuiDemoComponent.hpp" />
     <ClInclude Include="ImGuiDemoState.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
