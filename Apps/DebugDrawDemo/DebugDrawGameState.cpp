@@ -9,6 +9,7 @@
 #include <Usagi/Runtime/Input/Mouse/Mouse.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
 #include <Usagi/Transform/TransformComponent.hpp>
+#include <Usagi/Utility/Functional.hpp>
 
 #include <Usagi/Extension/DebugDraw/DebugDrawSubsystem.hpp>
 #include "DebugDrawDemoComponent.hpp"
@@ -22,17 +23,15 @@ void usagi::DebugDrawGameState::setupInput()
 
 void usagi::DebugDrawGameState::setupCamera()
 {
-    using namespace std::placeholders;
-
     mCameraElement = addChild<ModelCameraMan>(
         "Camera",
         std::make_shared<PerspectiveCamera>(),
         std::make_shared<ModelViewCameraController>(
             Vector3f::Zero(), 10.f
         ));
-    mInputMap.addAnalogAction2D("Camera:Move", std::bind(
+    mInputMap.addAnalogAction2D("Camera:Move", partial_apply(
         &ModelViewCameraController::rotate,
-        mCameraElement->cameraController(), _1));
+        mCameraElement->cameraController()));
     mInputMap.bindMouseRelativeMovement("Camera:Move");
 }
 

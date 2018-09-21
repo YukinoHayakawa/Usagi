@@ -9,6 +9,7 @@
 #include <Usagi/Graphics/Game/GraphicalGame.hpp>
 #include <Usagi/Runtime/Graphics/Swapchain.hpp>
 #include <Usagi/Transform/TransformComponent.hpp>
+#include <Usagi/Utility/Functional.hpp>
 
 #include <MoeLoop/JSON/JsonPropertySheetAssetConverter.hpp>
 #include <MoeLoop/MoeLoopGame.hpp>
@@ -69,10 +70,9 @@ void SceneState::setupAnimation()
 
 void SceneState::setupInput()
 {
-    using namespace std::placeholders;
     const auto im = game()->inputMapping();
-    im->addBinaryAction("NextMessage",
-        std::bind(&SceneState::playerContinueScript, this, _1));
+    im->addBinaryAction("NextMessage", partial_apply(
+        &SceneState::playerContinueScript, this));
     im->bindKey("NextMessage", KeyCode::ENTER);
     // todo should not be here
 }
@@ -108,6 +108,7 @@ void SceneState::playerContinueScript(const bool yes)
 {
     if(yes)
     {
+        // newly pushed animation not counted...
         if(mAnimation->activeCount() > 0)
         {
         }

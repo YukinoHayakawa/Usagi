@@ -641,9 +641,6 @@
     <ClInclude Include="Animation\AnimationComponent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\Functional.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Asset\Decoder\StbImageAssetDecoder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -780,6 +777,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Extension\Nuklear\DelegatedImGuiComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Functional.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
