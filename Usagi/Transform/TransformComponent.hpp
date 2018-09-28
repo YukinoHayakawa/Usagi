@@ -107,7 +107,7 @@ public:
         return localToWorld().inverse();
     }
 
-    const std::type_info & baseType() override
+    const std::type_info & baseType() override final
     {
         return typeid(TransformComponent);
     }

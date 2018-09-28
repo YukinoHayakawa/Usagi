@@ -27,7 +27,7 @@ struct SpriteComponent : Component
     constexpr static std::size_t NUM_LAYERS = 2;
     SpriteLayer layers[NUM_LAYERS];
 
-    const std::type_info & baseType() override
+    const std::type_info & baseType() override final
     {
         return typeid(SpriteComponent);
     }
