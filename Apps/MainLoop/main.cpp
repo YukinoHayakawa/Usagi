@@ -65,7 +65,8 @@ public:
 
     void onMouseMove(const MousePositionEvent &e) override
     {
-        LOG(info, "Mouse moved:       {}",
+        LOG(info, "Mouse moved:       abs={}, rel={}",
+            e.position.transpose(),
             e.distance.transpose()
         );
     }

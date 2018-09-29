@@ -17,6 +17,7 @@ class Win32Mouse
     friend class Win32InputManager;
 
     bool mMouseCursorCaptured = false;
+    Vector2f mLastPosition;
 
     /**
      * \brief Mouse cursor uses a counter to determine whether it should be
@@ -28,10 +29,12 @@ class Win32Mouse
         = { false };
 
     void sendButtonEvent(
+        Window *window,
         MouseButtonCode button,
         bool pressed,
         const Vector2f &pos);
     void sendWheelEvent(
+        Window *window,
         const Vector2f &distance,
         const Vector2f &pos);
 
@@ -48,6 +51,9 @@ class Win32Mouse
     void onWindowResizeEnd(const WindowSizeEvent &e) override;
 
     void handleRawInput(RAWINPUT *raw) override;
+
+    static POINT convertFromVirtualDesktopPosition(const Vector2f &pos);
+    Vector2f screenPositionToActiveWindow(POINT screen);
 
 public:
     Win32Mouse(HANDLE device_handle, std::string name);

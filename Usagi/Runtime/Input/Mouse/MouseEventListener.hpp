@@ -9,6 +9,7 @@ namespace usagi
 struct MouseEvent
 {
     class Mouse *mouse = nullptr;
+    class Window *window = nullptr;
     Vector2f position;
 };
 
