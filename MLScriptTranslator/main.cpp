@@ -739,7 +739,7 @@ struct Scene
             out << l << "\n";
         }
         out << SCENE_BEGIN_TAG << "\n";
-        out << COMMENT_TAG << " " << comment_name << "\n";
+        out << COMMENT_TAG << " " << name << " " << comment_name << "\n";
         out << "local scene = game:currentScene();\n\n";
         out << "local narrator = scene:loadCharacter(\"Narrator\");\n\n";
         if(!characters.empty())
