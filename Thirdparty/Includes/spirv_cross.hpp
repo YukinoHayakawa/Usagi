@@ -1,1 +1,0 @@
-../Submodules/SPIRV-Cross/spirv_cross.hpp

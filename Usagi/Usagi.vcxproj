@@ -64,11 +64,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\UsagiProjects.props" />
+    <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\UsagiProjects.props" />
+    <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -88,6 +88,7 @@
     <Lib>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <PreBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -107,6 +108,7 @@
     <Lib>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <PreBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -391,43 +393,46 @@
     <ClInclude Include="Utility\Unicode.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Thirdparty\Submodules\fmt\fmt.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\fmt\build\fmt.vcxproj">
       <Project>{65806822-06b5-3679-ac9f-629ea69adaf1}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\glslang\glslang\glslang.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\glslang\build\glslang\glslang.vcxproj">
       <Project>{cfebe9ae-9cf8-30fa-8fc0-31067e861f34}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\glslang\hlsl\HLSL.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\glslang\build\glslang\OSDependent\Windows\OSDependent.vcxproj">
+      <Project>{aaffd61e-152c-3583-ae0e-76767e90c3ff}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\glslang\build\hlsl\HLSL.vcxproj">
       <Project>{83d45e57-0b6e-3904-b1ac-b366ad1e8a72}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\glslang\OGLCompilersDLL\OGLCompiler.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\glslang\build\OGLCompilersDLL\OGLCompiler.vcxproj">
       <Project>{0747be93-f3c1-397f-bfc7-2a4ababe7ba7}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\glslang\SPIRV\SPIRV.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\glslang\build\SPIRV\SPIRV.vcxproj">
       <Project>{ab744df2-2244-3bd4-984e-6c3f82756fb5}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\glslang\StandAlone\glslang-default-resource-limits.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\glslang\build\StandAlone\glslang-default-resource-limits.vcxproj">
       <Project>{777ca18f-9fd4-3f3b-be41-0e7f78629123}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-core.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\SPIRV-Cross\build\spirv-cross-core.vcxproj">
       <Project>{5a2df431-3a80-3c06-b9b1-27430b56a29e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-cpp.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\SPIRV-Cross\build\spirv-cross-cpp.vcxproj">
       <Project>{38420c6a-42c5-3ab9-a6e5-59e445ac0e5e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-glsl.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\SPIRV-Cross\build\spirv-cross-glsl.vcxproj">
       <Project>{065dc5c3-4006-3e20-a116-6b66bf3d954b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-hlsl.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\SPIRV-Cross\build\spirv-cross-hlsl.vcxproj">
       <Project>{e727a94c-0b46-3335-b1ea-d79477de7681}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-msl.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\SPIRV-Cross\build\spirv-cross-msl.vcxproj">
       <Project>{17861b06-326c-313f-b531-6698f69a7e0a}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-reflect.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\SPIRV-Cross\build\spirv-cross-reflect.vcxproj">
       <Project>{383414a1-4e4e-3867-b4d1-a695d8987077}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Thirdparty\Submodules\SPIRV-Cross\spirv-cross-util.vcxproj">
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\SPIRV-Cross\build\spirv-cross-util.vcxproj">
       <Project>{88cc132d-bf6f-39b4-af07-17c68a1c42c0}</Project>
     </ProjectReference>
   </ItemGroup>
