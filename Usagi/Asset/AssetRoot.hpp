@@ -39,7 +39,7 @@ class AssetRoot : public Element
      * loading may only return a shared_ptr in order to store in the cache.
      * \tparam ConverterT
      * \tparam DecoderT
-     * \tparam Cached
+     * \tparam AllowCache
      * \tparam Args
      * \param locator
      * \param converter_args
@@ -48,7 +48,7 @@ class AssetRoot : public Element
     template <
         typename ConverterT,
         typename DecoderT,
-        bool Cached,
+        bool AllowCache,
         typename... Args
     >
     auto locateSubresource(
@@ -62,7 +62,7 @@ class AssetRoot : public Element
         ctx.asset = findAsset(locator);
 
         // found in cache
-        if constexpr(Cached)
+        if constexpr(AllowCache)
         {
             if(auto res = ctx.asset->subresource<typename FindHelper<
                 ConverterT, DecoderT, Args...>::ReturnT::element_type
@@ -78,7 +78,7 @@ class AssetRoot : public Element
             &ctx,
             DecoderT()(*in),
             std::forward<Args>(converter_args)...);
-        if constexpr(Cached) ctx.asset->addSubresource(res);
+        if constexpr(AllowCache) ctx.asset->addSubresource(res);
         return std::move(res);
     }
 

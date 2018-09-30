@@ -8,10 +8,10 @@
 #include <Usagi/Core/Element.hpp>
 #include <Usagi/Utility/TypeCast.hpp>
 
+#include "Subsystem.hpp"
+
 namespace usagi
 {
-class Subsystem;
-
 struct SubsystemInfo
 {
     std::string name;

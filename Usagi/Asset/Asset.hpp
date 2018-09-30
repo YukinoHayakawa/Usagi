@@ -58,7 +58,8 @@ public:
     {
         const auto i = mSubresources.find(typeid(SubresourceT));
         if(i == mSubresources.end()) return { };
-        return std::any_cast<std::weak_ptr<SubresourceT>>(i->second).lock();
+        return std::any_cast<const std::weak_ptr<SubresourceT>&>(i->second)
+            .lock();
     }
 
     template <typename SubresourceT>
@@ -67,7 +68,20 @@ public:
         const auto i = mSubresources.insert({
             typeid(SubresourceT), std::weak_ptr<SubresourceT>(res)
         });
-        assert(i.second);
+        // subresource already exists
+        if(!i.second)
+        {
+            auto &old = std::any_cast<std::weak_ptr<SubresourceT>&>(
+                i.first->second);
+            if(!old.expired())
+            {
+                throw std::runtime_error(
+                    "Attempting to overwrite a subresource currently in use."
+                );
+            }
+            // replace expired subresource
+            old = res;
+        }
     }
 };
 }
