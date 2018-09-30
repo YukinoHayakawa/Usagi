@@ -85,6 +85,7 @@
     <ClCompile Include="Asset\Converter\GpuImageAssetConverter.cpp" />
     <ClCompile Include="Asset\Converter\SpirvAssetConverter.cpp" />
     <ClCompile Include="Asset\Converter\Uncached\StringAssetConverter.cpp" />
+    <ClCompile Include="Asset\Helper\Load.cpp" />
     <ClCompile Include="Asset\Package\Filesystem\FilesystemAsset.cpp" />
     <ClCompile Include="Asset\Package\Filesystem\FilesystemAssetPackage.cpp" />
     <ClCompile Include="Asset\Decoder\StbImageAssetDecoder.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="Asset\Converter\Uncached\StringAssetConverter.hpp" />
     <ClInclude Include="Asset\Decoder\ImageBuffer.hpp" />
     <ClInclude Include="Asset\Decoder\RawAssetDecoder.hpp" />
+    <ClInclude Include="Asset\Helper\Load.hpp" />
     <ClInclude Include="Asset\Package\Filesystem\FilesystemAsset.hpp" />
     <ClInclude Include="Asset\Package\Filesystem\FilesystemAssetPackage.hpp" />
     <ClInclude Include="Asset\Decoder\StbImageAssetDecoder.hpp" />
