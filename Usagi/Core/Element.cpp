@@ -37,9 +37,9 @@ void usagi::Element::removeChild(Element *child)
     if(iter == mChildren.end())
         throw std::runtime_error("Cannot find specified child.");
     auto p = iter->get();
-    p->fireEvent<PreElementRemovalEvent>();
+    p->sendEvent<PreElementRemovalEvent>();
     mChildren.erase(iter);
-    fireEvent<ChildElementRemovedEvent>();
+    sendEvent<ChildElementRemovedEvent>();
 }
 
 void usagi::Element::addComponent(Component *component)
@@ -58,7 +58,7 @@ void usagi::Element::insertComponent(const std::type_info &type,
         LOG(error, "An element cannot have two components of the same type!");
         throw std::runtime_error("Conflicted components.");
     }
-    fireEvent<ComponentAddedEvent>(type, p);
+    sendEvent<ComponentAddedEvent>(type, p);
 }
 
 usagi::Element::ComponentMap::iterator usagi::Element::eraseComponent(
@@ -66,8 +66,8 @@ usagi::Element::ComponentMap::iterator usagi::Element::eraseComponent(
 {
     const auto comp = i->second.get();
     const auto &t = comp->baseType();
-    fireEvent<PreComponentRemovalEvent>(t, comp);
+    sendEvent<PreComponentRemovalEvent>(t, comp);
     i = mComponents.erase(i);
-    fireEvent<PostComponentRemovalEvent>(t);
+    sendEvent<PostComponentRemovalEvent>(t);
     return i;
 }

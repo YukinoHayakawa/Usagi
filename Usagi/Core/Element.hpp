@@ -27,7 +27,7 @@ class Component;
  * interaction with entity and the game world is carried out by components
  * and subsystems. Inter-entity communication is performed by event system.
  *
- * Contains component and event logics.
+ * Contains component and event logic.
  */
 class Element : Noncopyable
 {
@@ -63,6 +63,7 @@ class Element : Noncopyable
 	template <typename EventT, typename... Args>
 	void handleEvent(EventT &e, const std::type_info &type)
 	{
+        // todo handling polymorphic events?
 		const auto range = mEventHandlers.equal_range(type);
 		for(auto i = range.first; i != range.second && !e.canceled(); ++i)
 		{
@@ -111,12 +112,12 @@ public:
         assert(c);
         // ElementCreatedEvent is fired before acceptance test, so it gets
         // a change to pass the test. (todo: is this a good idea?)
-        c->template fireEvent<ElementCreatedEvent>();
+        c->template sendEvent<ElementCreatedEvent>();
         if(!acceptChild(c.get()))
             throw std::logic_error("Child element is rejected by parent.");
 		const auto r = c.get();
         mChildren.push_back(std::move(c));
-        fireEvent<ChildElementAddedEvent>(r);
+        sendEvent<ChildElementAddedEvent>(r);
 		return r;
     }
 
@@ -208,7 +209,7 @@ public:
     using EventHandler = std::function<void(EventT &)>;
 
     template <typename EventT, typename... Args>
-    void fireEvent(Args &&... args)
+    void sendEvent(Args &&... args)
     {
         EventT event { std::forward<Args>(args)... };
         event.setSource(this);
