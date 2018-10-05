@@ -1,7 +1,10 @@
 ﻿#include "Win32Runtime.hpp"
 
+#pragma warning(push)
+#pragma warning(disable:4091)
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
+#pragma warning(pop)
 
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Extension/Vulkan/VulkanGpuDevice.hpp>

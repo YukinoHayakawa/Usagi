@@ -136,9 +136,18 @@
     <ClCompile Include="Extension\Win32\Input\Win32Mouse.cpp" />
     <ClCompile Include="Extension\Win32\Input\Win32RawInputDevice.cpp" />
     <ClCompile Include="Extension\Win32\Win32Helper.cpp" />
-    <ClCompile Include="Extension\Win32\Win32Runtime.cpp" />
-    <ClCompile Include="Extension\Win32\Window\Win32Window.cpp" />
-    <ClCompile Include="Extension\Win32\Window\Win32WindowManager.cpp" />
+    <ClCompile Include="Extension\Win32\Win32Runtime.cpp">
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ConformanceMode>
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ConformanceMode>
+    </ClCompile>
+    <ClCompile Include="Extension\Win32\Window\Win32Window.cpp">
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ConformanceMode>
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ConformanceMode>
+    </ClCompile>
+    <ClCompile Include="Extension\Win32\Window\Win32WindowManager.cpp">
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ConformanceMode>
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ConformanceMode>
+    </ClCompile>
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\GameState.cpp" />
     <ClCompile Include="Game\GameStateManager.cpp" />
