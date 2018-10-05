@@ -7,6 +7,7 @@
 #include "../Win32Helper.hpp"
 #include "Win32WindowManager.hpp"
 
+#include <versionhelpers.h>
 #include <ShellScalingAPI.h>
 #include "../Win32MacroFix.hpp"
 
@@ -172,9 +173,36 @@ void usagi::Win32Window::close()
 
 usagi::Vector2f usagi::Win32Window::dpiScale() const
 {
-    const auto monitor = MonitorFromWindow(mHandle, MONITOR_DEFAULTTONEAREST);
-    unsigned int dpi_x, dpi_y;
-    GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &dpi_x, &dpi_y);
+    unsigned int dpi_x = 96, dpi_y = 96;
+    // http://www.virtualdub.org/blog/pivot/entry.php?id=384
+    if(IsWindows8Point1OrGreater())
+    {
+        static HMODULE shcorelib = LoadLibraryExW(
+            L"Shcore.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+        if(!shcorelib)
+            throw win32::Win32Exception("Failed to load Shcore.dll.");
+        static auto func_GetDpiForMonitor =
+            reinterpret_cast<decltype(&GetDpiForMonitor)>(
+            GetProcAddress(shcorelib, "GetDpiForMonitor"));
+        if(!func_GetDpiForMonitor)
+            throw win32::Win32Exception("Failed to find GetDpiForMonitor.");
+        const auto monitor = MonitorFromWindow(
+            mHandle, MONITOR_DEFAULTTONEAREST);
+        func_GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &dpi_x, &dpi_y);
+    }
+    else
+    {
+        if(HDC hdc = GetDC(NULL))
+        {
+            dpi_x = GetDeviceCaps(hdc, LOGPIXELSX);
+            dpi_y = GetDeviceCaps(hdc, LOGPIXELSY);
+            ReleaseDC(NULL, hdc);
+        }
+        else
+        {
+            LOG(warn, "Failed to get DPI scale.");
+        }
+    }
     return Vector2f { dpi_x, dpi_y } / 96.f;
 }
 
@@ -239,6 +267,7 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
 {
     assert(hWnd == mHandle);
 
+    // todo handle WM_DPICHANGED
     switch(message)
     {
         // window focus change
