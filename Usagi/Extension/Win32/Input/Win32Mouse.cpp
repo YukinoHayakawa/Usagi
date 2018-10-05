@@ -4,6 +4,11 @@
 #include <Usagi/Extension/Win32/Window/Win32WindowManager.hpp>
 #include <Usagi/Extension/Win32/Window/Win32Window.hpp>
 
+// Microsoft forgot to define it for Windows 8.1
+#ifndef RI_MOUSE_HWHEEL
+#define RI_MOUSE_HWHEEL 0x0800
+#endif
+
 void usagi::Win32Mouse::sendButtonEvent(
     Window *window,
     MouseButtonCode button,
