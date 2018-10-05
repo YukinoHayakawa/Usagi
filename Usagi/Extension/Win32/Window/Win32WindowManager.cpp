@@ -1,6 +1,4 @@
 ﻿#include "../Win32.hpp"
-#include <ShellScalingAPI.h>
-#pragma comment(lib, "Shcore.lib")
 
 #include "Win32WindowManager.hpp"
 
@@ -55,7 +53,6 @@ usagi::Win32WindowManager::Win32WindowManager()
 {
     LOG(info, "Creating Win32WindowManager");
 
-    SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
     registerWindowClass();
 }
 
