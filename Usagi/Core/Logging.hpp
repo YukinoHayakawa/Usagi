@@ -17,11 +17,14 @@ enum class LoggingLevel
     off = 6
 };
 
+bool shouldLog(LoggingLevel level);
 void doLog(LoggingLevel level, const char *str);
 
 template <typename... Args>
 void log(const LoggingLevel level, const char *fmt, const Args &... args)
 {
+    if(!shouldLog(level)) return;
+
     fmt::format_arg_store<fmt::format_context, Args...> as { args... };
     fmt::memory_buffer buffer;
     fmt::vformat_to(buffer, fmt, as);
