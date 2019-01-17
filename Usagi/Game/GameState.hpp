@@ -25,7 +25,8 @@ class GameState : public Element
 
 protected:
     /**
-     * \brief Maintain a linked list of states.
+     * \brief Maintain a linked list of states. A state can use this to
+     * access state below its own position on the state stack.
      */
     GameState *mPreviousState = nullptr;
 
