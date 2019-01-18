@@ -148,17 +148,28 @@ void usagi::Win32Mouse::handleRawInput(RAWINPUT *raw)
         MOUSE_BTN_EVENT(BUTTON_5, BUTTON_5);
 #undef MOUSE_BTN_EVENT
 
+        const auto wheel_y = static_cast<short>(mouse.usButtonData) /
+            WHEEL_DELTA;
         // process scrolling
         if(mouse.usButtonFlags & RI_MOUSE_WHEEL)
-            sendWheelEvent(window, {
-                0, static_cast<short>(mouse.usButtonData) / WHEEL_DELTA
-            }, abs);
+        {
+            sendWheelEvent(window, { 0, wheel_y }, abs);
+            // send virtual button events for wheel scrolling
+            sendButtonEvent(window,
+                wheel_y < 0
+                    ? MouseButtonCode::WHEEL_DOWN
+                    : MouseButtonCode::WHEEL_UP,
+                true, abs);
+            sendButtonEvent(window,
+                wheel_y < 0
+                    ? MouseButtonCode::WHEEL_DOWN
+                    : MouseButtonCode::WHEEL_UP,
+                false, abs);
+        }
         // horizontal scrolling, which seems to be undocumented.
         // found here: https://stackoverflow.com/questions/7942307/horizontal-mouse-wheel-messages-from-windows-raw-input
         if(mouse.usButtonFlags & RI_MOUSE_HWHEEL)
-            sendWheelEvent(window, {
-                static_cast<short>(mouse.usButtonData) / WHEEL_DELTA, 0
-            }, abs);
+            sendWheelEvent(window, { wheel_y, 0 }, abs);
     }
 }
 
