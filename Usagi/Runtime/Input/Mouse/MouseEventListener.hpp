@@ -34,16 +34,34 @@ class MouseEventListener
 public:
     virtual ~MouseEventListener() = default;
 
-    virtual void onMouseMove(const MousePositionEvent &e)
+    /**
+     * \brief
+     * \param e
+     * \return true if the event is handled by the listener. false if it is not.
+     */
+    virtual bool onMouseMove(const MousePositionEvent &e)
     {
+        return false;
     }
 
-    virtual void onMouseButtonStateChange(const MouseButtonEvent &e)
+    /**
+     * \brief
+     * \param e
+     * \return true if the event is handled by the listener. false if it is not.
+     */
+    virtual bool onMouseButtonStateChange(const MouseButtonEvent &e)
     {
+        return false;
     }
 
-    virtual void onMouseWheelScroll(const MouseWheelEvent &e)
+    /**
+     * \brief
+     * \param e
+     * \return true if the event is handled by the listener. false if it is not.
+     */
+    virtual bool onMouseWheelScroll(const MouseWheelEvent &e)
     {
+        return false;
     }
 };
 }

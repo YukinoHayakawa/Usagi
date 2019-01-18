@@ -23,8 +23,14 @@ class KeyEventListener
 public:
     virtual ~KeyEventListener() = default;
 
-    virtual void onKeyStateChange(const KeyEvent &e)
+    /**
+     * \brief
+     * \param e
+     * \return true if the event is handled by the listener. false if it is not.
+     */
+    virtual bool onKeyStateChange(const KeyEvent &e)
     {
+        return false;
     }
 };
 }
