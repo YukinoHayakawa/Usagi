@@ -366,99 +366,100 @@ std::shared_ptr<usagi::GraphicsCommandList> usagi::NuklearSubsystem::render(
     return std::move(cmd_list);
 }
 
-void usagi::NuklearSubsystem::onKeyStateChange(const KeyEvent &e)
+bool usagi::NuklearSubsystem::onKeyStateChange(const KeyEvent &e)
 {
     switch(e.key_code)
     {
         case KeyCode::LEFT_SHIFT:
         case KeyCode::RIGHT_SHIFT:
             nk_input_key(&mContext, NK_KEY_SHIFT, e.pressed);
-            break;
+            return true;
 
         case KeyCode::DELETE:
             nk_input_key(&mContext, NK_KEY_DEL, e.pressed);
-            break;
+            return true;
 
         case KeyCode::ENTER:
         case KeyCode::NUM_ENTER:
             nk_input_key(&mContext, NK_KEY_ENTER, e.pressed);
-            break;
+            return true;
 
         case KeyCode::TAB:
             nk_input_key(&mContext, NK_KEY_TAB, e.pressed);
-            break;
+            return true;
 
         case KeyCode::LEFT:
             if(e.keyboard->isCtrlPressed())
                 nk_input_key(&mContext, NK_KEY_TEXT_WORD_LEFT, e.pressed);
             else
                 nk_input_key(&mContext, NK_KEY_LEFT, e.pressed);
-            break;
+            return true;
         case KeyCode::RIGHT:
             if(e.keyboard->isCtrlPressed())
                 nk_input_key(&mContext, NK_KEY_TEXT_WORD_RIGHT, e.pressed);
             else
                 nk_input_key(&mContext, NK_KEY_RIGHT, e.pressed);
-            break;
+            return true;
 
         case KeyCode::BACKSPACE:
             nk_input_key(&mContext, NK_KEY_BACKSPACE, e.pressed);
-            break;
+            return true;
 
         case KeyCode::HOME:
             nk_input_key(&mContext, NK_KEY_TEXT_START, e.pressed);
             nk_input_key(&mContext, NK_KEY_SCROLL_START, e.pressed);
-            break;
+            return true;
         case KeyCode::END:
             nk_input_key(&mContext, NK_KEY_TEXT_END, e.pressed);
             nk_input_key(&mContext, NK_KEY_SCROLL_END, e.pressed);
-            break;
+            return true;
         case KeyCode::PAGE_UP:
             nk_input_key(&mContext, NK_KEY_SCROLL_UP, e.pressed);
-            break;
+            return true;
         case KeyCode::PAGE_DOWN:
             nk_input_key(&mContext, NK_KEY_SCROLL_DOWN, e.pressed);
-            break;
+            return true;
 
         case KeyCode::A:
             if(e.keyboard->isCtrlPressed())
                 nk_input_key(&mContext, NK_KEY_TEXT_SELECT_ALL, e.pressed);
-            break;
+            return true;
         case KeyCode::C:
             if(e.keyboard->isCtrlPressed())
                 nk_input_key(&mContext, NK_KEY_COPY, e.pressed);
-            break;
+            return true;
         case KeyCode::V:
             if(e.keyboard->isCtrlPressed())
                 nk_input_key(&mContext, NK_KEY_PASTE, e.pressed);
-            break;
+            return true;
         case KeyCode::X:
             if(e.keyboard->isCtrlPressed())
                 nk_input_key(&mContext, NK_KEY_CUT, e.pressed);
-            break;
+            return true;
         case KeyCode::Z:
             if(e.keyboard->isCtrlPressed())
                 nk_input_key(&mContext, NK_KEY_TEXT_UNDO, e.pressed);
-            break;
+            return true;
         case KeyCode::Y:
             if(e.keyboard->isCtrlPressed())
                 nk_input_key(&mContext, NK_KEY_TEXT_REDO, e.pressed);
-            break;
+            return true;
 
-        default:;
+        default: return false;
     }
 }
 
-void usagi::NuklearSubsystem::onMouseMove(const MousePositionEvent &e)
+bool usagi::NuklearSubsystem::onMouseMove(const MousePositionEvent &e)
 {
     nk_input_motion(
         &mContext,
         static_cast<int>(e.position.x()),
         static_cast<int>(e.position.y())
     );
+    return true;
 }
 
-void usagi::NuklearSubsystem::onMouseButtonStateChange(
+bool usagi::NuklearSubsystem::onMouseButtonStateChange(
     const MouseButtonEvent &e)
 {
     const auto pos = e.position.cast<int>();
@@ -467,22 +468,23 @@ void usagi::NuklearSubsystem::onMouseButtonStateChange(
         case MouseButtonCode::LEFT:
             nk_input_button(
                 &mContext, NK_BUTTON_LEFT, pos.x(), pos.y(), e.pressed);
-            break;
+            return true;
         case MouseButtonCode::RIGHT:
             nk_input_button(
                 &mContext, NK_BUTTON_RIGHT, pos.x(), pos.y(), e.pressed);
-            break;
+            return true;
         case MouseButtonCode::MIDDLE:
             nk_input_button(
                 &mContext, NK_BUTTON_MIDDLE, pos.x(), pos.y(), e.pressed);
-            break;
-        default: ;
+            return true;
+        default: return false;
     }
 }
 
-void usagi::NuklearSubsystem::onMouseWheelScroll(const MouseWheelEvent &e)
+bool usagi::NuklearSubsystem::onMouseWheelScroll(const MouseWheelEvent &e)
 {
     nk_input_scroll(&mContext, { e.distance.x(), e.distance.y() });
+    return true;
 }
 
 void usagi::NuklearSubsystem::onWindowCharInput(const WindowCharEvent &e)

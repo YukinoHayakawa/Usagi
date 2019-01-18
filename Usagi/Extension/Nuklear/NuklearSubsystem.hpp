@@ -67,10 +67,10 @@ public:
         std::shared_ptr<Mouse> mouse);
     ~NuklearSubsystem() override;
 
-    void onKeyStateChange(const KeyEvent &e) override;
-    void onMouseMove(const MousePositionEvent &e) override;
-    void onMouseButtonStateChange(const MouseButtonEvent &e) override;
-    void onMouseWheelScroll(const MouseWheelEvent &e) override;
+    bool onKeyStateChange(const KeyEvent &e) override;
+    bool onMouseMove(const MousePositionEvent &e) override;
+    bool onMouseButtonStateChange(const MouseButtonEvent &e) override;
+    bool onMouseWheelScroll(const MouseWheelEvent &e) override;
     void onWindowCharInput(const WindowCharEvent &e) override;
 
     void update(const Clock &clock) override;

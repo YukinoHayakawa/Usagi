@@ -210,8 +210,8 @@ void usagi::VulkanGraphicsCommandList::createDescriptorPool()
     info.setMaxSets(16);
     std::initializer_list<vk::DescriptorPoolSize> sizes {
         { vk::DescriptorType::eSampler, 16 },
-    { vk::DescriptorType::eSampledImage, 16 },
-    { vk::DescriptorType::eUniformBuffer, 16 },
+        { vk::DescriptorType::eSampledImage, 16 },
+        { vk::DescriptorType::eUniformBuffer, 16 },
     };
     info.setPoolSizeCount(static_cast<uint32_t>(sizes.size()));
     info.setPPoolSizes(sizes.begin());
@@ -224,6 +224,7 @@ vk::DescriptorSet usagi::VulkanGraphicsCommandList::
 {
     assert(mCurrentPipeline);
 
+    // todo whats the logic??
     auto allow_new_pool = true;
 
     if(mDescriptorPools.empty())

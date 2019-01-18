@@ -71,9 +71,9 @@ public:
     void createPipelines() override;
     std::shared_ptr<GraphicsCommandList> render(const Clock &clock) override;
 
-    void onKeyStateChange(const KeyEvent &e) override;
-    void onMouseButtonStateChange(const MouseButtonEvent &e) override;
-    void onMouseWheelScroll(const MouseWheelEvent &e) override;
+    bool onKeyStateChange(const KeyEvent &e) override;
+    bool onMouseButtonStateChange(const MouseButtonEvent &e) override;
+    bool onMouseWheelScroll(const MouseWheelEvent &e) override;
     void onWindowCharInput(const WindowCharEvent &e) override;
 
     void update(const Clock &clock) override;

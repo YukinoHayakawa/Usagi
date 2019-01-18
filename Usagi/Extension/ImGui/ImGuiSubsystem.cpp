@@ -451,7 +451,7 @@ std::shared_ptr<usagi::GraphicsCommandList> usagi::ImGuiSubsystem::render(
     return std::move(cmd_list);
 }
 
-void usagi::ImGuiSubsystem::onKeyStateChange(const KeyEvent &e)
+bool usagi::ImGuiSubsystem::onKeyStateChange(const KeyEvent &e)
 {
     auto &io = ImGui::GetIO();
 
@@ -465,21 +465,27 @@ void usagi::ImGuiSubsystem::onKeyStateChange(const KeyEvent &e)
         || io.KeysDown[static_cast<std::size_t>(KeyCode::RIGHT_ALT)];
     io.KeySuper = io.KeysDown[static_cast<std::size_t>(KeyCode::LEFT_OS)]
         || io.KeysDown[static_cast<std::size_t>(KeyCode::RIGHT_OS)];
+
+    return true;
 }
 
-void usagi::ImGuiSubsystem::onMouseButtonStateChange(
+bool usagi::ImGuiSubsystem::onMouseButtonStateChange(
     const MouseButtonEvent &e)
 {
     if(e.pressed)
         mMouseJustPressed[static_cast<std::size_t>(e.button)] = true;
+
+    return true;
 }
 
-void usagi::ImGuiSubsystem::onMouseWheelScroll(const MouseWheelEvent &e)
+bool usagi::ImGuiSubsystem::onMouseWheelScroll(const MouseWheelEvent &e)
 {
     auto &io = ImGui::GetIO();
 
     io.MouseWheelH += e.distance.x();
     io.MouseWheel += e.distance.y();
+
+    return true;
 }
 
 void usagi::ImGuiSubsystem::onWindowCharInput(const WindowCharEvent &e)
