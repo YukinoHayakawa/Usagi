@@ -237,9 +237,6 @@
     <ClCompile Include="Graphics\RenderTarget\RenderTargetProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Interactive\InputMapping.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\Game\OverlayRenderingSubsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -250,6 +247,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Asset\Helper\Load.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interactive\ActionGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interactive\InputMapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -509,9 +512,6 @@
     <ClInclude Include="Runtime\Input\DeviceType.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Input\InputManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Memory\BitmapMemoryAllocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -764,9 +764,6 @@
     <ClInclude Include="Runtime\Graphics\GpuAttachmentOps.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Interactive\InputMapping.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Utility\DummyDeleter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -786,6 +783,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Asset\Helper\Load.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interactive\ActionGroup.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interactive\InputMapping.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Input\InputManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

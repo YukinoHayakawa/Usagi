@@ -1,63 +1,78 @@
 ﻿#pragma once
 
 #include <string>
-#include <functional>
-#include <map>
-#include <set>
+#include <vector>
 
-#include <Usagi/Core/Math.hpp>
-#include <Usagi/Runtime/Input/Keyboard/KeyCode.hpp>
-#include <Usagi/Runtime/Input/Mouse/MouseButtonCode.hpp>
-#include <Usagi/Runtime/Input/Keyboard/KeyEventListener.hpp>
-#include <Usagi/Runtime/Input/Mouse/MouseEventListener.hpp>
+#include "ActionGroup.hpp"
 
 namespace usagi
 {
 class InputMapping
-    : public KeyEventListener
+    : public Element
+    , public KeyEventListener
     , public MouseEventListener
 {
-public:
-    using BinaryActionHandler = std::function<void(bool active)>;
-    using AnalogAction1DHandler = std::function<void(float value)>;
-    // input handlers typically manipulates the values, thus it is passed
-    // by value.
-    using AnalogAction2DHandler = std::function<void(Vector2f value)>;
+    bool acceptChild(Element *child) override;
 
-private:
-    std::map<std::string, BinaryActionHandler> mBinaryActions;
-    std::map<KeyCode, std::string> mKeyBindings;
-    std::map<MouseButtonCode, std::string> mMouseButtonBindings;
-
-    void performBinaryAction(const std::string &name, bool active);
-
-    std::map<std::string, AnalogAction2DHandler> mAnalogActions2D;
-    std::set<std::string> mMouseRelativeMoveBindings;
+protected:
+    std::vector<ActionGroup> mActionGroups;
 
 public:
-    // --- 1D Binary Actions ---
+    InputMapping(Element *parent, std::string name);
 
-    void addBinaryAction(std::string name, BinaryActionHandler handler);
+    /*
+     * Action Group management.
+     *
+     * An action group is a set of actions that are coherently together in a
+     * game context. Such as the controls for game character or vehicle, or
+     * pause menu controls that are active through the most stages of the game.
+     * This grouping allow separated controls of input handling and separation
+     * of game states and input handling. In a typical game, the action groups
+     * shall be defined by the game and states should active certain groups
+     * according its gameplay need, or even manage extra temporary action
+     * groups.
+     *
+     * Action group handlers should be cleared before transitioning to another
+     * state to prevent leaking input actions to inactive states (states not
+     * on the top of the stack). This behavior should be performed by the
+     * pause() method of states. The action handlers are correspondingly
+     * registered in resume() method and during the creation of the states.
+     *
+     * Input events are handled in a chain of responsibilities. The most
+     * recently added action group has the highest priority of processing
+     * input events. If it does not handle the event or is inactive, the event
+     * will be passed to the next action group in the reverse order of
+     * appending, until the event is handled or the action groups were all
+     * considered.
+     */
 
-    void bindKey(std::string action, KeyCode code);
-    void bindMouseButton(std::string action, MouseButtonCode code);
+    ActionGroup * addActionGroup(std::string name)
+    {
+        return addChild<ActionGroup>(std::move(name));
+    }
 
-    // void addAnalogAction1D(std::string name, AnalogAction1DHandler handler);
+    ActionGroup * actionGroup(const std::string &name) const
+    {
+        return static_cast<ActionGroup*>(findChildByName(name));
+    }
 
-    // --- 2D Analog Actions ---
-
-    void addAnalogAction2D(std::string name, AnalogAction2DHandler handler);
+    void removeActionGroup(const std::string &name)
+    {
+        return removeChildByName(name);
+    }
 
     /**
-     * \brief
-     * \param name The name of a 2D analog action.
+     * \brief Deactivate all action groups and remove all registered action
+     * handlers.
      */
-    void bindMouseRelativeMovement(std::string name);
+    void disableAllActionGroups();
 
-    // --- Event Listeners ---
+    /*
+     * Event Listeners
+     */
 
-    void onMouseMove(const MousePositionEvent &e) override;
-    void onKeyStateChange(const KeyEvent &e) override;
-    void onMouseButtonStateChange(const MouseButtonEvent &e) override;
+    bool onMouseMove(const MousePositionEvent &e) override;
+    bool onKeyStateChange(const KeyEvent &e) override;
+    bool onMouseButtonStateChange(const MouseButtonEvent &e) override;
 };
 }

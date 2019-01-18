@@ -31,6 +31,7 @@ class Component;
  */
 class Element : Noncopyable
 {
+protected:
     Element *mParent;
     using ChildrenArray = std::vector<std::shared_ptr<Element>>;
     ChildrenArray mChildren;
@@ -86,6 +87,8 @@ class Element : Noncopyable
 	    return true;
 	}
 
+    void removeChildByIter(ChildrenArray::iterator iter);
+
 public:
     Element(Element *parent, std::string name = { });
     virtual ~Element();
@@ -96,6 +99,7 @@ public:
 
     std::string name() const { return mName; }
 	void setName(const std::string &name) { mName = name; }
+    std::string path() const;
 
     // Entity Hierarchy
 
@@ -104,6 +108,7 @@ public:
     template <typename ElementType = Element, typename... Args>
     ElementType * addChild(Args && ...args)
     {
+        // todo enforce unique child name
         static_assert(std::is_base_of_v<Element, ElementType>,
 			"ElementType is not derived from Element.");
 		auto c = std::make_unique<ElementType>(
@@ -114,7 +119,7 @@ public:
         // a change to pass the test. (todo: is this a good idea?)
         c->template sendEvent<ElementCreatedEvent>();
         if(!acceptChild(c.get()))
-            throw std::logic_error("Child element is rejected by parent.");
+            throw std::logic_error("Child element was rejected by parent.");
 		const auto r = c.get();
         mChildren.push_back(std::move(c));
         sendEvent<ChildElementAddedEvent>(r);
@@ -140,6 +145,7 @@ public:
     }
 
     void removeChild(Element *child);
+    void removeChildByName(const std::string &name);
 
     // Component
 
@@ -239,12 +245,12 @@ protected:
         return mChildren.end();
     }
 
-    template <typename Func>
+    template <typename ChildT, typename Func>
     void forEachChild(Func f)
     {
         for(auto &&c : mChildren)
         {
-            f(c.get());
+            f(static_cast<ChildT*>(c.get()));
         }
     }
 };

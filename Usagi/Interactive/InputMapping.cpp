@@ -1,84 +1,55 @@
 ﻿#include "InputMapping.hpp"
 
+#include <Usagi/Utility/TypeCast.hpp>
 #include <Usagi/Core/Logging.hpp>
 
-void usagi::InputMapping::addBinaryAction(
-    std::string name,
-    BinaryActionHandler handler)
+bool usagi::InputMapping::acceptChild(Element *child)
 {
-    const auto i = mBinaryActions.insert({
-        std::move(name), std::move(handler)
+    return is_instance_of<ActionGroup>(child);
+}
+
+usagi::InputMapping::InputMapping(Element *parent, std::string name)
+    : Element(parent, std::move(name))
+{
+}
+
+void usagi::InputMapping::disableAllActionGroups()
+{
+    LOG(info, "Disabling all action groups.");
+    forEachChild<ActionGroup>([](ActionGroup *g) {
+        g->deactivate();
     });
-    if(!i.second)
+}
+
+bool usagi::InputMapping::onMouseMove(const MousePositionEvent &e)
+{
+    for(auto i = mChildren.rbegin(); i != mChildren.rend(); ++i)
     {
-        LOG(error, "Binary action \"{}\" is already registered!", name);
-        throw std::runtime_error("Action name conflict.");
+        const auto g = static_cast<ActionGroup*>(i->get());
+        if(g->isActive() && g->onMouseMove(e))
+            return true;
     }
+    return false;
 }
 
-void usagi::InputMapping::bindKey(std::string action, const KeyCode code)
+bool usagi::InputMapping::onKeyStateChange(const KeyEvent &e)
 {
-    mKeyBindings.insert_or_assign(code, std::move(action));
-}
-
-void usagi::InputMapping::bindMouseButton(
-    std::string action,
-    const MouseButtonCode code)
-{
-    mMouseButtonBindings.insert_or_assign(code, std::move(action));
-}
-
-void usagi::InputMapping::addAnalogAction2D(
-    std::string name,
-    AnalogAction2DHandler handler)
-{
-    const auto i = mAnalogActions2D.insert({
-        std::move(name), std::move(handler)
-    });
-    if(!i.second)
+    for(auto i = mChildren.rbegin(); i != mChildren.rend(); ++i)
     {
-        LOG(error, "2D analog action \"{}\" is already registered!", name);
-        throw std::runtime_error("Action name conflict.");
+        const auto g = static_cast<ActionGroup*>(i->get());
+        if(g->isActive() && g->onKeyStateChange(e))
+            return true;
     }
+    return false;
 }
 
-void usagi::InputMapping::bindMouseRelativeMovement(std::string name)
+bool usagi::InputMapping::onMouseButtonStateChange(const MouseButtonEvent &e)
 {
-    mMouseRelativeMoveBindings.insert(std::move(name));
-}
-
-void usagi::InputMapping::onMouseMove(const MousePositionEvent &e)
-{
-    const auto rel = e.distance.cast<float>();
-    for(auto &&b : mMouseRelativeMoveBindings)
+    for(auto i = mChildren.rbegin(); i != mChildren.rend(); ++i)
     {
-        mAnalogActions2D.find(b)->second(rel);
+        const auto g = static_cast<ActionGroup*>(i->get());
+        if(g->isActive() && g->onMouseButtonStateChange(e))
+            return true;
     }
-}
-
-void usagi::InputMapping::performBinaryAction(
-    const std::string &name,
-    const bool active)
-{
-    const auto i = mBinaryActions.find(name);
-    if(i == mBinaryActions.end())
-    {
-        LOG(error, "Event is bind to non-existent action.");
-        throw std::logic_error("Invalid binding.");
-    }
-    i->second(active);
-}
-
-void usagi::InputMapping::onKeyStateChange(const KeyEvent &e)
-{
-    const auto i = mKeyBindings.find(e.key_code);
-    if(i == mKeyBindings.end()) return;
-    performBinaryAction(i->second, e.pressed);
-}
-
-void usagi::InputMapping::onMouseButtonStateChange(const MouseButtonEvent &e)
-{
-    const auto i = mMouseButtonBindings.find(e.button);
-    if(i == mMouseButtonBindings.end()) return;
-    performBinaryAction(i->second, e.pressed);
+    return false;
 }

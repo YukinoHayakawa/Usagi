@@ -161,6 +161,7 @@
     <ClCompile Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.cpp" />
     <ClCompile Include="Graphics\RenderTarget\Source\SwapchainRenderTargetSource.cpp" />
     <ClCompile Include="Graphics\RenderWindow.cpp" />
+    <ClCompile Include="Interactive\ActionGroup.cpp" />
     <ClCompile Include="Interactive\InputMapping.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
@@ -276,11 +277,12 @@
     <ClInclude Include="Graphics\RenderTarget\RenderTargetDescriptor.hpp" />
     <ClInclude Include="Graphics\RenderTarget\RenderTargetProvider.hpp" />
     <ClInclude Include="Graphics\RenderTarget\RenderTargetSource.hpp" />
+    <ClInclude Include="Interactive\InputMapping.hpp" />
     <ClInclude Include="Runtime\Graphics\GpuAttachmentOps.hpp" />
     <ClInclude Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.hpp" />
     <ClInclude Include="Graphics\RenderTarget\Source\SwapchainRenderTargetSource.hpp" />
     <ClInclude Include="Graphics\RenderWindow.hpp" />
-    <ClInclude Include="Interactive\InputMapping.hpp" />
+    <ClInclude Include="Interactive\ActionGroup.hpp" />
     <ClInclude Include="Runtime\EventEmitter.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\CompareOp.hpp" />
     <ClInclude Include="Runtime\Graphics\Enum\GpuAttachmentOp.hpp" />
