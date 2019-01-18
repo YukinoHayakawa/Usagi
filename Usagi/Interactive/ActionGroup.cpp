@@ -9,7 +9,7 @@ usagi::ActionGroup::ActionGroup(Element *parent, std::string name)
 {
 }
 
-void usagi::ActionGroup::addBinaryAction(
+void usagi::ActionGroup::setBinaryActionHandler(
     std::string name,
     BinaryActionHandler handler)
 {
@@ -35,7 +35,7 @@ void usagi::ActionGroup::bindMouseButton(
     mMouseButtonBindings.insert_or_assign(code, std::move(action));
 }
 
-void usagi::ActionGroup::addAnalogAction2D(
+void usagi::ActionGroup::setAnalogAction2DHandler(
     std::string name,
     AnalogAction2DHandler handler)
 {
@@ -75,6 +75,8 @@ void usagi::ActionGroup::performBinaryAction(
     const std::string &name,
     const bool active)
 {
+    // the logic is, an action might not be bound with key events,
+    // but it must has a proper handler.
     const auto i = mBinaryActions.find(name);
     if(i == mBinaryActions.end())
     {

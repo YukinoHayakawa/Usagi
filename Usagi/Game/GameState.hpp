@@ -74,6 +74,12 @@ public:
 
     // todo also pause the clock
     virtual void pause() { }
+
+    /**
+     * \brief Invoked when the state should start to run. Can either be when
+     * the state is put on the stack top for the first time or when other
+     * states are popped out.
+     */
     virtual void resume() { }
 };
 }

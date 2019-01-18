@@ -19,6 +19,7 @@ usagi::GameStateManager::GameStateManager(
 
 void usagi::GameStateManager::pushState(GameState *state, bool pause_below)
 {
+    assert(hasChild(state));
     // the state should not be on the stack already
     assert(state->mPreviousState == nullptr);
     // changing state during updating process may lead to unexpected
@@ -43,11 +44,13 @@ void usagi::GameStateManager::pushState(GameState *state, bool pause_below)
             mTopState->pause();
         // push state
         mTopState = state;
+        state->resume();
     }
 }
 
 void usagi::GameStateManager::changeState(GameState *state)
 {
+    assert(hasChild(state));
     assert(state->mPreviousState == nullptr);
     if(mUpdating)
     {

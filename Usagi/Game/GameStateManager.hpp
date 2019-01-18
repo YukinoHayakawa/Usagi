@@ -20,9 +20,6 @@ class GameStateManager : public Element
      */
     GameState *mDebugState = nullptr;
 
-    void pushState(GameState *state, bool pause_below);
-    void changeState(GameState *state);
-
 public:
     GameStateManager(Element *parent, std::string name, Game *game);
 
@@ -32,6 +29,12 @@ public:
     // when an event is broadcast at this manager element, all states will
     // receive the event.
     // todo event broadcasting not implemented
+
+    // these two are used mainly in scripts. the states must be direct children
+    // of this state manager.
+
+    void pushState(GameState *state, bool pause_below = true);
+    void changeState(GameState *state);
 
     template <typename State, bool PauseBelow = true, typename... Args>
     void pushState(Args &&... args)

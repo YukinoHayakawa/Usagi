@@ -58,7 +58,7 @@ public:
      * 1D Binary Actions
      */
 
-    void addBinaryAction(std::string name, BinaryActionHandler handler);
+    void setBinaryActionHandler(std::string name, BinaryActionHandler handler);
 
     void bindKey(std::string action, KeyCode code);
     void bindMouseButton(std::string action, MouseButtonCode code);
@@ -69,7 +69,9 @@ public:
      * 2D Analog Actions
      */
 
-    void addAnalogAction2D(std::string name, AnalogAction2DHandler handler);
+    void setAnalogAction2DHandler(
+        std::string name,
+        AnalogAction2DHandler handler);
 
     /**
      * \brief
