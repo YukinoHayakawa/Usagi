@@ -162,7 +162,7 @@ public:
     {
         auto comp = std::make_shared<CompT>(std::forward<Args>(args)...);
         const auto r = comp.get();
-        insertComponent(comp->baseType(), std::move(comp));
+        insertComponent(r->baseType(), std::move(comp));
         return r;
     }
 
