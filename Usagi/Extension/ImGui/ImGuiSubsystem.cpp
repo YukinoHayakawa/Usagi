@@ -136,10 +136,6 @@ usagi::ImGuiSubsystem::ImGuiSubsystem(
 
 usagi::ImGuiSubsystem::~ImGuiSubsystem()
 {
-    mWindow->removeEventListener(this);
-    mKeyboard->removeEventListener(this);
-    mMouse->removeEventListener(this);
-
     ImGui::SetCurrentContext(mContext);
     ImGui::DestroyContext();
 }

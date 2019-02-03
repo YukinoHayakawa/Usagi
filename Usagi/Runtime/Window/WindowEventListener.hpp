@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <Usagi/Core/Math.hpp>
+#include <Usagi/Runtime/EventListener.hpp>
 
 namespace usagi
 {
@@ -33,11 +34,9 @@ struct WindowCharEvent : WindowEvent
     std::uint16_t utf16 = 0;
 };
 
-class WindowEventListener
+class WindowEventListener : public EventListener<WindowEventListener>
 {
 public:
-    virtual ~WindowEventListener() = default;
-
     /**
      * \brief Fired when the window is activated/deactivated.
      * \param e

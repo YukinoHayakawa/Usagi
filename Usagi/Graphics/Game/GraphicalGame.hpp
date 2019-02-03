@@ -40,7 +40,6 @@ protected:
 
 public:
     explicit GraphicalGame(std::shared_ptr<Runtime> runtime);
-    ~GraphicalGame();
 
     /**
      * \brief The content of the vector will be removed.

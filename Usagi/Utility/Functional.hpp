@@ -5,6 +5,7 @@
 
 namespace usagi
 {
+// todo: c++20 std::bind_front
 // code from https://stackoverflow.com/a/26213996/2150446
 template <typename Func, typename... Args>
 auto partial_apply(Func function, Args ... args)

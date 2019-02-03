@@ -163,6 +163,7 @@
     <ClCompile Include="Graphics\RenderWindow.cpp" />
     <ClCompile Include="Interactive\ActionGroup.cpp" />
     <ClCompile Include="Interactive\InputMapping.cpp" />
+    <ClCompile Include="Interactive\InputSubsystem.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
     <ClCompile Include="Runtime\Input\Keyboard\KeyCode.cpp" />
@@ -278,7 +279,10 @@
     <ClInclude Include="Graphics\RenderTarget\RenderTargetDescriptor.hpp" />
     <ClInclude Include="Graphics\RenderTarget\RenderTargetProvider.hpp" />
     <ClInclude Include="Graphics\RenderTarget\RenderTargetSource.hpp" />
+    <ClInclude Include="Interactive\InputComponent.hpp" />
     <ClInclude Include="Interactive\InputMapping.hpp" />
+    <ClInclude Include="Interactive\InputSubsystem.hpp" />
+    <ClInclude Include="Runtime\EventListener.hpp" />
     <ClInclude Include="Runtime\Graphics\GpuAttachmentOps.hpp" />
     <ClInclude Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.hpp" />
     <ClInclude Include="Graphics\RenderTarget\Source\SwapchainRenderTargetSource.hpp" />

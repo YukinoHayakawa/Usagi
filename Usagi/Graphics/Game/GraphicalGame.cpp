@@ -95,12 +95,6 @@ usagi::GraphicalGame::GraphicalGame(std::shared_ptr<Runtime> runtime)
     mPostRender = std::make_unique<ImageTransitionSubsystem>(mRuntime->gpu());
 }
 
-usagi::GraphicalGame::~GraphicalGame()
-{
-    if(mMainWindow.window)
-        mMainWindow.window->removeEventListener(this);
-}
-
 void usagi::GraphicalGame::submitGraphicsJobs(
     std::vector<std::shared_ptr<GraphicsCommandList>> &jobs)
 {

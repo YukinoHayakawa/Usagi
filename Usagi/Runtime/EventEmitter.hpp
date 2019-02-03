@@ -8,8 +8,22 @@
 namespace usagi
 {
 template <typename ListenerT>
+class EventListener;
+
+template <typename ListenerT>
 class EventEmitter : Noncopyable
 {
+    friend class EventListener<ListenerT>;
+
+    void eraseEventListener(ListenerT *listener)
+    {
+        mEventListeners.erase(
+            std::remove(
+                mEventListeners.begin(), mEventListeners.end(), listener
+            ), mEventListeners.end()
+        );
+    }
+
 protected:
     std::vector<ListenerT*> mEventListeners;
 
@@ -24,10 +38,19 @@ protected:
     }
 
 public:
-    virtual ~EventEmitter() = default;
+    virtual ~EventEmitter()
+    {
+        // emitter-listener relationships are automatically cleaned up
+        // when either is destroyed.
+        for(auto && listener : mEventListeners)
+        {
+            listener->removeRegisteredEmitter(this);
+        }
+    }
 
     void addEventListener(ListenerT *listener)
     {
+        listener->addRegisteredEmitter(this);
         mEventListeners.push_back(listener);
     }
 
@@ -40,11 +63,8 @@ public:
 
     void removeEventListener(ListenerT *listener)
     {
-        mEventListeners.erase(
-            std::remove(
-                mEventListeners.begin(), mEventListeners.end(), listener
-            ), mEventListeners.end()
-        );
+        listener->removeRegisteredEmitter(this);
+        eraseEventListener(listener);
     }
 };
 }

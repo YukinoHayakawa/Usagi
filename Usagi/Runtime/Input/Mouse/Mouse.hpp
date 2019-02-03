@@ -5,12 +5,13 @@
 #include <Usagi/Runtime/Input/Device.hpp>
 
 #include "MouseButtonCode.hpp"
+#include "MouseEventListener.hpp"
 
 namespace usagi
 {
 class Mouse
     : public Device
-    , public EventEmitter<class MouseEventListener>
+    , public EventEmitter<MouseEventListener>
 {
     bool mImmersiveMode = false;
 

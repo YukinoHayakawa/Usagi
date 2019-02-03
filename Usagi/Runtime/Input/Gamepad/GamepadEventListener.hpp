@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <Usagi/Runtime/EventListener.hpp>
+
 namespace usagi
 {
 class Gamepad;
@@ -15,11 +17,9 @@ struct GamepadButtonEvent : GamepadEvent
     bool pressed;
 };
 
-class GamepadEventListener
+class GamepadEventListener : public EventListener<GamepadEventListener>
 {
 public:
-    virtual ~GamepadEventListener() = default;
-
     virtual void onButtonStateChange(const GamepadButtonEvent &e)
     {
     }

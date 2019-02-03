@@ -62,6 +62,13 @@ public:
         return ptr;
     }
 
+    template <typename SubsystemT, typename... Args>
+    SubsystemT * addSubsystem(std::string name, Args &&... args)
+    {
+        auto sys = std::make_unique<SubsystemT>(std::forward<Args>(args)...);
+        return addSubsystem(std::move(name), std::move(sys));
+    }
+
     void enableSubsystem(const std::string &subsystem_name);
     void disableSubsystem(const std::string &subsystem_name);
 

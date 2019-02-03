@@ -137,10 +137,6 @@ usagi::NuklearSubsystem::NuklearSubsystem(
 
 usagi::NuklearSubsystem::~NuklearSubsystem()
 {
-    mWindow->removeEventListener(this);
-    mKeyboard->removeEventListener(this);
-    mMouse->removeEventListener(this);
-
     nk_font_atlas_clear(&mAtlas);
     nk_buffer_free(&mCommandList);
     nk_free(&mContext);

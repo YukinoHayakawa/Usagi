@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <Usagi/Core/Math.hpp>
+#include <Usagi/Runtime/EventListener.hpp>
 
 #include "MouseButtonCode.hpp"
 
@@ -40,11 +41,9 @@ struct MouseWheelEvent : MouseEvent
     Vector2f distance;
 };
 
-class MouseEventListener
+class MouseEventListener : public EventListener<MouseEventListener>
 {
 public:
-    virtual ~MouseEventListener() = default;
-
     /**
      * \brief
      * \param e

@@ -72,6 +72,7 @@ void * BitmapMemoryAllocator::allocate(
         return reinterpret_cast<void*>(mBase + first_free_block * mBlockSize);
     }
 
+    // todo use std::align
     auto first_addr = utility::roundUpUnsigned(mBase, alignment);
     const auto end_addr = mBase + mBlockSize * mBitmap.size();
     while(true)

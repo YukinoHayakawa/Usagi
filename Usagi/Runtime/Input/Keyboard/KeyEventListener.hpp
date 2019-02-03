@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <Usagi/Runtime/EventListener.hpp>
+
 #include "KeyCode.hpp"
 
 namespace usagi
@@ -18,11 +20,9 @@ struct KeyEvent : KeyboardEvent
     bool repeated;
 };
 
-class KeyEventListener
+class KeyEventListener : public EventListener<KeyEventListener>
 {
 public:
-    virtual ~KeyEventListener() = default;
-
     /**
      * \brief
      * \param e

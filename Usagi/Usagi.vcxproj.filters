@@ -258,6 +258,9 @@
     <ClCompile Include="Sampler\RandomSampler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Interactive\InputSubsystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asset\Asset.hpp">
@@ -801,6 +804,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sampler\Sampler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interactive\InputComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interactive\InputSubsystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\EventListener.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
