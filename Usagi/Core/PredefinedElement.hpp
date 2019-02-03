@@ -6,6 +6,7 @@
 
 namespace usagi
 {
+// todo: need fix - component can be added/removed during runtime. if they are fixed in construction, bad things could happen when trying to remove a component. prevent removing builtin component, or forbid builtin component all together
 template <typename... BuiltInComponents>
 class PredefinedElement : public Element
 {

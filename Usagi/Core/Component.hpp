@@ -8,6 +8,7 @@ namespace usagi
 {
 /**
  * \brief Piece of data of an entity.
+ * todo: to maximize the utility of data-oriented design, cache-friendliness and data locality should be considered. the components should be stored linearly. component database & id based entity?
  */
 class Component : Noncopyable
 {

@@ -169,6 +169,7 @@
     <ClCompile Include="Runtime\Input\Mouse\Mouse.cpp" />
     <ClCompile Include="Runtime\Input\Mouse\MouseButtonCode.cpp" />
     <ClCompile Include="Runtime\Memory\BitmapMemoryAllocator.cpp" />
+    <ClCompile Include="Sampler\RandomSampler.cpp" />
     <ClCompile Include="Transform\TransformSubsystem.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClCompile Include="Utility\Hash.cpp" />
@@ -334,6 +335,8 @@
     <ClInclude Include="Runtime\Window\Window.hpp" />
     <ClInclude Include="Runtime\Window\WindowEventListener.hpp" />
     <ClInclude Include="Runtime\Window\WindowManager.hpp" />
+    <ClInclude Include="Sampler\RandomSampler.hpp" />
+    <ClInclude Include="Sampler\Sampler.hpp" />
     <ClInclude Include="Transform\TransformComponent.hpp" />
     <ClInclude Include="Transform\TransformSubsystem.hpp" />
     <ClInclude Include="Transform\Util.hpp" />
@@ -399,6 +402,9 @@
     <ProjectReference Include="..\..\..\Thirdparties\Submodules\SPIRV-Cross\build\spirv-cross-util.vcxproj">
       <Project>{88cc132d-bf6f-39b4-af07-17c68a1c42c0}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="eigen.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

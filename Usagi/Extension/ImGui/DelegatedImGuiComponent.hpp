@@ -11,6 +11,8 @@ struct DelegatedImGuiComponent : ImGuiComponent
     using DrawFunction = std::function<void(const Clock &clock)>;
     DrawFunction draw_func;
 
+    DelegatedImGuiComponent() = default;
+
     explicit DelegatedImGuiComponent(
         DrawFunction draw_func)
         : draw_func(std::move(draw_func))
