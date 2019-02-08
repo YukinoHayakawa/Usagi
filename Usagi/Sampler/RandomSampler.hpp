@@ -14,5 +14,6 @@ class RandomSampler : public Sampler
 public:
     float next1D() override;
     Vector2f next2D() override;
+    Vector3f next3D() override;
 };
 }

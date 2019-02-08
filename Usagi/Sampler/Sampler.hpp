@@ -11,5 +11,6 @@ public:
 
     virtual float next1D() = 0;
     virtual Vector2f next2D() = 0;
+    virtual Vector3f next3D() = 0;
 };
 }
