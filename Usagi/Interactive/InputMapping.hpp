@@ -53,12 +53,12 @@ public:
 
     ActionGroup * actionGroup(const std::string &name) const
     {
-        return static_cast<ActionGroup*>(findChildByName(name));
+        return static_cast<ActionGroup*>(getChild(name));
     }
 
     void removeActionGroup(const std::string &name)
     {
-        return removeChildByName(name);
+        return removeChild(name);
     }
 
     /**

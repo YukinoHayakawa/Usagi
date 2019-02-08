@@ -35,7 +35,7 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
 		    throw std::runtime_error("Path must be within the root folder.");
     }
 	// search in cache
-	if(const auto asset = findChildByName(normalized.u8string()))
+	if(const auto asset = findChild(normalized.u8string()))
 	{
 	    return static_cast<Asset*>(asset);
 	}

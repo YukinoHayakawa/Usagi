@@ -60,7 +60,7 @@ void usagi::Element::removeChild(Element *child)
     removeChildByIter(iter);
 }
 
-void usagi::Element::removeChildByName(const std::string &name)
+void usagi::Element::removeChild(const std::string &name)
 {
     const auto iter = std::find_if(
         mChildren.begin(), mChildren.end(),

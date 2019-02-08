@@ -39,7 +39,7 @@ usagi::Asset * usagi::AssetRoot::findAssetByString(
 
         LOG(info, "Searching asset in package {}: {}", package_name, path);
         if(const auto pkg =
-            static_cast<AssetPackage*>(findChildByName(package_name)))
+            static_cast<AssetPackage*>(findChild(package_name)))
         {
             return pkg->findByString(path);
         }

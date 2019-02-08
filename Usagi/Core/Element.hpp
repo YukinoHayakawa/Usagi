@@ -126,13 +126,20 @@ public:
 		return r;
     }
 
-    Element * findChildByName(const std::string &name) const
+    Element * findChild(const std::string &name) const
     {
         const auto iter = std::find_if(
             childrenBegin(), childrenEnd(),
             [&](auto &&c) { return c->name() == name; }
         );
         return iter == childrenEnd() ? nullptr : iter->get();
+    }
+
+    Element * getChild(const std::string &name) const
+    {
+        if(const auto c = findChild(name))
+            return c;
+        throw std::runtime_error("No child was found with specified name.");
     }
 
     template <typename ChildT>
@@ -145,7 +152,7 @@ public:
     }
 
     void removeChild(Element *child);
-    void removeChildByName(const std::string &name);
+    void removeChild(const std::string &name);
 
     // Component
 
