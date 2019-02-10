@@ -1,13 +1,14 @@
 ﻿#pragma once
 
-#include <eigen3/Eigen/Core>
+#include <Usagi/Core/Math.hpp>
 
-namespace yuki
+namespace usagi
 {
 struct Intersection
 {
-    Eigen::Vector3f position;
-    float distance;
-    Eigen::Vector3f normal;
+    Vector3f position;
+    float distance = std::numeric_limits<float>::infinity();
+    Vector3f normal;
+    bool inside = false;
 };
 }

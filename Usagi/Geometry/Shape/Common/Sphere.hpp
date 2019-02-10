@@ -1,0 +1,23 @@
+﻿#pragma once
+
+#include <Usagi/Geometry/Shape.hpp>
+#include <Usagi/Core/Math.hpp>
+
+namespace usagi
+{
+class Sphere : public Shape
+{
+    Vector3f mCenter = Vector3f::Zero();
+    float mRadius = 1.f;
+
+    template <bool FillRecord>
+    constexpr bool intersect(const Ray &ray, Intersection *x) const;
+
+public:
+    Sphere() = default;
+    Sphere(Vector3f center, float radius);
+
+    bool intersect(const Ray &ray) override;
+    bool intersect(const Ray &ray, Intersection &x) override;
+};
+}

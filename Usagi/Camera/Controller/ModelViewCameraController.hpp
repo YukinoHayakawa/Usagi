@@ -6,7 +6,6 @@
 
 namespace usagi
 {
-
 /**
  * \brief Camera always look at a target from a fixed distance.
  */
@@ -28,7 +27,7 @@ public:
 
     /**
      * \brief
-     * \param rel <dAzimuth, dInclination>, in degrees
+     * \param rel relative <dAzimuth, dInclination> angles, in degrees
      */
     void rotate(Vector2f rel);
 };

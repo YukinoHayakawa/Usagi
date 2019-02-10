@@ -1,18 +1,19 @@
 ﻿#pragma once
 
-#include <eigen3/Eigen/Core>
+#include <Usagi/Core/Math.hpp>
+#include <Usagi/Utility/Math.hpp>
 
-namespace yuki
+namespace usagi
 {
 struct Ray
 {
-    Eigen::Vector3f origin;
-    Eigen::Vector3f direction;
+    Vector3f origin;
+    Vector3f direction;
+    Interval<float> t_range { 0.f, std::numeric_limits<float>::infinity() };
 
-    Ray(Eigen::Vector3f origin, Eigen::Vector3f direction)
-        : origin { std::move(origin) }
-        , direction { std::move(direction) }
+    Vector3f operator()(const float t) const
     {
+        return origin + t * direction;
     }
 };
 }

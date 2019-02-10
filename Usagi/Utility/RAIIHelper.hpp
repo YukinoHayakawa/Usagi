@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <functional>
-
 #include <Usagi/Utility/Noncopyable.hpp>
 
 namespace usagi

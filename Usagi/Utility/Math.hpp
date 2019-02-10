@@ -1,16 +1,39 @@
 #pragma once
 
+#include <cmath>
+#include <utility>
+
 namespace usagi
 {
 template <typename T>
 struct Interval
 {
-    T left_endpoint, right_endpoint;
+    T min, max;
+
+    constexpr bool openContains(T value) const
+    {
+        return value > min && value < max;
+    }
 };
 
 template <typename T>
-bool withinOpenInterval(const T &value, const Interval<T> &interval)
+constexpr auto solveQuadratic(T a, T b, T c)
 {
-    return value > interval.left_endpoint && value < interval.right_endpoint;
+    struct Solution
+    {
+        T discriminant;
+        T t0 = 0, t1 = 0;
+    } s;
+    s.discriminant = b * b - 4 * a * c;
+    if(s.discriminant >= 0)
+    {
+        const auto sd = std::sqrt(s.discriminant);
+        const auto aa = a + a;
+        s.t0 = (-b + sd) / aa;
+        s.t1 = (-b - sd) / aa;
+        // always make t0 the smaller root
+        if(s.t0 > s.t1) std::swap(s.t0, s.t1);
+    }
+    return s;
 }
 }
