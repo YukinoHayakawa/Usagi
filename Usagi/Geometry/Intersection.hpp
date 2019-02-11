@@ -10,5 +10,6 @@ struct Intersection
     float distance = std::numeric_limits<float>::infinity();
     Vector3f normal;
     bool inside = false;
+    Shape *shape = nullptr;
 };
 }

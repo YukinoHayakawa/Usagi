@@ -13,7 +13,7 @@ usagi::Sphere::Sphere(Vector3f center, float radius)
 // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
 
 template <bool FillRecord>
-constexpr bool usagi::Sphere::intersect(const Ray &ray, Intersection *x) const
+bool usagi::Sphere::intersect(const Ray &ray, Intersection *x)
 {
     const auto a = ray.direction.dot(ray.direction);
     const Vector3f d_oc = ray.origin - mCenter;
@@ -45,6 +45,7 @@ constexpr bool usagi::Sphere::intersect(const Ray &ray, Intersection *x) const
             return false;
         }
         x->normal = (x->position - mCenter).normalized();
+        x->shape = this;
 
         return true;
     }

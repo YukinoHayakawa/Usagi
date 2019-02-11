@@ -150,6 +150,7 @@
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\GameState.cpp" />
     <ClCompile Include="Game\GameStateManager.cpp" />
+    <ClCompile Include="Geometry\RayCastSubsystem.cpp" />
     <ClCompile Include="Geometry\Shape\Common\Sphere.cpp" />
     <ClCompile Include="Graphics\Game\GraphicalGame.cpp" />
     <ClCompile Include="Graphics\Game\GraphicalGameState.cpp" />
@@ -272,6 +273,7 @@
     <ClInclude Include="Game\GameStateManager.hpp" />
     <ClInclude Include="Geometry\Intersection.hpp" />
     <ClInclude Include="Geometry\Ray.hpp" />
+    <ClInclude Include="Geometry\RayCastSubsystem.hpp" />
     <ClInclude Include="Geometry\Shape.hpp" />
     <ClInclude Include="Geometry\Shape\Common\Sphere.hpp" />
     <ClInclude Include="Geometry\Transform.hpp" />

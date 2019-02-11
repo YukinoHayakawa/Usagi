@@ -13,7 +13,7 @@ struct Ray
     Vector3f origin;
     Vector3f direction;
     // t is the parameter
-    Interval<float> t_range {
+    mutable Interval<float> t_range {
         std::numeric_limits<float>::epsilon(),
         std::numeric_limits<float>::infinity()
     };

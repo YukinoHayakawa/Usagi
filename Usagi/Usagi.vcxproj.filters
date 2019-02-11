@@ -261,6 +261,9 @@
     <ClCompile Include="Geometry\Shape\Common\Sphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Geometry\RayCastSubsystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asset\Asset.hpp">
@@ -837,6 +840,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Extension\DebugDraw\DelegatedDebugDrawComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\RayCastSubsystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

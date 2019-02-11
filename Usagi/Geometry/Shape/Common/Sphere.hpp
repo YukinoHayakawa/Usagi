@@ -11,7 +11,7 @@ class Sphere : public Shape
     float mRadius = 1.f;
 
     template <bool FillRecord>
-    constexpr bool intersect(const Ray &ray, Intersection *x) const;
+    bool intersect(const Ray &ray, Intersection *x);
 
 public:
     Sphere() = default;
