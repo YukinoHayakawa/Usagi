@@ -31,8 +31,17 @@ usagi::Element::~Element()
     // todo: need someway to notify the subsystems that an element has been
     // destroyed. maybe listen on removeChild?
     // Erase all components and notify the subsystems
-    //for(auto i = mComponents.begin(); i != mComponents.end();
-    //    i = eraseComponent(i));
+
+    // destroy children before self so that events from children are able to
+    // bubble up
+    mChildren.clear();
+
+    for(auto i = mComponents.begin(); i != mComponents.end();
+        i = eraseComponent(i))
+    {
+    }
+
+    LOG(info, "Removing element: {}", path());
 }
 
 std::string usagi::Element::path() const
@@ -45,7 +54,6 @@ void usagi::Element::removeChildByIter(ChildrenArray::iterator iter)
     if(iter == mChildren.end())
         throw std::runtime_error("Child element not found.");
     auto p = iter->get();
-    LOG(info, "Removing element: {}", p->path());
     p->sendEvent<PreElementRemovalEvent>();
     mChildren.erase(iter);
     sendEvent<ChildElementRemovedEvent>();
@@ -53,6 +61,7 @@ void usagi::Element::removeChildByIter(ChildrenArray::iterator iter)
 
 void usagi::Element::removeChild(Element *child)
 {
+    if(child == nullptr) return;
     const auto iter = std::find_if(
         mChildren.begin(), mChildren.end(),
         [=](auto &&c) { return c.get() == child; }

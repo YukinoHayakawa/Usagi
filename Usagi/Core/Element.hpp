@@ -241,6 +241,8 @@ public:
         return dynamic_cast<ElementT*>(this) != nullptr;
     }
 
+    // todo clone element (prototyping)
+
 protected:
     ChildrenArray::const_iterator childrenBegin() const
     {
