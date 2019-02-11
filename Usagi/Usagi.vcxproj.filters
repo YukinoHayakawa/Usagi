@@ -836,5 +836,8 @@
     <ClInclude Include="Geometry\Transform.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Extension\DebugDraw\DelegatedDebugDrawComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

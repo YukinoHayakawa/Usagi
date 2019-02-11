@@ -222,6 +222,7 @@
     <ClInclude Include="Extension\DebugDraw\DebugDraw.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDrawComponent.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDrawSubsystem.hpp" />
+    <ClInclude Include="Extension\DebugDraw\DelegatedDebugDrawComponent.hpp" />
     <ClInclude Include="Extension\ImGui\DelegatedImGuiComponent.hpp" />
     <ClInclude Include="Extension\ImGui\ImGui.hpp" />
     <ClInclude Include="Extension\ImGui\ImGuiComponent.hpp" />
