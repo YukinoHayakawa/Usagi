@@ -19,5 +19,15 @@ public:
 
     bool intersect(const Ray &ray) override;
     bool intersect(const Ray &ray, Intersection &x) override;
+
+    const Vector3f & center() const
+    {
+        return mCenter;
+    }
+
+    float radius() const
+    {
+        return mRadius;
+    }
 };
 }
