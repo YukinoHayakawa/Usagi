@@ -90,7 +90,6 @@
     <ClCompile Include="Asset\Package\Filesystem\FilesystemAssetPackage.cpp" />
     <ClCompile Include="Asset\Decoder\StbImageAssetDecoder.cpp" />
     <ClCompile Include="Camera\Controller\ModelViewCameraController.cpp" />
-    <ClCompile Include="Camera\OrthogonalCamera.cpp" />
     <ClCompile Include="Camera\PerspectiveCamera.cpp" />
     <ClCompile Include="Core\Clock.cpp" />
     <ClCompile Include="Core\Element.cpp" />
@@ -196,12 +195,13 @@
     <ClInclude Include="Asset\Package\Filesystem\FilesystemAssetPackage.hpp" />
     <ClInclude Include="Asset\Decoder\StbImageAssetDecoder.hpp" />
     <ClInclude Include="Camera\Camera.hpp" />
+    <ClInclude Include="Camera\CameraSample.hpp" />
     <ClInclude Include="Camera\Controller\CameraController.hpp" />
     <ClInclude Include="Camera\Controller\CameraMan.hpp" />
     <ClInclude Include="Camera\Controller\ModelViewCameraController.hpp" />
     <ClInclude Include="Camera\Controller\StaticCameraController.hpp" />
-    <ClInclude Include="Camera\OrthogonalCamera.hpp" />
     <ClInclude Include="Camera\PerspectiveCamera.hpp" />
+    <ClInclude Include="Camera\ProjectiveCamera.hpp" />
     <ClInclude Include="Core\Clock.hpp" />
     <ClInclude Include="Core\Component.hpp" />
     <ClInclude Include="Core\Element.hpp" />
@@ -273,6 +273,7 @@
     <ClInclude Include="Geometry\Ray.hpp" />
     <ClInclude Include="Geometry\Shape.hpp" />
     <ClInclude Include="Geometry\Shape\Common\Sphere.hpp" />
+    <ClInclude Include="Geometry\Transform.hpp" />
     <ClInclude Include="Geometry\TransformComponent.hpp" />
     <ClInclude Include="Graphics\Game\GraphicalGame.hpp" />
     <ClInclude Include="Graphics\Game\GraphicalGameState.hpp" />

@@ -1,15 +1,9 @@
 ﻿#include "PerspectiveCamera.hpp"
 
-usagi::PerspectiveCamera::PerspectiveCamera(
-    const float fov_y_radians,
-    const float aspect,
-    const float near,
-    const float far)
-{
-    setPerspective(fov_y_radians, aspect, near, far);
-}
+#include "CameraSample.hpp"
 
 void usagi::PerspectiveCamera::setPerspective(
+    const Vector2f &screen_size,
     const float fov_y_radians,
     const float aspect,
     const float near,
@@ -43,4 +37,29 @@ void usagi::PerspectiveCamera::setPerspective(
     // 0,              0,           -invtan,    0,
     // 0,              far / range, 0,          -near * far / range,
     // 0,              1,           0,          0;
+
+    Affine3f screen_to_ndc = Affine3f::Identity();
+    screen_to_ndc.scale(Vector3f(
+        2.f / screen_size.x(),
+        2.f / screen_size.y(),
+        1
+    ));
+    screen_to_ndc.pretranslate(Vector3f(-1, -1, 0));
+
+    mScreenToLocal = mLocalToNdc.inverse() * screen_to_ndc;
+}
+
+usagi::Ray usagi::PerspectiveCamera::generateRay(
+    const CameraSample &sample) const
+{
+    Vector3f screen_pos = resize<3>(sample.screen);
+
+    // todo thin lens instead of pinhole
+    const Vector3f local_start = Vector3f::Zero();
+    const Vector3f local_end = mScreenToLocal * Point(screen_pos);
+
+    Ray r;
+    r.direction = (local_end - local_start).normalized();
+    r.origin = local_start;
+    return r;
 }

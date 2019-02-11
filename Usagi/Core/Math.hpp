@@ -34,6 +34,29 @@ using Vector2i32 = Eigen::Matrix<std::int32_t, 2, 1>;
 using Vector3f = Eigen::Vector3f;
 using Vector4f = Eigen::Vector4f;
 
+// don't know why but MSVC forces me to spell out all arguments even those with
+// default parameters, maybe a bug.
+// https://developercommunity.visualstudio.com/content/problem/449437/msvc-cannot-deduce-template-argument-from-a-class.html
+// template <int OtherDim, typename Scalar, int Dim>
+// auto resize(const Eigen::Matrix<Scalar, Dim, 1> &vec)
+template <int OtherDim, typename Scalar, int Dim, auto... Args>
+auto resize(const Eigen::Matrix<Scalar, Dim, 1, Args...> &vec)
+{
+    Eigen::Matrix<Scalar, OtherDim, 1> r;
+    // extend size
+    if constexpr(OtherDim > Dim)
+    {
+        r = decltype(r)::Zero();
+        r.template head<Dim>() = vec;
+    }
+    // shrink size or unchanged
+    else
+    {
+        r = vec.template head<OtherDim>();
+    }
+    return r;
+}
+
 // Color
 
 using Color4f = Vector4f;

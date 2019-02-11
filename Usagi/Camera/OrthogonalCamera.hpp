@@ -1,16 +1,12 @@
 ﻿#pragma once
 
-#include "Camera.hpp"
+#include "ProjectiveCamera.hpp"
 
 namespace usagi
 {
-class OrthogonalCamera : public Camera
+class OrthogonalCamera : public ProjectiveCamera
 {
-    Projective3f mLocalToNdc;
-
 public:
-    OrthogonalCamera() = default;
-
     void setOrthogonal(
         float left,
         float right,
@@ -18,7 +14,5 @@ public:
         float top,
         float near,
         float far);
-
-    Projective3f localToNDC() const override { return mLocalToNdc; }
 };
 }

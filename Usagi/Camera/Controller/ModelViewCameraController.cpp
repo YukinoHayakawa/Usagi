@@ -10,7 +10,7 @@ usagi::ModelViewCameraController::ModelViewCameraController(
 {
 }
 
-// todo cumulate the changes
+// todo accumulate the changes
 void usagi::ModelViewCameraController::rotate(Vector2f rel)
 {
     rel.y() *= mYPositivity;

@@ -180,9 +180,6 @@
     <ClCompile Include="Asset\Package\Filesystem\FilesystemAssetPackage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera\OrthogonalCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Camera\Controller\ModelViewCameraController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -674,9 +671,6 @@
     <ClInclude Include="Asset\Package\Filesystem\FilesystemAssetPackage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera\OrthogonalCamera.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Camera\Controller\CameraController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -824,13 +818,22 @@
     <ClInclude Include="Geometry\Ray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\TransformComponent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Geometry\Shape.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Geometry\Shape\Common\Sphere.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\TransformComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\CameraSample.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\ProjectiveCamera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Transform.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

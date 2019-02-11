@@ -1,9 +1,13 @@
 ﻿#pragma once
 
 #include <Usagi/Core/Math.hpp>
+#include <Usagi/Geometry/Ray.hpp>
 
 namespace usagi
 {
+struct CameraSample;
+
+// todo add TransformComponent?
 class Camera
 {
 public:
@@ -39,7 +43,7 @@ public:
      *      |/
      *      -------- x
      *
-     * NDC coordinates:
+     * NDC & Screen coordinates:
      *         z
      *        /
      *       /
@@ -50,5 +54,8 @@ public:
      * \return
      */
     virtual Projective3f localToNDC() const = 0;
+
+    // cast ray in camera local space
+    virtual Ray generateRay(const CameraSample &sample) const = 0;
 };
 }
