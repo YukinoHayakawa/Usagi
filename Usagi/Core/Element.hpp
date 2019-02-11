@@ -241,9 +241,14 @@ public:
         return dynamic_cast<ElementT*>(this) != nullptr;
     }
 
+    template <typename ElementT>
+    auto as() const
+    {
+        return static_cast<ElementT*>(this);
+    }
+
     // todo clone element (prototyping)
 
-protected:
     ChildrenArray::const_iterator childrenBegin() const
     {
         return mChildren.begin();
@@ -254,6 +259,7 @@ protected:
         return mChildren.end();
     }
 
+protected:
     template <typename ChildT, typename Func>
     void forEachChild(Func f)
     {
