@@ -6,6 +6,7 @@
 
 #include "ShapeComponent.hpp"
 #include "Intersection.hpp"
+#include "RayCastComponent.hpp"
 
 namespace usagi
 {
@@ -14,7 +15,11 @@ struct Ray;
 /**
  * \brief Provides ray cast service. Does nothing during update.
  */
-class RayCastSubsystem : public CollectionSubsystem<ShapeComponent>
+class RayCastSubsystem
+    : public CollectionSubsystem<
+        ShapeComponent,
+        RayCastComponent
+    >
 {
 public:
     void update(const Clock &clock) override { }
