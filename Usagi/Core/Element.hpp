@@ -242,7 +242,7 @@ public:
     }
 
     template <typename ElementT>
-    auto as() const
+    auto as()
     {
         return static_cast<ElementT*>(this);
     }

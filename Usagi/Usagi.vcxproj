@@ -273,6 +273,7 @@
     <ClInclude Include="Game\GameStateManager.hpp" />
     <ClInclude Include="Geometry\Intersection.hpp" />
     <ClInclude Include="Geometry\Ray.hpp" />
+    <ClInclude Include="Geometry\RayCastComponent.hpp" />
     <ClInclude Include="Geometry\RayCastSubsystem.hpp" />
     <ClInclude Include="Geometry\Shape.hpp" />
     <ClInclude Include="Geometry\Shape\Common\Sphere.hpp" />
