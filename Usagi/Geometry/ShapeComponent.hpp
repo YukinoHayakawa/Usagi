@@ -12,6 +12,8 @@ struct ShapeComponent : Component
 {
     std::shared_ptr<Shape> shape;
 
+    ShapeComponent() = default;
+
     ShapeComponent(std::shared_ptr<Shape> shape)
         : shape(std::move(shape))
     {
