@@ -4,7 +4,7 @@
 
 #include <Usagi/Game/CollectionSubsystem.hpp>
 
-#include "GeometryComponent.hpp"
+#include "ShapeComponent.hpp"
 #include "Intersection.hpp"
 
 namespace usagi
@@ -14,7 +14,7 @@ struct Ray;
 /**
  * \brief Provides ray cast service. Does nothing during update.
  */
-class RayCastSubsystem : public CollectionSubsystem<GeometryComponent>
+class RayCastSubsystem : public CollectionSubsystem<ShapeComponent>
 {
 public:
     void update(const Clock &clock) override { }

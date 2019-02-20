@@ -8,18 +8,18 @@ namespace usagi
 {
 class Shape;
 
-struct GeometryComponent : Component
+struct ShapeComponent : Component
 {
     std::shared_ptr<Shape> shape;
 
-    GeometryComponent(std::shared_ptr<Shape> shape)
+    ShapeComponent(std::shared_ptr<Shape> shape)
         : shape(std::move(shape))
     {
     }
 
     const std::type_info & baseType() override
     {
-        return typeid(GeometryComponent);
+        return typeid(ShapeComponent);
     }
 };
 }

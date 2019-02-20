@@ -281,7 +281,7 @@
     <ClInclude Include="Graphics\Game\GraphicalGame.hpp" />
     <ClInclude Include="Graphics\Game\GraphicalGameState.hpp" />
     <ClInclude Include="Game\Subsystem.hpp" />
-    <ClInclude Include="Geometry\GeometryComponent.hpp" />
+    <ClInclude Include="Geometry\ShapeComponent.hpp" />
     <ClInclude Include="Graphics\Game\ImageTransitionSubsystem.hpp" />
     <ClInclude Include="Graphics\Game\OverlayRenderingSubsystem.hpp" />
     <ClInclude Include="Graphics\Game\ProjectiveRenderingSubsystem.hpp" />
