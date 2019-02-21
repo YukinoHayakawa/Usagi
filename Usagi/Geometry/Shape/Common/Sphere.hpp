@@ -29,5 +29,15 @@ public:
     {
         return mRadius;
     }
+
+    void setCenter(Vector3f center)
+    {
+        mCenter = std::move(center);
+    }
+
+    void setRadius(float radius)
+    {
+        mRadius = radius;
+    }
 };
 }
