@@ -20,7 +20,7 @@ usagi::Element::Element(Element * const parent, std::string name)
     // todo this may conflict with virtual path containing slashed like the case in asset manager
     assert(name.find('/') == std::string::npos);
 
-    LOG(info, "Created element: {}", path());
+    // LOG(info, "Created element: {}", path());
 }
 
 usagi::Element::~Element()
@@ -41,7 +41,7 @@ usagi::Element::~Element()
     {
     }
 
-    LOG(info, "Removing element: {}", path());
+    // LOG(info, "Removing element: {}", path());
 }
 
 std::string usagi::Element::path() const
@@ -94,7 +94,7 @@ void usagi::Element::insertComponent(const std::type_info &type,
         LOG(error, "An element can only have one instance of the same type of component.");
         throw std::runtime_error("Conflicted components.");
     }
-    LOG(info, "Adding component: {}[{}]", path(), p->baseType().name());
+    // LOG(info, "Adding component: {}[{}]", path(), p->baseType().name());
     sendEvent<ComponentAddedEvent>(type, p);
 }
 
@@ -103,7 +103,7 @@ usagi::Element::ComponentMap::iterator usagi::Element::eraseComponent(
 {
     const auto comp = i->second.get();
     const auto &t = comp->baseType();
-    LOG(info, "Removing component: {}[{}]", path(), t.name());
+    // LOG(info, "Removing component: {}[{}]", path(), t.name());
     sendEvent<PreComponentRemovalEvent>(t, comp);
     i = mComponents.erase(i);
     sendEvent<PostComponentRemovalEvent>(t);

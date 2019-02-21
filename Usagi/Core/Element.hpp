@@ -135,11 +135,17 @@ public:
         return iter == childrenEnd() ? nullptr : iter->get();
     }
 
-    Element * getChild(const std::string &name) const
+    Element * childByName(const std::string &name) const
     {
         if(const auto c = findChild(name))
             return c;
         throw std::runtime_error("No child was found with specified name.");
+    }
+
+    Element * childByIndex(const std::size_t idx) const
+    {
+        assert(idx < mChildren.size());
+        return mChildren[idx].get();
     }
 
     template <typename ChildT>
@@ -149,6 +155,11 @@ public:
         return std::any_of(mChildren.begin(), mChildren.end(), [e](auto &&c) {
             return c.get() == static_cast<Element*>(e);
         });
+    }
+
+    std::size_t childrenCount() const
+    {
+        return mChildren.size();
     }
 
     void removeChild(Element *child);

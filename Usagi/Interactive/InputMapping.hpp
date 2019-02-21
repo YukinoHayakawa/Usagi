@@ -53,7 +53,7 @@ public:
 
     ActionGroup * actionGroup(const std::string &name) const
     {
-        return static_cast<ActionGroup*>(getChild(name));
+        return static_cast<ActionGroup*>(childByName(name));
     }
 
     void removeActionGroup(const std::string &name)
