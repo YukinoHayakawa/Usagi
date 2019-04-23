@@ -9,6 +9,8 @@ enum class GpuBufferFormat
     R8G8B8_UNORM,
     R8G8B8A8_UNORM,
 
+	B8G8R8A8_UNORM,
+
     R32_SFLOAT,
     R32G32_SFLOAT,
     R32G32B32_SFLOAT,

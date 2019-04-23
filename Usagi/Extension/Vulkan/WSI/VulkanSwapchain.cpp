@@ -132,6 +132,7 @@ vk::SurfaceFormatKHR usagi::VulkanSwapchain::selectSurfaceFormat(
         }
     }
 
+	// bug: NVIDIA card has only limited color formats
     // Return the first format from the list
     return surface_formats[0];
 }
@@ -165,6 +166,7 @@ vk::Extent2D usagi::VulkanSwapchain::selectSurfaceExtent(
 vk::PresentModeKHR usagi::VulkanSwapchain::selectPresentMode(
     const std::vector<vk::PresentModeKHR> &present_modes)
 {
+	// todo: allow disable v-sync
     // prefer mailbox mode to achieve triple buffering
     if(std::find(present_modes.begin(), present_modes.end(),
         vk::PresentModeKHR::eMailbox) != present_modes.end())
