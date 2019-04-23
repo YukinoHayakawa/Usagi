@@ -375,9 +375,6 @@
     <ClInclude Include="Utility\Unicode.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Thirdparties\Submodules\fmt\build\fmt.vcxproj">
-      <Project>{65806822-06b5-3679-ac9f-629ea69adaf1}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Thirdparties\Submodules\glslang\build\glslang\glslang.vcxproj">
       <Project>{cfebe9ae-9cf8-30fa-8fc0-31067e861f34}</Project>
     </ProjectReference>
