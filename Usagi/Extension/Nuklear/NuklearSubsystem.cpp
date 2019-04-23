@@ -27,6 +27,7 @@
 
 #include "Nuklear.hpp"
 
+// bug: mouse scrolls window even when not focusing it
 namespace
 {
 struct nk_vertex

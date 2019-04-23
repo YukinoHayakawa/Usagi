@@ -37,6 +37,7 @@ void usagi::Win32Runtime::writeMiniDump(
     if((h_file != nullptr) && (h_file != INVALID_HANDLE_VALUE))
     {
         // Create the minidump
+        // bug: cannot obtain the stack trace upon crash
 
         MINIDUMP_EXCEPTION_INFORMATION mdei;
 
@@ -45,7 +46,8 @@ void usagi::Win32Runtime::writeMiniDump(
         mdei.ClientPointers = FALSE;
 
         const auto mdt = static_cast<MINIDUMP_TYPE>(
-            MiniDumpWithPrivateReadWriteMemory |
+			MiniDumpWithIndirectlyReferencedMemory |
+			MiniDumpScanMemory |
             MiniDumpWithDataSegs |
             MiniDumpWithHandleData |
             MiniDumpWithFullMemoryInfo |
