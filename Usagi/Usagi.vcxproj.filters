@@ -264,6 +264,9 @@
     <ClCompile Include="Geometry\RayCastSubsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Camera\OrthogonalCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asset\Asset.hpp">
@@ -846,6 +849,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Geometry\RayCastComponent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\OrthogonalCamera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Debug.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
