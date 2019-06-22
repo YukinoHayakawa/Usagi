@@ -2,12 +2,11 @@
 
 #include <fstream>
 #include <cstring>
-#include <iostream>
 
 #include <glslang/glslang/Public/ShaderLang.h>
-#include <glslang/ResourceLimits.h>
+#include <glslang/StandAlone/ResourceLimits.h>
+#include <glslang/glslang/Public/ShaderLang.h>
 #include <glslang/SPIRV/GlslangToSpv.h>
-#include <glslang/SPIRV/disassemble.h>
 
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Utility/RAIIHelper.hpp>

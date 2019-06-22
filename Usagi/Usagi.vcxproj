@@ -14,19 +14,19 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{4250E1C0-EA0B-4575-BC04-11E7F83C2ED4}</ProjectGuid>
     <RootNamespace>Usagi</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -378,6 +378,9 @@
     <ClInclude Include="Utility\Unicode.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\fmt\build\fmt.vcxproj">
+      <Project>{65806822-06b5-3679-ac9f-629ea69adaf1}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Thirdparties\Submodules\glslang\build\glslang\glslang.vcxproj">
       <Project>{cfebe9ae-9cf8-30fa-8fc0-31067e861f34}</Project>
     </ProjectReference>
@@ -395,6 +398,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\Thirdparties\Submodules\glslang\build\StandAlone\glslang-default-resource-limits.vcxproj">
       <Project>{777ca18f-9fd4-3f3b-be41-0e7f78629123}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Thirdparties\Submodules\lua\build\lua.vcxproj">
+      <Project>{d800dc6b-c67f-4793-ba7c-c59d633846b6}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Thirdparties\Submodules\SPIRV-Cross\build\spirv-cross-core.vcxproj">
       <Project>{5a2df431-3a80-3c06-b9b1-27430b56a29e}</Project>

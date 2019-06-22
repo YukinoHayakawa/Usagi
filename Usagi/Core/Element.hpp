@@ -10,6 +10,7 @@
 #include <typeindex>
 #include <typeinfo>
 #include <vector>
+#include <stdexcept>
 
 #include <Usagi/Utility/Noncopyable.hpp>
 

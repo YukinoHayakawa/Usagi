@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <utfcpp/utf8.h>
+#include <utf8.h>
 
 std::wstring usagi::utf8To16(const std::string &string)
 {

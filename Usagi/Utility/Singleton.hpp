@@ -20,7 +20,7 @@ public:
         mInstance = static_cast<T*>(this);
     }
 
-    ~Singleton()
+    virtual ~Singleton()
     {
         mInstance = nullptr;
     }

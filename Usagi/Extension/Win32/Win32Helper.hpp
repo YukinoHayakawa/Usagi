@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <string>
+#include <stdexcept>
 
 #include "Win32.hpp"
 #include "Win32MacroFix.hpp"

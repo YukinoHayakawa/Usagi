@@ -14,7 +14,7 @@ class Win32Keyboard;
 class Win32Mouse;
 
 class Win32InputManager
-    : Singleton<Win32InputManager>
+    : public Singleton<Win32InputManager>
     , public InputManager
 {
     static inline const wchar_t WINDOW_CLASS_NAME[] = L"UsagiInputSink";

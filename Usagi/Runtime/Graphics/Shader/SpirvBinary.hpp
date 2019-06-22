@@ -5,7 +5,7 @@
 #include <map>
 #include <optional>
 
-#include <spirv_cross.hpp>
+#include <SPIRV-Cross/spirv_cross.hpp>
 
 #include "ShaderStage.hpp"
 
