@@ -99,7 +99,7 @@ struct ColorBlendState
 
 enum class VertexInputRate
 {
-	PER_VERTEX,
-	PER_INSTANCE,
+    PER_VERTEX,
+    PER_INSTANCE,
 };
 }

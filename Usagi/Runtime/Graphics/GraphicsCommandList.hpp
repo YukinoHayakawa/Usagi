@@ -73,13 +73,13 @@ public:
         std::uint32_t index,
         Vector2f origin,
         Vector2f size
-	) = 0;
+    ) = 0;
 
     virtual void setScissor(
         std::uint32_t viewport_index,
         Vector2i32 origin,
         Vector2u32 size
-	) = 0;
+    ) = 0;
 
     virtual void setLineWidth(float width) = 0;
 
@@ -105,7 +105,7 @@ public:
         const char *name,
         const void *data,
         std::size_t size
-	) = 0;
+    ) = 0;
 
     virtual void bindIndexBuffer(
         const std::shared_ptr<GpuBuffer> &buffer,
@@ -163,6 +163,6 @@ public:
         std::uint32_t first_index,
         std::int32_t vertex_offset,
         std::uint32_t first_instance
-	) = 0;
+    ) = 0;
 };
 }

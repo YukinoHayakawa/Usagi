@@ -14,5 +14,8 @@ public:
         float top,
         float near,
         float far);
+
+    virtual Ray generateRay(const CameraSample &sample) const { return {}; }
+
 };
 }

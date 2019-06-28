@@ -15,7 +15,7 @@ class VulkanRenderPass;
 
 struct VulkanPushConstantField
 {
-	std::uint32_t offset = 0, size = 0;
+    std::uint32_t offset = 0, size = 0;
 };
 
 class VulkanGraphicsPipeline
@@ -25,10 +25,10 @@ class VulkanGraphicsPipeline
 public:
     using DescriptorSetLayoutBindingMap =
         std::map<std::uint32_t, std::vector<vk::DescriptorSetLayoutBinding>>;
-	using DescriptorSetLayoutMap =
-		std::map<std::uint32_t, vk::UniqueDescriptorSetLayout>;
-	using PushConstantFieldMap =
-		std::map<ShaderStage, std::map<std::string, VulkanPushConstantField>>;
+    using DescriptorSetLayoutMap =
+        std::map<std::uint32_t, vk::UniqueDescriptorSetLayout>;
+    using PushConstantFieldMap =
+        std::map<ShaderStage, std::map<std::string, VulkanPushConstantField>>;
 
 private:
     vk::UniquePipeline mPipeline;
@@ -37,7 +37,7 @@ private:
 
     const DescriptorSetLayoutBindingMap mLayoutBindings;
     const DescriptorSetLayoutMap mLayouts;
-	const PushConstantFieldMap mConstantFieldMap;
+    const PushConstantFieldMap mConstantFieldMap;
 
 public:
     VulkanGraphicsPipeline(

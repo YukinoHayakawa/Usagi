@@ -3,7 +3,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include <Usagi/Engine/Entity/Component.hpp>
+#include <Usagi/Core/Component.hpp>
 
 namespace usagi
 {

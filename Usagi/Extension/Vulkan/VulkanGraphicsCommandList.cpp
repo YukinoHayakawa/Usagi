@@ -338,7 +338,7 @@ void usagi::VulkanGraphicsCommandList::setConstant(
 
     const auto constant_info = mCurrentPipeline->queryConstantInfo(stage, name);
     if(size != constant_info.size)
-	    throw std::runtime_error("Unmatched constant size.");
+        throw std::runtime_error("Unmatched constant size.");
 
     mCommandBuffer->pushConstants(
         mCurrentPipeline->layout(),
@@ -350,29 +350,29 @@ void usagi::VulkanGraphicsCommandList::setConstant(
 
 void usagi::VulkanGraphicsCommandList::bindIndexBuffer(
     const std::shared_ptr<GpuBuffer> &buffer,
-	const std::size_t offset,
-	const GraphicsIndexType type)
+    const std::size_t offset,
+    const GraphicsIndexType type)
 {
-	auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer.get());
+    auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer.get());
     auto allocation = vk_buffer.allocation();
 
     mCommandBuffer->bindIndexBuffer(
         allocation->pool()->buffer(), allocation->offset() + offset,
         translate(type)
-	);
+    );
 
     mResources.push_back(std::move(allocation));
 }
 
 void usagi::VulkanGraphicsCommandList::bindVertexBuffer(
-	const std::uint32_t binding_index,
+    const std::uint32_t binding_index,
     const std::shared_ptr<GpuBuffer> &buffer,
-	const std::size_t offset)
+    const std::size_t offset)
 {
-	auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer.get());
+    auto &vk_buffer = dynamic_cast_ref<VulkanGpuBuffer>(buffer.get());
     auto allocation = vk_buffer.allocation();
 
-	vk::Buffer buffers[] = { allocation->pool()->buffer() };
+    vk::Buffer buffers[] = { allocation->pool()->buffer() };
     vk::DeviceSize sizes[] = { allocation->offset() + offset };
 
     mCommandBuffer->bindVertexBuffers(binding_index, 1, buffers, sizes);

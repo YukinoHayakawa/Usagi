@@ -7,9 +7,9 @@ namespace usagi
 class PreComponentRemovalEvent : public ComponentEvent
 {
 public:
-	PreComponentRemovalEvent(const std::type_info &type, Component *component)
-		: ComponentEvent { type, component }
-	{
-	}
+    PreComponentRemovalEvent(const std::type_info &type, Component *component)
+        : ComponentEvent { type, component }
+    {
+    }
 };
 }

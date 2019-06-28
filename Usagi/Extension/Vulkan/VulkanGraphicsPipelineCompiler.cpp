@@ -18,21 +18,21 @@ vk::UniqueShaderModule usagi::VulkanGraphicsPipelineCompiler::
     createShaderModule(const SpirvBinary *binary) const
 {
     auto &bytecodes = binary->bytecodes();
-	vk::ShaderModuleCreateInfo create_info;
-	create_info.setCodeSize(bytecodes.size() * sizeof(SpirvBinary::Bytecode));
-	create_info.setPCode(bytecodes.data());
-	return mDevice->device().createShaderModuleUnique(create_info);
+    vk::ShaderModuleCreateInfo create_info;
+    create_info.setCodeSize(bytecodes.size() * sizeof(SpirvBinary::Bytecode));
+    create_info.setPCode(bytecodes.data());
+    return mDevice->device().createShaderModuleUnique(create_info);
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setupShaderStages()
 {
     mShaderStageCreateInfos.clear();
 
-	if(mShaders.count(ShaderStage::VERTEX) == 0)
-	{
+    if(mShaders.count(ShaderStage::VERTEX) == 0)
+    {
         LOG(error, "Pipeline does not contain vertex stage.");
         return;
-	}
+    }
     if(mShaders.count(ShaderStage::FRAGMENT) == 0)
     {
         LOG(warn, "Pipeline does not contain fragment stage.");
@@ -75,14 +75,14 @@ void usagi::VulkanGraphicsPipelineCompiler::setupDynamicStates()
     // todo optional
     // Viewport and scissor should be set after binding the pipeline
     mDynamicStates = {
-		vk::DynamicState::eViewport,
-		vk::DynamicState::eScissor,
+        vk::DynamicState::eViewport,
+        vk::DynamicState::eScissor,
         vk::DynamicState::eLineWidth,
-	};
-	mDynamicStateCreateInfo.dynamicStateCount =
+    };
+    mDynamicStateCreateInfo.dynamicStateCount =
         static_cast<uint32_t>(mDynamicStates.size());
-	mDynamicStateCreateInfo.pDynamicStates = mDynamicStates.data();
-	mPipelineCreateInfo.pDynamicState = &mDynamicStateCreateInfo;
+    mDynamicStateCreateInfo.pDynamicStates = mDynamicStates.data();
+    mPipelineCreateInfo.pDynamicState = &mDynamicStateCreateInfo;
 }
 
 void usagi::VulkanGraphicsPipelineCompiler::setRenderPass(
@@ -299,32 +299,32 @@ struct usagi::VulkanGraphicsPipelineCompiler::ReflectionHelper
 std::shared_ptr<usagi::GraphicsPipeline>
     usagi::VulkanGraphicsPipelineCompiler::compile()
 {
-	LOG(info, "Compiling graphics pipeline...");
+    LOG(info, "Compiling graphics pipeline...");
 
-	setupShaderStages();
-	setupDynamicStates();
+    setupShaderStages();
+    setupDynamicStates();
 
-	LOG(info, "Generating pipeline layout...");
+    LOG(info, "Generating pipeline layout...");
 
     Context ctx;
 
-	for(auto &&shader : mShaders)
-	{
+    for(auto &&shader : mShaders)
+    {
         LOG(info, "Reflecting {} shader", to_string(shader.first));
 
         ReflectionHelper helper { ctx, this, shader };
         if(shader.first == ShaderStage::VERTEX)
             helper.reflectVertexInputAttributes();
         // todo
-		//if(shader.first == ShaderStage::FRAGMENT)
+        //if(shader.first == ShaderStage::FRAGMENT)
         //    helper.reflectRenderTargets();
         helper.reflectPushConstantRanges();
         helper.reflectDescriptorSets();
-	}
+    }
 
     vk::UniquePipelineLayout compatible_pipeline_layout;
-	{
-		vk::PipelineLayoutCreateInfo info;
+    {
+        vk::PipelineLayoutCreateInfo info;
 
         for(auto &&layout : ctx.desc_set_layout_bindings)
         {
@@ -333,7 +333,7 @@ std::shared_ptr<usagi::GraphicsPipeline>
                 static_cast<uint32_t>(layout.second.size()));
             layout_info.setPBindings(layout.second.data());
             auto l = mDevice->device().createDescriptorSetLayoutUnique(
-				layout_info);
+                layout_info);
             ctx.desc_set_layout_array.push_back(l.get());
             ctx.desc_set_layouts[layout.first] = std::move(l);
         }
@@ -345,15 +345,15 @@ std::shared_ptr<usagi::GraphicsPipeline>
             static_cast<uint32_t>(ctx.push_constants.size()));
         info.setPPushConstantRanges(ctx.push_constants.data());
 
-		compatible_pipeline_layout =
-			mDevice->device().createPipelineLayoutUnique(info);
-		mPipelineCreateInfo.setLayout(compatible_pipeline_layout.get());
-	}
+        compatible_pipeline_layout =
+            mDevice->device().createPipelineLayoutUnique(info);
+        mPipelineCreateInfo.setLayout(compatible_pipeline_layout.get());
+    }
 
     setupVertexInput();
 
-	auto pipeline = mDevice->device().createGraphicsPipelineUnique(
-		{ }, mPipelineCreateInfo);
+    auto pipeline = mDevice->device().createGraphicsPipelineUnique(
+        { }, mPipelineCreateInfo);
     auto wrapped_pipeline = std::make_shared<VulkanGraphicsPipeline>(
         std::move(pipeline),
         std::move(compatible_pipeline_layout),

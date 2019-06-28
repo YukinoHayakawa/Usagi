@@ -46,8 +46,8 @@ void usagi::Win32Runtime::writeMiniDump(
         mdei.ClientPointers = FALSE;
 
         const auto mdt = static_cast<MINIDUMP_TYPE>(
-			MiniDumpWithIndirectlyReferencedMemory |
-			MiniDumpScanMemory |
+            MiniDumpWithIndirectlyReferencedMemory |
+            MiniDumpScanMemory |
             MiniDumpWithDataSegs |
             MiniDumpWithHandleData |
             MiniDumpWithFullMemoryInfo |

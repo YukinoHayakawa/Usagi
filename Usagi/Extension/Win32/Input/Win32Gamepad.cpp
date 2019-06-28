@@ -61,18 +61,18 @@ void usagi::Win32Gamepad::handleRawInput(RAWINPUT *data)
     // Get the pressed buttons
     auto usage_length = static_cast<ULONG>(mButtons.size());
     auto result = HidP_GetUsages(
-	    HidP_Input, mButtonCaps[0].UsagePage, 0,
-	    mButtonUsages.data(), &usage_length,
-	    reinterpret_cast<PHIDP_PREPARSED_DATA>(mPreparsedData.data()),
-	    reinterpret_cast<PCHAR>(data->data.hid.bRawData),
-	    data->data.hid.dwSizeHid
-	);
+        HidP_Input, mButtonCaps[0].UsagePage, 0,
+        mButtonUsages.data(), &usage_length,
+        reinterpret_cast<PHIDP_PREPARSED_DATA>(mPreparsedData.data()),
+        reinterpret_cast<PCHAR>(data->data.hid.bRawData),
+        data->data.hid.dwSizeHid
+    );
     if(result != HIDP_STATUS_SUCCESS)
         throw std::runtime_error("HidP_GetUsages() failed.");
 
     // Reset button states
     std::fill(mButtons.begin(), mButtons.end(), 0);
-	for(unsigned i = 0; i < usage_length; i++)
+    for(unsigned i = 0; i < usage_length; i++)
         mButtons[mButtonUsages[i] - mButtonCaps[0].Range.UsageMin] = true;
 
     for(std::size_t i = 0; i < mLastButtons.size(); ++i)
@@ -91,24 +91,24 @@ void usagi::Win32Gamepad::handleRawInput(RAWINPUT *data)
 
     // Get the state of discrete-valued-controls
     ULONG value;
-	for(unsigned i = 0; i < mCaps.NumberInputValueCaps; ++i)
-	{
-		result = HidP_GetUsageValue(
-			HidP_Input, mValueCaps[i].UsagePage, 0,
+    for(unsigned i = 0; i < mCaps.NumberInputValueCaps; ++i)
+    {
+        result = HidP_GetUsageValue(
+            HidP_Input, mValueCaps[i].UsagePage, 0,
             mValueCaps[i].NotRange.Usage, &value,
             reinterpret_cast<PHIDP_PREPARSED_DATA>(mPreparsedData.data()),
             reinterpret_cast<PCHAR>(data->data.hid.bRawData),
             data->data.hid.dwSizeHid
         );
-	    switch(result)
-	    {
-	        case HIDP_STATUS_SUCCESS:
-	        // value not found in the report
-	        case HIDP_STATUS_INCOMPATIBLE_REPORT_ID:
-	            break;
-	        default:
-	            throw std::runtime_error("HidP_GetUsageValue() failed.");
-	    }
+        switch(result)
+        {
+            case HIDP_STATUS_SUCCESS:
+            // value not found in the report
+            case HIDP_STATUS_INCOMPATIBLE_REPORT_ID:
+                break;
+            default:
+                throw std::runtime_error("HidP_GetUsageValue() failed.");
+        }
 //        if(mValueCaps[i].NotRange.Usage == HID_USAGE_GENERIC_HATSWITCH)
 //        {
 //            LOG(info, "{}", value);
@@ -144,7 +144,7 @@ void usagi::Win32Gamepad::handleRawInput(RAWINPUT *data)
 ////            if(!result)
 ////                DebugBreak();
 //        }
-	}
+    }
 }
 
 bool usagi::Win32Gamepad::isButtonPressed(GamepadButtonCode)

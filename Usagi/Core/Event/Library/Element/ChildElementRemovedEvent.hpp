@@ -7,9 +7,9 @@ namespace usagi
 class ChildElementRemovedEvent : public ChildElementEvent
 {
 public:
-	explicit ChildElementRemovedEvent()
-		: ChildElementEvent { nullptr }
-	{
-	}
+    explicit ChildElementRemovedEvent()
+        : ChildElementEvent { nullptr }
+    {
+    }
 };
 }

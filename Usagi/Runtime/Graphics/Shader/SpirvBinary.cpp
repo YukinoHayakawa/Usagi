@@ -171,15 +171,15 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
 
     if(program.getInfoLog()[0])
         LOG(info, "Linker output:\n{}", program.getInfoLog());
-	if(program.getInfoDebugLog()[0])
+    if(program.getInfoDebugLog()[0])
         LOG(info, "Linker debug output:\n{}", program.getInfoDebugLog());
 
     if(!compilation_suceeded || !link_succeeded)
         throw std::runtime_error("Shader compilation failed.");
 
     program.buildReflection();
-	LOG(info, "Reflection database:");
-	program.dumpReflection();
+    LOG(info, "Reflection database:");
+    program.dumpReflection();
 
     // Generate SPIR-V code
     std::vector<Bytecode> spirv;
@@ -192,7 +192,7 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
 
     GlslangToSpv(*program.getIntermediate(glslang_stage), spirv, &logger,
         &spv_options);
-	// LOG(info, "Disassembly:");
+    // LOG(info, "Disassembly:");
     // Disassemble(std::cout, spirv);
 
     // save bytecode to cache

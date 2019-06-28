@@ -7,9 +7,9 @@ namespace usagi
 class ChildElementAddedEvent : public ChildElementEvent
 {
 public:
-	explicit ChildElementAddedEvent(Element *child)
-		: ChildElementEvent { child }
-	{
-	}
+    explicit ChildElementAddedEvent(Element *child)
+        : ChildElementEvent { child }
+    {
+    }
 };
 }

@@ -23,23 +23,23 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByString(
 usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
     const std::filesystem::path &relative_path)
 {
-	// extract relative path
+    // extract relative path
     const auto normalized = relative_path.relative_path().lexically_normal();
     {
-		if(normalized.empty())
-			throw std::runtime_error("Empty path.");
+        if(normalized.empty())
+            throw std::runtime_error("Empty path.");
         const auto &first_component = *normalized.begin();
-		if(first_component == ".")
-		    throw std::runtime_error("Path does not point to a file.");
-		if(first_component == "..")
-		    throw std::runtime_error("Path must be within the root folder.");
+        if(first_component == ".")
+            throw std::runtime_error("Path does not point to a file.");
+        if(first_component == "..")
+            throw std::runtime_error("Path must be within the root folder.");
     }
-	// search in cache
-	if(const auto asset = findChild(normalized.u8string()))
-	{
-	    return static_cast<Asset*>(asset);
-	}
-	// not in cache, create a child and return it if the file exists.
+    // search in cache
+    if(const auto asset = findChild(normalized.u8string()))
+    {
+        return static_cast<Asset*>(asset);
+    }
+    // not in cache, create a child and return it if the file exists.
     {
         if(!std::filesystem::exists(mRootPath / normalized))
             throw std::runtime_error("File not found.");

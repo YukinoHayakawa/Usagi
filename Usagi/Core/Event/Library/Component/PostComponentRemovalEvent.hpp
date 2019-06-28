@@ -8,8 +8,8 @@ class PostComponentRemovalEvent : public ComponentEvent
 {
 public:
     explicit PostComponentRemovalEvent(const std::type_info &type)
-		: ComponentEvent { type, nullptr }
-	{
-	}
+        : ComponentEvent { type, nullptr }
+    {
+    }
 };
 }

@@ -25,14 +25,14 @@ class VulkanGraphicsPipelineCompiler final : public GraphicsPipelineCompiler
     using ShaderMap = std::map<ShaderStage, ShaderInfo>;
     ShaderMap mShaders;
 
-	vk::UniqueShaderModule createShaderModule(const SpirvBinary *binary) const;
+    vk::UniqueShaderModule createShaderModule(const SpirvBinary *binary) const;
 
     std::vector<vk::PipelineShaderStageCreateInfo> mShaderStageCreateInfos;
     vk::PipelineVertexInputStateCreateInfo mVertexInputStateCreateInfo;
     std::vector<vk::DynamicState> mDynamicStates;
     vk::PipelineDynamicStateCreateInfo mDynamicStateCreateInfo;
     vk::PipelineInputAssemblyStateCreateInfo mInputAssemblyStateCreateInfo;
-	vk::PipelineViewportStateCreateInfo mViewportStateCreateInfo;
+    vk::PipelineViewportStateCreateInfo mViewportStateCreateInfo;
     vk::PipelineRasterizationStateCreateInfo mRasterizationStateCreateInfo;
     vk::PipelineMultisampleStateCreateInfo mMultisampleStateCreateInfo;
     vk::PipelineDepthStencilStateCreateInfo mDepthStencilStateCreateInfo;
@@ -58,7 +58,7 @@ class VulkanGraphicsPipelineCompiler final : public GraphicsPipelineCompiler
         vk::VertexInputAttributeDescription>;
     VertexAttributeLocationArray mVertexAttributeLocationArray;
 
-	void setupShaderStages();
+    void setupShaderStages();
     void setupVertexInput();
     void setupDynamicStates();
 

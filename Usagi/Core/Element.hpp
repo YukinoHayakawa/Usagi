@@ -39,43 +39,43 @@ protected:
 
     std::string mName;
 
-	using ComponentMap = std::unordered_map<
-		std::type_index, std::shared_ptr<Component>
+    using ComponentMap = std::unordered_map<
+        std::type_index, std::shared_ptr<Component>
     >;
-	ComponentMap mComponents;
+    ComponentMap mComponents;
 
-	void insertComponent(
-		const std::type_info &type,
-		std::shared_ptr<Component> component
-	);
+    void insertComponent(
+        const std::type_info &type,
+        std::shared_ptr<Component> component
+    );
 
-	template <typename CompBaseT>
-	ComponentMap::iterator getComponentIter(const bool throws = true)
-	{
-		auto iter = mComponents.find(typeid(CompBaseT));
+    template <typename CompBaseT>
+    ComponentMap::iterator getComponentIter(const bool throws = true)
+    {
+        auto iter = mComponents.find(typeid(CompBaseT));
         if(iter == mComponents.end() && throws)
             throw std::runtime_error("Element has no such component.");
         return iter;
-	}
+    }
 
     ComponentMap::iterator eraseComponent(ComponentMap::iterator i);
 
-	std::multimap<std::type_index, std::any> mEventHandlers;
+    std::multimap<std::type_index, std::any> mEventHandlers;
 
-	template <typename EventT, typename... Args>
-	void handleEvent(EventT &e, const std::type_info &type)
-	{
+    template <typename EventT, typename... Args>
+    void handleEvent(EventT &e, const std::type_info &type)
+    {
         // todo handling polymorphic events?
-		const auto range = mEventHandlers.equal_range(type);
-		for(auto i = range.first; i != range.second && !e.canceled(); ++i)
-		{
-			std::any_cast<EventHandler<EventT>&>(i->second)(e);
-		}
-		if(!e.canceled() && e.bubbling() && parent())
-		{
+        const auto range = mEventHandlers.equal_range(type);
+        for(auto i = range.first; i != range.second && !e.canceled(); ++i)
+        {
+            std::any_cast<EventHandler<EventT>&>(i->second)(e);
+        }
+        if(!e.canceled() && e.bubbling() && parent())
+        {
             parent()->handleEvent(e, type);
-		}
-	}
+        }
+    }
 
     /**
      * \brief Invoked before adding a child. If false is returned, the addition
@@ -84,9 +84,9 @@ protected:
      * \return
      */
     virtual bool acceptChild(Element *child)
-	{
-	    return true;
-	}
+    {
+        return true;
+    }
 
     void removeChildByIter(ChildrenArray::iterator iter);
 
@@ -99,7 +99,7 @@ public:
     Element & operator=(Element &&other) = delete;
 
     std::string name() const { return mName; }
-	void setName(const std::string &name) { mName = name; }
+    void setName(const std::string &name) { mName = name; }
     std::string path() const;
 
     // Entity Hierarchy
@@ -111,20 +111,20 @@ public:
     {
         // todo enforce unique child name
         static_assert(std::is_base_of_v<Element, ElementType>,
-			"ElementType is not derived from Element.");
-		auto c = std::make_unique<ElementType>(
-			this, std::forward<Args>(args)...
-		);
+            "ElementType is not derived from Element.");
+        auto c = std::make_unique<ElementType>(
+            this, std::forward<Args>(args)...
+        );
         assert(c);
         // ElementCreatedEvent is fired before acceptance test, so it gets
         // a change to pass the test. (todo: is this a good idea?)
         c->template sendEvent<ElementCreatedEvent>();
         if(!acceptChild(c.get()))
             throw std::logic_error("Child element was rejected by parent.");
-		const auto r = c.get();
+        const auto r = c.get();
         mChildren.push_back(std::move(c));
         sendEvent<ChildElementAddedEvent>(r);
-		return r;
+        return r;
     }
 
     Element * findChild(const std::string &name) const
@@ -193,12 +193,12 @@ public:
     void addComponent(Component *component);
 
     template <typename CompBaseT, typename CompCastT = CompBaseT>
-	CompCastT * getComponent()
+    CompCastT * getComponent()
     {
         const auto iter = getComponentIter<CompBaseT>();
         if constexpr(std::is_same_v<CompBaseT, CompCastT>)
             return static_cast<CompCastT*>(iter->second.get());
-		else
+        else
             return dynamic_cast<CompCastT*>(iter->second.get());
     }
 

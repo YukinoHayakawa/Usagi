@@ -21,11 +21,13 @@ bool shouldLog(LoggingLevel level);
 void doLog(LoggingLevel level, const char *str);
 
 template <typename... Args>
-void log(const LoggingLevel level, const char *fmt, const Args &... args)
+void log(const LoggingLevel level, const char *fmt, Args &&... args)
 {
     if(!shouldLog(level)) return;
 
-    fmt::format_arg_store<fmt::format_context, Args...> as { args... };
+    fmt::format_arg_store<fmt::format_context, Args...> as {
+        std::forward<Args>(args)...
+    };
     fmt::memory_buffer buffer;
     fmt::vformat_to(buffer, fmt, as);
     doLog(level, buffer.data());

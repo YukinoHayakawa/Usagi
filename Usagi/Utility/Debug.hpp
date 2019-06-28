@@ -10,12 +10,12 @@ namespace usagi
 inline void debugBreak()
 {
 #ifdef _WIN32
-	if(IsDebuggerPresent())
-	{
-		__debugbreak();
-	}
+    if(IsDebuggerPresent())
+    {
+        __debugbreak();
+    }
 #else
-	__builtin_trap();
+    __builtin_trap();
 #endif
 }
 }

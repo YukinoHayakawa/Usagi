@@ -27,7 +27,7 @@ public:
         Element *parent,
         std::string name,
         boost::uuids::uuid uuid = boost::uuids::nil_uuid()
-	);
+    );
 
     virtual std::unique_ptr<std::istream> open() = 0;
 
