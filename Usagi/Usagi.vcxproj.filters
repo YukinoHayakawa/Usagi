@@ -267,6 +267,9 @@
     <ClCompile Include="Camera\OrthogonalCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Utility\Utf8Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asset\Asset.hpp">
@@ -855,6 +858,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utility\Debug.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Utf8Main.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

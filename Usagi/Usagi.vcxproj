@@ -176,6 +176,7 @@
     <ClCompile Include="Transform\TransformSubsystem.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClCompile Include="Utility\Hash.cpp" />
+    <ClCompile Include="Utility\Utf8Main.cpp" />
     <ClCompile Include="Utility\Stream.cpp" />
     <ClCompile Include="Utility\Unicode.cpp" />
   </ItemGroup>
@@ -367,6 +368,7 @@
     <ClInclude Include="Utility\Functional.hpp" />
     <ClInclude Include="Utility\Hash.hpp" />
     <ClInclude Include="Utility\Iterator.hpp" />
+    <ClInclude Include="Utility\Utf8Main.hpp" />
     <ClInclude Include="Utility\Math.hpp" />
     <ClInclude Include="Utility\Noncopyable.hpp" />
     <ClInclude Include="Utility\RAIIHelper.hpp" />
