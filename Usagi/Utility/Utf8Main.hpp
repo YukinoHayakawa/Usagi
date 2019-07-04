@@ -10,18 +10,15 @@ namespace usagi
 {
 std::vector<std::string> argsFromMain(int argc, wchar_t *argv[]);
 std::vector<std::string> argsFromMain(int argc, char *argv[]);
+
+int wrappedMain(const std::vector<std::string> &args);
 }
 
 #ifdef _WIN32
 int wmain(int argc, wchar_t *argv[])
-{
-    const auto args = usagi::argsFromMain(argc, argv);
-    return usagi_main(args);
-}
 #else
 int main(int argc, char *argv[])
-{
-    const auto args = usagi::argsFromMain(argc, argv);
-    return usagi_main(args);
-}
 #endif
+{
+    return usagi::wrappedMain(usagi::argsFromMain(argc, argv));
+}
