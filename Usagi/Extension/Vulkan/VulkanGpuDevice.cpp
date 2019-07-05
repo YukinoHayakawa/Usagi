@@ -44,8 +44,13 @@ VkBool32 usagi::VulkanGpuDevice::debugMessengerCallback(
     const vk::DebugUtilsMessageTypeFlagsEXT &message_type,
     const vk::DebugUtilsMessengerCallbackDataEXT *callback_data) const
 {
+    // see https://www.lunarg.com/wp-content/uploads/2018/05/Vulkan-Debug-Utils_05_18_v1.pdf for example code
+
     LoggingLevel level;
     using Severity = vk::DebugUtilsMessageSeverityFlagBitsEXT;
+    using Type = vk::DebugUtilsMessageTypeFlagBitsEXT;
+    bool validation_error = false;
+
     if(message_severity & Severity::eVerbose)
         level = LoggingLevel::debug;
     else if(message_severity & Severity::eInfo)
@@ -58,34 +63,35 @@ VkBool32 usagi::VulkanGpuDevice::debugMessengerCallback(
         level = LoggingLevel::info;
 
     log(level,
-        "[Vulkan] {} [{}][ID={}]: {}",
+        "[Vulkan] {} : {} - Message ID Number {}, Message ID String {}:\n{}",
+        to_string(message_severity),
         to_string(message_type),
-        callback_data->pMessageIdName
-            ? callback_data->pMessageIdName
-            : "<Unknown>",
         callback_data->messageIdNumber,
+        callback_data->pMessageIdName,
         callback_data->pMessage);
 
     if(callback_data->objectCount > 0)
     {
+        log(level, "    Objects - {}",
+            callback_data->objectCount);
         for(uint32_t i = 0; i < callback_data->objectCount; ++i)
         {
             const auto &object = callback_data->pObjects[i];
-            log(level, "Object #{}: Handle {}, Type {}, Name \"{}\"",
+            log(level, "        Object[{}] - Type {}, Value {}, Name \"{}\"",
                 i,
-                object.objectHandle,
                 to_string(object.objectType),
+                object.objectHandle,
                 object.pObjectName ? object.pObjectName : "");
         }
     }
     if(callback_data->cmdBufLabelCount > 0)
     {
-        LOG(info, "Command Buffer Label Count: {}",
+        log(level, "    Command Buffer Label - {}",
             callback_data->cmdBufLabelCount);
         for(uint32_t i = 0; i < callback_data->cmdBufLabelCount; ++i)
         {
             log(level,
-                "Label #{}: {} {{ {}, {}, {}, {} }}\n",
+                "        Label[{}] - {} {{ {}, {}, {}, {} }}\n",
                 i,
                 callback_data->pCmdBufLabels[i].pLabelName,
                 callback_data->pCmdBufLabels[i].color[0],
@@ -93,6 +99,10 @@ VkBool32 usagi::VulkanGpuDevice::debugMessengerCallback(
                 callback_data->pCmdBufLabels[i].color[2],
                 callback_data->pCmdBufLabels[i].color[3]);
         }
+    }
+
+    if(message_type & Type::eValidation) {
+        validation_error = true;
     }
 
     // Don't bail out, but keep going. return false;
@@ -182,7 +192,7 @@ void usagi::VulkanGpuDevice::createDebugReport()
     using Severity = vk::DebugUtilsMessageSeverityFlagBitsEXT;
     info.messageSeverity =
         // Severity::eVerbose |
-        // Severity::eInfo |
+        Severity::eInfo |
         Severity::eWarning |
         Severity::eError;
     using Type = vk::DebugUtilsMessageTypeFlagBitsEXT;
