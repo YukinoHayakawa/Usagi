@@ -1,5 +1,6 @@
 #include "Logging.hpp"
 
+#include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace
@@ -14,8 +15,12 @@ bool shouldLog(LoggingLevel level)
     return gLogger->should_log(static_cast<spdlog::level::level_enum>(level));
 }
 
-void doLog(const LoggingLevel level, const char *str)
+void doLog(const LoggingLevel level, std::string_view msg)
 {
-    gLogger->log(static_cast<spdlog::level::level_enum>(level), str);
+    gLogger->log(
+        spdlog::source_loc { },
+        static_cast<spdlog::level::level_enum>(level),
+        msg
+    );
 }
 }

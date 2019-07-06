@@ -113,7 +113,7 @@ void usagi::Win32Runtime::enableCrashHandler(
 
 void usagi::Win32Runtime::displayErrorDialog(const std::string &msg)
 {
-    LOG(error, msg);
+    LOG(error, msg.c_str());
     MessageBoxW(nullptr, utf8To16(msg).c_str(), L"Error", MB_OK | MB_ICONERROR);
 }
 

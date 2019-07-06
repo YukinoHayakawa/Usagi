@@ -18,25 +18,16 @@ enum class LoggingLevel
 };
 
 bool shouldLog(LoggingLevel level);
-void doLog(LoggingLevel level, const char *str);
+void doLog(LoggingLevel level, std::string_view msg);
 
 template <typename... Args>
-void log(const LoggingLevel level, const char *fmt, Args &&... args)
+void log(const LoggingLevel level, std::string_view fmt, Args &&... args)
 {
     if(!shouldLog(level)) return;
 
-    fmt::format_arg_store<fmt::format_context, Args...> as {
-        std::forward<Args>(args)...
-    };
     fmt::memory_buffer buffer;
-    fmt::vformat_to(buffer, fmt, as);
-    doLog(level, buffer.data());
-}
-
-template <typename T>
-void log(const LoggingLevel level, const T &arg)
-{
-    log(level, "{}", arg);
+    fmt::format_to(buffer, fmt, std::forward<Args>(args)...);
+    doLog(level, { buffer.data(), buffer.size() });
 }
 }
 
