@@ -5,7 +5,11 @@
 
 namespace
 {
-auto gLogger = spdlog::stdout_color_mt("console");
+auto gLogger = []() {
+    auto logger = spdlog::stdout_color_mt("default");
+    // logger->set_pattern()
+    return std::move(logger);
+}();
 }
 
 namespace usagi
