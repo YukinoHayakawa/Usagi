@@ -27,7 +27,7 @@ class GpuBuffer;
 class GraphicsPipeline;
 class Mouse;
 
-class NuklearSystem
+class NuklearSystem final
     : public OverlayRenderingSystem
     , public CollectionSystem<NuklearComponent>
     , public KeyEventListener
@@ -78,5 +78,10 @@ public:
     void createRenderTarget(RenderTargetDescriptor &descriptor) override;
     void createPipelines() override;
     std::shared_ptr<GraphicsCommandList> render(const Clock &clock) override;
+
+    const std::type_info & type() override
+    {
+        return typeid(decltype(*this));
+    }
 };
 }

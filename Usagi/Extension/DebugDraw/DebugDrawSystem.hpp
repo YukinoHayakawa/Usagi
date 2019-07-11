@@ -18,7 +18,7 @@ class GraphicsPipeline;
 class GpuCommandPool;
 class GpuBuffer;
 
-class DebugDrawSystem
+class DebugDrawSystem final
     : public ProjectiveRenderingSystem
     , public OverlayRenderingSystem
     , public CollectionSystem<DebugDrawComponent>
@@ -50,6 +50,11 @@ public:
     void update(const Clock &clock) override;
     std::shared_ptr<GraphicsCommandList> render(const Clock &clock) override;
 
+    const std::type_info & type() override
+    {
+        return typeid(decltype(*this));
+    }
+    
     dd::GlyphTextureHandle createGlyphTexture(
         int width,
         int height,

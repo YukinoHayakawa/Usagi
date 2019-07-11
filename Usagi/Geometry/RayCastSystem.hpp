@@ -15,7 +15,7 @@ struct Ray;
 /**
  * \brief Provides ray cast service. Does nothing during update.
  */
-class RayCastSystem
+class RayCastSystem final
     : public CollectionSystem<
         ShapeComponent,
         RayCastComponent
@@ -30,5 +30,10 @@ public:
      * \return
      */
     std::optional<Intersection> intersect(const Ray &ray);
+
+    const std::type_info & type() override
+    {
+        return typeid(decltype(*this));
+    }
 };
 }

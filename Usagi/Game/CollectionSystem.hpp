@@ -29,8 +29,8 @@ public:
         if(processable)
         {
             LOG(debug, "Registering\n"
-                "    Element   {}: {} at\n"
-                "    System {}: {}",
+                "    Element {}: {} at\n"
+                "    System  {}: {}",
                 static_cast<void*>(element), element->path(),
                 static_cast<void*>(this), typeid(*this).name()
             );
@@ -42,8 +42,8 @@ public:
             if(erased)
             {
                 LOG(debug, "Removed\n"
-                    "    Element   {}: {} from\n"
-                    "    System {}: {}",
+                    "    Element {}: {} from\n"
+                    "    System  {}: {}",
                     static_cast<void *>(element), element->path(),
                     static_cast<void *>(this), typeid(*this).name()
                 );

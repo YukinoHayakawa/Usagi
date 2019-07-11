@@ -26,7 +26,7 @@ class GpuBuffer;
 class GraphicsPipeline;
 class Mouse;
 
-class ImGuiSystem
+class ImGuiSystem final
     : public OverlayRenderingSystem
     , public CollectionSystem<ImGuiComponent>
     , public KeyEventListener
@@ -77,5 +77,10 @@ public:
     void onWindowCharInput(const WindowCharEvent &e) override;
 
     void update(const Clock &clock) override;
+
+    const std::type_info & type() override
+    {
+        return typeid(decltype(*this));
+    }
 };
 }
