@@ -22,6 +22,13 @@ void usagi::Animation::finish()
     LOG(info, "Animation finished: {}", name);
 }
 
+void usagi::AnimationComponent::add(Animation animation)
+{
+    assert(animation.duration > 0);
+    LOG(debug, "Adding animation: {}", animation.name);
+    animations.push_back(std::move(animation));
+}
+
 void usagi::AnimationComponent::finishAll()
 {
     for(auto &&a : animations)

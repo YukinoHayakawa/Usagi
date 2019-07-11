@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <Usagi/Game/Subsystem.hpp>
+#include <Usagi/Game/System.hpp>
 
 namespace usagi
 {
@@ -12,9 +12,9 @@ class Framebuffer;
 class GraphicsCommandList;
 
 /**
- * \brief Subsystem that uses GPU to draw.
+ * \brief System that uses GPU to draw.
  */
-class RenderableSubsystem : virtual public Subsystem
+class RenderableSystem : virtual public System
 {
 protected:
     std::shared_ptr<RenderTarget> mRenderTarget;

@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include <Usagi/Graphics/Game/ProjectiveRenderingSubsystem.hpp>
-#include <Usagi/Graphics/Game/OverlayRenderingSubsystem.hpp>
-#include <Usagi/Game/CollectionSubsystem.hpp>
+#include <Usagi/Graphics/Game/ProjectiveRenderingSystem.hpp>
+#include <Usagi/Graphics/Game/OverlayRenderingSystem.hpp>
+#include <Usagi/Game/CollectionSystem.hpp>
 
 #include "DebugDraw.hpp"
 #include "DebugDrawComponent.hpp"
@@ -18,10 +18,10 @@ class GraphicsPipeline;
 class GpuCommandPool;
 class GpuBuffer;
 
-class DebugDrawSubsystem
-    : public ProjectiveRenderingSubsystem
-    , public OverlayRenderingSubsystem
-    , public CollectionSubsystem<DebugDrawComponent>
+class DebugDrawSystem
+    : public ProjectiveRenderingSystem
+    , public OverlayRenderingSystem
+    , public CollectionSystem<DebugDrawComponent>
     , public dd::RenderInterface
 {
     Game *mGame = nullptr;
@@ -42,8 +42,8 @@ class DebugDrawSubsystem
     void createTextPipeline();
 
 public:
-    explicit DebugDrawSubsystem(Game *game);
-    ~DebugDrawSubsystem();
+    explicit DebugDrawSystem(Game *game);
+    ~DebugDrawSystem();
 
     void createRenderTarget(RenderTargetDescriptor &descriptor) override;
     void createPipelines() override;

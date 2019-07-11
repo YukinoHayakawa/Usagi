@@ -91,8 +91,8 @@ usagi::GraphicalGame::GraphicalGame(std::shared_ptr<Runtime> runtime)
 {
     mRuntime->initGpu();
 
-    mPreRender = std::make_unique<ImageTransitionSubsystem>(mRuntime->gpu());
-    mPostRender = std::make_unique<ImageTransitionSubsystem>(mRuntime->gpu());
+    mPreRender = std::make_unique<ImageTransitionSystem>(mRuntime->gpu());
+    mPostRender = std::make_unique<ImageTransitionSystem>(mRuntime->gpu());
 }
 
 void usagi::GraphicalGame::submitGraphicsJobs(

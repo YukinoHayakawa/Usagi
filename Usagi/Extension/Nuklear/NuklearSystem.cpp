@@ -1,4 +1,4 @@
-﻿#include "NuklearSubsystem.hpp"
+﻿#include "NuklearSystem.hpp"
 
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Converter/SpirvAssetConverter.hpp>
@@ -38,12 +38,12 @@ struct nk_vertex
 };
 }
 
-void usagi::NuklearSubsystem::setup()
+void usagi::NuklearSystem::setup()
 {
     nk_init_default(&mContext, nullptr);
 
-    mContext.clip.copy = &NuklearSubsystem::clipboardCopy;
-    mContext.clip.paste = &NuklearSubsystem::clipboardPaste;
+    mContext.clip.copy = &NuklearSystem::clipboardCopy;
+    mContext.clip.paste = &NuklearSystem::clipboardPaste;
     mContext.clip.userdata = nk_handle_ptr(mWindow.get());
 
     nk_buffer_init_default(&mCommandList);
@@ -117,7 +117,7 @@ void usagi::NuklearSubsystem::setup()
     }
 }
 
-usagi::NuklearSubsystem::NuklearSubsystem(
+usagi::NuklearSystem::NuklearSystem(
     Game *game,
     std::shared_ptr<Window> window,
     std::shared_ptr<Keyboard> keyboard,
@@ -136,14 +136,14 @@ usagi::NuklearSubsystem::NuklearSubsystem(
     nk_input_begin(&mContext);
 }
 
-usagi::NuklearSubsystem::~NuklearSubsystem()
+usagi::NuklearSystem::~NuklearSystem()
 {
     nk_font_atlas_clear(&mAtlas);
     nk_buffer_free(&mCommandList);
     nk_free(&mContext);
 }
 
-void usagi::NuklearSubsystem::createPipelines()
+void usagi::NuklearSystem::createPipelines()
 {
     auto gpu = mGame->runtime()->gpu();
     auto assets = mGame->assets();
@@ -203,7 +203,7 @@ void usagi::NuklearSubsystem::createPipelines()
     mPipeline = compiler->compile();
 }
 
-void usagi::NuklearSubsystem::clipboardPaste(
+void usagi::NuklearSystem::clipboardPaste(
     nk_handle usr, nk_text_edit *edit)
 {
     const auto window = static_cast<Window*>(usr.ptr);
@@ -211,7 +211,7 @@ void usagi::NuklearSubsystem::clipboardPaste(
     nk_textedit_paste(edit, str.c_str(), static_cast<int>(str.size()));
 }
 
-void usagi::NuklearSubsystem::clipboardCopy(
+void usagi::NuklearSystem::clipboardCopy(
     nk_handle usr,
     const char *text,
     int len)
@@ -221,26 +221,26 @@ void usagi::NuklearSubsystem::clipboardCopy(
     window->setClipboardText({ text, static_cast<std::size_t>(len) });
 }
 
-void usagi::NuklearSubsystem::update(const Clock &clock)
+void usagi::NuklearSystem::update(const Clock &clock)
 {
     nk_input_end(&mContext);
     processElements(clock);
 }
 
-void usagi::NuklearSubsystem::createRenderTarget(
+void usagi::NuklearSystem::createRenderTarget(
     RenderTargetDescriptor &descriptor)
 {
     descriptor.sharedColorTarget("nuklear");
     mRenderTarget = descriptor.finish();
 }
 
-void usagi::NuklearSubsystem::processElements(const Clock &clock)
+void usagi::NuklearSystem::processElements(const Clock &clock)
 {
     for(auto &e : mRegistry)
         std::get<NuklearComponent*>(e.second)->draw(clock, &mContext);
 }
 
-std::shared_ptr<usagi::GraphicsCommandList> usagi::NuklearSubsystem::render(
+std::shared_ptr<usagi::GraphicsCommandList> usagi::NuklearSystem::render(
     const Clock &clock)
 {
     /* fill converting configuration */
@@ -363,7 +363,7 @@ std::shared_ptr<usagi::GraphicsCommandList> usagi::NuklearSubsystem::render(
     return std::move(cmd_list);
 }
 
-bool usagi::NuklearSubsystem::onKeyStateChange(const KeyEvent &e)
+bool usagi::NuklearSystem::onKeyStateChange(const KeyEvent &e)
 {
     switch(e.key_code)
     {
@@ -446,7 +446,7 @@ bool usagi::NuklearSubsystem::onKeyStateChange(const KeyEvent &e)
     }
 }
 
-bool usagi::NuklearSubsystem::onMouseMove(const MousePositionEvent &e)
+bool usagi::NuklearSystem::onMouseMove(const MousePositionEvent &e)
 {
     nk_input_motion(
         &mContext,
@@ -456,7 +456,7 @@ bool usagi::NuklearSubsystem::onMouseMove(const MousePositionEvent &e)
     return true;
 }
 
-bool usagi::NuklearSubsystem::onMouseButtonStateChange(
+bool usagi::NuklearSystem::onMouseButtonStateChange(
     const MouseButtonEvent &e)
 {
     const auto pos = e.position.cast<int>();
@@ -478,13 +478,13 @@ bool usagi::NuklearSubsystem::onMouseButtonStateChange(
     }
 }
 
-bool usagi::NuklearSubsystem::onMouseWheelScroll(const MouseWheelEvent &e)
+bool usagi::NuklearSystem::onMouseWheelScroll(const MouseWheelEvent &e)
 {
     nk_input_scroll(&mContext, { e.distance.x(), e.distance.y() });
     return true;
 }
 
-void usagi::NuklearSubsystem::onWindowCharInput(const WindowCharEvent &e)
+void usagi::NuklearSystem::onWindowCharInput(const WindowCharEvent &e)
 {
     if(e.utf32 >= 32)
         nk_input_unicode(&mContext, e.utf32);

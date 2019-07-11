@@ -4,7 +4,7 @@
 
 #include <Usagi/Core/Math.hpp>
 
-#include "RenderableSubsystem.hpp"
+#include "RenderableSystem.hpp"
 
 namespace usagi
 {
@@ -12,7 +12,7 @@ namespace usagi
  * \brief Contains common facilities for rendering 3D scenes using projection
  * matrices.
  */
-class ProjectiveRenderingSubsystem : virtual public RenderableSubsystem
+class ProjectiveRenderingSystem : virtual public RenderableSystem
 {
 protected:
     /**

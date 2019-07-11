@@ -1,18 +1,18 @@
 ﻿#pragma once
 
-#include "RenderableSubsystem.hpp"
+#include "RenderableSystem.hpp"
 
 namespace usagi
 {
 class GpuDevice;
 class GpuCommandPool;
 
-class ImageTransitionSubsystem : public RenderableSubsystem
+class ImageTransitionSystem : public RenderableSystem
 {
     std::shared_ptr<GpuCommandPool> mCommandPool;
 
 public:
-    explicit ImageTransitionSubsystem(GpuDevice *gpu);
+    explicit ImageTransitionSystem(GpuDevice *gpu);
 
     void onElementComponentChanged(Element *element) override;
     void update(const Clock &clock) override;

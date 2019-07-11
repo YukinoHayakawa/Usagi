@@ -1,10 +1,10 @@
-﻿#include "OverlayRenderingSubsystem.hpp"
+﻿#include "OverlayRenderingSystem.hpp"
 
 #include <Usagi/Graphics/RenderWindow.hpp>
 #include <Usagi/Runtime/Graphics/Swapchain.hpp>
 #include <Usagi/Runtime/Window/Window.hpp>
 
-void usagi::OverlayRenderingSubsystem::setSizeFunctionsFromRenderWindow(
+void usagi::OverlayRenderingSystem::setSizeFunctionsFromRenderWindow(
     RenderWindow *render_window)
 {
     setFrameBufferSizeFunc([=]() {

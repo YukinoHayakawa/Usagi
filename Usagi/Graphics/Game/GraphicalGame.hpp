@@ -6,7 +6,7 @@
 #include <Usagi/Runtime/Window/WindowEventListener.hpp>
 #include <Usagi/Runtime/Graphics/Enum/GpuBufferFormat.hpp>
 
-#include "ImageTransitionSubsystem.hpp"
+#include "ImageTransitionSystem.hpp"
 
 namespace usagi
 {
@@ -24,8 +24,8 @@ class GraphicalGame
 {
 protected:
     RenderWindow mMainWindow;
-    std::unique_ptr<ImageTransitionSubsystem> mPreRender;
-    std::unique_ptr<ImageTransitionSubsystem> mPostRender;
+    std::unique_ptr<ImageTransitionSystem> mPreRender;
+    std::unique_ptr<ImageTransitionSystem> mPostRender;
     std::vector<std::shared_ptr<GraphicsCommandList>> mPendingJobs;
 
     void createMainWindow(

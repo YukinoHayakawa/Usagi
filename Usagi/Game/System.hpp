@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <typeinfo>
+
 #include <Usagi/Utility/Noncopyable.hpp>
 
 namespace usagi
@@ -7,10 +9,10 @@ namespace usagi
 class Clock;
 class Element;
 
-class Subsystem : Noncopyable
+class System : Noncopyable
 {
 public:
-    virtual ~Subsystem() = default;
+    virtual ~System() = default;
 
     /**
      * \brief Update the state of subsystem based on provided time step.
@@ -25,5 +27,7 @@ public:
      * \param element
      */
     virtual void onElementComponentChanged(Element *element) = 0;
+
+    virtual const std::type_info & type() = 0;
 };
 }

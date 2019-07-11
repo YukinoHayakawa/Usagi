@@ -8,14 +8,14 @@
 #include <Usagi/Core/Element.hpp>
 #include <Usagi/Utility/TypeCast.hpp>
 
-#include "Subsystem.hpp"
+#include "System.hpp"
 
 namespace usagi
 {
-struct SubsystemInfo
+struct SystemInfo
 {
     std::string name;
-    std::unique_ptr<Subsystem> subsystem;
+    std::unique_ptr<System> subsystem;
     bool enabled = true;
 };
 
@@ -30,47 +30,47 @@ protected:
      */
     GameState *mPreviousState = nullptr;
 
-    std::vector<SubsystemInfo> mSubsystems;
+    std::vector<SystemInfo> mSystems;
     Clock mClock;
 
-    std::vector<SubsystemInfo>::iterator findSubsystemByName(
+    std::vector<SystemInfo>::iterator findSystemByName(
         const std::string &subsystem_name);
 
-    void setSubsystemEnabled(
+    void setSystemEnabled(
         const std::string &subsystem_name,
         bool enabled);
 
-    Subsystem * addSubsystemPtr(
+    System * addSystemPtr(
         std::string name,
-        std::unique_ptr<Subsystem> subsystem);
+        std::unique_ptr<System> subsystem);
 
-    virtual void subsystemFilter(Subsystem *subsystem) { }
+    virtual void subsystemFilter(System *subsystem) { }
 
 public:
     GameState(Element *parent, std::string name);
 
-    template <typename SubsystemT>
-    SubsystemT * addSubsystem(
+    template <typename SystemT>
+    SystemT * addSystem(
         std::string name,
-        std::unique_ptr<SubsystemT> subsystem)
+        std::unique_ptr<SystemT> subsystem)
     {
         auto ptr = subsystem.get();
-        addSubsystemPtr(
+        addSystemPtr(
             std::move(name),
-            unique_pointer_cast<Subsystem>(std::move(subsystem))
+            unique_pointer_cast<System>(std::move(subsystem))
         );
         return ptr;
     }
 
-    template <typename SubsystemT, typename... Args>
-    SubsystemT * addSubsystem(std::string name, Args &&... args)
+    template <typename SystemT, typename... Args>
+    SystemT * addSystem(std::string name, Args &&... args)
     {
-        auto sys = std::make_unique<SubsystemT>(std::forward<Args>(args)...);
-        return addSubsystem(std::move(name), std::move(sys));
+        auto sys = std::make_unique<SystemT>(std::forward<Args>(args)...);
+        return addSystem(std::move(name), std::move(sys));
     }
 
-    void enableSubsystem(const std::string &subsystem_name);
-    void disableSubsystem(const std::string &subsystem_name);
+    void enableSystem(const std::string &subsystem_name);
+    void disableSystem(const std::string &subsystem_name);
 
     /**
      * \brief Invoke update methods on each enabled subsystem by the order

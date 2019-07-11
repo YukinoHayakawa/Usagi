@@ -6,13 +6,13 @@
 #include <Usagi/Core/Event/Library/Component/PreComponentRemovalEvent.hpp>
 #include <Usagi/Core/Event/Library/Component/PostComponentRemovalEvent.hpp>
 
-#include "Subsystem.hpp"
+#include "System.hpp"
 
 usagi::GameState::GameState(Element *parent, std::string name)
     : Element(parent, std::move(name))
 {
     const auto system_listener = [&](auto &&e) {
-        for(auto &&s : mSubsystems)
+        for(auto &&s : mSystems)
         {
             s.subsystem->onElementComponentChanged(e.source());
         }
@@ -26,57 +26,57 @@ usagi::GameState::GameState(Element *parent, std::string name)
     addEventListener<PostComponentRemovalEvent>(system_listener);
 }
 
-std::vector<usagi::SubsystemInfo>::iterator
-usagi::GameState::findSubsystemByName(const std::string &subsystem_name)
+std::vector<usagi::SystemInfo>::iterator
+usagi::GameState::findSystemByName(const std::string &subsystem_name)
 {
     return std::find_if(
-        mSubsystems.begin(), mSubsystems.end(),
+        mSystems.begin(), mSystems.end(),
         [&](auto &s) { return s.name == subsystem_name; }
     );
 }
 
-void usagi::GameState::setSubsystemEnabled(
+void usagi::GameState::setSystemEnabled(
     const std::string &subsystem_name,
     bool enabled)
 {
-    const auto iter = findSubsystemByName(subsystem_name);
-    if(iter == mSubsystems.end())
+    const auto iter = findSystemByName(subsystem_name);
+    if(iter == mSystems.end())
         throw std::runtime_error("No such subsystem");
     iter->enabled = enabled;
 }
 
-usagi::Subsystem * usagi::GameState::addSubsystemPtr(
+usagi::System * usagi::GameState::addSystemPtr(
     std::string name,
-    std::unique_ptr<Subsystem> subsystem)
+    std::unique_ptr<System> subsystem)
 {
-    SubsystemInfo info;
+    SystemInfo info;
     info.name = std::move(name);
     info.subsystem = std::move(subsystem);
 
     // check that no existing subsystem is using the same name
-    if(findSubsystemByName(info.name) != mSubsystems.end())
+    if(findSystemByName(info.name) != mSystems.end())
     {
-        throw std::runtime_error("Subsystem name already used.");
+        throw std::runtime_error("System name already used.");
     }
     const auto ptr = info.subsystem.get();
-    mSubsystems.push_back(std::move(info));
+    mSystems.push_back(std::move(info));
     subsystemFilter(ptr);
     return ptr;
 }
 
-void usagi::GameState::enableSubsystem(const std::string &subsystem_name)
+void usagi::GameState::enableSystem(const std::string &subsystem_name)
 {
-    setSubsystemEnabled(subsystem_name, true);
+    setSystemEnabled(subsystem_name, true);
 }
 
-void usagi::GameState::disableSubsystem(const std::string &subsystem_name)
+void usagi::GameState::disableSystem(const std::string &subsystem_name)
 {
-    setSubsystemEnabled(subsystem_name, false);
+    setSystemEnabled(subsystem_name, false);
 }
 
 void usagi::GameState::update(const Clock &clock)
 {
-    for(auto &&s : mSubsystems)
+    for(auto &&s : mSystems)
     {
         if(s.enabled)
             s.subsystem->update(clock);

@@ -77,7 +77,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation\AnimationComponent.cpp" />
-    <ClCompile Include="Animation\AnimationSubsystem.cpp" />
+    <ClCompile Include="Animation\AnimationSystem.cpp" />
     <ClCompile Include="Animation\TimingFunctions.cpp" />
     <ClCompile Include="Asset\Asset.cpp" />
     <ClCompile Include="Asset\AssetPackage.cpp" />
@@ -100,13 +100,13 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
     </ClCompile>
-    <ClCompile Include="Extension\DebugDraw\DebugDrawSubsystem.cpp" />
+    <ClCompile Include="Extension\DebugDraw\DebugDrawSystem.cpp" />
     <ClCompile Include="Extension\ImGui\ImGuiImpl.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
     </ClCompile>
-    <ClCompile Include="Extension\ImGui\ImGuiSubsystem.cpp" />
-    <ClCompile Include="Extension\Nuklear\NuklearSubsystem.cpp" />
+    <ClCompile Include="Extension\ImGui\ImGuiSystem.cpp" />
+    <ClCompile Include="Extension\Nuklear\NuklearSystem.cpp" />
     <ClCompile Include="Extension\Nuklear\NuklearImpl.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
@@ -151,12 +151,12 @@
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\GameState.cpp" />
     <ClCompile Include="Game\GameStateManager.cpp" />
-    <ClCompile Include="Geometry\RayCastSubsystem.cpp" />
+    <ClCompile Include="Geometry\RayCastSystem.cpp" />
     <ClCompile Include="Geometry\Shape\Common\Sphere.cpp" />
     <ClCompile Include="Graphics\Game\GraphicalGame.cpp" />
     <ClCompile Include="Graphics\Game\GraphicalGameState.cpp" />
-    <ClCompile Include="Graphics\Game\ImageTransitionSubsystem.cpp" />
-    <ClCompile Include="Graphics\Game\OverlayRenderingSubsystem.cpp" />
+    <ClCompile Include="Graphics\Game\ImageTransitionSystem.cpp" />
+    <ClCompile Include="Graphics\Game\OverlayRenderingSystem.cpp" />
     <ClCompile Include="Graphics\RenderTarget\RenderTarget.cpp" />
     <ClCompile Include="Graphics\RenderTarget\RenderTargetDescriptor.cpp" />
     <ClCompile Include="Graphics\RenderTarget\RenderTargetProvider.cpp" />
@@ -165,7 +165,7 @@
     <ClCompile Include="Graphics\RenderWindow.cpp" />
     <ClCompile Include="Interactive\ActionGroup.cpp" />
     <ClCompile Include="Interactive\InputMapping.cpp" />
-    <ClCompile Include="Interactive\InputSubsystem.cpp" />
+    <ClCompile Include="Interactive\InputSystem.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
     <ClCompile Include="Runtime\Input\Keyboard\KeyCode.cpp" />
@@ -173,7 +173,7 @@
     <ClCompile Include="Runtime\Input\Mouse\MouseButtonCode.cpp" />
     <ClCompile Include="Runtime\Memory\BitmapMemoryAllocator.cpp" />
     <ClCompile Include="Sampler\RandomSampler.cpp" />
-    <ClCompile Include="Transform\TransformSubsystem.cpp" />
+    <ClCompile Include="Transform\TransformSystem.cpp" />
     <ClCompile Include="Utility\File.cpp" />
     <ClCompile Include="Utility\Hash.cpp" />
     <ClCompile Include="Utility\Utf8Main.cpp" />
@@ -182,7 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationComponent.hpp" />
-    <ClInclude Include="Animation\AnimationSubsystem.hpp" />
+    <ClInclude Include="Animation\AnimationSystem.hpp" />
     <ClInclude Include="Animation\TimingFunctions.hpp" />
     <ClInclude Include="Asset\Asset.hpp" />
     <ClInclude Include="Asset\AssetLoadingContext.hpp" />
@@ -225,16 +225,16 @@
     <ClInclude Include="Core\PredefinedElement.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDraw.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDrawComponent.hpp" />
-    <ClInclude Include="Extension\DebugDraw\DebugDrawSubsystem.hpp" />
+    <ClInclude Include="Extension\DebugDraw\DebugDrawSystem.hpp" />
     <ClInclude Include="Extension\DebugDraw\DelegatedDebugDrawComponent.hpp" />
     <ClInclude Include="Extension\ImGui\DelegatedImGuiComponent.hpp" />
     <ClInclude Include="Extension\ImGui\ImGui.hpp" />
     <ClInclude Include="Extension\ImGui\ImGuiComponent.hpp" />
     <ClInclude Include="Extension\ImGui\ImGuiConfig.hpp" />
-    <ClInclude Include="Extension\ImGui\ImGuiSubsystem.hpp" />
+    <ClInclude Include="Extension\ImGui\ImGuiSystem.hpp" />
     <ClInclude Include="Extension\Nuklear\DelegatedImGuiComponent.hpp" />
     <ClInclude Include="Extension\Nuklear\NuklearComponent.hpp" />
-    <ClInclude Include="Extension\Nuklear\NuklearSubsystem.hpp" />
+    <ClInclude Include="Extension\Nuklear\NuklearSystem.hpp" />
     <ClInclude Include="Extension\Nuklear\Nuklear.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanBatchResource.hpp" />
     <ClInclude Include="Extension\Vulkan\VulkanBufferAllocation.hpp" />
@@ -270,32 +270,32 @@
     <ClInclude Include="Extension\Win32\Win32Runtime.hpp" />
     <ClInclude Include="Extension\Win32\Window\Win32Window.hpp" />
     <ClInclude Include="Extension\Win32\Window\Win32WindowManager.hpp" />
-    <ClInclude Include="Game\CollectionSubsystem.hpp" />
+    <ClInclude Include="Game\CollectionSystem.hpp" />
     <ClInclude Include="Game\Game.hpp" />
     <ClInclude Include="Game\GameState.hpp" />
     <ClInclude Include="Game\GameStateManager.hpp" />
     <ClInclude Include="Geometry\Intersection.hpp" />
     <ClInclude Include="Geometry\Ray.hpp" />
     <ClInclude Include="Geometry\RayCastComponent.hpp" />
-    <ClInclude Include="Geometry\RayCastSubsystem.hpp" />
+    <ClInclude Include="Geometry\RayCastSystem.hpp" />
     <ClInclude Include="Geometry\Shape.hpp" />
     <ClInclude Include="Geometry\Shape\Common\Sphere.hpp" />
     <ClInclude Include="Geometry\Transform.hpp" />
     <ClInclude Include="Geometry\TransformComponent.hpp" />
     <ClInclude Include="Graphics\Game\GraphicalGame.hpp" />
     <ClInclude Include="Graphics\Game\GraphicalGameState.hpp" />
-    <ClInclude Include="Game\Subsystem.hpp" />
+    <ClInclude Include="Game\System.hpp" />
     <ClInclude Include="Geometry\ShapeComponent.hpp" />
-    <ClInclude Include="Graphics\Game\ImageTransitionSubsystem.hpp" />
-    <ClInclude Include="Graphics\Game\OverlayRenderingSubsystem.hpp" />
-    <ClInclude Include="Graphics\Game\ProjectiveRenderingSubsystem.hpp" />
+    <ClInclude Include="Graphics\Game\ImageTransitionSystem.hpp" />
+    <ClInclude Include="Graphics\Game\OverlayRenderingSystem.hpp" />
+    <ClInclude Include="Graphics\Game\ProjectiveRenderingSystem.hpp" />
     <ClInclude Include="Graphics\RenderTarget\RenderTarget.hpp" />
     <ClInclude Include="Graphics\RenderTarget\RenderTargetDescriptor.hpp" />
     <ClInclude Include="Graphics\RenderTarget\RenderTargetProvider.hpp" />
     <ClInclude Include="Graphics\RenderTarget\RenderTargetSource.hpp" />
     <ClInclude Include="Interactive\InputComponent.hpp" />
     <ClInclude Include="Interactive\InputMapping.hpp" />
-    <ClInclude Include="Interactive\InputSubsystem.hpp" />
+    <ClInclude Include="Interactive\InputSystem.hpp" />
     <ClInclude Include="Runtime\EventListener.hpp" />
     <ClInclude Include="Runtime\Graphics\GpuAttachmentOps.hpp" />
     <ClInclude Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.hpp" />
@@ -318,7 +318,7 @@
     <ClInclude Include="Runtime\Graphics\GraphicsPipeline.hpp" />
     <ClInclude Include="Runtime\Graphics\GraphicsPipelineCompiler.hpp" />
     <ClInclude Include="Runtime\Graphics\PipelineCreateInfo.hpp" />
-    <ClInclude Include="Graphics\Game\RenderableSubsystem.hpp" />
+    <ClInclude Include="Graphics\Game\RenderableSystem.hpp" />
     <ClInclude Include="Runtime\Graphics\RenderPass.hpp" />
     <ClInclude Include="Runtime\Graphics\RenderPassCreateInfo.hpp" />
     <ClInclude Include="Runtime\Graphics\Framebuffer.hpp" />
@@ -356,7 +356,7 @@
     <ClInclude Include="Sampler\RandomSampler.hpp" />
     <ClInclude Include="Sampler\Sampler.hpp" />
     <ClInclude Include="Transform\TransformComponent.hpp" />
-    <ClInclude Include="Transform\TransformSubsystem.hpp" />
+    <ClInclude Include="Transform\TransformSystem.hpp" />
     <ClInclude Include="Transform\Util.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />

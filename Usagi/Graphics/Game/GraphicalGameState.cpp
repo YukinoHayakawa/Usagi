@@ -4,19 +4,19 @@
 
 #include <Usagi/Graphics/RenderTarget/RenderTargetDescriptor.hpp>
 
-#include "RenderableSubsystem.hpp"
+#include "RenderableSystem.hpp"
 #include "GraphicalGame.hpp"
 
-void usagi::GraphicalGameState::subsystemFilter(Subsystem *subsystem)
+void usagi::GraphicalGameState::subsystemFilter(System *subsystem)
 {
-    if(const auto sys = dynamic_cast<RenderableSubsystem*>(subsystem))
+    if(const auto sys = dynamic_cast<RenderableSystem*>(subsystem))
     {
         RenderTargetDescriptor desc { mGame };
         // create the render target before pipelines as render pass is used
         // in the later process.
         sys->createRenderTarget(desc);
         sys->createPipelines();
-        mRenderableSubsystems.push_back({ mRenderableSubsystems.size(), sys });
+        mRenderableSystems.push_back({ mRenderableSystems.size(), sys });
     }
 }
 
@@ -39,11 +39,11 @@ void usagi::GraphicalGameState::update(const Clock &clock)
     // set camera for each subsystem??
 
     // record command lists in parallel
-    mCommandLists.resize(mRenderableSubsystems.size());
+    mCommandLists.resize(mRenderableSystems.size());
     std::for_each(
         std::execution::par,
-        mRenderableSubsystems.begin(),
-        mRenderableSubsystems.end(),
+        mRenderableSystems.begin(),
+        mRenderableSystems.end(),
         [&](const IndexedRenderable &i) {
             mCommandLists[i.first] = i.second->render(mClock);
         }

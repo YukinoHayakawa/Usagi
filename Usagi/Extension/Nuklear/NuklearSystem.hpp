@@ -2,15 +2,16 @@
 
 #include <memory>
 
-#include <Usagi/Graphics/Game/OverlayRenderingSubsystem.hpp>
+#include <Usagi/Graphics/Game/OverlayRenderingSystem.hpp>
 #include <Usagi/Runtime/Input/Keyboard/KeyEventListener.hpp>
 #include <Usagi/Runtime/Input/Mouse/MouseEventListener.hpp>
 #include <Usagi/Runtime/Window/WindowEventListener.hpp>
-#include <Usagi/Game/CollectionSubsystem.hpp>
+#include <Usagi/Game/CollectionSystem.hpp>
 
-#include "ImGuiComponent.hpp"
+#include "Nuklear.hpp"
+#include "NuklearComponent.hpp"
 
-struct ImGuiContext;
+struct NuklearContext;
 
 namespace usagi
 {
@@ -26,9 +27,9 @@ class GpuBuffer;
 class GraphicsPipeline;
 class Mouse;
 
-class ImGuiSubsystem
-    : public OverlayRenderingSubsystem
-    , public CollectionSubsystem<ImGuiComponent>
+class NuklearSystem
+    : public OverlayRenderingSystem
+    , public CollectionSystem<NuklearComponent>
     , public KeyEventListener
     , public MouseEventListener
     , public WindowEventListener
@@ -38,19 +39,18 @@ class ImGuiSubsystem
     std::shared_ptr<Keyboard> mKeyboard;
     std::shared_ptr<Mouse> mMouse;
 
-    ImGuiContext *mContext = nullptr;
-    bool mMouseJustPressed[5] = { };
+    mutable nk_context mContext;
+    nk_font_atlas mAtlas;
+    mutable nk_buffer mCommandList;
+    nk_draw_null_texture mNullTexture;
 
-    void setupInput();
+    static void clipboardPaste(nk_handle usr, struct nk_text_edit *edit);
+    static void clipboardCopy(nk_handle usr, const char *text, int len);
 
-    void newFrame(float dt);
     void processElements(const Clock &clock);
-
-    void updateMouse();
 
     std::shared_ptr<GraphicsPipeline> mPipeline;
     std::shared_ptr<GpuCommandPool> mCommandPool;
-    std::shared_ptr<RenderPass> mRenderPass;
     std::shared_ptr<GpuBuffer> mVertexBuffer;
     std::shared_ptr<GpuBuffer> mIndexBuffer;
     std::shared_ptr<GpuImage> mFontTexture;
@@ -60,22 +60,23 @@ class ImGuiSubsystem
     void setup();
 
 public:
-    ImGuiSubsystem(
+    NuklearSystem(
         Game *game,
         std::shared_ptr<Window> window,
         std::shared_ptr<Keyboard> keyboard,
         std::shared_ptr<Mouse> mouse);
-    ~ImGuiSubsystem() override;
-
-    void createRenderTarget(RenderTargetDescriptor &descriptor) override;
-    void createPipelines() override;
-    std::shared_ptr<GraphicsCommandList> render(const Clock &clock) override;
+    ~NuklearSystem() override;
 
     bool onKeyStateChange(const KeyEvent &e) override;
+    bool onMouseMove(const MousePositionEvent &e) override;
     bool onMouseButtonStateChange(const MouseButtonEvent &e) override;
     bool onMouseWheelScroll(const MouseWheelEvent &e) override;
     void onWindowCharInput(const WindowCharEvent &e) override;
 
     void update(const Clock &clock) override;
+
+    void createRenderTarget(RenderTargetDescriptor &descriptor) override;
+    void createPipelines() override;
+    std::shared_ptr<GraphicsCommandList> render(const Clock &clock) override;
 };
 }

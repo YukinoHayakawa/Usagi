@@ -39,13 +39,7 @@
     <ClCompile Include="Extension\DebugDraw\DebugDrawImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Extension\DebugDraw\DebugDrawSubsystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Extension\ImGui\ImGuiImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\ImGui\ImGuiSubsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Vulkan\WSI\VulkanSwapchain.cpp">
@@ -153,9 +147,6 @@
     <ClCompile Include="Runtime\Memory\BitmapMemoryAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Transform\TransformSubsystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Utility\File.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -183,9 +174,6 @@
     <ClCompile Include="Camera\Controller\ModelViewCameraController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Animation\AnimationSubsystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Core\Clock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -196,9 +184,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Extension\Nuklear\NuklearImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Extension\Nuklear\NuklearSubsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameState.cpp">
@@ -228,13 +213,7 @@
     <ClCompile Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Game\ImageTransitionSubsystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\RenderTarget\RenderTargetProvider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Game\OverlayRenderingSubsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Asset\Converter\Uncached\StringAssetConverter.cpp">
@@ -255,19 +234,40 @@
     <ClCompile Include="Sampler\RandomSampler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Interactive\InputSubsystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Geometry\Shape\Common\Sphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Geometry\RayCastSubsystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Camera\OrthogonalCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utility\Utf8Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interactive\InputSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\AnimationSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\DebugDraw\DebugDrawSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\ImGui\ImGuiSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extension\Nuklear\NuklearSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry\RayCastSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Game\ImageTransitionSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Game\OverlayRenderingSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform\TransformSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -335,9 +335,6 @@
     <ClInclude Include="Extension\DebugDraw\DebugDrawComponent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\DebugDraw\DebugDrawSubsystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Extension\ImGui\ImGui.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -345,9 +342,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Extension\ImGui\ImGuiConfig.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\ImGui\ImGuiSubsystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Extension\Vulkan\WSI\VulkanSwapchain.hpp">
@@ -455,9 +449,6 @@
     <ClInclude Include="Game\Game.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Subsystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Graphics\Enum\CompareOp.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -546,9 +537,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Transform\TransformComponent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform\TransformSubsystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Transform\Util.hpp">
@@ -692,12 +680,6 @@
     <ClInclude Include="Asset\AssetLoadingContext.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\AnimationSubsystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\CollectionSubsystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Clock.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -708,9 +690,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Extension\Nuklear\Nuklear.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\Nuklear\NuklearSubsystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Extension\Nuklear\NuklearComponent.hpp">
@@ -734,15 +713,6 @@
     <ClInclude Include="Graphics\Game\GraphicalGameState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Game\OverlayRenderingSubsystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Game\ProjectiveRenderingSubsystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Game\RenderableSubsystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\RenderTarget\RenderTargetSource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -762,9 +732,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Game\ImageTransitionSubsystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Graphics\GpuImageFormat.hpp">
@@ -812,9 +779,6 @@
     <ClInclude Include="Interactive\InputComponent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Interactive\InputSubsystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\EventListener.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -845,9 +809,6 @@
     <ClInclude Include="Extension\DebugDraw\DelegatedDebugDrawComponent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\RayCastSubsystem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Geometry\ShapeComponent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -861,6 +822,45 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utility\Utf8Main.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\System.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interactive\InputSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\AnimationSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\CollectionSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\DebugDraw\DebugDrawSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\ImGui\ImGuiSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\Nuklear\NuklearSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\RayCastSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Game\ImageTransitionSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Game\OverlayRenderingSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Game\ProjectiveRenderingSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Game\RenderableSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform\TransformSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

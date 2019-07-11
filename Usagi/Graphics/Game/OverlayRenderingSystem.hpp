@@ -4,7 +4,7 @@
 
 #include <Usagi/Core/Math.hpp>
 
-#include "RenderableSubsystem.hpp"
+#include "RenderableSystem.hpp"
 
 namespace usagi
 {
@@ -13,7 +13,7 @@ class RenderWindow;
 /**
  * \brief Draw in 2D screen coordinates.
  */
-class OverlayRenderingSubsystem : virtual public RenderableSubsystem
+class OverlayRenderingSystem : virtual public RenderableSystem
 {
 protected:
     using SizeFunc = std::function<Vector2f()>;

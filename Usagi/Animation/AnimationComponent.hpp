@@ -26,7 +26,7 @@ struct Animation
     TimePoint start_time = 0;
     TimeDuration duration = 0;
 
-    // used by AnimationSubsystem
+    // used by AnimationSystem
 
     bool started = false;
     // normalized 0~1
@@ -71,11 +71,7 @@ struct AnimationComponent : Component
 {
     std::vector<Animation> animations;
 
-    void add(Animation animation)
-    {
-        assert(animation.duration > 0);
-        animations.push_back(std::move(animation));
-    }
+    void add(Animation animation);
 
     /**
      * \brief Immediately call all animation_func with value 1 to set them

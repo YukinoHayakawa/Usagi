@@ -31,7 +31,7 @@ private:
 
     /**
     * \brief Transform from local coordinates to world coordinates.
-    * Calculated by TransformSubsystem using
+    * Calculated by TransformSystem using
     * <Parent Element>.localToWorld() * localToParent() if the parent has
     * a TransformComponent. Otherwise identical to localToParent().
     * The calculation cascade towards the root element and is cached if

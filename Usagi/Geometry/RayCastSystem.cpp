@@ -1,10 +1,10 @@
-﻿#include "RayCastSubsystem.hpp"
+﻿#include "RayCastSystem.hpp"
 
 #include "Intersection.hpp"
 #include "Shape.hpp"
 #include "Ray.hpp"
 
-std::optional<usagi::Intersection> usagi::RayCastSubsystem::intersect(
+std::optional<usagi::Intersection> usagi::RayCastSystem::intersect(
     const Ray &ray)
 {
     Intersection x;

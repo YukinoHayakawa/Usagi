@@ -1,17 +1,17 @@
 ﻿#pragma once
 
-#include <Usagi/Game/Subsystem.hpp>
+#include <Usagi/Game/System.hpp>
 
 namespace usagi
 {
 class InputMapping;
 
-class InputSubsystem : public Subsystem
+class InputSystem : public System
 {
     InputMapping *mInputMapping = nullptr;
 
 public:
-    explicit InputSubsystem(InputMapping *input_mapping);
+    explicit InputSystem(InputMapping *input_mapping);
 
     void onElementComponentChanged(Element *element) override;
 

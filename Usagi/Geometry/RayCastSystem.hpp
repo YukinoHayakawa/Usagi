@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include <Usagi/Game/CollectionSubsystem.hpp>
+#include <Usagi/Game/CollectionSystem.hpp>
 
 #include "ShapeComponent.hpp"
 #include "Intersection.hpp"
@@ -15,8 +15,8 @@ struct Ray;
 /**
  * \brief Provides ray cast service. Does nothing during update.
  */
-class RayCastSubsystem
-    : public CollectionSubsystem<
+class RayCastSystem
+    : public CollectionSystem<
         ShapeComponent,
         RayCastComponent
     >

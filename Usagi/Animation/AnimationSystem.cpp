@@ -1,4 +1,4 @@
-﻿#include "AnimationSubsystem.hpp"
+﻿#include "AnimationSystem.hpp"
 
 #include <cmath>
 
@@ -34,7 +34,7 @@ struct Sentry
 };
 }
 
-void usagi::AnimationSubsystem::update(const Clock &clock)
+void usagi::AnimationSystem::update(const Clock &clock)
 {
     mActiveCount = 0;
     for(auto &&e : mRegistry)

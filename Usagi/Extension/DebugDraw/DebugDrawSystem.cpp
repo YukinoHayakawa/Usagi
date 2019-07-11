@@ -1,4 +1,4 @@
-﻿#include "DebugDrawSubsystem.hpp"
+﻿#include "DebugDrawSystem.hpp"
 
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Converter/SpirvAssetConverter.hpp>
@@ -18,7 +18,7 @@
 #include <Usagi/Runtime/Graphics/GraphicsPipelineCompiler.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
 
-void usagi::DebugDrawSubsystem::createRenderTarget(
+void usagi::DebugDrawSystem::createRenderTarget(
     RenderTargetDescriptor &descriptor)
 {
     descriptor.sharedColorTarget("debugdraw");
@@ -26,7 +26,7 @@ void usagi::DebugDrawSubsystem::createRenderTarget(
     mRenderTarget = descriptor.finish();
 }
 
-void usagi::DebugDrawSubsystem::createPipelines()
+void usagi::DebugDrawSystem::createPipelines()
 {
     auto gpu = mGame->runtime()->gpu();
     mCommandPool = gpu->createCommandPool();
@@ -36,7 +36,7 @@ void usagi::DebugDrawSubsystem::createPipelines()
     createTextPipeline();
 }
 
-void usagi::DebugDrawSubsystem::createPointLinePipeline()
+void usagi::DebugDrawSystem::createPointLinePipeline()
 {
     auto gpu = mGame->runtime()->gpu();
     auto assets = mGame->assets();
@@ -96,7 +96,7 @@ void usagi::DebugDrawSubsystem::createPointLinePipeline()
     mLineDepthEnabledPipeline = compiler->compile();
 }
 
-void usagi::DebugDrawSubsystem::createTextPipeline()
+void usagi::DebugDrawSystem::createTextPipeline()
 {
     auto gpu = mGame->runtime()->gpu();
     auto assets = mGame->assets();
@@ -156,19 +156,19 @@ void usagi::DebugDrawSubsystem::createTextPipeline()
     mTextPipeline = compiler->compile();
 }
 
-usagi::DebugDrawSubsystem::DebugDrawSubsystem(Game *game)
+usagi::DebugDrawSystem::DebugDrawSystem(Game *game)
     : mGame(game)
 {
     dd::initialize(&mContext, this);
 }
 
-usagi::DebugDrawSubsystem::~DebugDrawSubsystem()
+usagi::DebugDrawSystem::~DebugDrawSystem()
 {
     dd::shutdown(mContext);
     mContext = nullptr;
 }
 
-void usagi::DebugDrawSubsystem::update(const Clock &clock)
+void usagi::DebugDrawSystem::update(const Clock &clock)
 {
     for(auto &&e : mRegistry)
     {
@@ -176,7 +176,7 @@ void usagi::DebugDrawSubsystem::update(const Clock &clock)
     }
 }
 
-std::shared_ptr<usagi::GraphicsCommandList> usagi::DebugDrawSubsystem::render(
+std::shared_ptr<usagi::GraphicsCommandList> usagi::DebugDrawSystem::render(
     const Clock &clock)
 {
     const auto framebuffer = mRenderTarget->createFramebuffer();
@@ -194,7 +194,7 @@ std::shared_ptr<usagi::GraphicsCommandList> usagi::DebugDrawSubsystem::render(
     return std::move(mCurrentCmdList);
 }
 
-dd::GlyphTextureHandle usagi::DebugDrawSubsystem::createGlyphTexture(
+dd::GlyphTextureHandle usagi::DebugDrawSystem::createGlyphTexture(
     const int width,
     const int height,
     const void *pixels)
@@ -223,13 +223,13 @@ dd::GlyphTextureHandle usagi::DebugDrawSubsystem::createGlyphTexture(
         mFontTexture->baseView().get());
 }
 
-void usagi::DebugDrawSubsystem::destroyGlyphTexture(dd::GlyphTextureHandle)
+void usagi::DebugDrawSystem::destroyGlyphTexture(dd::GlyphTextureHandle)
 {
     mFontTexture.reset();
     mFontSampler.reset();
 }
 
-void usagi::DebugDrawSubsystem::drawPointList(
+void usagi::DebugDrawSystem::drawPointList(
     const dd::DrawVertex *points,
     const int count,
     const bool depth_enabled)
@@ -254,7 +254,7 @@ void usagi::DebugDrawSubsystem::drawPointList(
     mVertexBuffer->release();
 }
 
-void usagi::DebugDrawSubsystem::drawLineList(
+void usagi::DebugDrawSystem::drawLineList(
     const dd::DrawVertex *lines,
     const int count,
     const bool depth_enabled)
@@ -282,7 +282,7 @@ void usagi::DebugDrawSubsystem::drawLineList(
     mVertexBuffer->release();
 }
 
-void usagi::DebugDrawSubsystem::drawGlyphList(
+void usagi::DebugDrawSystem::drawGlyphList(
     const dd::DrawVertex *glyphs,
     const int count,
     const dd::GlyphTextureHandle glyph_tex)

@@ -1,15 +1,15 @@
-﻿#include "InputSubsystem.hpp"
+﻿#include "InputSystem.hpp"
 
 #include <Usagi/Core/Element.hpp>
 
 #include "InputComponent.hpp"
 
-usagi::InputSubsystem::InputSubsystem(InputMapping *input_mapping)
+usagi::InputSystem::InputSystem(InputMapping *input_mapping)
     : mInputMapping(input_mapping)
 {
 }
 
-void usagi::InputSubsystem::onElementComponentChanged(Element *element)
+void usagi::InputSystem::onElementComponentChanged(Element *element)
 {
     if(const auto comp = element->findComponent<InputComponent>())
     {

@@ -1,5 +1,5 @@
 ﻿#define DEBUG_DRAW_IMPLEMENTATION
-#include "DebugDrawSubsystem.hpp"
+#include "DebugDrawSystem.hpp"
 
 void dd::xySquareGrid(
     DD_EXPLICIT_CONTEXT_ONLY(ContextHandle ctx,)

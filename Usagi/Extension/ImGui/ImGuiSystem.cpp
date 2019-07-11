@@ -1,4 +1,4 @@
-﻿#include "ImGuiSubsystem.hpp"
+﻿#include "ImGuiSystem.hpp"
 
 #include <Usagi/Asset/AssetRoot.hpp>
 #include <Usagi/Asset/Converter/SpirvAssetConverter.hpp>
@@ -26,7 +26,7 @@
 
 #include "ImGui.hpp"
 
-void usagi::ImGuiSubsystem::setup()
+void usagi::ImGuiSystem::setup()
 {
     mContext = ImGui::CreateContext();
     auto &io = ImGui::GetIO();
@@ -117,7 +117,7 @@ void usagi::ImGuiSubsystem::setup()
     }
 }
 
-usagi::ImGuiSubsystem::ImGuiSubsystem(
+usagi::ImGuiSystem::ImGuiSystem(
     Game *game,
     std::shared_ptr<Window> window,
     std::shared_ptr<Keyboard> keyboard,
@@ -134,20 +134,20 @@ usagi::ImGuiSubsystem::ImGuiSubsystem(
     mMouse->addEventListener(this);
 }
 
-usagi::ImGuiSubsystem::~ImGuiSubsystem()
+usagi::ImGuiSystem::~ImGuiSystem()
 {
     ImGui::SetCurrentContext(mContext);
     ImGui::DestroyContext();
 }
 
-void usagi::ImGuiSubsystem::createRenderTarget(
+void usagi::ImGuiSystem::createRenderTarget(
     RenderTargetDescriptor &descriptor)
 {
     descriptor.sharedColorTarget("imgui");
     mRenderTarget = descriptor.finish();
 }
 
-void usagi::ImGuiSubsystem::createPipelines()
+void usagi::ImGuiSystem::createPipelines()
 {
     auto gpu = mGame->runtime()->gpu();
     auto assets = mGame->assets();
@@ -202,7 +202,7 @@ void usagi::ImGuiSubsystem::createPipelines()
     mPipeline = compiler->compile();
 }
 
-void usagi::ImGuiSubsystem::setupInput()
+void usagi::ImGuiSystem::setupInput()
 {
     // Setup back-end capabilities flags
     auto &io = ImGui::GetIO();
@@ -248,7 +248,7 @@ void usagi::ImGuiSubsystem::setupInput()
     io.ClipboardUserData = mWindow.get();
 }
 
-void usagi::ImGuiSubsystem::update(const Clock &clock)
+void usagi::ImGuiSystem::update(const Clock &clock)
 {
     ImGui::SetCurrentContext(mContext);
 
@@ -256,7 +256,7 @@ void usagi::ImGuiSubsystem::update(const Clock &clock)
     processElements(clock);
 }
 
-void usagi::ImGuiSubsystem::newFrame(const float dt)
+void usagi::ImGuiSystem::newFrame(const float dt)
 {
     auto &io = ImGui::GetIO();
 
@@ -283,7 +283,7 @@ void usagi::ImGuiSubsystem::newFrame(const float dt)
     ImGui::NewFrame();
 }
 
-void usagi::ImGuiSubsystem::updateMouse()
+void usagi::ImGuiSystem::updateMouse()
 {
     auto &io = ImGui::GetIO();
 
@@ -315,13 +315,13 @@ void usagi::ImGuiSubsystem::updateMouse()
     // todo: update cursor
 }
 
-void usagi::ImGuiSubsystem::processElements(const Clock &clock)
+void usagi::ImGuiSystem::processElements(const Clock &clock)
 {
     for(auto &e : mRegistry)
         std::get<ImGuiComponent*>(e.second)->draw(clock);
 }
 
-std::shared_ptr<usagi::GraphicsCommandList> usagi::ImGuiSubsystem::render(
+std::shared_ptr<usagi::GraphicsCommandList> usagi::ImGuiSystem::render(
     const Clock &clock)
 {
     ImGui::Render();
@@ -447,7 +447,7 @@ std::shared_ptr<usagi::GraphicsCommandList> usagi::ImGuiSubsystem::render(
     return std::move(cmd_list);
 }
 
-bool usagi::ImGuiSubsystem::onKeyStateChange(const KeyEvent &e)
+bool usagi::ImGuiSystem::onKeyStateChange(const KeyEvent &e)
 {
     auto &io = ImGui::GetIO();
 
@@ -465,7 +465,7 @@ bool usagi::ImGuiSubsystem::onKeyStateChange(const KeyEvent &e)
     return true;
 }
 
-bool usagi::ImGuiSubsystem::onMouseButtonStateChange(
+bool usagi::ImGuiSystem::onMouseButtonStateChange(
     const MouseButtonEvent &e)
 {
     if(e.pressed)
@@ -474,7 +474,7 @@ bool usagi::ImGuiSubsystem::onMouseButtonStateChange(
     return true;
 }
 
-bool usagi::ImGuiSubsystem::onMouseWheelScroll(const MouseWheelEvent &e)
+bool usagi::ImGuiSystem::onMouseWheelScroll(const MouseWheelEvent &e)
 {
     auto &io = ImGui::GetIO();
 
@@ -484,7 +484,7 @@ bool usagi::ImGuiSubsystem::onMouseWheelScroll(const MouseWheelEvent &e)
     return true;
 }
 
-void usagi::ImGuiSubsystem::onWindowCharInput(const WindowCharEvent &e)
+void usagi::ImGuiSystem::onWindowCharInput(const WindowCharEvent &e)
 {
     auto &io = ImGui::GetIO();
 

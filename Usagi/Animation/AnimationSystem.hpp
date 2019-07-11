@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include <Usagi/Game/CollectionSubsystem.hpp>
+#include <Usagi/Game/CollectionSystem.hpp>
 
 #include "AnimationComponent.hpp"
 
 namespace usagi
 {
-class AnimationSubsystem : public CollectionSubsystem<AnimationComponent>
+class AnimationSystem : public CollectionSystem<AnimationComponent>
 {
     std::size_t mActiveCount = 0;
 
