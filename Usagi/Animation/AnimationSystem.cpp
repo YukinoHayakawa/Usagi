@@ -108,3 +108,8 @@ void usagi::AnimationSystem::update(const Clock &clock)
         }
     }
 }
+
+void AnimationSystem::immediatelyFinishAll()
+{
+    // todo
+}
