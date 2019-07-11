@@ -6,8 +6,10 @@
 namespace
 {
 auto gLogger = []() {
-    auto logger = spdlog::stdout_color_mt("default");
+    using namespace spdlog;
+    auto logger = stdout_color_mt("default");
     // logger->set_pattern()
+    logger->set_level(level::level_enum::trace);
     return std::move(logger);
 }();
 }
