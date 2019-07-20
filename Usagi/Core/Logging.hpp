@@ -4,7 +4,7 @@
 // enables outputting custom types
 #include <fmt/ostream.h>
 
-namespace usagi
+namespace usagi::logging
 {
 enum class LoggingLevel
 {
@@ -19,6 +19,7 @@ enum class LoggingLevel
 
 bool shouldLog(LoggingLevel level);
 void doLog(LoggingLevel level, std::string_view msg);
+void addFileSink(const std::string &file_path);
 
 template <typename... Args>
 void log(const LoggingLevel level, std::string_view fmt, Args &&... args)
@@ -31,4 +32,7 @@ void log(const LoggingLevel level, std::string_view fmt, Args &&... args)
 }
 }
 
-#define LOG(level, ...) ::usagi::log(::usagi::LoggingLevel::level, __VA_ARGS__)
+#define LOG(level, ...) \
+    ::usagi::logging::log(\
+        ::usagi::logging::LoggingLevel::level, __VA_ARGS__) \
+/**/

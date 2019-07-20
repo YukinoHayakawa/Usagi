@@ -44,6 +44,8 @@ VkBool32 usagi::VulkanGpuDevice::debugMessengerCallback(
     const vk::DebugUtilsMessageTypeFlagsEXT &message_type,
     const vk::DebugUtilsMessengerCallbackDataEXT *callback_data) const
 {
+    using namespace logging;
+
     // see https://www.lunarg.com/wp-content/uploads/2018/05/Vulkan-Debug-Utils_05_18_v1.pdf for example code
 
     LoggingLevel level;

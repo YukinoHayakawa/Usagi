@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 namespace
 {
@@ -14,7 +15,7 @@ auto gLogger = []() {
 }();
 }
 
-namespace usagi
+namespace usagi::logging
 {
 bool shouldLog(LoggingLevel level)
 {
@@ -28,5 +29,13 @@ void doLog(const LoggingLevel level, std::string_view msg)
         static_cast<spdlog::level::level_enum>(level),
         msg
     );
+}
+
+void addFileSink(const std::string &file_path)
+{
+    gLogger->sinks().push_back(
+        std::make_shared<spdlog::sinks::basic_file_sink_mt>(
+            file_path
+        ));
 }
 }
