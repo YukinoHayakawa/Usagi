@@ -1,5 +1,7 @@
 ﻿#include "VulkanGpuBuffer.hpp"
 
+#include <Usagi/Utility/Rounding.hpp>
+
 #include "VulkanGpuDevice.hpp"
 #include "VulkanBufferAllocation.hpp"
 #include "VulkanMemoryPool.hpp"
@@ -14,7 +16,17 @@ usagi::VulkanGpuBuffer::VulkanGpuBuffer(
 
 void usagi::VulkanGpuBuffer::allocate(std::size_t size)
 {
-    mAllocation = mPool->allocate(size);
+    // the buffer allocation size must be flushable according to
+    // VUID-VkMappedMemoryRange-size-01390:
+    // If size is not equal to VK_WHOLE_SIZE, size must either be a multiple of
+    // VkPhysicalDeviceLimits::nonCoherentAtomSize, or offset plus size must
+    // equal the size of memory.
+    const std::size_t flushable_size = utility::roundUpUnsigned(
+        size,
+        mPool->device()->physicalDevice().getProperties()
+            .limits.nonCoherentAtomSize
+    );
+    mAllocation = mPool->allocate(flushable_size);
 }
 
 void * usagi::VulkanGpuBuffer::mappedMemory()
