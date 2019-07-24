@@ -186,23 +186,51 @@ public:
         };
     }
 
+private:
+    Entity & findEntity(EntityId id)
+    {
+        const auto iter = mEntities.find(id);
+        assert(iter != mEntities.end());
+        return *iter;
+    }
+
     template <typename Component, typename... Args>
     EntityManager & addComponent(Entity &entity, Args &&... args)
     {
         auto &storage = componentStorage<Component>();
         if(entity.components[storage.mask_bit])
-            throw std::runtime_error("Entity already has specified component.");
+            throw std::runtime_error(
+                "Entity already has the specified component.");
         entity.components[storage.mask_bit].flip();
         storage.insert(entity.id, { std::forward<Args>(args)... });
         return *this;
     }
 
-    template <typename Component, typename... Args>
-    EntityManager & addComponent(EntityId id, Args &&... args)
+    template <typename Component>
+    EntityManager & removeComponent(Entity &entity)
     {
-        auto &entity = *mEntities.find(id);
-        assert(entity != mEntities.end());
+        auto &storage = componentStorage<Component>();
+        if(!entity.components[storage.mask_bit])
+            throw std::runtime_error(
+                "Entity does not have the specified component.");
+        entity.components[storage.mask_bit].flip();
+        storage.erase(entity.id);
+        return *this;
+    }
+
+public:
+    template <typename Component, typename... Args>
+    EntityManager & addComponent(const EntityId id, Args &&... args)
+    {
+        auto &entity = findEntity(id);
         return addComponent<Component>(entity, std::forward<Args>(args)...);
+    }
+
+    template <typename Component>
+    EntityManager & removeComponent(const EntityId id)
+    {
+        auto &entity = findEntity(id);
+        return removeComponent<Component>(entity);
     }
 };
 }
