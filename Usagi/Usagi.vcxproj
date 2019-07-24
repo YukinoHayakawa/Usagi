@@ -92,6 +92,7 @@
     <ClCompile Include="Core\Element.cpp" />
     <ClCompile Include="Core\Event\Event.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
+    <ClCompile Include="ECS\Game2.cpp" />
     <ClCompile Include="Extension\DebugDraw\DebugDrawImpl.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
@@ -219,6 +220,15 @@
     <ClInclude Include="Core\Logging.hpp" />
     <ClInclude Include="Core\Math.hpp" />
     <ClInclude Include="Core\PredefinedElement.hpp" />
+    <ClInclude Include="ECS\Common.hpp" />
+    <ClInclude Include="ECS\ComponentStorage.hpp" />
+    <ClInclude Include="ECS\ComponentStream.hpp" />
+    <ClInclude Include="ECS\Entity.hpp" />
+    <ClInclude Include="ECS\EntityManager.hpp" />
+    <ClInclude Include="ECS\Execution.hpp" />
+    <ClInclude Include="ECS\Game2.hpp" />
+    <ClInclude Include="ECS\GameContext.hpp" />
+    <ClInclude Include="ECS\System.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDraw.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDrawComponent.hpp" />
     <ClInclude Include="Extension\DebugDraw\DebugDrawSystem.hpp" />
@@ -364,6 +374,7 @@
     <ClInclude Include="Utility\Functional.hpp" />
     <ClInclude Include="Utility\Hash.hpp" />
     <ClInclude Include="Utility\Iterator.hpp" />
+    <ClInclude Include="Utility\SortedArray.hpp" />
     <ClInclude Include="Utility\Utf8Main.hpp" />
     <ClInclude Include="Utility\Math.hpp" />
     <ClInclude Include="Utility\Noncopyable.hpp" />
