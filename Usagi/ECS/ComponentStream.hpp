@@ -14,6 +14,7 @@ class ComponentStream
 public:
     ComponentStream(ComponentStorage<Component> &storage)
         : mStorage(storage)
+        , mCursor(mStorage.components.begin())
     {
     }
 

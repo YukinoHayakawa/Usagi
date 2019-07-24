@@ -54,6 +54,7 @@ class EntityManager
 
         bool operator()(const Entity &e) const
         {
+            assert(manager);
             return e.matchMask(mask);
         }
     };
