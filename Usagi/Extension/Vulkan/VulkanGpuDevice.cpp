@@ -8,6 +8,7 @@
 #include <Usagi/Runtime/Memory/BitmapMemoryAllocator.hpp>
 #include <Usagi/Utility/Flag.hpp>
 #include <Usagi/Utility/TypeCast.hpp>
+#include <Usagi/Utility/String.hpp>
 
 #include "VulkanFramebuffer.hpp"
 #include "VulkanGpuBuffer.hpp"
@@ -69,7 +70,7 @@ VkBool32 usagi::VulkanGpuDevice::debugMessengerCallback(
         to_string(message_severity),
         to_string(message_type),
         callback_data->messageIdNumber,
-        callback_data->pMessageIdName,
+        USAGI_OPT_STRING(callback_data->pMessageIdName),
         callback_data->pMessage);
 
     if(callback_data->objectCount > 0)
@@ -83,7 +84,8 @@ VkBool32 usagi::VulkanGpuDevice::debugMessengerCallback(
                 i,
                 to_string(object.objectType),
                 object.objectHandle,
-                object.pObjectName ? object.pObjectName : "");
+                USAGI_OPT_STRING(object.pObjectName)
+            );
         }
     }
     if(callback_data->cmdBufLabelCount > 0)
@@ -289,9 +291,12 @@ void usagi::VulkanGpuDevice::createDeviceAndQueues()
 
 void usagi::VulkanGpuDevice::createMemoryPools()
 {
+    const auto dyn_size = 1024 * 1024 * 64; // 64MiB  todo from config
+    const auto device_size = 1024 * 1024 * 512; // 512MiB  todo from config
+    LOG(info, "Allocating {} bytes for dynamic memory pool", dyn_size);
     mDynamicBufferPool = std::make_unique<BitmapBufferPool>(
         this,
-        1024 * 1024 * 512, // 512MiB  todo from config
+        dyn_size,
         vk::MemoryPropertyFlagBits::eHostVisible |
         vk::MemoryPropertyFlagBits::eHostCoherent,
         vk::BufferUsageFlagBits::eTransferSrc |
@@ -307,9 +312,10 @@ void usagi::VulkanGpuDevice::createMemoryPools()
         }
     );
 
+    LOG(info, "Allocating {} bytes for device memory pool", device_size);
     mDeviceImagePool = std::make_unique<BitmapImagePool>(
         this,
-        1024 * 1024 * 512, // 512MiB  todo from config
+        device_size,
         vk::MemoryPropertyFlagBits::eDeviceLocal,
         vk::ImageUsageFlagBits::eTransferDst |
         vk::ImageUsageFlagBits::eSampled,
@@ -529,7 +535,9 @@ usagi::VulkanGpuDevice::allocateStageBuffer(std::size_t size)
 
 void usagi::VulkanGpuDevice::copyBufferToImage(
     const std::shared_ptr<VulkanBufferAllocation> &buffer,
-    VulkanGpuImage *image)
+    VulkanGpuImage *image,
+    const Vector2i &offset,
+    const Vector2u32 &size)
 {
     vk::UniqueCommandBuffer cmd;
     {
@@ -568,8 +576,8 @@ void usagi::VulkanGpuDevice::copyBufferToImage(
     }
     {
         vk::BufferImageCopy copy;
-        const auto size = image->size();
         copy.setImageExtent({ size.x(), size.y(), 1 });
+        copy.setImageOffset({ offset.x(), offset.y(), 0 });
         copy.setBufferOffset(buffer->offset());
         copy.imageSubresource.setAspectMask(vk::ImageAspectFlagBits::eColor);
         copy.imageSubresource.setLayerCount(1);

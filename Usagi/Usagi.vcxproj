@@ -375,6 +375,7 @@
     <ClInclude Include="Utility\Hash.hpp" />
     <ClInclude Include="Utility\Iterator.hpp" />
     <ClInclude Include="Utility\SortedArray.hpp" />
+    <ClInclude Include="Utility\String.hpp" />
     <ClInclude Include="Utility\Utf8Main.hpp" />
     <ClInclude Include="Utility\Math.hpp" />
     <ClInclude Include="Utility\Noncopyable.hpp" />
