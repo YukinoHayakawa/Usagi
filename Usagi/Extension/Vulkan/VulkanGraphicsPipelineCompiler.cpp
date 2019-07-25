@@ -426,6 +426,16 @@ void usagi::VulkanGraphicsPipelineCompiler::setShader(
     mShaders[stage] = std::move(info);
 }
 
+usagi::VulkanGraphicsPipelineCompiler::VertexInputBindingArray::iterator
+usagi::VulkanGraphicsPipelineCompiler::findVertexBufferBinding(
+    const std::uint32_t binding_index)
+{
+    return std::find_if(
+        mVertexInputBindings.begin(), mVertexInputBindings.end(),
+        [=](auto &&item) { return item.binding == binding_index; }
+    );
+}
+
 void usagi::VulkanGraphicsPipelineCompiler::setVertexBufferBinding(
     const std::uint32_t binding_index,
     const std::uint32_t stride,
@@ -436,10 +446,7 @@ void usagi::VulkanGraphicsPipelineCompiler::setVertexBufferBinding(
     vulkan_binding.setStride(stride);
     vulkan_binding.setInputRate(translate(input_rate));
 
-    const auto iter = std::find_if(
-        mVertexInputBindings.begin(), mVertexInputBindings.end(),
-        [=](auto &&item) { return item.binding == binding_index; }
-    );
+    const auto iter = findVertexBufferBinding(binding_index);
     if(iter != mVertexInputBindings.end())
         *iter = vulkan_binding; // update old info
     else
@@ -452,6 +459,9 @@ void usagi::VulkanGraphicsPipelineCompiler::setVertexAttribute(
     const std::uint32_t offset,
     const GpuBufferFormat source_format)
 {
+    if(findVertexBufferBinding(binding_index) == mVertexInputBindings.end())
+        LOG(warn, "Vertex input binding {} is not registered.", binding_index);
+
     vk::VertexInputAttributeDescription vulkan_attr;
     // Deferred to compilation when shader reflection is available.
     // vulkan_attr.setLocation();

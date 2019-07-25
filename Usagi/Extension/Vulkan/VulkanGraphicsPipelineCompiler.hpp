@@ -65,6 +65,9 @@ class VulkanGraphicsPipelineCompiler final : public GraphicsPipelineCompiler
     // Pipeline derivatives support
     std::shared_ptr<VulkanGraphicsPipeline> mParentPipeline;
 
+    VertexInputBindingArray::iterator findVertexBufferBinding(
+            std::uint32_t binding_index);
+
 public:
     explicit VulkanGraphicsPipelineCompiler(VulkanGpuDevice *device);
 
