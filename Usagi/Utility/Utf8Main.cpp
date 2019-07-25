@@ -4,6 +4,8 @@
 #include <utf8.h>
 #include <fmt/printf.h>
 
+#include <Usagi/Core/Logging.hpp>
+
 int usagi_main(const std::vector<std::string> &args);
 
 namespace usagi
@@ -42,11 +44,11 @@ int wrappedMain(const std::vector<std::string> &args)
     }
     catch(const std::exception &e)
     {
-        fmt::print("{}\n", e.what());
+        LOG(error, e.what());
     }
     catch(...)
     {
-        fmt::print("Unknown unhandled exception occurred.\n");
+        LOG(error, "Unknown unhandled exception occurred.");
     }
     return 1;
 }
