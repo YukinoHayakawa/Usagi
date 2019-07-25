@@ -42,7 +42,7 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
     // not in cache, create a child and return it if the file exists.
     {
         if(!std::filesystem::exists(mRootPath / normalized))
-            throw std::runtime_error("File not found.");
+            return nullptr;
         return addChild<FilesystemAsset>(normalized.u8string());
     }
 }
