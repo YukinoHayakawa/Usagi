@@ -25,7 +25,13 @@ public:
         std::size_t buffer_size);
     ~VulkanPooledImage();
 
-    void upload(const void *data, std::size_t size) override;
+    void upload(const void *buf_data, std::size_t buf_size) override;
+
+    void uploadRegion(
+        const void *buf_data,
+        std::size_t buf_size,
+        const Vector2i &tex_offset,
+        const Vector2u32 &tex_size) override;
 
     vk::Image image() const override { return mImage.get(); }
     std::size_t offset() const { return mBufferOffset; }

@@ -23,12 +23,23 @@ usagi::VulkanPooledImage::~VulkanPooledImage()
     mPool->deallocate(mBufferOffset);
 }
 
-void usagi::VulkanPooledImage::upload(const void *data, const std::size_t size)
+void usagi::VulkanPooledImage::upload(
+    const void *buf_data,
+    const std::size_t buf_size)
 {
-    assert(size <= mBufferSize);
+    uploadRegion(buf_data, buf_size, Vector2i::Zero(), mSize);
+}
+
+void usagi::VulkanPooledImage::uploadRegion(
+    const void *buf_data,
+    std::size_t buf_size,
+    const Vector2i &tex_offset,
+    const Vector2u32 &tex_size)
+{
+    assert(buf_size <= mBufferSize);
 
     auto device = mPool->device();
-    const auto buffer = device->allocateStageBuffer(size);
-    memcpy(buffer->mappedAddress(), data, size);
-    device->copyBufferToImage(buffer, this);
+    const auto buffer = device->allocateStageBuffer(buf_size);
+    memcpy(buffer->mappedAddress(), buf_data, buf_size);
+    device->copyBufferToImage(buffer, this, tex_offset, tex_size);
 }

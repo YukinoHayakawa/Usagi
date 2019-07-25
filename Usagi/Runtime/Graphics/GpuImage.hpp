@@ -35,9 +35,15 @@ public:
 
     /**
      * \brief Upload image data to GPU memory.
-     * \param data
-     * \param size
+     * \param buf_data
+     * \param buf_size
      */
-    virtual void upload(const void *data, std::size_t size) = 0;
+    virtual void upload(const void *buf_data, std::size_t buf_size) = 0;
+    // todo uploading from subregion of a complete buffer to subregion of an image
+    virtual void uploadRegion(
+        const void *buf_data,
+        std::size_t buf_size,
+        const Vector2i &tex_offset,
+        const Vector2u32 &tex_size) = 0;
 };
 }

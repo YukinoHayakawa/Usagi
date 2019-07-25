@@ -120,6 +120,9 @@ public:
         std::size_t size);
     void copyBufferToImage(
         const std::shared_ptr<VulkanBufferAllocation> &buffer,
-        VulkanGpuImage *image);
+        VulkanGpuImage *image,
+        const Vector2i &offset,
+        const Vector2u32 &size
+    );
 };
 }

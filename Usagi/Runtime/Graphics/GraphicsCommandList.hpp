@@ -107,6 +107,15 @@ public:
         std::size_t size
     ) = 0;
 
+    template <typename T>
+    void setConstant(
+        ShaderStage stage,
+        const char *name,
+        T &&data)
+    {
+        setConstant(stage, name, &data, sizeof(data));
+    }
+
     virtual void bindIndexBuffer(
         const std::shared_ptr<GpuBuffer> &buffer,
         std::size_t offset,
@@ -123,7 +132,7 @@ public:
     virtual void bindVertexBuffer(
         std::uint32_t binding_index,
         const std::shared_ptr<GpuBuffer> &buffer,
-        std::size_t offset
+        std::size_t offset = 0
     ) = 0;
 
     // Shader Resource Binding

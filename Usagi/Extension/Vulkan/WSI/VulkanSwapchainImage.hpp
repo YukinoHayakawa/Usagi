@@ -23,5 +23,14 @@ public:
     {
         throw std::runtime_error("Operation not supported.");
     }
+
+    void uploadRegion(
+        const void *buf_data,
+        std::size_t buf_size,
+        const Vector2i &tex_offset,
+        const Vector2u32 &tex_size) override
+    {
+        throw std::runtime_error("Operation not supported.");
+    }
 };
 }
