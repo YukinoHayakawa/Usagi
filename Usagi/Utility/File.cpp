@@ -10,10 +10,14 @@ namespace fs = std::filesystem;
 
 std::string usagi::readFileAsString(const fs::path &path)
 {
-    std::ifstream file(path);
+    std::ifstream file(path, std::ios::binary);
     file.exceptions(std::ifstream::badbit | std::ifstream::failbit);
     const auto size = file_size(path);
-    return readStreamAsString(file);
+    // data.resize(size);
+    // file.read(data.data(), size);
+    auto data = readStreamAsString(file);
+    assert(data.size() == size);
+    return data;
 }
 
 void usagi::dumpBinary(
