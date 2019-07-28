@@ -6,7 +6,7 @@
 #include <set>
 
 #include <Usagi/Core/Element.hpp>
-#include <Usagi/Core/Math.hpp>
+#include <Usagi/Math/Matrix.hpp>
 #include <Usagi/Runtime/Input/Keyboard/KeyCode.hpp>
 #include <Usagi/Runtime/Input/Mouse/MouseButtonCode.hpp>
 #include <Usagi/Runtime/Input/Keyboard/KeyEventListener.hpp>

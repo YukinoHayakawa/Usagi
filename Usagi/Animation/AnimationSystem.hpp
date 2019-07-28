@@ -19,5 +19,7 @@ public:
     }
 
     std::size_t activeCount() const { return mActiveCount; }
+
+    void immediatelyFinishAll();
 };
 }

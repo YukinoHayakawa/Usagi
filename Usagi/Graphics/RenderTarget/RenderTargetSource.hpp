@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <Usagi/Core/Math.hpp>
+#include <Usagi/Math/Matrix.hpp>
 #include <Usagi/Runtime/Graphics/RenderPassCreateInfo.hpp>
 
 namespace usagi

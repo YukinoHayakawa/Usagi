@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Core/Math.hpp>
+#include <Usagi/Color/Color.hpp>
 
 namespace usagi
 {

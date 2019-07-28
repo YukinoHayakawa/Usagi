@@ -204,6 +204,7 @@
     <ClInclude Include="Camera\PerspectiveCamera.hpp" />
     <ClInclude Include="Camera\ProjectiveCamera.hpp" />
     <ClInclude Include="Core\Clock.hpp" />
+    <ClInclude Include="Color\Color.hpp" />
     <ClInclude Include="Core\Component.hpp" />
     <ClInclude Include="Core\Element.hpp" />
     <ClInclude Include="Core\Event\Event.hpp" />
@@ -217,8 +218,11 @@
     <ClInclude Include="Core\Event\Library\Element\ElementCreatedEvent.hpp" />
     <ClInclude Include="Core\Event\Library\Element\PreElementRemovalEvent.hpp" />
     <ClInclude Include="Core\Event\Library\Input\MousePositionEvent.hpp" />
+    <ClInclude Include="Math\Angle.hpp" />
+    <ClInclude Include="Math\Bound.hpp" />
+    <ClInclude Include="Math\Constant.hpp" />
+    <ClInclude Include="Math\Lerp.hpp" />
     <ClInclude Include="Core\Logging.hpp" />
-    <ClInclude Include="Core\Math.hpp" />
     <ClInclude Include="Core\PredefinedElement.hpp" />
     <ClInclude Include="ECS\Common.hpp" />
     <ClInclude Include="ECS\ComponentStorage.hpp" />
@@ -302,6 +306,7 @@
     <ClInclude Include="Interactive\InputComponent.hpp" />
     <ClInclude Include="Interactive\InputMapping.hpp" />
     <ClInclude Include="Interactive\InputSystem.hpp" />
+    <ClInclude Include="Math\Matrix.hpp" />
     <ClInclude Include="Runtime\EventListener.hpp" />
     <ClInclude Include="Runtime\Graphics\GpuAttachmentOps.hpp" />
     <ClInclude Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.hpp" />

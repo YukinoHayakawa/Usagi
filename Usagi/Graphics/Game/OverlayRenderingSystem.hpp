@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include <Usagi/Core/Math.hpp>
+#include <Usagi/Math/Matrix.hpp>
 
 #include "RenderableSystem.hpp"
 

@@ -3,7 +3,7 @@
 #include <memory>
 
 #include <Usagi/Utility/Noncopyable.hpp>
-#include <Usagi/Core/Math.hpp>
+#include <Usagi/Math/Matrix.hpp>
 
 #include "GpuImageFormat.hpp"
 

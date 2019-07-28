@@ -1,6 +1,7 @@
 ﻿#include "ModelViewCameraController.hpp"
 
 #include <Usagi/Transform/TransformComponent.hpp>
+#include <Usagi/Math/Angle.hpp>
 
 usagi::ModelViewCameraController::ModelViewCameraController(
     Vector3f look_at_target,

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include <Usagi/Core/Math.hpp>
+#include <Usagi/Math/Matrix.hpp>
+#include <Usagi/Color/Color.hpp>
 #include <Usagi/Utility/Noncopyable.hpp>
 
 #include "Enum/GpuImageLayout.hpp"

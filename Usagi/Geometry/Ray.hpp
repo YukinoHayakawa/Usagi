@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Core/Math.hpp>
+#include <Usagi/Math/Matrix.hpp>
 #include <Usagi/Utility/Math.hpp>
 
 #include "Transform.hpp"

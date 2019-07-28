@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <Usagi/Utility/Noncopyable.hpp>
-#include <Usagi/Core/Math.hpp>
+#include <Usagi/Math/Matrix.hpp>
 
 namespace usagi
 {
