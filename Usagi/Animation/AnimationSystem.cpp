@@ -34,7 +34,7 @@ struct Sentry
 };
 }
 
-void usagi::AnimationSystem::update(const Clock &clock)
+void AnimationSystem::update(const Clock &clock)
 {
     mActiveCount = 0;
     for(auto &&e : mRegistry)
@@ -111,5 +111,10 @@ void usagi::AnimationSystem::update(const Clock &clock)
 
 void AnimationSystem::immediatelyFinishAll()
 {
-    // todo
+    for(auto &&e : mRegistry)
+    {
+        const auto ani = std::get<AnimationComponent*>(e.second);
+        ani->finishAll();
+    }
+    mActiveCount = 0;
 }
