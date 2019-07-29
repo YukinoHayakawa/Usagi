@@ -6,11 +6,11 @@ usagi::VulkanBufferAllocation::VulkanBufferAllocation(
     VulkanBufferMemoryPoolBase *pool,
     std::size_t offset,
     std::size_t size,
-    void *apped_address)
+    void *mapped_address)
     : mPool(pool)
     , mOffset(offset)
     , mSize(size)
-    , mMappedAddress(apped_address)
+    , mMappedAddress(mapped_address)
 {
 }
 

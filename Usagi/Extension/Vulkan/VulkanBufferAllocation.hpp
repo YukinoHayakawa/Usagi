@@ -20,7 +20,7 @@ public:
         VulkanBufferMemoryPoolBase *pool,
         std::size_t offset,
         std::size_t size,
-        void *apped_address);
+        void *mapped_address);
     ~VulkanBufferAllocation();
 
     VulkanBufferMemoryPoolBase * pool() const { return mPool; }
