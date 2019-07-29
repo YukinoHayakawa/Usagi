@@ -4,8 +4,9 @@
 
 namespace usagi
 {
-std::wstring utf8To16(const std::string &string);
-std::string utf16To8(const std::wstring &string);
+std::wstring utf8To16(std::string_view string);
+std::string utf16To8(std::wstring_view string);
+std::u32string utf8To32(std::string_view string);
 
 // conversion code from
 // https://blog.keyman.com/2011/06/accepting-unicode-input-in-your-windows-application/
