@@ -37,9 +37,11 @@ public:
     ~Win32WindowManager();
 
     std::shared_ptr<Window> createWindow(
-        const std::string &title,
+        std::string_view title,
         const Vector2i &position,
         const Vector2u32 &size) override;
+
+    Vector2u32 currentDisplayResolution() override;
 
     void processEvents() override;
 

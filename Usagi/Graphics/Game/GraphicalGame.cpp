@@ -14,16 +14,14 @@
 
 void usagi::GraphicalGame::createMainWindow(
     const std::string &window_title,
-    const Vector2i &window_position,
     const Vector2u32 &window_size,
     const GpuBufferFormat swapchain_format)
 {
     assert(!mMainWindow.window);
 
-    mMainWindow.create(
+    mMainWindow.createCentered(
         mRuntime.get(),
         window_title,
-        window_position,
         window_size,
         swapchain_format
     );

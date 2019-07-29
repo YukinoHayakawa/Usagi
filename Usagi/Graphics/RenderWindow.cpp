@@ -8,7 +8,7 @@
 
 void usagi::RenderWindow::create(
     Runtime *runtime,
-    const std::string &window_title,
+    std::string_view window_title,
     const Vector2i &window_position,
     const Vector2u32 &window_size,
     const GpuBufferFormat swapchain_format)
@@ -21,4 +21,17 @@ void usagi::RenderWindow::create(
 
     swapchain = runtime->gpu()->createSwapchain(window.get());
     swapchain->create(window->size(), swapchain_format);
+}
+
+void usagi::RenderWindow::createCentered(
+    Runtime *runtime,
+    std::string_view window_title,
+    const Vector2u32 &window_size,
+    GpuBufferFormat swapchain_format)
+{
+    const auto display_size =
+        runtime->windowManager()->currentDisplayResolution();
+    const Vector2i centered_pos =
+        (display_size.cast<int>() - window_size.cast<int>()) / 2;
+    create(runtime, window_title, centered_pos, window_size, swapchain_format);
 }

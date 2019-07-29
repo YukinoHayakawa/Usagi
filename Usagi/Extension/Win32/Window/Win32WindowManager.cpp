@@ -82,11 +82,21 @@ usagi::Win32Window * usagi::Win32WindowManager::activeWindow()
 }
 
 std::shared_ptr<usagi::Window> usagi::Win32WindowManager::createWindow(
-    const std::string &title,
+    std::string_view title,
     const Vector2i &position,
     const Vector2u32 &size)
 {
-    return std::make_shared<Win32Window>(this, title, position, size);
+    return std::make_shared<Win32Window>(
+        this, std::string { title }, position, size
+    );
+}
+
+usagi::Vector2u32 usagi::Win32WindowManager::currentDisplayResolution()
+{
+    return {
+        GetSystemMetrics(SM_CXSCREEN),
+        GetSystemMetrics(SM_CYSCREEN)
+    };
 }
 
 void usagi::Win32WindowManager::processEvents()

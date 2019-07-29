@@ -13,10 +13,12 @@ public:
     virtual ~WindowManager() = default;
 
     virtual std::shared_ptr<Window> createWindow(
-        const std::string &title,
+        std::string_view title,
         const Vector2i &position,
         const Vector2u32 &size
     ) = 0;
+
+    virtual Vector2u32 currentDisplayResolution() = 0;
 
     /**
      * \brief Read window events from system event queue and dispatch
