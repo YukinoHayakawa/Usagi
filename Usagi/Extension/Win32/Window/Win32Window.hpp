@@ -53,6 +53,7 @@ public:
 
     Vector2i position() const override;
     void setPosition(const Vector2i &position) override;
+    void centerWindow() override;
 
     Vector2u32 size() const override;
     void setSize(const Vector2u32 &size) override;

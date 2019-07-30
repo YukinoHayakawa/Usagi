@@ -22,10 +22,5 @@ public:
         const Vector2i &window_position,
         const Vector2u32 &window_size,
         GpuBufferFormat swapchain_format);
-
-    void createCentered(Runtime *runtime,
-        std::string_view window_title,
-        const Vector2u32 &window_size,
-        GpuBufferFormat swapchain_format);
 };
 }

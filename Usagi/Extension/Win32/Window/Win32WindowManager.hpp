@@ -42,6 +42,7 @@ public:
         const Vector2u32 &size) override;
 
     Vector2u32 currentDisplayResolution() override;
+    static Vector2u32 getCurrentDisplayResolution();
 
     void processEvents() override;
 

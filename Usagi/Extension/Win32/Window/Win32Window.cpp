@@ -176,6 +176,15 @@ void usagi::Win32Window::setPosition(const Vector2i &position)
     });
 }
 
+void usagi::Win32Window::centerWindow()
+{
+    const auto display_size =
+        Win32WindowManager::getCurrentDisplayResolution();
+    const Vector2i centered_pos =
+        (display_size.cast<int>() - size().cast<int>()) / 2;
+    setPosition(centered_pos);
+}
+
 bool usagi::Win32Window::isOpen() const
 {
     return !mClosed;

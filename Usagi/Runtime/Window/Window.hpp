@@ -18,6 +18,7 @@ public:
 
     virtual Vector2i position() const = 0;
     virtual void setPosition(const Vector2i &position) = 0;
+    virtual void centerWindow() = 0;
 
     /**
      * \brief Get client area size.

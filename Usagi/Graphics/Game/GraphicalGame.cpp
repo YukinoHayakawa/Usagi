@@ -19,9 +19,10 @@ void usagi::GraphicalGame::createMainWindow(
 {
     assert(!mMainWindow.window);
 
-    mMainWindow.createCentered(
+    mMainWindow.create(
         mRuntime.get(),
         window_title,
+        { 0, 0 },
         window_size,
         swapchain_format
     );

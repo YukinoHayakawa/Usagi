@@ -93,6 +93,11 @@ std::shared_ptr<usagi::Window> usagi::Win32WindowManager::createWindow(
 
 usagi::Vector2u32 usagi::Win32WindowManager::currentDisplayResolution()
 {
+    return getCurrentDisplayResolution();
+}
+
+usagi::Vector2u32 usagi::Win32WindowManager::getCurrentDisplayResolution()
+{
     return {
         GetSystemMetrics(SM_CXSCREEN),
         GetSystemMetrics(SM_CYSCREEN)
