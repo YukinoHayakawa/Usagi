@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <memory>
+#include <functional>
 
 #include <Usagi/Game/System.hpp>
 
@@ -18,6 +19,10 @@ class RenderableSystem : virtual public System
 {
 protected:
     std::shared_ptr<RenderTarget> mRenderTarget;
+
+    std::function<float()> mScalingFunc = []() {
+        return 1.f;
+    };
 
 public:
     virtual void createRenderTarget(RenderTargetDescriptor &descriptor) = 0;
@@ -39,5 +44,10 @@ public:
      * \param clock
      */
     virtual std::shared_ptr<GraphicsCommandList> render(const Clock &clock) = 0;
+
+    void setScalingFunc(std::function<float()> scaling_func)
+    {
+        mScalingFunc = std::move(scaling_func);
+    }
 };
 }
