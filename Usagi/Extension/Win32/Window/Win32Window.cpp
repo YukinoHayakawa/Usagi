@@ -43,6 +43,21 @@ RECT usagi::Win32Window::getWindowRect() const
     return window_rect;
 }
 
+void usagi::Win32Window::setResizingEnabled(const bool enabled)
+{
+    auto style = GetWindowLongW(mHandle, GWL_STYLE);
+    constexpr auto resizing_style = WS_MAXIMIZEBOX | WS_SIZEBOX;
+    if(enabled)
+    {
+        style |= resizing_style;
+    }
+    else
+    {
+        style ^= resizing_style;
+    }
+    SetWindowLongW(mHandle, GWL_STYLE, style);
+}
+
 usagi::Win32Window::Win32Window(
     Win32WindowManager *manager,
     std::string title,

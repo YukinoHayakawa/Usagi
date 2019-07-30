@@ -66,6 +66,8 @@ public:
     bool isOpen() const override;
     void close() override;
 
+    void setResizingEnabled(bool enabled) override;
+
     Vector2f dpiScale() const override;
 
     std::string getClipboardText() override;
