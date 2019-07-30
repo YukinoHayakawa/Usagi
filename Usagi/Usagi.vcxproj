@@ -370,6 +370,7 @@
     <ClInclude Include="Transform\TransformSystem.hpp" />
     <ClInclude Include="Transform\Util.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
+    <ClInclude Include="Utility\Bool.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
     <ClInclude Include="Utility\Debug.hpp" />
     <ClInclude Include="Utility\DummyDeleter.hpp" />
