@@ -30,6 +30,27 @@ RECT usagi::Win32Window::clientScreenRect() const
     return rc;
 }
 
+UINT usagi::Win32Window::buildStyle() const
+{
+    UINT style = WS_VISIBLE;
+    if(mFullscreen)
+    {
+        style |= WS_POPUP;
+    }
+    else
+    {
+        style |= WINDOW_STYLE;
+        if(!mAllowResizing)
+            style ^= WS_MAXIMIZEBOX | WS_SIZEBOX;
+    }
+    return style;
+}
+
+void usagi::Win32Window::updateWindowStyle()
+{
+    SetWindowLongW(mHandle, GWL_STYLE, buildStyle());
+}
+
 RECT usagi::Win32Window::getWindowRect() const
 {
     RECT window_rect;
@@ -45,17 +66,8 @@ RECT usagi::Win32Window::getWindowRect() const
 
 void usagi::Win32Window::setResizingEnabled(const bool enabled)
 {
-    auto style = GetWindowLongW(mHandle, GWL_STYLE);
-    constexpr auto resizing_style = WS_MAXIMIZEBOX | WS_SIZEBOX;
-    if(enabled)
-    {
-        style |= resizing_style;
-    }
-    else
-    {
-        style ^= resizing_style;
-    }
-    SetWindowLongW(mHandle, GWL_STYLE, style);
+    mAllowResizing = enabled;
+    updateWindowStyle();
 }
 
 usagi::Win32Window::Win32Window(
@@ -76,7 +88,7 @@ usagi::Win32Window::Win32Window(
         WINDOW_STYLE_EX,
         Win32WindowManager::WINDOW_CLASS_NAME,
         window_title_wide.c_str(),
-        WINDOW_STYLE,
+        buildStyle(),
         window_rect.left, window_rect.top,
         window_rect.right, window_rect.bottom,
         nullptr,
@@ -84,6 +96,7 @@ usagi::Win32Window::Win32Window(
         manager->processInstanceHandle(),
         nullptr
     );
+    updateWindowStyle();
 
     if(!mHandle)
     {
@@ -120,13 +133,13 @@ usagi::Vector2u32 usagi::Win32Window::size() const
     return mSize;
 }
 
-void usagi::Win32Window::updateWindowPosition(HWND window_insert_after) const
+void usagi::Win32Window::updateWindowPosition(UINT flags) const
 {
     const auto window_rect = getWindowRect();
     SetWindowPos(mHandle, nullptr,
         window_rect.left, window_rect.top, window_rect.right,
         window_rect.bottom,
-        0
+        flags
     );
 }
 
@@ -154,18 +167,31 @@ void usagi::Win32Window::sendMoveEvent()
     });
 }
 
-void usagi::Win32Window::setSize(const Vector2u32 &size)
+void usagi::Win32Window::enableBorderlessFullscreen()
 {
-    mSize = size;
-    updateWindowPosition();
-    sendResizeEvent();
+    mFullscreen = true;
+    updateWindowStyle();
+    mPosition = { 0, 0 };
+    mSize = Win32WindowManager::getCurrentDisplayResolution();
+    SetWindowPos(mHandle, HWND_TOPMOST,
+        mPosition.x(), mPosition.y(),
+        mSize.x(), mSize.y(),
+        SWP_FRAMECHANGED
+    );
+}
+
+void usagi::Win32Window::disableBorderlessFullscreen()
+{
+    mFullscreen = false;
+    updateWindowStyle();
+    updateWindowPosition(SWP_FRAMECHANGED);
 }
 
 void usagi::Win32Window::setBorderlessFullscreen()
 {
-    mPosition = { 0, 0 };
-    mSize = Win32WindowManager::getCurrentDisplayResolution();
-    updateWindowPosition(HWND_TOPMOST);
+    // ref: https://stackoverflow.com/questions/34462445/fullscreen-vs-borderless-window
+
+    enableBorderlessFullscreen();
     sendMoveEvent();
     sendResizeEvent();
 }
@@ -187,10 +213,23 @@ usagi::Vector2i usagi::Win32Window::position() const
     return mPosition;
 }
 
+void usagi::Win32Window::setSize(const Vector2u32 &size)
+{
+    mSize = size;
+    if(mFullscreen)
+        disableBorderlessFullscreen();
+    else
+        updateWindowPosition();
+    sendResizeEvent();
+}
+
 void usagi::Win32Window::setPosition(const Vector2i &position)
 {
     mPosition = position;
-    updateWindowPosition();
+    if(mFullscreen)
+        disableBorderlessFullscreen();
+    else
+        updateWindowPosition();
     sendMoveEvent();
 }
 
@@ -435,6 +474,10 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
         case WM_DESTROY:
         {
             mClosed = true;
+            break;
+        }
+        case WM_WINDOWPOSCHANGING:
+        {
             break;
         }
         default:

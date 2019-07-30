@@ -25,13 +25,22 @@ class Win32Window : public Window
     static constexpr DWORD WINDOW_STYLE = WS_OVERLAPPEDWINDOW;
     static constexpr DWORD WINDOW_STYLE_EX = WS_EX_ACCEPTFILES;
 
+    bool mShow = true;
+    bool mFullscreen = false;
+    bool mAllowResizing = true;
+
+    UINT buildStyle() const;
+    void updateWindowStyle();
+    void enableBorderlessFullscreen();
+    void disableBorderlessFullscreen();
+
     /**
      * \brief Right and bottom are used as width and height for the convenience
      * of setting the window position.
      * \return
      */
     RECT getWindowRect() const;
-    void updateWindowPosition(HWND window_insert_after = nullptr) const;
+    void updateWindowPosition(UINT flags = 0) const;
 
     LRESULT handleWindowMessage(
         HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -60,6 +69,7 @@ public:
     Vector2u32 size() const override;
     void setSize(const Vector2u32 &size) override;
     void setBorderlessFullscreen() override;
+    void setResizingEnabled(bool enabled) override;
 
     std::string title() const override;
     void setTitle(std::string title) override;
@@ -69,8 +79,6 @@ public:
 
     bool isOpen() const override;
     void close() override;
-
-    void setResizingEnabled(bool enabled) override;
 
     Vector2f dpiScale() const override;
 
