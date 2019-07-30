@@ -31,10 +31,13 @@ class Win32Window : public Window
      * \return
      */
     RECT getWindowRect() const;
-    void updateWindowPosition() const;
+    void updateWindowPosition(HWND window_insert_after = nullptr) const;
 
     LRESULT handleWindowMessage(
         HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+    void sendResizeEvent();
+    void sendMoveEvent();
 
 public:
     /**
@@ -54,9 +57,9 @@ public:
     Vector2i position() const override;
     void setPosition(const Vector2i &position) override;
     void centerWindow() override;
-
     Vector2u32 size() const override;
     void setSize(const Vector2u32 &size) override;
+    void setBorderlessFullscreen() override;
 
     std::string title() const override;
     void setTitle(std::string title) override;

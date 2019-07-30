@@ -32,6 +32,8 @@ public:
      */
     virtual void setSize(const Vector2u32 &size) = 0;
 
+    virtual void setBorderlessFullscreen() = 0;
+
     /**
      * \brief Get window title encoded using UTF-8.
      * \return

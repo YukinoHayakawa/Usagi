@@ -69,8 +69,7 @@ usagi::Win32Window::Win32Window(
 {
     LOG(info, "Creating window: {}", mTitle);
 
-    auto window_title_wide = utf8To16(mTitle);
-
+    const auto window_title_wide = utf8To16(mTitle);
     const auto window_rect = getWindowRect();
 
     mHandle = CreateWindowExW(
@@ -121,7 +120,7 @@ usagi::Vector2u32 usagi::Win32Window::size() const
     return mSize;
 }
 
-void usagi::Win32Window::updateWindowPosition() const
+void usagi::Win32Window::updateWindowPosition(HWND window_insert_after) const
 {
     const auto window_rect = getWindowRect();
     SetWindowPos(mHandle, nullptr,
@@ -131,18 +130,44 @@ void usagi::Win32Window::updateWindowPosition() const
     );
 }
 
-void usagi::Win32Window::setSize(const Vector2u32 &size)
+void usagi::Win32Window::sendResizeEvent()
 {
-    mSize = size;
-    updateWindowPosition();
     WindowSizeEvent e;
     e.window = this;
-    e.size = size;
+    e.size = mSize;
     forEachListener([&](auto h) {
         h->onWindowResizeBegin(e);
         h->onWindowResized(e);
         h->onWindowResizeEnd(e);
     });
+}
+
+void usagi::Win32Window::sendMoveEvent()
+{
+    WindowPositionEvent e;
+    e.window = this;
+    e.position = mPosition;
+    forEachListener([&](auto h) {
+        h->onWindowMoveBegin(e);
+        h->onWindowMoved(e);
+        h->onWindowMoveEnd(e);
+    });
+}
+
+void usagi::Win32Window::setSize(const Vector2u32 &size)
+{
+    mSize = size;
+    updateWindowPosition();
+    sendResizeEvent();
+}
+
+void usagi::Win32Window::setBorderlessFullscreen()
+{
+    mPosition = { 0, 0 };
+    mSize = Win32WindowManager::getCurrentDisplayResolution();
+    updateWindowPosition(HWND_TOPMOST);
+    sendMoveEvent();
+    sendResizeEvent();
 }
 
 std::string usagi::Win32Window::title() const
@@ -166,14 +191,7 @@ void usagi::Win32Window::setPosition(const Vector2i &position)
 {
     mPosition = position;
     updateWindowPosition();
-    WindowPositionEvent e;
-    e.window = this;
-    e.position = position;
-    forEachListener([&](auto h) {
-        h->onWindowMoveBegin(e);
-        h->onWindowMoved(e);
-        h->onWindowMoveEnd(e);
-    });
+    sendMoveEvent();
 }
 
 void usagi::Win32Window::centerWindow()
