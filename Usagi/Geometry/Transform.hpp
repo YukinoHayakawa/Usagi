@@ -5,33 +5,33 @@
 namespace usagi
 {
 template <typename VectorT>
-struct Point
+struct AsPoint
 {
     const VectorT &value;
 
-    Point(const VectorT &value)
+    AsPoint(const VectorT &value)
         : value(value)
     {
     }
 };
 
 template <typename VectorT>
-struct Vector
+struct AsVector
 {
     const VectorT &value;
 
-    Vector(const VectorT &value)
+    AsVector(const VectorT &value)
         : value(value)
     {
     }
 };
 
 template <typename VectorT>
-struct Normal
+struct AsNormal
 {
     const VectorT &value;
 
-    Normal(const VectorT &value)
+    AsNormal(const VectorT &value)
         : value(value)
     {
     }
@@ -39,7 +39,7 @@ struct Normal
 
 template <typename Scalar, int Dim, int Mode, typename Vec>
 auto operator*(const Eigen::Transform<Scalar, Dim, Mode, 0> &transform,
-    const Vector<Vec> &vector) -> Eigen::Matrix<Scalar, Dim, 1>
+    const AsVector<Vec> &vector) -> Eigen::Matrix<Scalar, Dim, 1>
 {
     Eigen::Matrix<Scalar, Dim + 1, 1> affine_vec;
     affine_vec.template head<Dim>() = vector.value;
@@ -49,7 +49,7 @@ auto operator*(const Eigen::Transform<Scalar, Dim, Mode, 0> &transform,
 
 template <typename Scalar, int Dim, int Mode, typename Vec>
 auto operator*(const Eigen::Transform<Scalar, Dim, Mode, 0> &transform,
-    const Point<Vec> &point) -> Eigen::Matrix<Scalar, Dim, 1>
+    const AsPoint<Vec> &point) -> Eigen::Matrix<Scalar, Dim, 1>
 {
     return (transform * point.value.homogeneous()).template head<Dim>();
 }

@@ -56,7 +56,7 @@ usagi::Ray usagi::PerspectiveCamera::generateRay(
 
     // todo thin lens instead of pinhole
     const Vector3f local_start = Vector3f::Zero();
-    const Vector3f local_end = mScreenToLocal * Point(screen_pos);
+    const Vector3f local_end = mScreenToLocal * AsPoint(screen_pos);
 
     Ray r;
     r.direction = (local_end - local_start).normalized();

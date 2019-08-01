@@ -29,8 +29,8 @@ auto operator*(const Eigen::Transform<Scalar, Dim, Mode> &transform,
     const Ray &ray)
 {
     Ray r;
-    r.origin = transform * Point(ray.origin);
-    r.direction = transform * Vector(ray.direction);
+    r.origin = transform * AsPoint(ray.origin);
+    r.direction = transform * AsVector(ray.direction);
     return r;
 }
 }

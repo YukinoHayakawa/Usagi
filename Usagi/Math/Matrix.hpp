@@ -9,11 +9,13 @@ namespace usagi
 {
 // Vectors
 
+template <typename T, int Size>
+using Vector = Eigen::Matrix<T, Size, 1>;
 using Vector2f = Eigen::Vector2f;
 using Vector2d = Eigen::Vector2d;
 using Vector2i = Eigen::Vector2i;
-using Vector2u32 = Eigen::Matrix<std::uint32_t, 2, 1>;
-using Vector2i32 = Eigen::Matrix<std::int32_t, 2, 1>;
+using Vector2u32 = Vector<std::uint32_t, 2>;
+using Vector2i32 = Vector<std::int32_t, 2>;
 using Vector3f = Eigen::Vector3f;
 using Vector4f = Eigen::Vector4f;
 

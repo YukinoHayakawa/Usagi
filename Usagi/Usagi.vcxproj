@@ -219,6 +219,7 @@
     <ClInclude Include="Core\Event\Library\Element\PreElementRemovalEvent.hpp" />
     <ClInclude Include="Core\Event\Library\Input\MousePositionEvent.hpp" />
     <ClInclude Include="Math\Angle.hpp" />
+    <ClInclude Include="Math\Bezier.hpp" />
     <ClInclude Include="Math\Bound.hpp" />
     <ClInclude Include="Math\Constant.hpp" />
     <ClInclude Include="Math\Lerp.hpp" />
