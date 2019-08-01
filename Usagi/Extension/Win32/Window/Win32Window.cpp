@@ -476,6 +476,8 @@ LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,
             mClosed = true;
             break;
         }
+        // prevent window size from being restricted by desktop size
+        // https://stackoverflow.com/questions/445893/create-window-larger-than-desktop-display-resolution
         case WM_WINDOWPOSCHANGING:
         {
             break;

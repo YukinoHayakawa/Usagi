@@ -103,7 +103,8 @@ void usagi::VulkanSwapchain::present(
             LOG(warn, "Presented to a suboptimal swapchain.");
             break;
         case vk::Result::eErrorOutOfDateKHR:
-            LOG(error, "Presented to a out-of-date swapchain."); break;
+            LOG(error, "Presented to a out-of-date swapchain.");
+            break;
         default: ;
     }
 }

@@ -39,6 +39,7 @@ public:
     template <typename... Components, typename Func>
     void parallel(Func &&func)
     {
+        // todo impl parallel execution
         // executeTask<Components...>(std::execution::par, func);
         executeTask<Components...>(std::execution::seq, func);
     }
