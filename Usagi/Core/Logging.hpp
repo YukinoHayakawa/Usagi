@@ -21,6 +21,15 @@ bool shouldLog(LoggingLevel level);
 void doLog(LoggingLevel level, std::string_view msg);
 void addFileSink(const std::string &file_path);
 
+/**
+ * \brief
+ * \tparam Args
+ * \param level
+ * \param fmt For consistency, always treat fmt as a format string even when no
+ * arg is present. Be aware when using strings directly passed from other
+ * sources since they may contain formatting tokens.
+ * \param args
+ */
 template <typename... Args>
 void log(const LoggingLevel level, std::string_view fmt, Args &&... args)
 {

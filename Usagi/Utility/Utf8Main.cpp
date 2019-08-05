@@ -44,7 +44,7 @@ int wrappedMain(const std::vector<std::string> &args)
     }
     catch(const std::exception &e)
     {
-        LOG(error, e.what());
+        LOG(error, "std::exception captured: {}", e.what());
     }
     catch(...)
     {
