@@ -10,6 +10,7 @@ namespace usagi
 class GpuDevice;
 class InputManager;
 class WindowManager;
+class AudioManager;
 
 /**
  * \brief Provides access to platform-dependent resources and other
@@ -26,6 +27,7 @@ public:
     virtual void initGpu() = 0;
     virtual void initInput() = 0;
     virtual void initWindow() = 0;
+    virtual void initAudio() = 0;
 
     /**
      * \brief
@@ -37,5 +39,6 @@ public:
     virtual GpuDevice * gpu() const = 0;
     virtual InputManager * inputManager() const = 0;
     virtual WindowManager * windowManager() const = 0;
+    virtual AudioManager * audioManager() const = 0;
 };
 }
