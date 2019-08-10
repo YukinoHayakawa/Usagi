@@ -15,7 +15,7 @@ std::string usagi::readFileAsString(const fs::path &path)
     const auto size = file_size(path);
     // data.resize(size);
     // file.read(data.data(), size);
-    auto data = readStreamAsString(file);
+    auto data = readStreamToString(file);
     assert(data.size() == size);
     return data;
 }

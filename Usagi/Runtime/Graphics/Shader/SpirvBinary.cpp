@@ -64,7 +64,7 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromStream(
             glsl_source_stream.exceptions(old_exceptions);
         });
 
-    auto dump = readStreamAsString(glsl_source_stream);
+    auto dump = readStreamToString(glsl_source_stream);
     if(dump.size() % sizeof(Bytecode) != 0)
         throw std::runtime_error(
             "Not valid SPIR-V binary. File size is not a multiple of 4.");
@@ -220,5 +220,5 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceStream(
     const std::optional<std::filesystem::path> & cache_folder)
 {
     return fromGlslSourceString(
-        readStreamAsString(glsl_source_stream), stage, cache_folder);
+        readStreamToString(glsl_source_stream), stage, cache_folder);
 }

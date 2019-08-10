@@ -36,6 +36,7 @@ std::vector<std::string> argsFromMain(int argc, char *argv[])
     return args;
 }
 
+// note that only parameters are passed to this function. argv[0] is excluded.
 int wrappedMain(const std::vector<std::string> &args)
 {
     try

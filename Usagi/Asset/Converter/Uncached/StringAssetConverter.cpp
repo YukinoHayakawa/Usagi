@@ -6,5 +6,5 @@ std::string usagi::StringAssetConverter::operator()(
     AssetLoadingContext *ctx,
     std::istream &in) const
 {
-    return readStreamAsString(in);
+    return readStreamToString(in);
 }
