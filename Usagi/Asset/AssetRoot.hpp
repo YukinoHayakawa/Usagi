@@ -29,7 +29,7 @@ class AssetRoot : public Element
         using ReturnT = decltype(std::declval<ConverterT>()(
             std::declval<AssetLoadingContext*>(),
             std::declval<decltype(std::declval<DecoderT>()(
-                std::declval<std::istream&>()))&>(),
+                std::declval<std::istream&>()))&&>(),
             std::declval<Args>()...
         ));
     };
