@@ -21,14 +21,12 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -88,6 +86,7 @@
     <ClCompile Include="Camera\Controller\ModelViewCameraController.cpp" />
     <ClCompile Include="Camera\OrthogonalCamera.cpp" />
     <ClCompile Include="Camera\PerspectiveCamera.cpp" />
+    <ClCompile Include="Constants\DataFormat.cpp" />
     <ClCompile Include="Core\Clock.cpp" />
     <ClCompile Include="Core\Element.cpp" />
     <ClCompile Include="Core\Event\Event.cpp" />
@@ -163,6 +162,8 @@
     <ClCompile Include="Interactive\ActionGroup.cpp" />
     <ClCompile Include="Interactive\InputMapping.cpp" />
     <ClCompile Include="Interactive\InputSystem.cpp" />
+    <ClCompile Include="Runtime\Audio\AudioManager.cpp" />
+    <ClCompile Include="Runtime\Audio\AudioOutputStream.cpp" />
     <ClCompile Include="Runtime\Graphics\Shader\SpirvBinary.cpp" />
     <ClCompile Include="Runtime\Input\Gamepad\GamepadButtonCode.cpp" />
     <ClCompile Include="Runtime\Input\Keyboard\KeyCode.cpp" />
@@ -218,6 +219,7 @@
     <ClInclude Include="Core\Event\Library\Element\ElementCreatedEvent.hpp" />
     <ClInclude Include="Core\Event\Library\Element\PreElementRemovalEvent.hpp" />
     <ClInclude Include="Core\Event\Library\Input\MousePositionEvent.hpp" />
+    <ClInclude Include="Constants\DataFormat.hpp" />
     <ClInclude Include="Math\Angle.hpp" />
     <ClInclude Include="Math\Bezier.hpp" />
     <ClInclude Include="Math\Bound.hpp" />
@@ -308,6 +310,14 @@
     <ClInclude Include="Interactive\InputMapping.hpp" />
     <ClInclude Include="Interactive\InputSystem.hpp" />
     <ClInclude Include="Math\Matrix.hpp" />
+    <ClInclude Include="Runtime\Audio\AudioBuffer.hpp" />
+    <ClInclude Include="Runtime\Audio\AudioDevice.hpp" />
+    <ClInclude Include="Runtime\Audio\AudioDeviceProperties.hpp" />
+    <ClInclude Include="Runtime\Audio\AudioManager.hpp" />
+    <ClInclude Include="Runtime\Audio\AudioStream.hpp" />
+    <ClInclude Include="Runtime\Audio\AudioStreamFormat.hpp" />
+    <ClInclude Include="Runtime\Audio\AudioOutputStream.hpp" />
+    <ClInclude Include="Runtime\DeviceHub.hpp" />
     <ClInclude Include="Runtime\EventListener.hpp" />
     <ClInclude Include="Runtime\Graphics\GpuAttachmentOps.hpp" />
     <ClInclude Include="Graphics\RenderTarget\Source\ImageRenderTargetSource.hpp" />
@@ -372,7 +382,7 @@
     <ClInclude Include="Transform\Util.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\Bool.hpp" />
-    <ClInclude Include="Utility\CyclicContainerAdaptor.hpp" />
+    <ClInclude Include="Utility\CyclicContainerAdapter.hpp" />
     <ClInclude Include="Utility\Debug.hpp" />
     <ClInclude Include="Utility\DummyDeleter.hpp" />
     <ClInclude Include="Utility\EnumTranslator.hpp" />
