@@ -6,29 +6,34 @@
 namespace usagi::utility
 {
 /**
- * \brief Simulate a repeating sequence using an existing container.
- * A limit can be put on the repeat amount, and the starting position
- * does not have to be the beginning of the original container.
- * In either case, when the original end is reached during using the
- * adapted iterator, the next position wraps to the beginning of the
- * original container as long as the max repeat cycle is not reached.
- * todo: specialize std::iterator_traits<>
- * \tparam Container 
- * \tparam BaseIterator 
- */
+* \brief Simulate a repeating sequence using an existing container.
+* A limit can be put on the repeat amount, and the starting position
+* does not have to be the beginning of the original container.
+* In either case, when the original end is reached during using the
+* adapted iterator, the next position wraps to the beginning of the
+* original container as long as the max repeat cycle is not reached.
+* todo: specialize std::iterator_traits<>
+* \tparam Container
+* \tparam BaseIterator
+*/
+// todo better performance
 template <
     typename Container,
     typename BaseIterator = typename Container::iterator
 >
-class CyclicContainerAdaptor
+class CyclicContainerAdapter
 {
     Container &mContainer;
     BaseIterator mPseudoBegin;
     std::size_t mMaxCycle;
 
 public:
-    CyclicContainerAdaptor(Container &container, BaseIterator pseudo_begin,
-        const std::size_t max_cycle)
+    static constexpr std::size_t INDEFINITE = -1;
+
+    explicit CyclicContainerAdapter(
+        Container &container,
+        BaseIterator pseudo_begin = container.begin(),
+        const std::size_t max_cycle = INDEFINITE)
         : mContainer { container }
         , mPseudoBegin { std::move(pseudo_begin) }
         , mMaxCycle { max_cycle }
@@ -36,24 +41,20 @@ public:
     }
 
     /**
-     * \brief Implements a BidirectionalIterator.
-     */
+    * \brief Implements a BidirectionalIterator.
+    */
     class Iterator
     {
-        CyclicContainerAdaptor &mAdaptor;
+        CyclicContainerAdapter &mAdapter;
         BaseIterator mBase;
         std::size_t mCurrentCycle = 0;
-        // called when the underlying iterator is wrapped to begin or end.
-        std::function<void(int)> mWrapCallback;
 
     public:
-        Iterator()
-        {
-        }
-
-        Iterator(CyclicContainerAdaptor &container, BaseIterator base,
+        Iterator(
+            CyclicContainerAdapter &container,
+            BaseIterator base,
             const std::size_t current_cycle)
-            : mAdaptor { container }
+            : mAdapter { container }
             , mBase { base }
             , mCurrentCycle { current_cycle }
         {
@@ -68,12 +69,12 @@ public:
         Iterator & operator++()
         {
             ++mBase;
-            if(mBase == mAdaptor.mContainer.end())
+            // wrap back
+            if(mBase == mAdapter.mContainer.end())
             {
-                mBase = mAdaptor.mContainer.begin();
-                if(mWrapCallback) mWrapCallback(1);
+                mBase = mAdapter.mContainer.begin();
             }
-            if(mBase == mAdaptor.mPseudoBegin)
+            if(mBase == mAdapter.mPseudoBegin)
                 ++mCurrentCycle;
             return *this;
         }
@@ -87,6 +88,8 @@ public:
 
         friend bool operator==(const Iterator &lhs, const Iterator &rhs)
         {
+            if(&lhs.mAdapter != &rhs.mAdapter)
+                throw std::runtime_error("incompatible iterators");
             return lhs.mBase == rhs.mBase
                 && lhs.mCurrentCycle == rhs.mCurrentCycle;
         }
@@ -96,24 +99,23 @@ public:
             return !(lhs == rhs);
         }
 
-        auto & operator*() const
+        auto && operator*() const
         {
             return mBase.operator*();
         }
 
-        auto & operator->() const
+        auto && operator->() const
         {
             return mBase.operator->();
         }
 
         Iterator & operator--()
         {
-            if(mBase == mAdaptor.mPseudoBegin)
+            if(mBase == mAdapter.mPseudoBegin)
                 --mCurrentCycle;
-            if(mBase == mAdaptor.mContainer.begin())
+            if(mBase == mAdapter.mContainer.begin())
             {
-                mBase = mAdaptor.mContainer.end();
-                if(mWrapCallback) mWrapCallback(-1);
+                mBase = mAdapter.mContainer.end();
             }
             --mBase;
             return *this;
@@ -124,11 +126,6 @@ public:
             auto old_iter = *this;
             --*this;
             return old_iter;
-        }
-
-        void setWrapCallback(std::function<void(int)> wrap_callback)
-        {
-            mWrapCallback = std::move(wrap_callback);
         }
 
         BaseIterator base() const
