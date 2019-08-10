@@ -54,6 +54,6 @@ public:
     static constexpr int DEFAULT_OUTPUT_DEVICE = -1;
     static constexpr int DEFAULT_INPUT_DEVICE = -2;
 
-    virtual std::shared_ptr<AudioDevice> createDevice(int index) = 0;
+    virtual std::shared_ptr<AudioDevice> acquireDevice(int index) = 0;
 };
 }

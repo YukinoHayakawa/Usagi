@@ -11,8 +11,9 @@ enum class AudioStreamStatus
     ABORT = 2,
 };
 
+// todo pass float*?
 using AudioOutputCallback = std::function<AudioStreamStatus(
-    void *output_buffer,
+    std::uint8_t *output_buffer,
     std::size_t frames
 )>;
 }

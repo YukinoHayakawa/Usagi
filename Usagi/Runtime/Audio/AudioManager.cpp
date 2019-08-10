@@ -14,6 +14,6 @@ AudioDeviceAcquisitionAgent::AudioDeviceAcquisitionAgent(
 
 std::shared_ptr<AudioDevice> AudioDeviceAcquisitionAgent::acquireDevice() const
 {
-    return mManager->createDevice(mDeviceIndex);
+    return mManager->acquireDevice(mDeviceIndex);
 }
 }
