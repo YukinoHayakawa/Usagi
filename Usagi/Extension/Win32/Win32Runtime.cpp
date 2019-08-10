@@ -12,6 +12,8 @@
 #include <Usagi/Extension/Win32/Win32Helper.hpp>
 #include <Usagi/Extension/Win32/Window/Win32WindowManager.hpp>
 #include <Usagi/Utility/Unicode.hpp>
+// todo fix circular dependency
+#include <Usagi/Extensions/RtPortAudio/PortAudioAudioManager.hpp>
 
 std::shared_ptr<usagi::Runtime> usagi::Runtime::create()
 {
@@ -103,6 +105,12 @@ void usagi::Win32Runtime::initWindow()
     mWindowManager = std::make_unique<Win32WindowManager>();
 }
 
+void usagi::Win32Runtime::initAudio()
+{
+    if(mAudioManager) return;
+    mAudioManager = std::make_unique<PortAudioAudioManager>();
+}
+
 void usagi::Win32Runtime::enableCrashHandler(
     const std::string &report_file_path)
 {
@@ -130,4 +138,9 @@ usagi::InputManager * usagi::Win32Runtime::inputManager() const
 usagi::WindowManager * usagi::Win32Runtime::windowManager() const
 {
     return mWindowManager.get();
+}
+
+usagi::AudioManager * usagi::Win32Runtime::audioManager() const
+{
+    return mAudioManager.get();
 }

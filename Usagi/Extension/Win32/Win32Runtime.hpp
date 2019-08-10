@@ -8,10 +8,12 @@
 
 namespace usagi
 {
+class PortAudioAudioManager;
 class VulkanGpuDevice;
 class Win32InputManager;
 class Win32WindowManager;
 
+// todo: move win32 to extension
 class Win32Runtime
     : Singleton<Win32Runtime>
     , public Runtime
@@ -19,6 +21,7 @@ class Win32Runtime
     std::unique_ptr<VulkanGpuDevice> mGpu;
     std::unique_ptr<Win32InputManager> mInputManager;
     std::unique_ptr<Win32WindowManager> mWindowManager;
+    std::unique_ptr<PortAudioAudioManager> mAudioManager;
     std::string mMinidumpPath;
 
     static LONG WINAPI exceptionHandler(PEXCEPTION_POINTERS p_exception_info);
@@ -31,6 +34,7 @@ public:
     void initGpu() override;
     void initInput() override;
     void initWindow() override;
+    void initAudio() override;
 
     void enableCrashHandler(const std::string &report_file_path) override;
     void displayErrorDialog(const std::string &msg) override;
@@ -38,5 +42,6 @@ public:
     GpuDevice * gpu() const override;
     InputManager * inputManager() const override;
     WindowManager * windowManager() const override;
+    AudioManager * audioManager() const override;
 };
 }
