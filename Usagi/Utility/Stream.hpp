@@ -7,28 +7,12 @@
 namespace usagi
 {
 /**
- * \brief Pump all characters from the input stream into a string. Note that
- * the char stream may be altered unintentionally if the stream is not opened
- * as binary.
- * \tparam ContainerT
- * \param in
+ * \brief
+ * \param in A seekable stream.
  * \return
  */
-template <typename ContainerT>
-ContainerT readStreamToEnd(std::istream &in)
-{
-    // allows using with forward only streams
-    const std::istreambuf_iterator<char> begin(in), end;
-    return { begin, end };
-}
+std::size_t streamLength(std::istream &in);
 
-inline auto readStreamToString(std::istream &in)
-{
-    return readStreamToEnd<std::string>(in);
-}
-
-inline auto readStreamToByteVector(std::istream &in)
-{
-    return readStreamToEnd<std::vector<std::uint8_t>>(in);
-}
+std::string readStreamToString(std::istream &in);
+std::vector<std::uint8_t> readStreamToByteVector(std::istream &in);
 }

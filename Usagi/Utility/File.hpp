@@ -15,6 +15,6 @@ std::string readFileAsString(const std::filesystem::path &path);
 
 void dumpBinary(
     const std::filesystem::path &path,
-    void *data,
+    const void *data,
     std::size_t size);
 }

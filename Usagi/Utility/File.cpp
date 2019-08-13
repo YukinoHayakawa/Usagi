@@ -22,14 +22,14 @@ std::string usagi::readFileAsString(const fs::path &path)
 
 void usagi::dumpBinary(
     const std::filesystem::path &path,
-    void *data,
+    const void *data,
     const std::size_t size)
 {
     std::ofstream out(path, std::ios::binary);
     try
     {
         out.exceptions(std::ios::badbit | std::ios::failbit);
-        out.write(static_cast<char*>(data), size);
+        out.write(static_cast<const char*>(data), size);
     }
     catch(const std::exception &e)
     {
