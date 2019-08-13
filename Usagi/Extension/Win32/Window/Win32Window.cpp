@@ -2,7 +2,7 @@
 
 #include <Usagi/Utility/Unicode.hpp>
 #include <Usagi/Core/Logging.hpp>
-#include <Usagi/Utility/RAIIHelper.hpp>
+#include <Usagi/Utility/RawResource.hpp>
 
 #include "../Win32Helper.hpp"
 #include "Win32WindowManager.hpp"
@@ -287,45 +287,56 @@ usagi::Vector2f usagi::Win32Window::dpiScale() const
     return Vector2f { dpi_x, dpi_y } / 96.f;
 }
 
+namespace
+{
+auto getClipboard(HWND wnd)
+{
+    // guaranteed copy elision, no move/copy ctor is called.
+    return usagi::RawResource {
+        wnd,
+        [](HWND wnd) {
+            if(!OpenClipboard(wnd))
+            {
+                LOG(error, "Could not open the clipboard");
+                throw std::runtime_error("failed to open clipboard");
+            }
+        },
+        [](auto &&) {
+            CloseClipboard();
+        }
+    };
+}
+}
+
 // https://www-user.tu-chemnitz.de/~heha/petzold/ch12b.htm
 std::string usagi::Win32Window::getClipboardText()
 {
     if(!IsClipboardFormatAvailable(CF_UNICODETEXT))
         return { };
 
-    if(!OpenClipboard(mHandle))
-    {
-        LOG(error, "Could not open the clipboard to get text.");
-        return { };
-    }
+    auto clipboard = getClipboard(mHandle);
 
-    const auto hmem = GetClipboardData(CF_UNICODETEXT);
-    void *pmem = nullptr;
-    std::wstring str;
-    {
-        // auto unlock if wstring throws
-        RAIIHelper raii_pmem {
-            [&]() { pmem = GlobalLock(hmem); },
-            [&]() { GlobalUnlock(hmem); }
-        };
-        str = {
-            reinterpret_cast<wchar_t*>(pmem),
-            GlobalSize(hmem) / sizeof(wchar_t) - 1
-        };
-    }
-
-    CloseClipboard();
+    RawResource text {
+        std::tuple<HANDLE, void *>(),
+        [](auto &&text) {
+            std::get<0>(text) = GetClipboardData(CF_UNICODETEXT);
+            std::get<1>(text) = GlobalLock(std::get<0>(text));
+        },
+        [](auto &&text) {
+            GlobalUnlock(std::get<1>(text));
+        }
+    };
+    const std::wstring str = {
+        reinterpret_cast<wchar_t*>(std::get<1>(text.get())),
+        GlobalSize(std::get<0>(text.get())) / sizeof(wchar_t) - 1
+    };
 
     return utf16To8(str);
 }
 
 void usagi::Win32Window::setClipboardText(const std::string &text)
 {
-    if(!OpenClipboard(mHandle))
-    {
-        LOG(error, "Could not open the clipboard");
-        return;
-    }
+    auto clipboard = getClipboard(mHandle);
 
     const auto wstr = utf8To16(text);
     const auto hmem = GlobalAlloc(
@@ -339,8 +350,6 @@ void usagi::Win32Window::setClipboardText(const std::string &text)
     EmptyClipboard();
     // the memory will be freed by next call of EmptyClipboard().
     SetClipboardData(CF_UNICODETEXT, hmem);
-
-    CloseClipboard();
 }
 
 LRESULT usagi::Win32Window::handleWindowMessage(HWND hWnd, UINT message,

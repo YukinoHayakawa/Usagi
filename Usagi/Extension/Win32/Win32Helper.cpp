@@ -4,7 +4,7 @@
 
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Utility/Unicode.hpp>
-#include <Usagi/Utility/RAIIHelper.hpp>
+#include <Usagi/Utility/RawResource.hpp>
 
 #pragma warning(disable: 4005) // macro redefinition
 
@@ -57,18 +57,19 @@ std::wstring usagi::win32::resolveNtSymbolicLink(const std::wstring &link)
     );
 
     // Open object
-    HANDLE      link_handle = nullptr;
-    NTSTATUS    status;
-    RAIIHelper  nt_handle {
-        [&]() {
-            status = NtOpenSymbolicLinkObject(
-               &link_handle, SYMBOLIC_LINK_QUERY, &object_attributes);
-            if(!NT_SUCCESS(status) || (link_handle == nullptr)) {
-               throw std::runtime_error("NtOpenSymbolicLinkObject() failed.");
+    RawResource link_handle {
+        HANDLE { nullptr },
+        [&](HANDLE &h) {
+            const auto status = NtOpenSymbolicLinkObject(
+                &h, SYMBOLIC_LINK_QUERY, &object_attributes
+            );
+            if(!NT_SUCCESS(status) || (h == nullptr))
+            {
+                throw std::runtime_error("NtOpenSymbolicLinkObject() failed.");
             }
         },
-        [&]() {
-            NtClose(link_handle);
+        [&](HANDLE &h) {
+            NtClose(h);
         }
     };
 
@@ -78,7 +79,8 @@ std::wstring usagi::win32::resolveNtSymbolicLink(const std::wstring &link)
     RtlInitUnicodeString(&target, target_buffer);
     target.MaximumLength = sizeof(target_buffer);
 
-    status = NtQuerySymbolicLinkObject(link_handle, &target, nullptr);
+    const auto status = NtQuerySymbolicLinkObject(
+        link_handle, &target, nullptr);
     if(!NT_SUCCESS(status) || (link_handle == nullptr)) {
         throw std::runtime_error("NtQuerySymbolicLinkObject() failed.");
     }

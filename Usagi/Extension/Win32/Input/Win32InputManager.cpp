@@ -6,7 +6,7 @@
 #include "Win32InputManager.hpp"
 
 #include <Usagi/Core/Logging.hpp>
-#include <Usagi/Utility/RAIIHelper.hpp>
+#include <Usagi/Utility/RawResource.hpp>
 #include <Usagi/Utility/Unicode.hpp>
 
 #include "Win32Mouse.hpp"
@@ -167,23 +167,18 @@ void usagi::Win32InputManager::updateDeviceNames()
     LOG(info, "--------------------------------");
 
     // Create a HDEVINFO with all present devices.
-    HDEVINFO dev_info;
-    RAIIHelper dev_info_raii {
-        [&]() {
-            dev_info = SetupDiGetClassDevsW(
-                nullptr, // GUID
-                nullptr, // Enumerator (HID?)
-                nullptr,
-                DIGCF_PRESENT | DIGCF_ALLCLASSES // find all connected devices
-            );
-            if(dev_info == INVALID_HANDLE_VALUE)
-                throw win32::Win32Exception("SetupDiGetClassDevs() failed.");
-        },
-        [&]() {
-            SetupDiDestroyDeviceInfoList(dev_info);
-        }
-    };
-
+    const USAGI_TRIVIAL_RAW_RESOURCE(HDEVINFO, dev_info, {
+        dev_info = SetupDiGetClassDevsW(
+            nullptr, // GUID
+            nullptr, // Enumerator (HID?)
+            nullptr,
+            DIGCF_PRESENT | DIGCF_ALLCLASSES // find all connected devices
+        );
+        if(dev_info == INVALID_HANDLE_VALUE)
+            throw win32::Win32Exception("SetupDiGetClassDevs() failed.");
+    }, {
+        SetupDiDestroyDeviceInfoList(dev_info);
+    });
     mDeviceNames.clear();
 
     // Enumerate through all devices in Set.

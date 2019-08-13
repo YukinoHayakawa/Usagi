@@ -4,7 +4,7 @@
 
 #include <Usagi/Core/Logging.hpp>
 #include <Usagi/Game/Game.hpp>
-#include <Usagi/Utility/RAIIHelper.hpp>
+#include <Usagi/Utility/RawResource.hpp>
 
 #include "GameState.hpp"
 
@@ -93,10 +93,10 @@ void usagi::GameStateManager::popState(bool resume_below)
 
 void usagi::GameStateManager::update(const Clock &clock)
 {
-    RAIIHelper update_lock {
-        [&]() { mUpdating = true; },
-        [&]() { mUpdating = false; }
-    };
+    USAGI_TRIVIAL_RAW_RESOURCE(bool, update_lock,
+        { mUpdating = true; },
+        { mUpdating = false; }
+    );
 
     if(mTopState)
     {

@@ -9,7 +9,7 @@
 #include <glslang/SPIRV/GlslangToSpv.h>
 
 #include <Usagi/Core/Logging.hpp>
-#include <Usagi/Utility/RAIIHelper.hpp>
+#include <Usagi/Utility/RawResource.hpp>
 #include <Usagi/Utility/File.hpp>
 #include <Usagi/Utility/Hash.hpp>
 #include <Usagi/Utility/Stream.hpp>
@@ -55,14 +55,17 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromFile(
 std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromStream(
     std::istream &glsl_source_stream)
 {
-    const auto old_exceptions = glsl_source_stream.exceptions();
-    RAIIHelper exceptions(
-        [&]() {
+    RawResource exception_sentry(
+        glsl_source_stream.exceptions(),
+        [&](auto &&) {
             glsl_source_stream.exceptions(
-                std::ifstream::badbit | std::ifstream::failbit);
-        }, [&]() {
-            glsl_source_stream.exceptions(old_exceptions);
-        });
+                std::ifstream::badbit | std::ifstream::failbit
+            );
+        },
+        [&](auto &&old) {
+            glsl_source_stream.exceptions(old);
+        }
+    );
 
     auto dump = readStreamToString(glsl_source_stream);
     if(dump.size() % sizeof(Bytecode) != 0)
@@ -137,10 +140,10 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
     const auto glslang_stage = translate(stage);
     const auto messages = EShMsgDefault;
 
-    RAIIHelper glslang_process {
-        []() { InitializeProcess(); },
-        []() { FinalizeProcess(); }
-    };
+    USAGI_TRIVIAL_RAW_RESOURCE(int, glslang_process,
+        { InitializeProcess(); },
+        { FinalizeProcess(); }
+    );
     // shader must be released after program because the program may reference
     // the shaders.
     TShader shader(glslang_stage);

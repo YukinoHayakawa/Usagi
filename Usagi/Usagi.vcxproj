@@ -380,6 +380,7 @@
     <ClInclude Include="Transform\TransformComponent.hpp" />
     <ClInclude Include="Transform\TransformSystem.hpp" />
     <ClInclude Include="Transform\Util.hpp" />
+    <ClInclude Include="Utility\ArrayView.hpp" />
     <ClInclude Include="Utility\BitHack.hpp" />
     <ClInclude Include="Utility\Bool.hpp" />
     <ClInclude Include="Utility\CyclicContainerAdapter.hpp" />
@@ -393,10 +394,11 @@
     <ClInclude Include="Utility\Iterator.hpp" />
     <ClInclude Include="Utility\SortedArray.hpp" />
     <ClInclude Include="Utility\String.hpp" />
+    <ClInclude Include="Utility\TypeTrait.hpp" />
     <ClInclude Include="Utility\Utf8Main.hpp" />
     <ClInclude Include="Utility\Math.hpp" />
     <ClInclude Include="Utility\Noncopyable.hpp" />
-    <ClInclude Include="Utility\RAIIHelper.hpp" />
+    <ClInclude Include="Utility\RawResource.hpp" />
     <ClInclude Include="Utility\RotateCounter.hpp" />
     <ClInclude Include="Utility\Rounding.hpp" />
     <ClInclude Include="Utility\Singleton.hpp" />

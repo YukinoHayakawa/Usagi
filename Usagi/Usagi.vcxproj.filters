@@ -575,9 +575,6 @@
     <ClInclude Include="Utility\Noncopyable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\RAIIHelper.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Utility\RotateCounter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -954,6 +951,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Audio\AudioBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\ArrayView.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\RawResource.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\TypeTrait.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
