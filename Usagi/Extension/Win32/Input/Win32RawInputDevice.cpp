@@ -71,27 +71,25 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
 
         LOG(info, "Path               : {}", utf16To8(path));
 
-        try
+        bool got_path = false;
+        if(path.length() > 4)
         {
-            if(path.length() > 4)
+            // translate from Win32 namespace to NT namespace
+            // https://docs.microsoft.com/en-us/windows/desktop/fileio/naming-a-file#namespaces
+            // https://superuser.com/questions/884347/win32-and-the-global-namespace
+            path = L"\\GLOBAL??" + path.substr(3);
+            const auto dev_obj_name =
+                utf16To8(win32::resolveNtSymbolicLink(path));
+            if(!dev_obj_name.empty())
             {
-                // translate from Win32 namespace to NT namespace
-                // https://docs.microsoft.com/en-us/windows/desktop/fileio/naming-a-file#namespaces
-                // https://superuser.com/questions/884347/win32-and-the-global-namespace
-                path = L"\\GLOBAL??" + path.substr(3);
-                const auto dev_obj_name =
-                    utf16To8(win32::resolveNtSymbolicLink(path));
+                got_path = true;
                 LOG(info, "Name               : {}",
                     Win32InputManager::deviceFriendlyName(dev_obj_name));
             }
-            else
-            {
-                LOG(info, "Name               : <Invalid device path>");
-            }
         }
-        catch(const std::exception &e)
+        if(!got_path)
         {
-            LOG(info, "Name               : <{}>", e.what());
+            LOG(info, "Name               : <Invalid device path>");
         }
 
         switch(info.dwType)

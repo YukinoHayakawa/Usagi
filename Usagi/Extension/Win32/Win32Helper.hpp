@@ -14,6 +14,7 @@ namespace usagi::win32
  * \return
  */
 std::string getErrorMessage(DWORD error_code);
+// return empty string if the resolution failed
 std::wstring resolveNtSymbolicLink(const std::wstring &link);
 
 /**

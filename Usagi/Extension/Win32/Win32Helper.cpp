@@ -57,21 +57,14 @@ std::wstring usagi::win32::resolveNtSymbolicLink(const std::wstring &link)
     );
 
     // Open object
-    RawResource link_handle {
-        HANDLE { nullptr },
-        [&](HANDLE &h) {
-            const auto status = NtOpenSymbolicLinkObject(
-                &h, SYMBOLIC_LINK_QUERY, &object_attributes
-            );
-            if(!NT_SUCCESS(status) || (h == nullptr))
-            {
-                throw std::runtime_error("NtOpenSymbolicLinkObject() failed.");
-            }
-        },
-        [&](HANDLE &h) {
-            NtClose(h);
-        }
-    };
+    HANDLE link_handle = nullptr;
+    auto status = NtOpenSymbolicLinkObject(
+        &link_handle, SYMBOLIC_LINK_QUERY, &object_attributes
+    );
+    if(!NT_SUCCESS(status) || (link_handle == nullptr))
+    {
+        return { };
+    }
 
     // Query link target
     WCHAR           target_buffer[256] = { 0 };
@@ -79,10 +72,13 @@ std::wstring usagi::win32::resolveNtSymbolicLink(const std::wstring &link)
     RtlInitUnicodeString(&target, target_buffer);
     target.MaximumLength = sizeof(target_buffer);
 
-    const auto status = NtQuerySymbolicLinkObject(
-        link_handle, &target, nullptr);
-    if(!NT_SUCCESS(status) || (link_handle == nullptr)) {
-        throw std::runtime_error("NtQuerySymbolicLinkObject() failed.");
+    status = NtQuerySymbolicLinkObject(link_handle, &target, nullptr);
+
+    NtClose(link_handle);
+
+    if(!NT_SUCCESS(status) || (link_handle == nullptr))
+    {
+        return { };
     }
 
     return { target_buffer };
