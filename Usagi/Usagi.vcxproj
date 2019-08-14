@@ -90,6 +90,7 @@
     <ClCompile Include="Core\Clock.cpp" />
     <ClCompile Include="Core\Element.cpp" />
     <ClCompile Include="Core\Event\Event.cpp" />
+    <ClCompile Include="Core\Exception.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
     <ClCompile Include="ECS\Game2.cpp" />
     <ClCompile Include="Extension\DebugDraw\DebugDrawImpl.cpp">

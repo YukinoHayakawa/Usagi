@@ -12,11 +12,12 @@ using ExceptionStackTrace = boost::error_info<
     boost::stacktrace::stacktrace
 >;
 
+ExceptionStackTrace getCurrentStackTrace();
+
 template <class E>
 [[noreturn]] void throwWithStackTrace(const E &e)
 {
-    throw boost::enable_error_info(e)
-        << ExceptionStackTrace(boost::stacktrace::stacktrace());
+    throw boost::enable_error_info(e) << getCurrentStackTrace();
 }
 
 template <class E>
