@@ -17,7 +17,7 @@ usagi::GameStateManager::GameStateManager(
 {
 }
 
-void usagi::GameStateManager::pushState(GameState *state, bool pause_below)
+usagi::GameState * usagi::GameStateManager::pushState(GameState *state, bool pause_below)
 {
     assert(hasChild(state));
     // the state should not be on the stack already
@@ -46,9 +46,10 @@ void usagi::GameStateManager::pushState(GameState *state, bool pause_below)
         mTopState = state;
         state->resume();
     }
+    return topState();
 }
 
-void usagi::GameStateManager::changeState(GameState *state)
+usagi::GameState * usagi::GameStateManager::changeState(GameState *state)
 {
     assert(hasChild(state));
     assert(state->mPreviousState == nullptr);
@@ -66,6 +67,7 @@ void usagi::GameStateManager::changeState(GameState *state)
         if(mTopState) popState(false);
         pushState(state, false);
     }
+    return topState();
 }
 
 void usagi::GameStateManager::popState(bool resume_below)

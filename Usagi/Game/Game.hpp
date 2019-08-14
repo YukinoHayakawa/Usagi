@@ -27,12 +27,6 @@ protected:
 
     Clock mMasterClock;
 
-    virtual bool continueGame() const { return true; }
-    void processInput();
-    void updateClock();
-    void performDeferredActions();
-    virtual void frame();
-
 public:
     explicit Game(std::shared_ptr<Runtime> runtime);
     virtual ~Game() = default;
@@ -42,6 +36,12 @@ public:
     Runtime * runtime() const { return mRuntime.get(); }
     AssetRoot * assets() const { return mAssetRoot; }
     GameStateManager * states() const { return mStateManager; }
+
+    virtual bool continueGame() const { return true; }
+    void processInput();
+    void updateClock();
+    void performDeferredActions();
+    virtual void frame();
 
     virtual void mainLoop();
 };

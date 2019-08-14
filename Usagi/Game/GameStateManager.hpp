@@ -33,23 +33,23 @@ public:
     // these two are used mainly in scripts. the states must be direct children
     // of this state manager.
 
-    void pushState(GameState *state, bool pause_below = true);
-    void changeState(GameState *state);
+    GameState * pushState(GameState *state, bool pause_below = true);
+    GameState * changeState(GameState *state);
 
     template <typename State, bool PauseBelow = true, typename... Args>
-    void pushState(Args &&... args)
+    GameState * pushState(Args &&... args)
     {
         static_assert(std::is_base_of_v<GameState, State>);
         auto state = addChild<State>(std::forward<Args>(args)...);
-        pushState(state, PauseBelow);
+        return pushState(state, PauseBelow);
     }
 
     template <typename State, typename... Args>
-    void changeState(Args &&... args)
+    GameState * changeState(Args &&... args)
     {
         static_assert(std::is_base_of_v<GameState, State>);
         auto state = addChild<State>(std::forward<Args>(args)...);
-        changeState(state);
+        return changeState(state);
     }
 
     void popState(bool resume_below = true);
