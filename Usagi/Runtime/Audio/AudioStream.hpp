@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include <Usagi/Utility/ArrayView.hpp>
+
 namespace usagi
 {
 enum class AudioStreamStatus
@@ -11,9 +13,9 @@ enum class AudioStreamStatus
     ABORT = 2,
 };
 
-// todo pass float*?
+// todo use std::span
 using AudioOutputCallback = std::function<AudioStreamStatus(
-    std::uint8_t *output_buffer,
+    const ArrayView<std::byte*> &channels,
     std::size_t frames
 )>;
 }
