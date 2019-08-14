@@ -16,7 +16,7 @@ vk::DescriptorSetLayout usagi::VulkanGraphicsPipeline::descriptorSetLayout(
     if(i == mLayouts.end())
     {
         LOG(error, "Nonexisting descriptor set id = {}", set_id);
-        throw std::logic_error("Referenced invalid resource.");
+        USAGI_THROW(std::logic_error("Referenced invalid resource."));
     }
     return mLayouts.find(set_id)->second.get();
 }

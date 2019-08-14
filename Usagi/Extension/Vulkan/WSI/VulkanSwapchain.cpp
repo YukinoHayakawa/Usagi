@@ -43,16 +43,16 @@ std::shared_ptr<usagi::GpuSemaphore> usagi::VulkanSwapchain::acquireNextImage()
             LOG(warn, "Suboptimal swapchain");
         case vk::Result::eSuccess: break;
         case vk::Result::eNotReady:
-            throw std::runtime_error("Currently no usable swapchain image.");
+            USAGI_THROW(std::runtime_error("Currently no usable swapchain image."));
         case vk::Result::eTimeout:
-            throw std::runtime_error("acquireNextImageKHR() timed out.");
+            USAGI_THROW(std::runtime_error("acquireNextImageKHR() timed out."));
 
         case vk::Result::eErrorOutOfDateKHR:
             LOG(info, "Swapchain is out-of-date, recreating");
             createSwapchain(mSize, mFormat.format);
             return acquireNextImage();
 
-        default: throw std::runtime_error("acquireNextImageKHR() failed.");
+        default: USAGI_THROW(std::runtime_error("acquireNextImageKHR() failed."));
     }
 
     ++mImagesInUse;
@@ -188,7 +188,7 @@ std::uint32_t usagi::VulkanSwapchain::selectPresentationQueueFamily() const
             queue_index, mSurface.get()))
             return queue_index;
     }
-    throw std::runtime_error("No queue family supporting WSI was found.");
+    USAGI_THROW(std::runtime_error("No queue family supporting WSI was found."));
 }
 
 void usagi::VulkanSwapchain::create(

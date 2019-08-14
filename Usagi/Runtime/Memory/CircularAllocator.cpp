@@ -60,7 +60,7 @@ void * CircularAllocator::allocate(const std::size_t num_bytes,
     if(mTail == mHead)
     {
         if(!mAllocations.empty()) // buffer is full
-            throw std::bad_alloc();
+            USAGI_THROW(std::bad_alloc());
 
         // otherwise the buffer is empty, reset pointers
         mTail = mHead = mBegin;
@@ -109,7 +109,7 @@ void * CircularAllocator::allocate(const std::size_t num_bytes,
         }
     }
     if(alloc.state != Allocation::State::USED)
-        throw std::bad_alloc();
+        USAGI_THROW(std::bad_alloc());
 
     return mBegin + alloc.offset;
 }
@@ -141,7 +141,7 @@ void CircularAllocator::deallocate(void *pointer)
             return mBegin + alloc.offset == pointer;
         });
         if(iter == mAllocations.end())
-            throw std::invalid_argument("the pointer is not allocated from this allocator");
+            USAGI_THROW(std::invalid_argument("the pointer is not allocated from this allocator"));
 
         assert(iter->state == Allocation::State::USED);
         iter->state = Allocation::State::PENDING_FREE;

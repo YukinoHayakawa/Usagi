@@ -16,6 +16,7 @@
 
 #include "Event/Library/Element/ElementCreatedEvent.hpp"
 #include "Event/Library/Element/ChildElementAddedEvent.hpp"
+#include "Exception.hpp"
 
 namespace usagi
 {
@@ -54,7 +55,7 @@ protected:
     {
         auto iter = mComponents.find(typeid(CompBaseT));
         if(iter == mComponents.end() && throws)
-            throw std::runtime_error("Element has no such component.");
+            USAGI_THROW(std::runtime_error("Element has no such component."));
         return iter;
     }
 
@@ -120,7 +121,7 @@ public:
         // a change to pass the test. (todo: is this a good idea?)
         c->template sendEvent<ElementCreatedEvent>();
         if(!acceptChild(c.get()))
-            throw std::logic_error("Child element was rejected by parent.");
+            USAGI_THROW(std::logic_error("Child element was rejected by parent."));
         const auto r = c.get();
         mChildren.push_back(std::move(c));
         sendEvent<ChildElementAddedEvent>(r);
@@ -140,7 +141,7 @@ public:
     {
         if(const auto c = findChild(name))
             return c;
-        throw std::runtime_error("No child was found with specified name.");
+        USAGI_THROW(std::runtime_error("No child was found with specified name."));
     }
 
     Element * childByIndex(const std::size_t idx) const

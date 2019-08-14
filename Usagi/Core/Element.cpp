@@ -54,7 +54,7 @@ std::string usagi::Element::path() const
 void usagi::Element::removeChildByIter(ChildrenArray::iterator iter)
 {
     if(iter == mChildren.end())
-        throw std::runtime_error("Child element not found.");
+        USAGI_THROW(std::runtime_error("Child element not found."));
     auto p = iter->get();
     p->sendEvent<PreElementRemovalEvent>();
     mChildren.erase(iter);
@@ -94,7 +94,7 @@ void usagi::Element::insertComponent(const std::type_info &type,
     if(!r.second)
     {
         LOG(error, "An element can only have one instance of the same type of component.");
-        throw std::runtime_error("Conflicted components.");
+        USAGI_THROW(std::runtime_error("Conflicted components."));
     }
     LOG(debug, "Adding\n"
         "    Component {}: {} to\n"

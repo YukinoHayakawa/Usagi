@@ -47,7 +47,7 @@ std::unique_ptr<std::istream> usagi::FilesystemAsset::open()
     if(!*in)
     {
         LOG(error, "Failed to open {}", full_path.u8string());
-        throw std::runtime_error("Failed to open file.");
+        USAGI_THROW(std::runtime_error("Failed to open file."));
     }
 
     return std::move(in);

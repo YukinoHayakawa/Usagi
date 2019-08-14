@@ -89,7 +89,7 @@ public:
         friend bool operator==(const Iterator &lhs, const Iterator &rhs)
         {
             if(&lhs.mAdapter != &rhs.mAdapter)
-                throw std::runtime_error("incompatible iterators");
+                USAGI_THROW(std::runtime_error("incompatible iterators"));
             return lhs.mBase == rhs.mBase
                 && lhs.mCurrentCycle == rhs.mCurrentCycle;
         }

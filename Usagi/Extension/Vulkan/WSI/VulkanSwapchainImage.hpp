@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <Usagi/Core/Exception.hpp>
+
 #include "../VulkanGpuImage.hpp"
 
 namespace usagi
@@ -21,7 +23,7 @@ public:
     // todo this should be a valid operation, but requires waiting on the image available semaphore
     void upload(const void *data, std::size_t size) override
     {
-        throw std::runtime_error("Operation not supported.");
+        USAGI_THROW(std::runtime_error("Operation not supported."));
     }
 
     void uploadRegion(
@@ -30,7 +32,7 @@ public:
         const Vector2i &tex_offset,
         const Vector2u32 &tex_size) override
     {
-        throw std::runtime_error("Operation not supported.");
+        USAGI_THROW(std::runtime_error("Operation not supported."));
     }
 };
 }

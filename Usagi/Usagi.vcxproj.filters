@@ -962,5 +962,11 @@
     <ClInclude Include="Utility\TypeTrait.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Exception.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Format.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

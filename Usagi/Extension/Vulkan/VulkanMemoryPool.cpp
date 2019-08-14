@@ -59,7 +59,7 @@ void usagi::VulkanMemoryPool::allocateDeviceMemory(
             }
         }
     }
-    throw std::bad_alloc();
+    USAGI_THROW(std::bad_alloc());
 }
 
 vk::UniqueImage usagi::VulkanMemoryPool::createImage(

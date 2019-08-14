@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+#include <Usagi/Core/Exception.hpp>
+
 #include "Noncopyable.hpp"
 
 namespace usagi
@@ -15,7 +17,9 @@ public:
     Singleton()
     {
         if(mInstance)
-            throw std::runtime_error("Only one instance of T can be created!");
+            USAGI_THROW(std::runtime_error(
+                "Only one instance of T can be created!"
+            ));
 
         mInstance = static_cast<T*>(this);
     }

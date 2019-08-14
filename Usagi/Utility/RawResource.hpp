@@ -40,9 +40,19 @@ public:
         return mResource;
     }
 
-    ResT get()
+    ResT val()
     {
         return mResource;
+    }
+
+    ResT & ref()
+    {
+        return mResource;
+    }
+
+    ResT * addr()
+    {
+        return &mResource;
     }
 };
 }

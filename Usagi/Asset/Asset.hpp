@@ -75,9 +75,9 @@ public:
                 i.first->second);
             if(!old.expired())
             {
-                throw std::runtime_error(
+                USAGI_THROW(std::runtime_error(
                     "Attempting to overwrite a subresource currently in use."
-                );
+                ));
             }
             // replace expired subresource
             old = res;

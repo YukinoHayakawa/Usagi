@@ -26,7 +26,7 @@ void usagi::Win32InputManager::registerWindowClass() const
 
     if(!RegisterClassExW(&wcex))
     {
-        throw win32::Win32Exception("RegisterClassEx() failed!");
+        USAGI_THROW(win32::Win32Exception("RegisterClassEx() failed!"));
     }
 }
 
@@ -53,7 +53,7 @@ void usagi::Win32InputManager::createInputSinkWindow()
 
     if(!mMessageWindow)
     {
-        throw win32::Win32Exception("CreateWindowEx() failed");
+        USAGI_THROW(win32::Win32Exception("CreateWindowEx() failed"));
     }
 }
 
@@ -101,7 +101,7 @@ void usagi::Win32InputManager::registerRawInputDevices()
         sizeof(RAWINPUTDEVICE)) == FALSE)
     {
         //registration failed. Call GetLastError for the cause of the error
-        throw win32::Win32Exception("RegisterRawInputDevices() failed");
+        USAGI_THROW(win32::Win32Exception("RegisterRawInputDevices() failed"));
     }
 }
 
@@ -175,7 +175,7 @@ void usagi::Win32InputManager::updateDeviceNames()
             DIGCF_PRESENT | DIGCF_ALLCLASSES // find all connected devices
         );
         if(dev_info == INVALID_HANDLE_VALUE)
-            throw win32::Win32Exception("SetupDiGetClassDevs() failed.");
+            USAGI_THROW(win32::Win32Exception("SetupDiGetClassDevs() failed."));
     }, {
         SetupDiDestroyDeviceInfoList(dev_info);
     });
@@ -252,9 +252,9 @@ void usagi::Win32InputManager::fillRawInputBuffer(LPARAM lParam)
         sizeof(RAWINPUTHEADER)
     ) != dwSize)
     {
-        throw win32::Win32Exception(
+        USAGI_THROW(win32::Win32Exception(
             "GetRawInputData does not return correct size!"
-        );
+        ));
     }
 }
 

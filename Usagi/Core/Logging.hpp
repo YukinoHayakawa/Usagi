@@ -1,8 +1,6 @@
 ﻿#pragma once
 
-#include <fmt/format.h>
-// enables outputting custom types
-#include <fmt/ostream.h>
+#include "Format.hpp"
 
 namespace usagi::logging
 {

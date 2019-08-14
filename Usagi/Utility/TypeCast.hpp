@@ -3,6 +3,8 @@
 #include <memory>
 #include <type_traits>
 
+#include <Usagi/Core/Exception.hpp>
+
 namespace usagi
 {
 template <typename Target, typename Source>
@@ -11,7 +13,7 @@ std::shared_ptr<Target> dynamic_pointer_cast_throw(
 {
     auto result = std::dynamic_pointer_cast<Target>(source);
     if(!result)
-        throw std::bad_cast();
+        USAGI_THROW(std::bad_cast());
     return std::move(result);
 }
 

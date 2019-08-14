@@ -333,12 +333,13 @@ void usagi::VulkanGraphicsCommandList::setConstant(
     const std::size_t size)
 {
     if(mCurrentPipeline == nullptr)
-        throw std::runtime_error(
-            "No active pipeline is bound, unable to retrieve pipeline layout.");
+        USAGI_THROW(std::runtime_error(
+            "No active pipeline is bound, unable to retrieve pipeline layout."
+        ));
 
     const auto constant_info = mCurrentPipeline->queryConstantInfo(stage, name);
     if(size != constant_info.size)
-        throw std::runtime_error("Unmatched constant size.");
+        USAGI_THROW(std::runtime_error("Unmatched constant size."));
 
     mCommandBuffer->pushConstants(
         mCurrentPipeline->layout(),

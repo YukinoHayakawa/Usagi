@@ -2,6 +2,7 @@
 
 #include <Usagi/Runtime/Graphics/GpuDevice.hpp>
 #include <Usagi/Runtime/Graphics/GpuImage.hpp>
+#include <Usagi/Core/Exception.hpp>
 
 usagi::ImageRenderTargetSource::ImageRenderTargetSource(
     GpuDevice *gpu,
@@ -24,7 +25,7 @@ usagi::GpuAttachmentUsage & usagi::ImageRenderTargetSource::usage(
         case GpuImageUsage::DEPTH_STENCIL_ATTACHMENT:
             layout = GpuImageLayout::DEPTH_STENCIL_ATTACHMENT;
             break;
-        default: throw std::runtime_error("Unsupported image usage");;
+        default: USAGI_THROW(std::runtime_error("Unsupported image usage"));
     }
     u.format = mImage->format();
     if(u.initial_layout == GpuImageLayout::AUTO)

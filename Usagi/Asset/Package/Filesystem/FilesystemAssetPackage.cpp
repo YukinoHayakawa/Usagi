@@ -10,7 +10,7 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByUuid(
 {
     const auto iter = mUuidMap.find(uuid);
     if(iter == mUuidMap.end())
-        throw std::runtime_error("Asset not found.");
+        USAGI_THROW(std::runtime_error("Asset not found."));
     return findByFilesystemPath(iter->second);
 }
 
@@ -27,12 +27,12 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
     const auto normalized = relative_path.relative_path().lexically_normal();
     {
         if(normalized.empty())
-            throw std::runtime_error("Empty path.");
+            USAGI_THROW(std::runtime_error("Empty path."));
         const auto &first_component = *normalized.begin();
         if(first_component == ".")
-            throw std::runtime_error("Path does not point to a file.");
+            USAGI_THROW(std::runtime_error("Path does not point to a file."));
         if(first_component == "..")
-            throw std::runtime_error("Path must be within the root folder.");
+            USAGI_THROW(std::runtime_error("Path must be within the root folder."));
     }
     // search in cache
     if(const auto asset = findChild(normalized.u8string()))

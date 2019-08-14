@@ -29,7 +29,7 @@ void usagi::Win32WindowManager::registerWindowClass()
 
     if(!RegisterClassExW(&wcex))
     {
-        throw win32::Win32Exception("RegisterClassEx() failed!");
+        USAGI_THROW(win32::Win32Exception("RegisterClassEx() failed!"));
     }
 }
 

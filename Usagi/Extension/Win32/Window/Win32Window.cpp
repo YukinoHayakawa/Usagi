@@ -100,7 +100,7 @@ usagi::Win32Window::Win32Window(
 
     if(!mHandle)
     {
-        throw win32::Win32Exception("CreateWindowEx() failed");
+        USAGI_THROW(win32::Win32Exception("CreateWindowEx() failed"));
     }
 
     Win32WindowManager::mWindows.insert({ mHandle, this });
@@ -261,12 +261,12 @@ usagi::Vector2f usagi::Win32Window::dpiScale() const
         static HMODULE shcorelib = LoadLibraryExW(
             L"Shcore.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
         if(!shcorelib)
-            throw win32::Win32Exception("Failed to load Shcore.dll.");
+            USAGI_THROW(win32::Win32Exception("Failed to load Shcore.dll."));
         static auto func_GetDpiForMonitor =
             reinterpret_cast<decltype(&GetDpiForMonitor)>(
             GetProcAddress(shcorelib, "GetDpiForMonitor"));
         if(!func_GetDpiForMonitor)
-            throw win32::Win32Exception("Failed to find GetDpiForMonitor.");
+            USAGI_THROW(win32::Win32Exception("Failed to find GetDpiForMonitor."));
         const auto monitor = MonitorFromWindow(
             mHandle, MONITOR_DEFAULTTONEAREST);
         func_GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &dpi_x, &dpi_y);
@@ -298,7 +298,7 @@ auto getClipboard(HWND wnd)
             if(!OpenClipboard(wnd))
             {
                 LOG(error, "Could not open the clipboard");
-                throw std::runtime_error("failed to open clipboard");
+                USAGI_THROW(std::runtime_error("failed to open clipboard"));
             }
         },
         [](auto &&) {
@@ -327,8 +327,8 @@ std::string usagi::Win32Window::getClipboardText()
         }
     };
     const std::wstring str = {
-        reinterpret_cast<wchar_t*>(std::get<1>(text.get())),
-        GlobalSize(std::get<0>(text.get())) / sizeof(wchar_t) - 1
+        reinterpret_cast<wchar_t*>(std::get<1>(text.val())),
+        GlobalSize(std::get<0>(text.val())) / sizeof(wchar_t) - 1
     };
 
     return utf16To8(str);

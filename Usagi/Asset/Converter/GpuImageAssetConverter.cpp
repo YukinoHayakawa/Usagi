@@ -16,7 +16,7 @@ usagi::GpuImageAssetConverter::operator()(
     if(buffer.format != ImageBuffer::ChannelFormat::UINT8)
     {
         LOG(error, "Only uint8 images are implemented yet.");
-        throw std::runtime_error("Unimplemented image format.");
+        USAGI_THROW(std::runtime_error("Unimplemented image format."));
     }
 
     GpuImageCreateInfo info;
@@ -28,7 +28,7 @@ usagi::GpuImageAssetConverter::operator()(
         case 4: info.format = GpuBufferFormat::R8G8B8A8_UNORM; break;
         default:
             LOG(error, "Invalid channel amount: {}", buffer.channels);
-            throw std::runtime_error("Invalid image.");
+            USAGI_THROW(std::runtime_error("Invalid image."));
     }
     info.size = buffer.image_size;
     info.usage = GpuImageUsage::SAMPLED;

@@ -76,12 +76,12 @@ usagi::Asset * usagi::AssetRoot::findAsset(std::string locator) const
 {
     Asset *asset = nullptr;
     if(locator.empty())
-        throw std::runtime_error("Empty asset locator cannot match any asset.");
+        USAGI_THROW(std::runtime_error("Empty asset locator cannot match any asset."));
     if(locator.front() == '{') // try UUID
         asset = findAssetByUuid(boost::uuids::string_generator()(locator));
     else
         asset = findAssetByString(std::move(locator));
     if(asset == nullptr)
-        throw std::runtime_error("Asset not found.");
+        USAGI_THROW(std::runtime_error("Asset not found."));
     return asset;
 }

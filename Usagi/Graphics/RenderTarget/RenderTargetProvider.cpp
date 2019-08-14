@@ -1,5 +1,7 @@
 ﻿#include "RenderTargetProvider.hpp"
 
+#include <Usagi/Core/Exception.hpp>
+
 #include "RenderTargetSource.hpp"
 
 std::shared_ptr<usagi::RenderTargetSource>
@@ -7,8 +9,8 @@ usagi::RenderTargetProvider::findSource(const std::string &name) const
 {
     const auto i = mSources.find(name);
     if(i == mSources.end())
-        throw std::runtime_error(
-            "Could not find specified render target source");
+        USAGI_THROW(std::runtime_error(
+            "Could not find specified render target source"));
     return i->second;
 }
 
@@ -28,7 +30,7 @@ void usagi::RenderTargetProvider::addSharedSource(
     const auto r = mSources.insert({ name, std::move(source) });
     if(!r.second)
     {
-        throw std::runtime_error("Source name conflicted");
+        USAGI_THROW(std::runtime_error("Source name conflicted"));
     }
 }
 

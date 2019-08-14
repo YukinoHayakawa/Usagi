@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <Usagi/Core/Exception.hpp>
+
 #include "ComponentStorage.hpp"
 
 namespace usagi::ecs
@@ -28,8 +30,8 @@ public:
                 break;
             ++mCursor;
         }
-        throw std::logic_error(
-            "seeking component not belonging to the specified entity.");
+        USAGI_THROW(std::logic_error(
+            "seeking component not belonging to the specified entity."));
     }
 };
 }

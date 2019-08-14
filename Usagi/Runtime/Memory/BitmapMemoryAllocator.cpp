@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include <Usagi/Utility/Rounding.hpp>
+#include <Usagi/Core/Exception.hpp>
 
 namespace usagi
 {
@@ -26,11 +27,11 @@ BitmapMemoryAllocator::BitmapMemoryAllocator(void *base,
     static_assert(sizeof(char) == 1);
 
     if(!block_size)
-        throw std::invalid_argument(
-            "block size must be positive");
+        USAGI_THROW(std::invalid_argument(
+            "block size must be positive"));
     if(total_size < block_size)
-        throw std::invalid_argument(
-            "total size cannot hold a single block");
+        USAGI_THROW(std::invalid_argument(
+            "total size cannot hold a single block"));
 
     mBitmap = std::string(total_size / block_size, BLOCK_FREE);
 }
@@ -52,7 +53,7 @@ void * BitmapMemoryAllocator::allocate(
     const std::size_t num_bytes, const std::size_t alignment)
 {
     if(num_bytes == 0)
-        throw std::invalid_argument("allocation size must be greater than 0");
+        USAGI_THROW(std::invalid_argument("allocation size must be greater than 0"));
 
     std::lock_guard<std::mutex> lock_guard(mBitmapLock);
 
@@ -64,7 +65,7 @@ void * BitmapMemoryAllocator::allocate(
         const auto first_free_block = mBitmap.find(std::string(
             alloc_unit, BLOCK_FREE));
         if(first_free_block == std::string::npos)
-            throw std::bad_alloc();
+            USAGI_THROW(std::bad_alloc());
         markBlocksAllocated(
             mBitmap.begin() + first_free_block,
             mBitmap.begin() + first_free_block + alloc_unit
@@ -78,7 +79,7 @@ void * BitmapMemoryAllocator::allocate(
     while(true)
     {
         if(first_addr >= end_addr)
-            throw std::bad_alloc();
+            USAGI_THROW(std::bad_alloc());
 
         const auto last_addr = first_addr + num_bytes - 1;
         const auto begin_block = mBitmap.begin() + getAddressBlock(first_addr);

@@ -8,6 +8,8 @@
 
 #include <boost/iterator/filter_iterator.hpp>
 
+#include <Usagi/Core/Exception.hpp>
+
 #include "Entity.hpp"
 #include "ComponentStorage.hpp"
 #include "ComponentStream.hpp"
@@ -25,8 +27,8 @@ class EntityManager
     {
         if(mComponentStorage.size() >= MAX_COMPONENTS)
         {
-            throw std::logic_error(
-                "Component number exceeds the maximum allowed.");
+            USAGI_THROW(std::logic_error(
+                "Component number exceeds the maximum allowed."));
         }
         auto it = mComponentStorage.insert({
             typeid(Component),
@@ -114,7 +116,7 @@ public:
         const auto it = mComponentStorage.find(typeid(Component));
         if(it == mComponentStorage.end())
         {
-            throw std::runtime_error("Component type not registered.");
+            USAGI_THROW(std::runtime_error("Component type not registered."));
         }
         ComponentStorage<Component> &component_array =
             std::any_cast<ComponentStorage<Component>&>(it->second);
@@ -199,8 +201,8 @@ private:
     {
         auto &storage = componentStorage<Component>();
         if(entity.components[storage.mask_bit])
-            throw std::runtime_error(
-                "Entity already has the specified component.");
+            USAGI_THROW(std::runtime_error(
+                "Entity already has the specified component."));
         entity.components[storage.mask_bit].flip();
         storage.insert(entity.id, { std::forward<Args>(args)... });
         return *this;
@@ -211,8 +213,8 @@ private:
     {
         auto &storage = componentStorage<Component>();
         if(!entity.components[storage.mask_bit])
-            throw std::runtime_error(
-                "Entity does not have the specified component.");
+            USAGI_THROW(std::runtime_error(
+                "Entity does not have the specified component."));
         entity.components[storage.mask_bit].flip();
         storage.erase(entity.id);
         return *this;

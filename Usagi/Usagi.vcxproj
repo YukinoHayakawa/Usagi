@@ -220,6 +220,7 @@
     <ClInclude Include="Core\Event\Library\Element\PreElementRemovalEvent.hpp" />
     <ClInclude Include="Core\Event\Library\Input\MousePositionEvent.hpp" />
     <ClInclude Include="Constants\DataFormat.hpp" />
+    <ClInclude Include="Core\Format.hpp" />
     <ClInclude Include="Math\Angle.hpp" />
     <ClInclude Include="Math\Bezier.hpp" />
     <ClInclude Include="Math\Bound.hpp" />
@@ -387,6 +388,7 @@
     <ClInclude Include="Utility\Debug.hpp" />
     <ClInclude Include="Utility\DummyDeleter.hpp" />
     <ClInclude Include="Utility\EnumTranslator.hpp" />
+    <ClInclude Include="Core\Exception.hpp" />
     <ClInclude Include="Utility\File.hpp" />
     <ClInclude Include="Utility\Flag.hpp" />
     <ClInclude Include="Utility\Functional.hpp" />

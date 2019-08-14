@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include <Carrot/Preprocessor/unpack.hpp>
+#include <Usagi/Core/Exception.hpp>
 
 namespace usagi
 {
@@ -27,7 +28,7 @@ struct EnumTranslator
         auto i = std::find(Traits::src.begin(), Traits::src.end(), e);
         if(i != Traits::src.end())
             return Traits::dest[i - Traits::src.begin()];
-        throw std::runtime_error("Could not translate the enum.");
+        USAGI_THROW(std::runtime_error("Could not translate the enum."));
     }
 };
 }

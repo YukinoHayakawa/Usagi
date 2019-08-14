@@ -10,6 +10,7 @@
 #include <Usagi/Runtime/Graphics/GpuImageViewCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/GpuSamplerCreateInfo.hpp>
 #include <Usagi/Runtime/Graphics/Shader/ShaderStage.hpp>
+#include <Usagi/Core/Exception.hpp>
 
 using namespace usagi;
 
@@ -25,7 +26,7 @@ vk::ShaderStageFlagBits translate(ShaderStage stage)
         case ShaderStage::FRAGMENT:
             return vk::ShaderStageFlagBits::eFragment;
         default:
-            throw std::runtime_error("Invalid shader stage");
+            USAGI_THROW(std::runtime_error("Invalid shader stage"));
     }
 }
 
@@ -44,7 +45,7 @@ GpuBufferFormat from(vk::Format format)
         case vk::Format::eR32G32B32A32Sfloat:
             return GpuBufferFormat::R32G32B32A32_SFLOAT;
         default:
-            throw std::runtime_error("Unimplemented vk::Format.");
+            USAGI_THROW(std::runtime_error("Unimplemented vk::Format."));
     }
 }
 
@@ -57,7 +58,7 @@ vk::VertexInputRate translate(VertexInputRate rate)
         case VertexInputRate::PER_INSTANCE:
             return vk::VertexInputRate::eInstance;
         default:
-            throw std::runtime_error("Invalid vertex input rate.");
+            USAGI_THROW(std::runtime_error("Invalid vertex input rate."));
     }
 }
 
@@ -78,7 +79,7 @@ vk::PrimitiveTopology translate(PrimitiveTopology topology)
         case PrimitiveTopology::TRIANGLE_FAN:
             return vk::PrimitiveTopology::eTriangleFan;
         default:
-            throw std::runtime_error("Invalid primitive topology.");
+            USAGI_THROW(std::runtime_error("Invalid primitive topology."));
     }
 }
 
@@ -93,7 +94,7 @@ vk::CullModeFlags translate(FaceCullingMode face_culling_mode)
         case FaceCullingMode::BACK:
             return vk::CullModeFlagBits::eBack;
         default:
-            throw std::runtime_error("Invalid face culling mode.");
+            USAGI_THROW(std::runtime_error("Invalid face culling mode."));
     }
 }
 
@@ -106,7 +107,7 @@ vk::FrontFace translate(FrontFace front_face)
         case FrontFace::COUNTER_CLOCKWISE:
             return vk::FrontFace::eCounterClockwise;
         default:
-            throw std::runtime_error("Invalid front face.");
+            USAGI_THROW(std::runtime_error("Invalid front face."));
     }
 }
 
@@ -121,7 +122,7 @@ vk::PolygonMode translate(PolygonMode polygon_mode)
         case PolygonMode::POINT:
             return vk::PolygonMode::ePoint;
         default:
-            throw std::runtime_error("Invalid polygon mode.");
+            USAGI_THROW(std::runtime_error("Invalid polygon mode."));
     }
 }
 
@@ -140,7 +141,7 @@ vk::BlendOp translate(BlendingOperation blending_operation)
         case BlendingOperation::MAX:
             return vk::BlendOp::eMax;
         default:
-            throw std::runtime_error("Invalid blending operation.");
+            USAGI_THROW(std::runtime_error("Invalid blending operation."));
     }
 }
 
@@ -157,7 +158,7 @@ vk::BlendFactor translate(BlendingFactor blending_factor)
         case BlendingFactor::ONE_MINUS_SOURCE_ALPHA:
             return vk::BlendFactor::eOneMinusSrcAlpha;
         default:
-            throw std::runtime_error("Invalid blending factor.");
+            USAGI_THROW(std::runtime_error("Invalid blending factor."));
     }
 }
 
@@ -172,7 +173,7 @@ vk::AttachmentLoadOp translate(GpuAttachmentLoadOp op)
         case GpuAttachmentLoadOp::UNDEFINED:
             return vk::AttachmentLoadOp::eDontCare;
         default:
-            throw std::runtime_error("Invalid GpuAttachmentLoadOp.");
+            USAGI_THROW(std::runtime_error("Invalid GpuAttachmentLoadOp."));
     }
 }
 
@@ -185,7 +186,7 @@ vk::AttachmentStoreOp translate(GpuAttachmentStoreOp op)
         case GpuAttachmentStoreOp::UNDEFINED:
             return vk::AttachmentStoreOp::eDontCare;
         default:
-            throw std::runtime_error("Invalid GpuAttachmentStoreOp.");
+            USAGI_THROW(std::runtime_error("Invalid GpuAttachmentStoreOp."));
     }
 }
 
@@ -198,7 +199,7 @@ vk::IndexType translate(GraphicsIndexType type)
         case GraphicsIndexType::UINT32:
             return vk::IndexType::eUint32;
         default:
-            throw std::runtime_error("Invalid index type.");
+            USAGI_THROW(std::runtime_error("Invalid index type."));
     }
 }
 
@@ -213,7 +214,7 @@ vk::SampleCountFlagBits translateSampleCount(std::uint32_t sample_count)
         case 16: return vk::SampleCountFlagBits::e16;
         case 32: return vk::SampleCountFlagBits::e32;
         case 64: return vk::SampleCountFlagBits::e64;
-        default: throw std::runtime_error("Invalid sample count.");
+        default: USAGI_THROW(std::runtime_error("Invalid sample count."));
     }
 }
 
@@ -243,7 +244,7 @@ vk::PipelineStageFlagBits translate(GraphicsPipelineStage stage)
             return vk::PipelineStageFlagBits::eBottomOfPipe;
         case GraphicsPipelineStage::HOST:
             return vk::PipelineStageFlagBits::eHost;
-        default: throw std::runtime_error("Invalid GraphicsPipelineStage.");
+        default: USAGI_THROW(std::runtime_error("Invalid GraphicsPipelineStage."));
     }
 }
 
@@ -257,7 +258,7 @@ vk::BufferUsageFlagBits translate(const GpuBufferUsage usage)
             return vk::BufferUsageFlagBits::eIndexBuffer;
         case GpuBufferUsage::UNIFORM:
             return vk::BufferUsageFlagBits::eUniformBuffer;
-        default: throw std::runtime_error("Invalid GpuBufferUsage.");
+        default: USAGI_THROW(std::runtime_error("Invalid GpuBufferUsage."));
     }
 }
 
@@ -275,7 +276,7 @@ vk::SamplerAddressMode translate(GpuSamplerAddressMode mode)
             return vk::SamplerAddressMode::eClampToBorder;
         case GpuSamplerAddressMode::MIRROR_CLAMP_TO_EDGE:
             return vk::SamplerAddressMode::eMirrorClampToEdge;
-        default: throw std::runtime_error("Invalid GpuSamplerAddressMode.");
+        default: USAGI_THROW(std::runtime_error("Invalid GpuSamplerAddressMode."));
     }
 }
 
@@ -285,7 +286,7 @@ vk::Filter translate(const GpuFilter filter)
     {
         case GpuFilter::NEAREST: return vk::Filter::eNearest;
         case GpuFilter::LINEAR: return vk::Filter::eLinear;
-        default: throw std::runtime_error("Invalid GpuFilter.");
+        default: USAGI_THROW(std::runtime_error("Invalid GpuFilter."));
     }
 }
 
@@ -307,7 +308,7 @@ vk::ComponentSwizzle translate(const GpuImageComponentSwizzle swizzle)
             return vk::ComponentSwizzle::eB;
         case GpuImageComponentSwizzle::A:
             return vk::ComponentSwizzle::eA;
-        default: throw std::runtime_error("Invalid GpuImageComponentSwizzle.");
+        default: USAGI_THROW(std::runtime_error("Invalid GpuImageComponentSwizzle."));
     }
 }
 }

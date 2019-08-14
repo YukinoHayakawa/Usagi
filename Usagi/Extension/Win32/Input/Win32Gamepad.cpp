@@ -16,20 +16,20 @@ usagi::Win32Gamepad::Win32Gamepad(HANDLE device_handle, std::string name)
     // Get the preparsed data
     if(GetRawInputDeviceInfoW(device_handle, RIDI_PREPARSEDDATA,
         nullptr, &buffer_size) != 0)
-        throw win32::Win32Exception("GetRawInputDeviceInfo() failed.");
+        USAGI_THROW(win32::Win32Exception("GetRawInputDeviceInfo() failed."));
     mPreparsedData.resize(buffer_size);
     if(GetRawInputDeviceInfo(device_handle, RIDI_PREPARSEDDATA,
         mPreparsedData.data(), &buffer_size) == static_cast<UINT>(-1))
-        throw win32::Win32Exception("GetRawInputDeviceInfo() failed.");
+        USAGI_THROW(win32::Win32Exception("GetRawInputDeviceInfo() failed."));
 
     // Get the capabilities
     if(HidP_GetCaps(reinterpret_cast<PHIDP_PREPARSED_DATA>(
         mPreparsedData.data()), &mCaps) != HIDP_STATUS_SUCCESS)
-        throw std::runtime_error("HidP_GetCaps() failed.");
+        USAGI_THROW(std::runtime_error("HidP_GetCaps() failed."));
 
     if(mCaps.NumberInputButtonCaps == 0)
-        throw std::runtime_error(
-            "Found a strange gamepad without any buttons!");
+        USAGI_THROW(std::runtime_error(
+            "Found a strange gamepad without any buttons!"));
     mButtonCaps.resize(mCaps.NumberInputButtonCaps);
     mValueCaps.resize(mCaps.NumberInputValueCaps);
 
@@ -37,7 +37,7 @@ usagi::Win32Gamepad::Win32Gamepad(HANDLE device_handle, std::string name)
     if(HidP_GetButtonCaps(HidP_Input, mButtonCaps.data(), &caps_length,
         reinterpret_cast<PHIDP_PREPARSED_DATA>(mPreparsedData.data())) !=
         HIDP_STATUS_SUCCESS)
-        throw std::runtime_error("HidP_GetButtonCaps() failed.");
+        USAGI_THROW(std::runtime_error("HidP_GetButtonCaps() failed."));
     const auto num_buttons = mButtonCaps[0].Range.UsageMax
         - mButtonCaps[0].Range.UsageMin + 1;
     mButtons.resize(num_buttons);
@@ -48,7 +48,7 @@ usagi::Win32Gamepad::Win32Gamepad(HANDLE device_handle, std::string name)
     if(HidP_GetValueCaps(HidP_Input, mValueCaps.data(), &caps_length,
         reinterpret_cast<PHIDP_PREPARSED_DATA>(mPreparsedData.data())) !=
         HIDP_STATUS_SUCCESS)
-        throw std::runtime_error("HidP_GetValueCaps() failed.");
+        USAGI_THROW(std::runtime_error("HidP_GetValueCaps() failed."));
 }
 
 std::string usagi::Win32Gamepad::name() const
@@ -68,7 +68,7 @@ void usagi::Win32Gamepad::handleRawInput(RAWINPUT *data)
         data->data.hid.dwSizeHid
     );
     if(result != HIDP_STATUS_SUCCESS)
-        throw std::runtime_error("HidP_GetUsages() failed.");
+        USAGI_THROW(std::runtime_error("HidP_GetUsages() failed."));
 
     // Reset button states
     std::fill(mButtons.begin(), mButtons.end(), 0);
@@ -107,7 +107,7 @@ void usagi::Win32Gamepad::handleRawInput(RAWINPUT *data)
             case HIDP_STATUS_INCOMPATIBLE_REPORT_ID:
                 break;
             default:
-                throw std::runtime_error("HidP_GetUsageValue() failed.");
+                USAGI_THROW(std::runtime_error("HidP_GetUsageValue() failed."));
         }
 //        if(mValueCaps[i].NotRange.Usage == HID_USAGE_GENERIC_HATSWITCH)
 //        {

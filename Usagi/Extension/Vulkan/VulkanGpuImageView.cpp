@@ -1,5 +1,7 @@
 ﻿#include "VulkanGpuImageView.hpp"
 
+#include <Usagi/Core/Exception.hpp>
+
 #include "VulkanGpuImage.hpp"
 
 usagi::VulkanGpuImageView::VulkanGpuImageView(
@@ -21,7 +23,7 @@ void usagi::VulkanGpuImageView::fillShaderResourceInfo(
             image_info.setImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
             break;
         default:
-            throw std::runtime_error("Unsupported image usage.");
+            USAGI_THROW(std::runtime_error("Unsupported image usage."));
     }
     image_info.setImageView(mImageView.get());
     write.setPImageInfo(&image_info);

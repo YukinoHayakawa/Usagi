@@ -59,7 +59,7 @@ usagi::ImageBuffer usagi::StbImageAssetDecoder::operator()(
     if(data == nullptr)
     {
         LOG(error, "Failed to load image: {}", stbi_failure_reason());
-        throw std::runtime_error(stbi_failure_reason());
+        USAGI_THROW(std::runtime_error(stbi_failure_reason()));
     }
 
     ImageBuffer img;

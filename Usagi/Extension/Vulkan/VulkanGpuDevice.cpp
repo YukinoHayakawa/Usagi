@@ -124,8 +124,8 @@ uint32_t usagi::VulkanGpuDevice::selectQueue(
             return static_cast<uint32_t>(iter - queue_family.begin());
         }
     }
-    throw std::runtime_error(
-        "Could not find a queue family with required flags.");
+    USAGI_THROW(std::runtime_error(
+        "Could not find a queue family with required flags."));
 }
 
 void usagi::VulkanGpuDevice::createInstance()
@@ -234,7 +234,7 @@ void usagi::VulkanGpuDevice::selectPhysicalDevice()
         }
     }
     if(!mPhysicalDevice)
-        throw std::runtime_error("No available GPU supporting Vulkan.");
+        USAGI_THROW(std::runtime_error("No available GPU supporting Vulkan."));
     LOG(info, "Using physical device: {}",
         mPhysicalDevice.getProperties().deviceName);
 }

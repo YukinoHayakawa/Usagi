@@ -41,7 +41,7 @@ void usagi::GameState::setSystemEnabled(
 {
     const auto iter = findSystemByName(subsystem_name);
     if(iter == mSystems.end())
-        throw std::runtime_error("No such subsystem");
+        USAGI_THROW(std::runtime_error("No such subsystem"));
     iter->enabled = enabled;
 }
 
@@ -56,7 +56,7 @@ usagi::System * usagi::GameState::addSystemPtr(
     // check that no existing subsystem is using the same name
     if(findSystemByName(info.name) != mSystems.end())
     {
-        throw std::runtime_error("System name already used.");
+        USAGI_THROW(std::runtime_error("System name already used."));
     }
     const auto ptr = info.subsystem.get();
     mSystems.push_back(std::move(info));

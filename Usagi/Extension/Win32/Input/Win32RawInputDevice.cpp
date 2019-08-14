@@ -42,11 +42,11 @@ usagi::Win32RawInputDeviceEnumeration usagi::Win32RawInputDevice::
         UINT num_devices;
         if(GetRawInputDeviceList(
             nullptr, &num_devices, sizeof(RAWINPUTDEVICELIST)) != 0)
-            throw win32::Win32Exception("GetRawInputDeviceList() failed.");
+            USAGI_THROW(win32::Win32Exception("GetRawInputDeviceList() failed."));
         raw_input_device_list.resize(num_devices);
         if(GetRawInputDeviceList(raw_input_device_list.data(), &num_devices,
             sizeof(RAWINPUTDEVICELIST)) == static_cast<unsigned>(-1))
-            throw win32::Win32Exception("GetRawInputDeviceList() failed.");
+            USAGI_THROW(win32::Win32Exception("GetRawInputDeviceList() failed."));
     }
 
     for(auto &&device : raw_input_device_list)

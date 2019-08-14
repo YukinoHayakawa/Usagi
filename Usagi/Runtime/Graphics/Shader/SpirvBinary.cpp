@@ -22,8 +22,9 @@ usagi::SpirvBinary::SpirvBinary(std::vector<std::uint32_t> bytecodes)
 {
     // check header magic code
     if(mBytecodes.empty() || mBytecodes.front() != 0x07230203)
-        throw std::runtime_error(
-            "Not valid SPIR-V binary: header magic code does not match.");
+        USAGI_THROW(std::runtime_error(
+            "Not valid SPIR-V binary: header magic code does not match."
+        ));
 }
 
 namespace fs = std::filesystem;
@@ -42,8 +43,9 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromFile(
     const auto size = file_size(binary_path);
 
     if(size % sizeof(Bytecode) != 0)
-        throw std::runtime_error(
-            "Not valid SPIR-V binary: file size is not a multiple of 4.");
+        USAGI_THROW(std::runtime_error(
+            "Not valid SPIR-V binary: file size is not a multiple of 4."
+        ));
 
     std::vector<Bytecode> content;
     content.resize(size / sizeof(Bytecode));
@@ -69,8 +71,8 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromStream(
 
     auto dump = readStreamToString(glsl_source_stream);
     if(dump.size() % sizeof(Bytecode) != 0)
-        throw std::runtime_error(
-            "Not valid SPIR-V binary. File size is not a multiple of 4.");
+        USAGI_THROW(std::runtime_error(
+            "Not valid SPIR-V binary. File size is not a multiple of 4."));
 
     std::vector<Bytecode> content;
     content.resize(dump.size() / 4);
@@ -87,7 +89,7 @@ EShLanguage translate(const usagi::ShaderStage stage)
     {
         case usagi::ShaderStage::VERTEX: return EShLangVertex;
         case usagi::ShaderStage::FRAGMENT: return EShLangFragment;
-        default: throw std::runtime_error("Invalid shader stage.");
+        default: USAGI_THROW(std::runtime_error("Invalid shader stage."));
     }
 }
 }
@@ -178,7 +180,7 @@ std::shared_ptr<usagi::SpirvBinary> usagi::SpirvBinary::fromGlslSourceString(
         LOG(info, "Linker debug output:\n{}", program.getInfoDebugLog());
 
     if(!compilation_suceeded || !link_succeeded)
-        throw std::runtime_error("Shader compilation failed.");
+        USAGI_THROW(std::runtime_error("Shader compilation failed."));
 
     program.buildReflection();
     LOG(info, "Reflection database:");

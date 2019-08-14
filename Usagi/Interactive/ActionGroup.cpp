@@ -19,7 +19,7 @@ void usagi::ActionGroup::setBinaryActionHandler(
     if(!i.second)
     {
         LOG(error, "Binary action \"{}\" is already registered!", name);
-        throw std::runtime_error("Action name conflict.");
+        USAGI_THROW(std::runtime_error("Action name conflict."));
     }
 }
 
@@ -45,7 +45,7 @@ void usagi::ActionGroup::setAnalogAction2DHandler(
     if(!i.second)
     {
         LOG(error, "2D analog action \"{}\" is already registered!", name);
-        throw std::runtime_error("Action name conflict.");
+        USAGI_THROW(std::runtime_error("Action name conflict."));
     }
 }
 
@@ -81,7 +81,7 @@ void usagi::ActionGroup::performBinaryAction(
     if(i == mBinaryActions.end())
     {
         LOG(error, "Event is bind to non-existent action.");
-        throw std::logic_error("Invalid binding.");
+        USAGI_THROW(std::logic_error("Invalid binding."));
     }
     i->second(active);
 }

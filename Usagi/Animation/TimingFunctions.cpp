@@ -35,7 +35,7 @@ TimingFunction get(const std::string &name)
     if(i == EASINGS.end())
     {
         LOG(error, "No such easing function: {}", name);
-        throw std::runtime_error("Non-existing key");
+        USAGI_THROW(std::runtime_error("Non-existing key"));
     }
     return i->second;
 }
