@@ -1,1 +1,0 @@
-../../../../../Thirdparties/Submodules/NtCall64/Source/NtCall64/ntos.h
