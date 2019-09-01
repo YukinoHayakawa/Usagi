@@ -5,26 +5,26 @@
 #include <boost/exception/enable_error_info.hpp>
 #include <boost/exception/get_error_info.hpp>
 
-namespace usagi
+namespace usagi::exception
 {
-using ExceptionStackTrace = boost::error_info<
+using ExceptionStacktrace = boost::error_info<
     struct tag_stacktrace,
     boost::stacktrace::stacktrace
 >;
 
-ExceptionStackTrace getCurrentStackTrace();
+ExceptionStacktrace getExceptionStacktrace();
 
 template <class E>
-[[noreturn]] void throwWithStackTrace(const E &e)
+[[noreturn]] void throwWithStacktrace(const E &e)
 {
-    throw boost::enable_error_info(e) << getCurrentStackTrace();
+    throw boost::enable_error_info(e) << getExceptionStacktrace();
 }
 
 template <class E>
-auto getStackTrace(const E &e)
+auto getStacktrace(const E &e)
 {
-    return boost::get_error_info<ExceptionStackTrace>(e);
+    return boost::get_error_info<ExceptionStacktrace>(e);
 }
 }
 
-#define USAGI_THROW(e) ::usagi::throwWithStackTrace(e)
+#define USAGI_THROW(e) ::usagi::exception::throwWithStacktrace(e)

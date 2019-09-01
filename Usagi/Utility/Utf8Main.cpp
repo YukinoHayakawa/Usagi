@@ -45,20 +45,6 @@ int wrappedMain(const std::vector<std::string> &args)
     catch(const std::exception &e)
     {
         LOG(error, "std::exception captured: {}", e.what());
-        const auto st = getStackTrace(e);
-        if(st)
-        {
-            LOG(error, "Strack Trace: \n{}", *st);
-            // very slow (at least in debug)
-            // std::size_t i = 0;
-            // for(auto &&f : *st)
-            // {
-            //     LOG(error, "    #{:<3} {} {}",
-            //         i++, f.address(), f.name());
-            //     LOG(error, "        at {}:{}",
-            //         f.source_file(), f.source_line());
-            // }
-        }
     }
     catch(...)
     {

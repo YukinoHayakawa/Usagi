@@ -4,10 +4,23 @@
 // https://github.com/microsoft/vcpkg/issues/7678
 #include <boost/stacktrace.hpp>
 
-namespace usagi
+#include "Logging.hpp"
+
+namespace usagi::exception
 {
-ExceptionStackTrace getCurrentStackTrace()
+ExceptionStacktrace getExceptionStacktrace()
 {
-    return ExceptionStackTrace(boost::stacktrace::stacktrace());
+    // skip first 3 frames in getting the stacktrace
+    auto st = boost::stacktrace::stacktrace(3, -1);
+    LOG(error, "Exception thrown!\nStacktrace: \n{}", st);
+    return { std::move(st) };
 }
 }
+
+#ifdef _MSC_VER
+#   ifdef _DEBUG
+#       pragma comment(lib, "boost_stacktrace_windbg_cached-vc140-mt-gd.lib")
+#   else
+#       pragma comment(lib, "boost_stacktrace_windbg_cached-vc140-mt.lib")
+#   endif
+#endif
