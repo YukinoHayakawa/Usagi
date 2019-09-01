@@ -92,59 +92,9 @@
     <ClCompile Include="Core\Event\Event.cpp" />
     <ClCompile Include="Core\Exception.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
+    <ClCompile Include="Experimental\Entity\ChunkObjectManager.cpp" />
+    <ClCompile Include="Experimental\Entity\EntityStorage.cpp" />
     <ClCompile Include="ECS\Game2.cpp" />
-    <ClCompile Include="Extension\DebugDraw\DebugDrawImpl.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
-    </ClCompile>
-    <ClCompile Include="Extension\DebugDraw\DebugDrawSystem.cpp" />
-    <ClCompile Include="Extension\ImGui\ImGuiImpl.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
-    </ClCompile>
-    <ClCompile Include="Extension\ImGui\ImGuiSystem.cpp" />
-    <ClCompile Include="Extension\Nuklear\NuklearSystem.cpp" />
-    <ClCompile Include="Extension\Nuklear\NuklearImpl.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
-    </ClCompile>
-    <ClCompile Include="Extension\Vulkan\VulkanBufferAllocation.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanEnumTranslation.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanExtensions.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanFramebuffer.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGpuBuffer.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGpuCommandPool.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGpuDevice.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGpuImage.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGpuImageView.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGraphicsCommandList.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipeline.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanGraphicsPipelineCompiler.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanMemoryPool.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanPooledImage.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanRenderPass.cpp" />
-    <ClCompile Include="Extension\Vulkan\VulkanSampler.cpp" />
-    <ClCompile Include="Extension\Vulkan\WSI\VulkanSwapchain.cpp" />
-    <ClCompile Include="Extension\Vulkan\WSI\VulkanSwapchainImage.cpp" />
-    <ClCompile Include="Extension\Vulkan\WSI\VulkanWin32WSI.cpp" />
-    <ClCompile Include="Extension\Win32\Input\Win32Gamepad.cpp" />
-    <ClCompile Include="Extension\Win32\Input\Win32InputManager.cpp" />
-    <ClCompile Include="Extension\Win32\Input\Win32Keyboard.cpp" />
-    <ClCompile Include="Extension\Win32\Input\Win32Mouse.cpp" />
-    <ClCompile Include="Extension\Win32\Input\Win32RawInputDevice.cpp" />
-    <ClCompile Include="Extension\Win32\Win32Helper.cpp" />
-    <ClCompile Include="Extension\Win32\Win32Runtime.cpp">
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ConformanceMode>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ConformanceMode>
-    </ClCompile>
-    <ClCompile Include="Extension\Win32\Window\Win32Window.cpp">
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ConformanceMode>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ConformanceMode>
-    </ClCompile>
-    <ClCompile Include="Extension\Win32\Window\Win32WindowManager.cpp">
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ConformanceMode>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ConformanceMode>
-    </ClCompile>
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\GameState.cpp" />
     <ClCompile Include="Game\GameStateManager.cpp" />
@@ -222,6 +172,8 @@
     <ClInclude Include="Core\Event\Library\Input\MousePositionEvent.hpp" />
     <ClInclude Include="Constants\DataFormat.hpp" />
     <ClInclude Include="Core\Format.hpp" />
+    <ClInclude Include="Experimental\Entity\ChunkObjectManager.hpp" />
+    <ClInclude Include="Experimental\Entity\EntityStorage.hpp" />
     <ClInclude Include="Math\Angle.hpp" />
     <ClInclude Include="Math\Bezier.hpp" />
     <ClInclude Include="Math\Bound.hpp" />
@@ -238,53 +190,6 @@
     <ClInclude Include="ECS\Game2.hpp" />
     <ClInclude Include="ECS\GameContext.hpp" />
     <ClInclude Include="ECS\System.hpp" />
-    <ClInclude Include="Extension\DebugDraw\DebugDraw.hpp" />
-    <ClInclude Include="Extension\DebugDraw\DebugDrawComponent.hpp" />
-    <ClInclude Include="Extension\DebugDraw\DebugDrawSystem.hpp" />
-    <ClInclude Include="Extension\DebugDraw\DelegatedDebugDrawComponent.hpp" />
-    <ClInclude Include="Extension\ImGui\DelegatedImGuiComponent.hpp" />
-    <ClInclude Include="Extension\ImGui\ImGui.hpp" />
-    <ClInclude Include="Extension\ImGui\ImGuiComponent.hpp" />
-    <ClInclude Include="Extension\ImGui\ImGuiConfig.hpp" />
-    <ClInclude Include="Extension\ImGui\ImGuiSystem.hpp" />
-    <ClInclude Include="Extension\Nuklear\DelegatedImGuiComponent.hpp" />
-    <ClInclude Include="Extension\Nuklear\NuklearComponent.hpp" />
-    <ClInclude Include="Extension\Nuklear\NuklearSystem.hpp" />
-    <ClInclude Include="Extension\Nuklear\Nuklear.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanBatchResource.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanBufferAllocation.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanEnumTranslation.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanFramebuffer.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGpuBuffer.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGpuCommandPool.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGpuDevice.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGpuImage.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGpuImageView.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGraphicsCommandList.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipeline.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanGraphicsPipelineCompiler.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanHelper.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanMemoryPool.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanPooledImage.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanRenderPass.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanResourceInfo.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanSampler.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanSemaphore.hpp" />
-    <ClInclude Include="Extension\Vulkan\VulkanShaderResource.hpp" />
-    <ClInclude Include="Extension\Vulkan\WSI\VulkanSwapchain.hpp" />
-    <ClInclude Include="Extension\Vulkan\WSI\VulkanSwapchainImage.hpp" />
-    <ClInclude Include="Extension\Win32\Input\Win32Gamepad.hpp" />
-    <ClInclude Include="Extension\Win32\Input\Win32InputManager.hpp" />
-    <ClInclude Include="Extension\Win32\Input\Win32Keyboard.hpp" />
-    <ClInclude Include="Extension\Win32\Input\Win32Mouse.hpp" />
-    <ClInclude Include="Extension\Win32\Input\Win32RawInputDevice.hpp" />
-    <ClInclude Include="Extension\Win32\ntos.h" />
-    <ClInclude Include="Extension\Win32\Win32.hpp" />
-    <ClInclude Include="Extension\Win32\Win32Helper.hpp" />
-    <ClInclude Include="Extension\Win32\Win32MacroFix.hpp" />
-    <ClInclude Include="Extension\Win32\Win32Runtime.hpp" />
-    <ClInclude Include="Extension\Win32\Window\Win32Window.hpp" />
-    <ClInclude Include="Extension\Win32\Window\Win32WindowManager.hpp" />
     <ClInclude Include="Game\CollectionSystem.hpp" />
     <ClInclude Include="Game\Game.hpp" />
     <ClInclude Include="Game\GameState.hpp" />
@@ -430,9 +335,6 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\Thirdparties\Submodules\glslang\build\StandAlone\glslang-default-resource-limits.vcxproj">
       <Project>{777ca18f-9fd4-3f3b-be41-0e7f78629123}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Thirdparties\Submodules\lua\build\lua.vcxproj">
-      <Project>{d800dc6b-c67f-4793-ba7c-c59d633846b6}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Thirdparties\Submodules\SPIRV-Cross\build\spirv-cross-core.vcxproj">
       <Project>{5a2df431-3a80-3c06-b9b1-27430b56a29e}</Project>
