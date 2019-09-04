@@ -2,6 +2,7 @@
 
 #include <Usagi/Runtime/Graphics/Shader/SpirvBinary.hpp>
 #include <Usagi/Asset/Asset.hpp>
+#include <Usagi/Core/Logging.hpp>
 
 #include "FilesystemAsset.hpp"
 
@@ -41,8 +42,14 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
     }
     // not in cache, create a child and return it if the file exists.
     {
-        if(!std::filesystem::exists(mRootPath / normalized))
+        const auto asset_path = mRootPath / normalized;
+        if(!exists(asset_path))
+        {
+            if(is_symlink(asset_path))
+                USAGI_THROW(std::runtime_error(
+                    "Symlink points to invalid location"));
             return nullptr;
+        }
         return addChild<FilesystemAsset>(normalized.u8string());
     }
 }
@@ -59,4 +66,6 @@ usagi::FilesystemAssetPackage::FilesystemAssetPackage(
     : AssetPackage { parent, std::move(name) }
     , mRootPath { std::move(root_path) }
 {
+    LOG(info, "FilesystemAssetPackage: {}",
+        std::filesystem::canonical(mRootPath));
 }

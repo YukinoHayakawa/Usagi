@@ -51,6 +51,7 @@ usagi::Asset * usagi::AssetRoot::findAssetByString(
     for(auto iter = childrenBegin(); iter != childrenEnd(); ++iter)
     {
         auto pkg = static_cast<AssetPackage*>(iter->get());
+        LOG(info, "Searching in package: {}", pkg->name());
         try
         {
             if(const auto asset = pkg->findByString(string))
