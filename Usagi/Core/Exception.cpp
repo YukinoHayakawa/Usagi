@@ -12,8 +12,13 @@ ExceptionStacktrace getExceptionStacktrace()
 {
     // skip first 3 frames in getting the stacktrace
     auto st = boost::stacktrace::stacktrace(3, -1);
-    LOG(error, "Exception thrown!\nStacktrace: \n{}", st);
+    LOG(error, "Exception thrown!\nStacktrace:\n{}", st);
     return { std::move(st) };
+}
+
+void printStacktrace()
+{
+    LOG(error, "Stacktrace:\n{}", boost::stacktrace::stacktrace(3, -1));
 }
 }
 

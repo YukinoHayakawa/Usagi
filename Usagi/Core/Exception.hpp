@@ -25,6 +25,8 @@ auto getStacktrace(const E &e)
 {
     return boost::get_error_info<ExceptionStacktrace>(e);
 }
+
+void printStacktrace();
 }
 
 #define USAGI_THROW(e) ::usagi::exception::throwWithStacktrace(e)
