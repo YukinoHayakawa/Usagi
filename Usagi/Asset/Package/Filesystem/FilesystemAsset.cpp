@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include <Usagi/Core/Logging.hpp>
+#include <Usagi/Utility/Unicode.hpp>
 #include <Usagi/Runtime/Runtime.hpp>
 
 #include "FilesystemAssetPackage.hpp"
@@ -27,15 +28,15 @@ std::string usagi::FilesystemAsset::path() const
 
 std::string usagi::FilesystemAsset::parentPath() const
 {
-    const auto path = std::filesystem::u8path(name());
+    const std::filesystem::path path { stringToU8string(name()) };
     return fmt::format("{}:{}/",
-        package()->name(), path.parent_path().u8string());
+        package()->name(), u8stringToString(path.parent_path().u8string()));
 }
 
 std::unique_ptr<std::istream> usagi::FilesystemAsset::open()
 {
     const auto full_path =
-        package()->rootPath() / std::filesystem::u8path(name());
+        package()->rootPath() / stringToU8string(name());
 
     LOG(info, "Loading asset: {}", name());
 
@@ -46,7 +47,7 @@ std::unique_ptr<std::istream> usagi::FilesystemAsset::open()
 
     if(!*in)
     {
-        LOG(error, "Failed to open {}", full_path.u8string());
+        LOG(error, "Failed to open {}", u8stringToString(full_path.u8string()));
         USAGI_THROW(std::runtime_error("Failed to open file."));
     }
 

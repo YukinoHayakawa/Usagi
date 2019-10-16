@@ -3,6 +3,7 @@
 #include <Usagi/Runtime/Graphics/Shader/SpirvBinary.hpp>
 #include <Usagi/Asset/Asset.hpp>
 #include <Usagi/Core/Logging.hpp>
+#include <Usagi/Utility/Unicode.hpp>
 
 #include "FilesystemAsset.hpp"
 
@@ -18,7 +19,7 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByUuid(
 usagi::Asset * usagi::FilesystemAssetPackage::findByString(
     const std::string &string)
 {
-    return findByFilesystemPath(std::filesystem::u8path(string));
+    return findByFilesystemPath(stringToU8string(string));
 }
 
 usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
@@ -36,7 +37,8 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
             USAGI_THROW(std::runtime_error("Path must be within the root folder."));
     }
     // search in cache
-    if(const auto asset = findChild(normalized.u8string()))
+    if(const auto asset = findChild(u8stringToString(
+        normalized.u8string())))
     {
         return static_cast<Asset*>(asset);
     }
@@ -50,7 +52,8 @@ usagi::Asset * usagi::FilesystemAssetPackage::findByFilesystemPath(
                     "Symlink points to invalid location"));
             return nullptr;
         }
-        return addChild<FilesystemAsset>(normalized.u8string());
+        return addChild<FilesystemAsset>(u8stringToString(
+            normalized.u8string()));
     }
 }
 

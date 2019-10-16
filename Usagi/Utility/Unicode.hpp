@@ -8,6 +8,12 @@ std::wstring utf8To16(std::string_view string);
 std::string utf16To8(std::wstring_view string);
 std::u32string utf8To32(std::string_view string);
 
+// handles API transitions between functions both using UTF-8 but with
+// different containers
+// todo: this should be removed
+std::string u8stringToString(const std::u8string &string);
+std::u8string stringToU8string(const std::string &string);
+
 // conversion code from
 // https://blog.keyman.com/2011/06/accepting-unicode-input-in-your-windows-application/
 constexpr bool isUtf16HighSurrogate(const wchar_t ch)

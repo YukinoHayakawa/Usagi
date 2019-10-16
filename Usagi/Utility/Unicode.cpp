@@ -28,3 +28,13 @@ std::u32string usagi::utf8To32(std::string_view string)
     );
     return utf32str;
 }
+
+std::string usagi::u8stringToString(const std::u8string &string)
+{
+    return { string.begin(), string.end() };
+}
+
+std::u8string usagi::stringToU8string(const std::string &string)
+{
+    return { string.begin(), string.end() };
+}
