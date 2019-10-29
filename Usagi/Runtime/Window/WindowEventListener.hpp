@@ -90,6 +90,14 @@ public:
     {
     }
 
+    virtual void onWindowMinimized(const WindowSizeEvent &e)
+    {
+    }
+
+    virtual void onWindowRestored(const WindowSizeEvent &e)
+    {
+    }
+
     virtual void onWindowCharInput(const WindowCharEvent &e)
     {
     }

@@ -183,12 +183,6 @@
     <ClCompile Include="Core\Exception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Experimental\Entity\EntityStorage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Experimental\Entity\ChunkObjectManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asset\Asset.hpp">
@@ -734,10 +728,19 @@
     <ClInclude Include="Core\Format.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Experimental\Entity\EntityStorage.hpp">
+    <ClInclude Include="Experimental\ECS\EntityPage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Experimental\Entity\ChunkObjectManager.hpp">
+    <ClInclude Include="Experimental\ECS\EntityManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\ECS\Entity.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\ECS\Component.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\ECS\System.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

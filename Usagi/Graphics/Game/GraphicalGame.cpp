@@ -1,6 +1,7 @@
 ﻿#include "GraphicalGame.hpp"
 
 #include <algorithm>
+#include <thread>
 
 #include <Usagi/Game/GameStateManager.hpp>
 #include <Usagi/Graphics/RenderTarget/RenderTargetDescriptor.hpp>
@@ -101,10 +102,8 @@ void usagi::GraphicalGame::submitGraphicsJobs(
     jobs.clear();
 }
 
-void usagi::GraphicalGame::frame()
+void usagi::GraphicalGame::render()
 {
-    processInput();
-
     // switch swapchain image
     const auto wait_semaphores = { mMainWindow.swapchain->acquireNextImage() };
 
@@ -140,6 +139,21 @@ void usagi::GraphicalGame::frame()
     gpu_device->reclaimResources();
 
     performDeferredActions();
+}
+
+void usagi::GraphicalGame::frame()
+{
+    processInput();
+
+    if(mPaused)
+    {
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(0.5s);
+    }
+    else
+    {
+        render();
+    }
 
     updateClock();
 }
@@ -153,4 +167,18 @@ void usagi::GraphicalGame::onWindowResizeEnd(const WindowSizeEvent &e)
 {
     if(e.size.x() != 0 && e.size.y() != 0)
         resize(e.size);
+}
+
+void usagi::GraphicalGame::onWindowMinimized(const WindowSizeEvent &e)
+{
+    // NVIDIA driver for Vulkan causes VK_DEVICE_LOST when the window is
+    // minimized. Pausing the rendering can prevent that.
+    // https://github.com/SaschaWillems/Vulkan/issues/493
+    mRuntime->gpu()->waitIdle();
+    mPaused = true;
+}
+
+void usagi::GraphicalGame::onWindowRestored(const WindowSizeEvent &e)
+{
+    mPaused = false;
 }

@@ -92,8 +92,6 @@
     <ClCompile Include="Core\Event\Event.cpp" />
     <ClCompile Include="Core\Exception.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
-    <ClCompile Include="Experimental\Entity\ChunkObjectManager.cpp" />
-    <ClCompile Include="Experimental\Entity\EntityStorage.cpp" />
     <ClCompile Include="ECS\Game2.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\GameState.cpp" />
@@ -172,8 +170,11 @@
     <ClInclude Include="Core\Event\Library\Input\MousePositionEvent.hpp" />
     <ClInclude Include="Constants\DataFormat.hpp" />
     <ClInclude Include="Core\Format.hpp" />
-    <ClInclude Include="Experimental\Entity\ChunkObjectManager.hpp" />
-    <ClInclude Include="Experimental\Entity\EntityStorage.hpp" />
+    <ClInclude Include="Experimental\ECS\Component.hpp" />
+    <ClInclude Include="Experimental\ECS\Entity.hpp" />
+    <ClInclude Include="Experimental\ECS\EntityManager.hpp" />
+    <ClInclude Include="Experimental\ECS\EntityPage.hpp" />
+    <ClInclude Include="Experimental\ECS\System.hpp" />
     <ClInclude Include="Math\Angle.hpp" />
     <ClInclude Include="Math\Bezier.hpp" />
     <ClInclude Include="Math\Bound.hpp" />

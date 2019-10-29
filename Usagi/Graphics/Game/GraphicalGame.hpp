@@ -27,6 +27,7 @@ protected:
     std::unique_ptr<ImageTransitionSystem> mPreRender;
     std::unique_ptr<ImageTransitionSystem> mPostRender;
     std::vector<std::shared_ptr<GraphicsCommandList>> mPendingJobs;
+    bool mPaused = false;
 
     void createMainWindow(
         const std::string &window_title,
@@ -35,6 +36,7 @@ protected:
     void setupRenderTargets(bool depth);
 
     bool continueGame() const override;
+    void render();
     void frame() override;
 
 public:
@@ -48,6 +50,8 @@ public:
         std::vector<std::shared_ptr<GraphicsCommandList>> &jobs);
     GpuDevice * gpu() const override;
     void onWindowResizeEnd(const WindowSizeEvent &e) override;
+    void onWindowMinimized(const WindowSizeEvent &e) override;
+    void onWindowRestored(const WindowSizeEvent &e) override;
 
     RenderWindow * mainWindow() { return &mMainWindow; }
 };
