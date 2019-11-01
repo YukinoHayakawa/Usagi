@@ -743,5 +743,23 @@
     <ClInclude Include="Experimental\ECS\System.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Experimental\ECS\Concepts.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\ECS\Archetype.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\ECS\EntityId.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\ECS\EntityDatabaseView.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\ECS\EntityDatabase.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Allocator\PoolAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

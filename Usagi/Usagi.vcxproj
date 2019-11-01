@@ -170,10 +170,16 @@
     <ClInclude Include="Core\Event\Library\Input\MousePositionEvent.hpp" />
     <ClInclude Include="Constants\DataFormat.hpp" />
     <ClInclude Include="Core\Format.hpp" />
+    <ClInclude Include="Experimental\ECS\Archetype.hpp" />
     <ClInclude Include="Experimental\ECS\Component.hpp" />
+    <ClInclude Include="Experimental\ECS\Concepts.hpp" />
     <ClInclude Include="Experimental\ECS\Entity.hpp" />
+    <ClInclude Include="Experimental\ECS\EntityDatabaseView.hpp" />
+    <ClInclude Include="Experimental\ECS\EntityDatabase.hpp" />
+    <ClInclude Include="Experimental\ECS\EntityId.hpp" />
     <ClInclude Include="Experimental\ECS\EntityManager.hpp" />
     <ClInclude Include="Experimental\ECS\EntityPage.hpp" />
+    <ClInclude Include="Utility\Allocator\PoolAllocator.hpp" />
     <ClInclude Include="Experimental\ECS\System.hpp" />
     <ClInclude Include="Math\Angle.hpp" />
     <ClInclude Include="Math\Bezier.hpp" />
