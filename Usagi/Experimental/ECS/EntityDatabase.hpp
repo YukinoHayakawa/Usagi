@@ -1,11 +1,13 @@
 ﻿#pragma once
 
 #include <tuple>
+#include <bitset>
 #include <limits>
 
 #include <Usagi/Utility/Allocator/PoolAllocator.hpp>
 
 #include "Component.hpp"
+#include "details/EntityPage.hpp"
 
 namespace usagi::ecs
 {
@@ -27,6 +29,7 @@ class EntityDatabase
 
 public:
     using ComponentMask = std::bitset<sizeof...(EnabledComponents)>;
+    constexpr static std::size_t EntityPageSize = EntityPageSize;
 
 private:
     PoolAllocator<EntityPage<
@@ -76,12 +79,6 @@ public:
 
     }
 
-    template <Component... InitialComponents>
-    EntityT create(Archetype<InitialComponents...> &archetype)
-    {
-
-    }
-
     class EntityRange
     {
         EntityId mBegin;
@@ -95,15 +92,21 @@ public:
     template <Component... InitialComponents>
     EntityRange create(
         Archetype<InitialComponents...> &archetype,
-        const std::size_t count)
+        const std::size_t count = 1)
     {
         // locate a page which is likely to improve data coherence
         auto &page = findCoherentPage<InitialComponents...>();
-        page.
+        for(std::size_t i = 0; i < count; ++i)
+        {
+            // todo: insert data by components instead of entities
+            auto &e = page.create();
+            (e.addComponent<InitialComponents>()
+                = archetype.initialValue<InitialComponents>(), ...);
+        }
     }
 
     template <Component T>
-    auto componentStorage()
+    auto & componentStorage()
     {
         return std::get<PagedPool<T>>(mComponentStorage);
     }
