@@ -24,9 +24,4 @@ concept Component =
     // memecpy-able
     std::is_standard_layout_v<T>
 ;
-
-template <Component... Components>
-struct ComponentFilter
-{
-};
 }

@@ -1,30 +1,29 @@
 ﻿#pragma once
 
-#include <bitset>
 #include <array>
 
-#include <Usagi/Experimental/ECS/Component/Component.hpp>
+#include "../Component.hpp"
 
 namespace usagi
 {
 template <
-    std::size_t EntityPageSize,
+    std::size_t NumEntities,
     Component... EnabledComponents
 >
 struct alignas(64) EntityPage
 {
-    constexpr static std::size_t MAX_COMPONENTS = sizeof...(EnabledComponents);
     constexpr static std::size_t INVALID_PAGE = -1;
+    using ComponentMaskT = ComponentMask<EnabledComponents...>;
 
     // Entity Component Masks
 
-    using ComponentMask = std::bitset<MAX_COMPONENTS>;
     struct ComponentState
     {
         // Bit mask of created components of an entity
-        ComponentMask owned;
+        ComponentMaskT owned;
     };
-    std::array<ComponentState, EntityPageSize> entity_states;
+
+    std::array<ComponentState, NumEntities> entity_states;
 
     // Component Storage References
 
@@ -38,14 +37,12 @@ struct alignas(64) EntityPage
     // -1 if the page is not allocated
     std::tuple<PageIndex<EnabledComponents>...> component_page_indices;
 
+    // Assistant Accessors
+
     template <Component C>
     std::size_t & componentPageIndex()
     {
         return std::get<PageIndex<C>>(component_page_indices);
     }
-
-    // Page Allocation Management
-
-
 };
 }
