@@ -2,11 +2,13 @@
 
 #include <type_traits>
 
+#include "EntityId.hpp"
+
 namespace usagi::ecs
 {
 template <
     typename Database,
-    typename Permission
+    typename PermissionChecker
 >
 class EntityView
 {
@@ -15,13 +17,13 @@ class EntityView
     using ComponentMaskT = typename DatabaseT::ComponentMask;
 
     DatabaseT &mDatabase;
-    DatabaseT::EntityPageT &mPage = mDatabase.entityPage(mId);
     EntityId mId;
+    DatabaseT::EntityPageT &mPage = mDatabase.entityPage(mId);
 
     template <Component C>
     std::size_t indexInPage() const
     {
-        return mId.id % DatabaseT::EntityPageSize;
+        return mId.id % DatabaseT::ENTITY_PAGE_SIZE;
     }
 
     template <Component C>
@@ -39,6 +41,12 @@ class EntityView
     }
 
 public:
+    EntityView(Database &database, EntityId id)
+        : mDatabase(database)
+        , mId(std::move(id))
+    {
+    }
+
     template <Component... C>
     bool hasComponents() const
     {
@@ -48,7 +56,7 @@ public:
     }
 
     template <Component C>
-    std::enable_if<Permission::hasWriteAccess<C>(), C &>
+    std::enable_if<PermissionChecker::hasWriteAccess<C>(), C &>
         addComponent()
     {
         // Locate the component position in the storage
@@ -63,20 +71,19 @@ public:
         // Turn on the owned component bit
         mPage.entity_states[pidx].owned |= mDatabase.componentMaskBit<C>();
         // Mark entity page dirty
-        // TODO
-        // update BITWISE-OR mask for all entities
+        mDatabase.markEntityDirty(mId);
         return storage->page(idx)[pidx];
     }
 
     template <Component C>
-    std::enable_if<!Permission::hasWriteAccess<C>(), C &>
+    std::enable_if<!PermissionChecker::hasWriteAccess<C>(), C &>
         addComponent()
     {
-        static_assert(false, "Does not have write access to the component.");
+        static_assert(false, "No write access to the component.");
     }
 
     template <Component C>
-    std::enable_if<Permission::hasWriteAccess<C>()>
+    std::enable_if<PermissionChecker::hasWriteAccess<C>()>
         removeComponent()
     {
         // Locate the component position in the storage
@@ -89,16 +96,16 @@ public:
         // Turn off the owned component bit
         mPage.entity_states[pidx].owned &= ~mDatabase.componentMaskBit<C>();
         // Mark entity page dirty
-        // TODO
-        // if all component of the same kind in that page were removed,
-        // the component page can be deallocated.
+        mDatabase.markEntityDirty(mId);
+        // TODO if all component of the same kind in that page were removed,
+        // the component page can be deallocated. -> in page iterator?
     }
 
     template <Component C>
-    std::enable_if<!Permission::hasWriteAccess<C>()>
+    std::enable_if<!PermissionChecker::hasWriteAccess<C>()>
         removeComponent()
     {
-        static_assert(false, "Does not have write access to the component.");
+        static_assert(false, "No write access to the component.");
     }
 
     /**
@@ -107,7 +114,7 @@ public:
      * \return
      */
     template <Component C>
-    std::enable_if<Permission::hasWriteAccess<C>(), const C &>
+    std::enable_if<PermissionChecker::hasWriteAccess<C>(), const C &>
         operator()()
     {
         return componentAccess<C>();
@@ -119,18 +126,18 @@ public:
      * \return
      */
     template <Component C>
-    std::enable_if<Permission::hasReadAccess<C>() &&
-        !Permission::hasWriteAccess<C>(), C &>
+    std::enable_if<PermissionChecker::hasReadAccess<C>() &&
+        !PermissionChecker::hasWriteAccess<C>(), C &>
         operator()()
     {
         return componentAccess<C>();
     }
 
     template <Component C>
-    std::enable_if<!Permission::hasReadAccess<C>()>
+    std::enable_if<!PermissionChecker::hasReadAccess<C>()>
         operator()()
     {
-        static_assert(false, "Does not have access to the component.");
+        static_assert(false, "No read access to the component.");
     }
 };
 }

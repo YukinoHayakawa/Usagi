@@ -8,6 +8,9 @@
 
 #include "Component.hpp"
 #include "details/EntityPage.hpp"
+#include "details/ComponentMask.hpp"
+#include "details/AllowAllPermissionChecker.hpp"
+#include "details/EntityDatabaseView.hpp"
 
 namespace usagi::ecs
 {
@@ -24,70 +27,81 @@ template <
 >
 class EntityDatabase
 {
-    // static_assert(sizeof...(EnabledComponents) <=
-    //     std::numeric_limits<ComponentMask>::digits);
+    // Should only friend with the iterators with the same type of database,
+    // but C++ does not allow friend with partial specializations.
+    template <
+        typename Database,
+        typename PermissionChecker
+    >
+    friend class EntityIterator;
 
 public:
-    using ComponentMask = std::bitset<sizeof...(EnabledComponents)>;
-    constexpr static std::size_t EntityPageSize = EntityPageSize;
+    using ComponentMaskT = ComponentMask<EnabledComponents...>;
+    constexpr static std::size_t ENTITY_PAGE_SIZE = EntityPageSize;
 
 private:
     PoolAllocator<EntityPage<
-        EntityPageSize, EnabledComponents...
+        ENTITY_PAGE_SIZE, EnabledComponents...
     >> mEntityPages;
+    /**
+     * \brief Caches the disjunction of component flags in each page for
+     * faster page filtering.
+     */
+    // std::vector<ComponentMaskT> mPageDisjunctionMasks;
+    // std::vector<bool> mPageDisjunctionMaskDirtyFlags;
 
     std::tuple<PoolAllocator<
-        std::array<EnabledComponents, EntityPageSize>
+        std::array<EnabledComponents, ENTITY_PAGE_SIZE>
     >...> mComponentStorage;
 
     template <Component C>
     struct ComponentMaskBit
     {
-        ComponentMask mask = 0;
+        ComponentMaskT mask = 0;
     };
 
     std::tuple<ComponentMaskBit<EnabledComponents>...> mComponentMaskBits;
 
 public:
-    using EntityT = Entity<EnabledComponents...>;
-
     EntityDatabase()
     {
         int i = 0;
-        (std::get<ComponentMaskBit<EnabledComponents>>(
-            mComponentMaskBits
-        ).mask = 1 << (i++), ...);
+        ((std::get<ComponentMaskBit<EnabledComponents>>(mComponentMaskBits)
+            .mask = 1 << (i++)), ...);
     }
 
     template <Component C>
-    ComponentMask componentMaskBit() const
+    ComponentMaskT componentMaskBit() const
     {
         return std::get<ComponentMaskBit<C>>(mComponentMaskBits).mask;
     }
 
     template <Component... Components>
-    ComponentMask buildComponentMask() const
+    ComponentMaskT buildComponentMask() const
     {
-        ComponentMask mask = 0;
-        (mask |= componentMaskBit<Components>(), ...);
+        ComponentMaskT mask = 0;
+        ((mask |= componentMaskBit<Components>()), ...);
         return mask;
     }
 
-    template <ComponentFilter Included, ComponentFilter Excluded>
-    auto view() const
+    template <typename... IncludeFilter, typename... ExcludeFilter>
+    auto view(
+        ComponentFilter<IncludeFilter...> include,
+        ComponentFilter<ExcludeFilter...> exclude) const
     {
-
+        using PermissionChecker = AllowAllPermissionChecker;
+        return EntityDatabaseView<
+            EntityDatabase,
+            PermissionChecker,
+            decltype(include),
+            decltype(exclude)
+        >();
     }
 
-    class EntityRange
-    {
-        EntityId mBegin;
-        EntityId mEnd;
-
-    public:
-        SequentialEntityIterator begin();
-        SequentialEntityIterator end();
-    };
+    // void markEntityDirty(const EntityId &id)
+    // {
+    //     // todo
+    // }
 
     template <Component... InitialComponents>
     EntityRange create(

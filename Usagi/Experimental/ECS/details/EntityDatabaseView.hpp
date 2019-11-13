@@ -1,23 +1,36 @@
 ﻿#pragma once
 
-#include "EntityDatabaseInterface.hpp"
+#include "ComponentFilter.hpp"
 
 namespace usagi::ecs
 {
 template <
-    EntityDatabaseInterface Database,
-    PermissionChecker PermCheck,
-    EntityFilter Filter
+    typename Database,
+    typename PermissionChecker,
+    typename IncludeFilter,
+    typename ExcludeFilter = ComponentFilter<>
 >
 class EntityDatabaseView
 {
 public:
     using DatabaseT = Database;
+    using PermissionCheckerT = PermissionChecker;
 
 private:
-    Database &mBaseview;
+    DatabaseT &mBaseview;
 
 public:
 
+
+
+    auto begin()
+    {
+
+    }
+
+    auto end()
+    {
+
+    }
 };
 }
