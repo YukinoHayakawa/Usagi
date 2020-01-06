@@ -18,7 +18,7 @@ public:
     {
     }
 
-    void format(const log_msg &msg, fmt::memory_buffer &dest) override
+    void format(const details::log_msg &msg, memory_buf_t &dest) override
     {
         using namespace std::chrono;
         const duration<double> delta = msg.time - logger_creation_time_;
@@ -39,7 +39,7 @@ class DefaultFormatter : public formatter
     logger_elapsed_formatter mTime;
 
 public:
-    void format(const details::log_msg &msg, fmt::memory_buffer &dest) override
+    void format(const details::log_msg &msg, memory_buf_t &dest) override
     {
         mTime.format(msg, dest);
 
