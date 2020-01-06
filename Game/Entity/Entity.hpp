@@ -5,7 +5,7 @@
 namespace usagi::ecs
 {
 /**
- * \brief A lightweighted proxy class for manipulating entity components.
+ * \brief A proxy class for manipulating entity components.
  * \tparam EnabledComponents
  */
 template <Component... EnabledComponents>

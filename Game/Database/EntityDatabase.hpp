@@ -6,7 +6,7 @@
 
 #include <Usagi/Utility/Allocator/PoolAllocator.hpp>
 
-#include "Component.hpp"
+#include <Usagi/Experimental/v2/ECS/Entity/Entity.hpp>
 #include "details/EntityPage.hpp"
 #include "details/ComponentMask.hpp"
 #include "details/AllowAllPermissionChecker.hpp"
@@ -27,8 +27,9 @@ template <
 >
 class EntityDatabase
 {
-    // Should only friend with the iterators with the same type of database,
-    // but C++ does not allow friend with partial specializations.
+    // Should only be friend with the iterators with the same type of database,
+    // but C++ does not allow being friend with partial class template
+    // specializations.
     template <
         typename Database,
         typename PermissionChecker
