@@ -1,8 +1,10 @@
 ﻿#pragma once
 
+#include <tuple>
+
 #include "Component.hpp"
 
-namespace usagi::ecs
+namespace usagi
 {
 template <Component... InitialComponents>
 class Archetype
@@ -13,7 +15,7 @@ public:
     Archetype() = default;
 
     template <typename... Args>
-    Archetype(Args &&...args)
+    explicit Archetype(Args &&... args)
         : mInitialValues { std::forward<Args>(args)... }
     {
     }
