@@ -4,35 +4,47 @@
 
 #include "EntityView.hpp"
 
-namespace usagi::ecs
+namespace usagi
 {
 template <
     typename Database,
-    typename PermissionChecker
+    typename PermissionValidator
 >
 class EntityIterator
 {
 public:
-    using DatabaseT = Database;
-    using PermissionCheckerT = PermissionChecker;
-    using PageIteratorT = decltype(DatabaseT::mEntityPages::allocatedBlocks());
-
-    using iterator_category = std::forward_iterator_tag;
-    using value_type = EntityView<DatabaseT, PermissionCheckerT>;
-    using difference_type = void;
-    using pointer = void;
-    using reference = void;
+    using DatabaseT             = Database;
+    using PermissionValidatorT  = PermissionValidator;
+    using PageIteratorT         = typename DatabaseT::EntityPageIteratorT;
 
     using DatabaseT::ENTITY_PAGE_SIZE;
 
+    // Standard Iterator Traits
+
+    using iterator_category = std::forward_iterator_tag;
+    using value_type        = EntityView<DatabaseT, PermissionValidatorT>;
+    using difference_type   = void;
+    using pointer           = void;
+    using reference         = void;
+
 private:
-    DatabaseT &mDatabase;
-    PageIteratorT mPageCursor = mDatabase.mEntityPages.begin();
-    std::size_t mIndexInPage = 0;
+    DatabaseT       *mDatabase;
+    PageIteratorT   mPageCursor     = mDatabase->mEntityPages.begin();
+    std::size_t     mIndexInPage    = 0;
 
 public:
-    explicit EntityIterator(Database &database)
+    explicit EntityIterator(DatabaseT *database)
         : mDatabase(database)
+    {
+    }
+
+    EntityIterator(
+        DatabaseT *database,
+        PageIteratorT page_cursor,
+        const std::size_t index_in_page)
+        : mDatabase(database)
+        , mPageCursor(std::move(page_cursor))
+        , mIndexInPage(index_in_page)
     {
     }
 
@@ -56,13 +68,8 @@ public:
 
     reference operator*() const
     {
-        EntityId id;
-
-        id.id = mPageCursor->first_entity_id;
-        id.id += mIndexInPage;
-        id.reserved = 0; // not used yet
-
-        return EntityView<DatabaseT, PermissionCheckerT>(mDatabase, id);
+        return EntityView<DatabaseT, PermissionValidatorT>(
+            mDatabase, &*mPageCursor, mIndexInPage);
     }
 
     // Equality Comparators

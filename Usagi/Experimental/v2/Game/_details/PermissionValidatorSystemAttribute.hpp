@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-#include "../Component.hpp"
+#include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 
-namespace usagi::ecs
+namespace usagi
 {
 /**
  * \brief Grants access to systems if they have the according permission.
  * \tparam ReadMask An instantiation of ComponentFilter containing the
- * components for which the system has read acces.
+ * components for which the system has read access.
  * \tparam WriteMask An instantiation of ComponentFilter containing the
  * components for which the system has write access.
  */
@@ -15,18 +15,19 @@ template <
     typename ReadMask,
     typename WriteMask
 >
-struct SystemPermissionChecker
+struct PermissionValidatorSystemAttribute
 {
     template <Component C>
     static constexpr bool hasReadAccess()
     {
-        return ReadMask::hasComponent<C>() || WriteMask::hasComponent<C>();
+        return ReadMask::template hasComponent<C>() ||
+            WriteMask::template hasComponent<C>();
     }
 
     template <Component C>
     static constexpr bool hasWriteAccess()
     {
-        return WriteMask::hasComponent<C>();
+        return WriteMask::template hasComponent<C>();
     }
 };
 }

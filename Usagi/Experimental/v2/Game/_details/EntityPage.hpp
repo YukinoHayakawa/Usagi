@@ -2,25 +2,24 @@
 
 #include <array>
 
-#include "../Component.hpp"
-#include "ComponentFilter.hpp"
+#include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 
-namespace usagi::ecs
+#include "ComponentMask.hpp"
+
+namespace usagi
 {
 template <
-    std::size_t NumEntities,
-    Component... EnabledComponents
+    std::uint16_t   NumEntities,
+    Component...    EnabledComponents
 >
-struct alignas(64) EntityPage
+struct EntityPage
 {
-public:
-    using ComponentMaskT = ComponentFilter<EnabledComponents...>;
+    using ComponentMaskT = ComponentMask<EnabledComponents...>;
     constexpr static std::size_t INVALID_PAGE = -1;
 
-public:
     struct ComponentState
     {
-        // Bit mask of created components of an entity
+        // Bitmask of created components of an entity
         ComponentMaskT owned;
     };
 
@@ -33,12 +32,16 @@ public:
     template <Component C>
     std::size_t & componentPageIndex()
     {
-        return std::get<PageIndex<C>>(component_page_indices);
+        return std::get<PageIndex<C>>(component_page_indices).index;
     }
 
-public:
-    std::size_t first_entity_id = 0;
+    // Specify the range of entity id represented by this page
+    std::uint64_t first_entity_id = -1;
+
     std::array<ComponentState, NumEntities> entity_states;
+
+    // Bitwise-OR of component masks of all entities
+    // ComponentMaskT  page_component_mask;
 
     // index into the page pool of each component.
     // -1 if the page is not allocated
