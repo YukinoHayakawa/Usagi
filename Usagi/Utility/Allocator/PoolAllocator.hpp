@@ -3,12 +3,17 @@
 #include <vector>
 #include <cassert>
 #include <type_traits>
+#include <utility>
+
+#include <boost/iterator/filter_iterator.hpp>
 
 namespace usagi
 {
 /**
  * \brief An object pool. The objects must be accessed via indices.
  * TODO: lock-free
+ * todo: dump & load from file
+ * todo: allow using memory-mapped file in place of the vector storage
  * \tparam T
  */
 template <typename T>
@@ -90,6 +95,11 @@ class PoolAllocator
         return b.free_block;
     }
 
+    static bool isAllocatedBlock(const Block &b)
+    {
+        return b.free_block.magic != MAGIC_CHECK;
+    }
+
 public:
     T & block(const std::size_t index)
     {
@@ -99,23 +109,26 @@ public:
     }
 
     template <typename... Args>
-    T & allocate(Args &&...args)
+    std::size_t allocate(Args &&...args)
     {
         Block *block = nullptr;
+        std::size_t idx = -1;
         if(mFreeListHead != INVALID_BLOCK)
         {
+            idx = mFreeListHead;
             block = &mStorage[mFreeListHead];
             mFreeListHead = headFreeBlock().next;
         }
         else
         {
+            idx = mStorage.size();
             mStorage.emplace_back();
             block = &mStorage.back();
         }
         // Prevent allocated block from appearing to be free
         block->free_block.magic = 0;
         new (&block->data) T(std::forward<Args>(args)...);
-        return block->data;
+        return idx;
     }
 
     void deallocate(const std::size_t index)
@@ -135,11 +148,33 @@ public:
     std::size_t numBlocks() const
     {
         return mStorage.size();
-    };
+    }
 
     std::size_t capacity() const
     {
         return mStorage.capacity();
     }
+
+    auto begin()
+    {
+        return boost::make_filter_iterator(
+            &PoolAllocator::isAllocatedBlock,
+            mStorage.begin(), mStorage.end()
+        );
+    }
+
+    auto end()
+    {
+        return boost::make_filter_iterator(
+            &PoolAllocator::isAllocatedBlock,
+            mStorage.end(), mStorage.end()
+        );
+    }
+
+    using IteratorT = decltype(boost::make_filter_iterator(
+        &PoolAllocator::isAllocatedBlock,
+        mStorage.begin(), mStorage.end()
+    ));
+    // using IteratorT = decltype(std::declval<PoolAllocator<T>>().begin());
 };
 }
