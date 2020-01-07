@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "../Component.hpp"
+#include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 
-namespace usagi::ecs
+namespace usagi
 {
 /**
  * \brief Contains a list of component types which may be used to filter

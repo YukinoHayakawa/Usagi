@@ -1,14 +1,14 @@
 ﻿#pragma once
 
-#include "../Component.hpp"
+#include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 
-namespace usagi::ecs
+namespace usagi
 {
 /**
  * \brief Grants access to all components. Mainly for test purposes or internal
  * uses.
  */
-struct AllowAllPermissionChecker
+struct PermissionValidatorAllowAll
 {
     template <Component C>
     static constexpr bool hasReadAccess()

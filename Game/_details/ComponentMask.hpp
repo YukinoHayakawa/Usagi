@@ -2,9 +2,9 @@
 
 #include <bitset>
 
-#include "../Component.hpp"
+#include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 
-namespace usagi::ecs
+namespace usagi
 {
 template <Component... Components>
 using ComponentMask = std::bitset<sizeof...(Components)>;
