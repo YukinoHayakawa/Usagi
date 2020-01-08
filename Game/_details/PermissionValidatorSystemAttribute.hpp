@@ -6,28 +6,28 @@ namespace usagi
 {
 /**
  * \brief Grants access to systems if they have the according permission.
- * \tparam ReadMask An instantiation of ComponentFilter containing the
+ * \tparam ReadAccessFilter An instantiation of ComponentFilter containing the
  * components for which the system has read access.
- * \tparam WriteMask An instantiation of ComponentFilter containing the
+ * \tparam WriteAccessFilter An instantiation of ComponentFilter containing the
  * components for which the system has write access.
  */
 template <
-    typename ReadMask,
-    typename WriteMask
+    typename ReadAccessFilter,
+    typename WriteAccessFilter
 >
 struct PermissionValidatorSystemAttribute
 {
     template <Component C>
     static constexpr bool hasReadAccess()
     {
-        return ReadMask::template hasComponent<C>() ||
-            WriteMask::template hasComponent<C>();
+        return ReadAccessFilter::template hasComponent<C>() ||
+            WriteAccessFilter::template hasComponent<C>();
     }
 
     template <Component C>
     static constexpr bool hasWriteAccess()
     {
-        return WriteMask::template hasComponent<C>();
+        return WriteAccessFilter::template hasComponent<C>();
     }
 };
 }

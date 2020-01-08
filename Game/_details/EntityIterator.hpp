@@ -6,6 +6,15 @@
 
 namespace usagi
 {
+/**
+ * \brief
+ *
+ * Iterator invalidation:
+ * -- When Entity Page is created or destroyed.
+ *
+ * \tparam Database
+ * \tparam PermissionValidator
+ */
 template <
     typename Database,
     typename PermissionValidator
@@ -17,18 +26,16 @@ public:
     using PermissionValidatorT  = PermissionValidator;
     using PageIteratorT         = typename DatabaseT::EntityPageIteratorT;
 
-    using DatabaseT::ENTITY_PAGE_SIZE;
-
     // Standard Iterator Traits
 
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::input_iterator_tag;
     using value_type        = EntityView<DatabaseT, PermissionValidatorT>;
     using difference_type   = void;
     using pointer           = void;
-    using reference         = void;
+    using reference         = value_type;
 
 private:
-    DatabaseT       *mDatabase;
+    DatabaseT       *mDatabase      = nullptr;
     PageIteratorT   mPageCursor     = mDatabase->mEntityPages.begin();
     std::size_t     mIndexInPage    = 0;
 
@@ -50,6 +57,8 @@ public:
 
     EntityIterator & operator++()
     {
+        assert(mPageCursor != mDatabase->mEntityPages.end());
+
         ++mIndexInPage;
         if(mIndexInPage == DatabaseT::ENTITY_PAGE_SIZE)
         {
@@ -68,8 +77,12 @@ public:
 
     reference operator*() const
     {
+        assert(mDatabase);
+        assert(mPageCursor != mDatabase->mEntityPages.end());
+        assert(mIndexInPage < DatabaseT::ENTITY_PAGE_SIZE);
+
         return EntityView<DatabaseT, PermissionValidatorT>(
-            mDatabase, &*mPageCursor, mIndexInPage);
+            mDatabase, &(*mPageCursor).data, mIndexInPage);
     }
 
     // Equality Comparators
@@ -77,7 +90,9 @@ public:
     friend bool operator==(
         const EntityIterator &lhs, const EntityIterator &rhs)
     {
-        return &lhs.mDatabase == &rhs.mDatabase
+        assert(lhs.mDatabase == rhs.mDatabase);
+
+        return lhs.mDatabase == rhs.mDatabase
             && lhs.mPageCursor == rhs.mPageCursor
             && lhs.mIndexInPage == rhs.mIndexInPage;
     }

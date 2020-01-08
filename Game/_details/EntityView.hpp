@@ -50,6 +50,11 @@ public:
         return (mPage->entity_states[mIndexInPage].owned & mask) == mask;
     }
 
+    auto componentMask() const
+    {
+        return mPage->entity_states[mIndexInPage].owned;
+    }
+
     template <Component C>
     C & addComponent()
     {
@@ -120,13 +125,6 @@ public:
         operator()() const
     {
         return componentAccess<C>();
-    }
-
-    template <Component C>
-    std::enable_if_t<PermissionValidator::template hasReadAccess<C>()>
-        operator()() const
-    {
-        static_assert(false, "No read access to the component.");
     }
 };
 }

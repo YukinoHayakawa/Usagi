@@ -4,14 +4,24 @@
 
 #include <Usagi/Experimental/v2/Game/_details/ComponentMask.hpp>
 #include <Usagi/Experimental/v2/Game/_details/EntityPage.hpp>
-#include <Usagi/Experimental/v2/Game/_details/PermissionValidatorAllowAll.hpp>
+#include <Usagi/Experimental/v2/Game/_details/PermissionValidatorAllowReadWrite.hpp>
 #include <Usagi/Experimental/v2/Game/_details/EntityIterator.hpp>
 #include <Usagi/Utility/Allocator/PoolAllocator.hpp>
 
 namespace usagi
 {
 /**
- * \brief
+ * \brief Entity Database manages Entities and their Component data. It
+ * provides compile time access permission validation for the Executive
+ * to prevent Systems from violating the data dependency.
+ *
+ * Entity Database consists of Entity Pages and Component Pages, each
+ * allocated in the unit specified by EntityPageSize template parameter.
+ * The pages are stored in linear containers with internal pooling mechanism.
+ * This arrangement makes it possible to directly dump and load the binary
+ * data of the pages without any further processing. It is also possible to
+ * map the memory onto disk files.
+ *
  * \tparam EntityPageSize Number of entities stored in each page. The
  * components storage will allocate components in the same unit.
  * \tparam EnabledComponents List of allowed component types. If there are
@@ -37,6 +47,11 @@ class EntityDatabase
         typename PermissionValidator
     >
     friend class EntityDatabaseAccess;
+
+    template <
+        typename Database
+    >
+    friend class EntityDatabaseView;
 
 public:
     constexpr static std::size_t ENTITY_PAGE_SIZE = EntityPageSize;
@@ -150,10 +165,21 @@ public:
     // }
 
     // todo: move to DbAccess?
+    // todo: universal reference?
     template <
         Component... InitialComponents
     >
-    void create(
+    decltype(auto) create(
+        Archetype<InitialComponents...> &&archetype,
+        const std::size_t count = 1)
+    {
+        return create(archetype, count);
+    }
+
+    template <
+        Component... InitialComponents
+    >
+    auto create(
         Archetype<InitialComponents...> &archetype,
         const std::size_t count = 1)
     {
@@ -169,7 +195,7 @@ public:
 
             // todo: insert data by components instead of entities
 
-            EntityView<EntityDatabase, PermissionValidatorAllowAll> view {
+            EntityView<EntityDatabase, PermissionValidatorAllowReadWrite> view {
                 this, page, j
             };
 

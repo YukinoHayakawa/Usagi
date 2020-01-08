@@ -2,6 +2,8 @@
 
 #include <tuple>
 
+#include <Usagi/Experimental/v2/Game/_details/ComponentFilter.hpp>
+
 #include "Component.hpp"
 
 namespace usagi
@@ -13,6 +15,8 @@ class Archetype
 
 public:
     Archetype() = default;
+
+    using component_filter = ComponentFilter<InitialComponents...>;
 
     template <typename... Args>
     explicit Archetype(Args &&... args)
