@@ -2,7 +2,7 @@
 
 #include "PermissionValidatorReadOnly.hpp"
 #include "EntityIterator.hpp"
-#include "EntityDatabaseView.hpp"
+#include "EntityDatabaseInternalAccess.hpp"
 
 namespace usagi
 {
@@ -13,31 +13,29 @@ namespace usagi
 template <
     typename Database
 >
-class EntityDatabaseViewUnfiltered :
-    public EntityDatabaseView<Database>
+class EntityDatabaseViewUnfiltered
+    : public EntityDatabaseInternalAccess<Database>
 {
 public:
-    using typename EntityDatabaseView<Database>::DatabaseT;
+    using DatabaseT = Database;
+    using IteratorT = EntityIterator<
+        DatabaseT,
+        PermissionValidatorReadOnly
+    >;
 
     explicit EntityDatabaseViewUnfiltered(Database *database)
-        : EntityDatabaseView<Database>(database)
+        : EntityDatabaseInternalAccess<Database>(database)
     {
     }
 
     auto begin()
     {
-        return EntityIterator<
-            DatabaseT,
-            PermissionValidatorReadOnly
-        >(this->mDatabase, this->entityPageBegin(), 0);
+        return IteratorT(this->mDatabase, this->entityPageBegin(), 0);
     }
 
     auto end()
     {
-        return EntityIterator<
-            DatabaseT,
-            PermissionValidatorReadOnly
-        >(this->mDatabase, this->entityPageEnd(), 0);
+        return IteratorT(this->mDatabase, this->entityPageEnd(), 0);
     }
 };
 }

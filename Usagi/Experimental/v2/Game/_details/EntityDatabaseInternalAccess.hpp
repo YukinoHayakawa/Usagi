@@ -5,7 +5,7 @@ namespace usagi
 template <
     typename Database
 >
-class EntityDatabaseView
+class EntityDatabaseInternalAccess
 {
 public:
     using DatabaseT = Database;
@@ -13,17 +13,17 @@ public:
 protected:
     DatabaseT *mDatabase = nullptr;
 
-    explicit EntityDatabaseView(Database *database)
+    explicit EntityDatabaseInternalAccess(Database *database)
         : mDatabase(database)
     {
     }
 
-    auto entityPageBegin()
+    auto entityPageBegin() const
     {
         return mDatabase->mEntityPages.begin();
     }
 
-    auto entityPageEnd()
+    auto entityPageEnd() const
     {
         return mDatabase->mEntityPages.end();
     }

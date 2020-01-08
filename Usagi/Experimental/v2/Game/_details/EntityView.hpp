@@ -2,6 +2,8 @@
 
 #include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 
+#include "EntityDatabaseInternalAccess.hpp"
+
 namespace usagi
 {
 template <
@@ -9,12 +11,12 @@ template <
     typename PermissionValidator
 >
 class EntityView
+    : EntityDatabaseInternalAccess<Database>
 {
     using DatabaseT         = Database;
     using EntityPageT       = typename DatabaseT::EntityPageT;
     using ComponentMaskT    = typename DatabaseT::ComponentMaskT;
 
-    DatabaseT       *mDatabase;
     EntityPageT     *mPage;
     std::size_t     mIndexInPage;
 
@@ -23,7 +25,7 @@ class EntityView
     {
         // Locate the component in the storage
         auto &idx = mPage->template componentPageIndex<C>();
-        auto &storage = mDatabase->template componentStorage<C>();
+        auto &storage = this->mDatabase->template componentStorage<C>();
         // Ensure that the entity has the component
         assert(hasComponents<C>());
         assert(idx != DatabaseT::EntityPageT::INVALID_PAGE);
@@ -31,12 +33,25 @@ class EntityView
         return storage->page(idx)[mIndexInPage];
     }
 
+    auto & entityStateRef() const
+    {
+        return mPage->entity_states[mIndexInPage];
+    }
+
+    template <Component... C>
+    static constexpr auto buildComponentMask()
+    {
+        constexpr auto mask = DatabaseT::template buildComponentMask<C...>();
+        // static_assert(DatabaseT::template buildComponentMask<C...>() != 0);
+        return mask;
+    }
+
 public:
     EntityView(
         DatabaseT *database,
         EntityPageT *page,
         const std::size_t index_in_page)
-        : mDatabase(database)
+        : EntityDatabaseInternalAccess<Database>(database)
         , mPage(page)
         , mIndexInPage(index_in_page)
     {
@@ -45,14 +60,27 @@ public:
     template <Component... C>
     bool hasComponents() const
     {
-        ComponentMaskT mask;
-        ((mask |= mDatabase->template componentMaskBit<C>()), ...);
-        return (mPage->entity_states[mIndexInPage].owned & mask) == mask;
+        constexpr auto mask = buildComponentMask<C...>();
+        assert(mask.any());
+        return (entityStateRef().owned & mask) == mask;
+    }
+
+    template <Component... C>
+    bool checkIncludeFilter(ComponentFilter<C...> filter) const
+    {
+        return hasComponents<C...>();
+    }
+
+    template <Component... C>
+    bool checkExcludeFilter(ComponentFilter<C...> filter) const
+    {
+        constexpr auto mask = buildComponentMask<C...>();
+        return (entityStateRef().owned & mask).none();
     }
 
     auto componentMask() const
     {
-        return mPage->entity_states[mIndexInPage].owned;
+        return entityStateRef().owned;
     }
 
     template <Component C>
@@ -65,15 +93,15 @@ public:
 
         // Locate the component position in the storage
         auto &idx = mPage->template componentPageIndex<C>();
-        auto &storage = mDatabase->template componentStorage<C>();
+        auto &storage = this->mDatabase->template componentStorage<C>();
         // The entity shouldn't have the requested entity
         assert(!hasComponents<C>());
         // If the component page hasn't be allocated yet, allocate it.
         if(idx == EntityPageT::INVALID_PAGE)
             idx = storage.allocate();
         // Turn on the owned component bit
-        mPage->entity_states[mIndexInPage].owned |=
-            mDatabase->template componentMaskBit<C>();
+        entityStateRef().owned |=
+            this->mDatabase->template componentMaskBit<C>();
         // todo Mark entity page dirty - calc component mask in iterator dtor?
         // mDatabase->markEntityDirty(mId);
         return storage.block(idx)[mIndexInPage];
@@ -89,13 +117,13 @@ public:
 
         // Locate the component position in the storage
         auto &idx = mPage->template componentPageIndex<C>();
-        auto &storage = mDatabase->template componentStorage<C>();
+        auto &storage = this->mDatabase->template componentStorage<C>();
         // The entity should have the requested entity
         assert(hasComponents<C>());
         assert(idx != EntityPageT::INVALID_PAGE);
         // Turn off the owned component bit
-        mPage->entity_states[mIndexInPage].owned &=
-            ~mDatabase->template componentMaskBit<C>();
+        entityStateRef().owned &=
+            ~this->mDatabase->template componentMaskBit<C>();
         // todo Mark entity page dirty
         // mDatabase->markEntityDirty(mId);
         // TODO if all component of the same kind in that page were removed,

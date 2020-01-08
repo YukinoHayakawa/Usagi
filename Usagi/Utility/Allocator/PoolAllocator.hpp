@@ -155,6 +155,11 @@ public:
         return mStorage.capacity();
     }
 
+    using IteratorT = boost::filter_iterator<
+        decltype(&PoolAllocator::isAllocatedBlock),
+        typename decltype(mStorage)::iterator
+    >;
+
     auto begin()
     {
         return boost::make_filter_iterator(
@@ -170,11 +175,5 @@ public:
             mStorage.end(), mStorage.end()
         );
     }
-
-    using IteratorT = decltype(boost::make_filter_iterator(
-        &PoolAllocator::isAllocatedBlock,
-        mStorage.begin(), mStorage.end()
-    ));
-    // using IteratorT = decltype(std::declval<PoolAllocator<T>>().begin());
 };
 }
