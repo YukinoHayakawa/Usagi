@@ -155,15 +155,16 @@ public:
         return mStorage.capacity();
     }
 
-    using IteratorT = boost::filter_iterator<
-        decltype(&PoolAllocator::isAllocatedBlock),
-        typename decltype(mStorage)::iterator
-    >;
+    static constexpr auto ALLOCATED_BLOCK_PREDICATE = [](auto &&block) {
+        // DO NOT directly pass the function pointer to isAllocatedBlock
+        // to filter_iterator because doing so will prevent inlining.
+        return isAllocatedBlock(std::forward<decltype(block)>(block));
+    };
 
     auto begin()
     {
         return boost::make_filter_iterator(
-            &PoolAllocator::isAllocatedBlock,
+            ALLOCATED_BLOCK_PREDICATE,
             mStorage.begin(), mStorage.end()
         );
     }
@@ -171,9 +172,21 @@ public:
     auto end()
     {
         return boost::make_filter_iterator(
-            &PoolAllocator::isAllocatedBlock,
+            ALLOCATED_BLOCK_PREDICATE,
             mStorage.end(), mStorage.end()
         );
     }
+
+    // using IteratorT = boost::filter_iterator<
+    //     decltype(ALLOCATED_BLOCK_PREDICATE),
+    //     typename decltype(mStorage)::iterator
+    // >;
+
+    using IteratorT = decltype(
+        boost::make_filter_iterator(
+            ALLOCATED_BLOCK_PREDICATE,
+            mStorage.end(), mStorage.end()
+        )
+    );
 };
 }

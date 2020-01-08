@@ -30,7 +30,7 @@ class EntityView
         assert(hasComponents<C>());
         assert(idx != DatabaseT::EntityPageT::INVALID_PAGE);
         // Access the component in the storage page
-        return storage->page(idx)[mIndexInPage];
+        return storage.block(idx)[mIndexInPage];
     }
 
     auto & entityStateRef() const
@@ -130,6 +130,8 @@ public:
         // the component page can be deallocated. -> in page iterator?
     }
 
+    // todo: fix verbose calling syntax caused by dependent name
+    // todo: compile time check of component type (type must be included etc)
     /**
      * \brief Read & write access to the component.
      * \tparam C
@@ -137,7 +139,7 @@ public:
      */
     template <Component C>
     std::enable_if_t<PermissionValidator::template hasWriteAccess<C>(), C &>
-        operator()()
+        component()
     {
         return componentAccess<C>();
     }
@@ -150,9 +152,35 @@ public:
     template <Component C>
     std::enable_if_t<PermissionValidator::template hasReadAccess<C>() &&
         !PermissionValidator::template hasWriteAccess<C>(), const C &>
-        operator()() const
+        component() const
     {
         return componentAccess<C>();
     }
 };
+
+/*
+template <Component C, typename EntityView>
+auto component(EntityView &&view) ->
+    std::enable_if_t<!std::is_const_v<std::remove_reference_t<decltype(
+        std::declval<EntityView>(1).template component<C>()
+    )>>, C &>
+{
+    return view.template component<C>();
+}
+
+template <Component C, typename EntityView>
+auto component(EntityView &&view) ->
+    std::enable_if_t<std::is_const_v<std::remove_reference_t<decltype(
+        std::declval<EntityView>(1).template component<C>()
+    )>>, const C &>
+{
+    return view.template component<C>();
+}
+*/
+
+template <Component C, typename EntityView>
+decltype(auto) component(EntityView &&view)
+{
+    return std::forward<EntityView>(view).template component<C>();
+}
 }
