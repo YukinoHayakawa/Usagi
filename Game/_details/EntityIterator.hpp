@@ -3,6 +3,7 @@
 #include <iterator>
 
 #include "EntityView.hpp"
+#include "EntityDatabaseInternalAccess.hpp"
 
 namespace usagi
 {
@@ -20,6 +21,7 @@ template <
     typename PermissionValidator
 >
 class EntityIterator
+    : protected EntityDatabaseInternalAccess<Database>
 {
 public:
     using DatabaseT             = Database;
@@ -28,20 +30,31 @@ public:
 
     // Standard Iterator Traits
 
+    // todo: fix: in fact, this iterator returns a proxy object when dereferenced. since the proxy object is actually not a reference, this iterator does not satisfy any iterator category requirement.
+    // boost::single_pass_traversal_tag
     using iterator_category = std::input_iterator_tag;
     using value_type        = EntityView<DatabaseT, PermissionValidatorT>;
     using difference_type   = void;
     using pointer           = void;
     using reference         = value_type;
 
-private:
-    DatabaseT       *mDatabase      = nullptr;
-    PageIteratorT   mPageCursor     = mDatabase->mEntityPages.begin();
+protected:
+    PageIteratorT   mPageCursor     = this->entityPageBegin();
     std::size_t     mIndexInPage    = 0;
+
+    auto currentView() const
+    {
+        assert(this->mDatabase);
+        assert(mPageCursor != this->entityPageEnd());
+        assert(mIndexInPage < DatabaseT::ENTITY_PAGE_SIZE);
+
+        return EntityView<DatabaseT, PermissionValidatorT>(
+            this->mDatabase, &(*mPageCursor).data, mIndexInPage);
+    }
 
 public:
     explicit EntityIterator(DatabaseT *database)
-        : mDatabase(database)
+        : EntityDatabaseInternalAccess<Database>(database)
     {
     }
 
@@ -49,7 +62,7 @@ public:
         DatabaseT *database,
         PageIteratorT page_cursor,
         const std::size_t index_in_page)
-        : mDatabase(database)
+        : EntityDatabaseInternalAccess<Database>(database)
         , mPageCursor(std::move(page_cursor))
         , mIndexInPage(index_in_page)
     {
@@ -57,7 +70,7 @@ public:
 
     EntityIterator & operator++()
     {
-        assert(mPageCursor != mDatabase->mEntityPages.end());
+        assert(mPageCursor != this->entityPageEnd());
 
         ++mIndexInPage;
         if(mIndexInPage == DatabaseT::ENTITY_PAGE_SIZE)
@@ -77,12 +90,7 @@ public:
 
     reference operator*() const
     {
-        assert(mDatabase);
-        assert(mPageCursor != mDatabase->mEntityPages.end());
-        assert(mIndexInPage < DatabaseT::ENTITY_PAGE_SIZE);
-
-        return EntityView<DatabaseT, PermissionValidatorT>(
-            mDatabase, &(*mPageCursor).data, mIndexInPage);
+        return currentView();
     }
 
     // Equality Comparators

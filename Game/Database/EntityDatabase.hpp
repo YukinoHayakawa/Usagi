@@ -7,6 +7,7 @@
 #include <Usagi/Experimental/v2/Game/_details/PermissionValidatorAllowReadWrite.hpp>
 #include <Usagi/Experimental/v2/Game/_details/EntityIterator.hpp>
 #include <Usagi/Utility/Allocator/PoolAllocator.hpp>
+#include <Usagi/Utility/ParameterPackIndex.hpp>
 
 namespace usagi
 {
@@ -33,25 +34,13 @@ template <
 >
 class EntityDatabase
 {
-    // Should only be friend with the iterators with the same type of database,
+    // Should only be friend with the access with the same type of database,
     // but C++ does not allow being friend with partial class template
     // specializations.
     template <
-        typename Database,
-        typename PermissionValidator
-    >
-    friend class EntityIterator;
-
-    template <
-        typename Database,
-        typename PermissionValidator
-    >
-    friend class EntityDatabaseAccess;
-
-    template <
         typename Database
     >
-    friend class EntityDatabaseView;
+    friend class EntityDatabaseInternalAccess;
 
 public:
     constexpr static std::size_t ENTITY_PAGE_SIZE = EntityPageSize;
@@ -81,14 +70,6 @@ private:
 
     std::tuple<ComponentStorageT<EnabledComponents>...> mComponentStorage;
 
-    template <Component C>
-    struct ComponentMaskBit
-    {
-        ComponentMaskT mask = 0;
-    };
-
-    std::tuple<ComponentMaskBit<EnabledComponents>...> mComponentMaskBits;
-
     /*
     template <
         Component... InitialComponents
@@ -109,24 +90,23 @@ private:
     }
 
 public:
-    EntityDatabase()
-    {
-        auto i = 0;
-        ((std::get<ComponentMaskBit<EnabledComponents>>(mComponentMaskBits)
-            .mask = 1ull << (i++)), ...);
-    }
+    EntityDatabase() = default;
 
     template <Component C>
-    ComponentMaskT componentMaskBit() const
+    static constexpr ComponentMaskT componentMaskBit()
     {
-        return std::get<ComponentMaskBit<C>>(mComponentMaskBits).mask;
+        ComponentMaskT mask;
+        mask.set(ParameterPackIndex_v<C, EnabledComponents...>, 1);
+        // static_assert(mask.any());
+        return mask;
     }
 
     template <Component... Components>
-    ComponentMaskT buildComponentMask() const
+    static constexpr ComponentMaskT buildComponentMask()
     {
-        ComponentMaskT mask = 0;
-        ((mask |= componentMaskBit<Components>()), ...);
+        constexpr auto mask = (ComponentMaskT(0) | ... |
+            componentMaskBit<Components>());
+        // static_assert(mask.any());
         return mask;
     }
 

@@ -9,7 +9,7 @@ template <
     typename Database,
     typename PermissionValidator
 >
-class EntityDatabaseAccess
+class EntityDatabaseExternalAccess
 {
 public:
     using DatabaseT = Database;
@@ -19,26 +19,28 @@ private:
     DatabaseT *mDatabase = nullptr;
 
 public:
-    explicit EntityDatabaseAccess(Database *database)
+    explicit EntityDatabaseExternalAccess(Database *database)
         : mDatabase(database)
     {
     }
 
     template <
-        typename ComponentFilterInclude,
-        typename ComponentFilterExclude
+        Component... Include,
+        Component... Exclude
     >
-    auto view()
+    auto view(
+        ComponentFilter<Include...> include,
+        ComponentFilter<Exclude...> exclude = { }) // default arguments via CTAD
     {
         return EntityDatabaseViewFiltered<
             DatabaseT,
             PermissionValidatorT,
-            ComponentFilterInclude,
-            ComponentFilterExclude
+            decltype(include),
+            decltype(exclude)
         >(mDatabase);
     }
 
-    auto fullView()
+    auto unfilteredView()
     {
         return EntityDatabaseViewUnfiltered<DatabaseT>(mDatabase);
     }
