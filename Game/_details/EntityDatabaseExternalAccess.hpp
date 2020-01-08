@@ -42,7 +42,10 @@ public:
 
     auto unfilteredView()
     {
-        return EntityDatabaseViewUnfiltered<DatabaseT>(mDatabase);
+        return EntityDatabaseViewUnfiltered<
+            DatabaseT,
+            PermissionValidatorT
+        >(mDatabase);
     }
 };
 }

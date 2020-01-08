@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "PermissionValidatorReadOnly.hpp"
 #include "EntityIterator.hpp"
 #include "EntityDatabaseInternalAccess.hpp"
 
@@ -11,16 +10,18 @@ namespace usagi
  * \tparam Database
  */
 template <
-    typename Database
+    typename Database,
+    typename PermissionValidator
 >
 class EntityDatabaseViewUnfiltered
     : public EntityDatabaseInternalAccess<Database>
 {
 public:
     using DatabaseT = Database;
+    using PermissionValidatorT = PermissionValidator;
     using IteratorT = EntityIterator<
         DatabaseT,
-        PermissionValidatorReadOnly
+        PermissionValidatorT
     >;
 
     explicit EntityDatabaseViewUnfiltered(Database *database)

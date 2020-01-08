@@ -13,9 +13,11 @@ template <
     typename ExcludeFilter = ComponentFilter<>
 >
 class EntityDatabaseViewFiltered
-    : EntityDatabaseViewUnfiltered<Database>
+    : EntityDatabaseViewUnfiltered<Database, PermissionValidator>
 {
-    using BaseViewT = EntityDatabaseViewUnfiltered<Database>;
+    using BaseViewT = EntityDatabaseViewUnfiltered<
+        Database, PermissionValidator
+    >;
 
 public:
     using DatabaseT = Database;
@@ -30,7 +32,7 @@ public:
     >;
 
     explicit EntityDatabaseViewFiltered(DatabaseT *database)
-        : EntityDatabaseViewUnfiltered<Database>(database)
+        : BaseViewT(database)
     {
     }
 
