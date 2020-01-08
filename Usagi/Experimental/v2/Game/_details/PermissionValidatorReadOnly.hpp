@@ -4,11 +4,7 @@
 
 namespace usagi
 {
-/**
- * \brief Grants access to all components. Mainly for test purposes or internal
- * uses.
- */
-struct PermissionValidatorAllowAll
+struct PermissionValidatorReadOnly
 {
     template <Component C>
     static constexpr bool hasReadAccess()
@@ -19,7 +15,7 @@ struct PermissionValidatorAllowAll
     template <Component C>
     static constexpr bool hasWriteAccess()
     {
-        return true;
+        return false;
     }
 };
 }
