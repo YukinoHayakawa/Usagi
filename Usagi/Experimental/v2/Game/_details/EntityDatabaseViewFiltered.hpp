@@ -8,25 +8,25 @@ namespace usagi
 {
 template <
     typename Database,
-    typename PermissionValidator,
+    typename ComponentAccess,
     typename IncludeFilter,
     typename ExcludeFilter = ComponentFilter<>
 >
 class EntityDatabaseViewFiltered
-    : EntityDatabaseViewUnfiltered<Database, PermissionValidator>
+    : EntityDatabaseViewUnfiltered<Database, ComponentAccess>
 {
     using BaseViewT = EntityDatabaseViewUnfiltered<
-        Database, PermissionValidator
+        Database, ComponentAccess
     >;
 
 public:
     using DatabaseT = Database;
-    using PermissionValidatorT = PermissionValidator;
+    using ComponentAccessT = ComponentAccess;
     using IncludeFilterT = IncludeFilter;
     using ExcludeFilterT = ExcludeFilter;
     using IteratorT = EntityIteratorFiltered<
         DatabaseT,
-        PermissionValidatorT,
+        ComponentAccessT,
         IncludeFilterT,
         ExcludeFilterT
     >;

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+namespace usagi
+{
 // Systems
 //
 // - Basics
@@ -59,3 +61,10 @@
 //         }
 //     }
 // };
+template <typename T>
+concept System = requires(T t)
+{
+    { T::ReadAccess };
+    { T::WriteAccess };
+};
+}

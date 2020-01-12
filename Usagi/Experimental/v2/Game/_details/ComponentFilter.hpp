@@ -13,9 +13,7 @@ template <Component... Components>
 struct ComponentFilter
 {
     template <Component C>
-    static constexpr bool hasComponent()
-    {
-        return std::disjunction_v<std::is_same<C, Components>...>;
-    }
+    static constexpr bool HAS_COMPONENT =
+        std::disjunction_v<std::is_same<C, Components>...>;
 };
 }

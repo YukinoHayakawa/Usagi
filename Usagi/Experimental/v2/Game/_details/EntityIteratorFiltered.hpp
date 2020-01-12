@@ -7,12 +7,12 @@ namespace usagi
 {
 template <
     typename Database,
-    typename PermissionValidator,
+    typename ComponentAccess,
     typename IncludeFilter,
     typename ExcludeFilter = ComponentFilter<>
 >
 class EntityIteratorFiltered
-    : EntityIterator<Database, PermissionValidator>
+    : EntityIterator<Database, ComponentAccess>
 {
     bool filterPredicate() const
     {
@@ -34,9 +34,9 @@ class EntityIteratorFiltered
     }
 
 public:
-    using BaseIteratorT = EntityIterator<Database, PermissionValidator>;
+    using BaseIteratorT = EntityIterator<Database, ComponentAccess>;
     using BaseIteratorT::DatabaseT;
-    using BaseIteratorT::PermissionValidatorT;
+    using BaseIteratorT::ComponentAccessT;
     using BaseIteratorT::PageIteratorT;
 
     // Standard Iterator Traits
