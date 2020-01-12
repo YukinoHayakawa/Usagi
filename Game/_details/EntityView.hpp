@@ -3,13 +3,13 @@
 #include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 
 #include "EntityDatabaseInternalAccess.hpp"
-#include "PermissionValidatorSystemAttribute.hpp"
+#include "ComponentAccessSystemAttribute.hpp"
 
 namespace usagi
 {
 template <
     typename Database,
-    typename PermissionValidator
+    typename ComponentAccess
 >
 class EntityView
     : EntityDatabaseInternalAccess<Database>
@@ -85,13 +85,8 @@ public:
     }
 
     template <Component C>
-    C & addComponent()
+    C & addComponent() requires ComponentAccess::template WRITE<C>
     {
-        static_assert(
-            PermissionValidator::template hasWriteAccess<C>(),
-            "No write access to the component."
-        );
-
         // Locate the component position in the storage
         auto &idx = mPage->template componentPageIndex<C>();
         auto &storage = this->mDatabase->template componentStorage<C>();
@@ -109,13 +104,8 @@ public:
     }
 
     template <Component C>
-    void removeComponent()
+    void removeComponent() requires ComponentAccess::template WRITE<C>
     {
-        static_assert(
-            PermissionValidator::template hasWriteAccess<C>(),
-            "No write access to the component."
-        );
-
         // Locate the component position in the storage
         auto &idx = mPage->template componentPageIndex<C>();
         auto &storage = this->mDatabase->template componentStorage<C>();
@@ -131,16 +121,15 @@ public:
         // the component page can be deallocated. -> in page iterator?
     }
 
-    // todo: fix verbose calling syntax caused by dependent name
-    // todo: compile time check of component type (type must be included etc)
+    // todo: compile time check of component type (type must be included in the db etc)
     /**
      * \brief Read & write access to the component.
      * \tparam C
      * \return
      */
     template <Component C>
-    std::enable_if_t<PermissionValidator::template hasWriteAccess<C>(), C &>
-        component()
+    C & component() requires
+        ComponentAccess::template WRITE<C>
     {
         return componentAccess<C>();
     }
@@ -151,112 +140,25 @@ public:
      * \return
      */
     template <Component C>
-    std::enable_if_t<PermissionValidator::template hasReadAccess<C>() &&
-        !PermissionValidator::template hasWriteAccess<C>(), const C &>
-        component() const
+    const C & component() const requires
+        !ComponentAccess::template WRITE<C>
+        && ComponentAccess::template READ<C>
     {
         return componentAccess<C>();
     }
 };
-
-/*
-template <Component C, typename EntityView>
-auto component(EntityView &&view) ->
-    std::enable_if_t<!std::is_const_v<std::remove_reference_t<decltype(
-        std::declval<EntityView>(1).template component<C>()
-    )>>, C &>
-{
-    return view.template component<C>();
-}
-
-template <Component C, typename EntityView>
-auto component(EntityView &&view) ->
-    std::enable_if_t<std::is_const_v<std::remove_reference_t<decltype(
-        std::declval<EntityView>(1).template component<C>()
-    )>>, const C &>
-{
-    return view.template component<C>();
-}
-
-
-*/
 
 template <Component C, typename EntityView>
 decltype(auto) component(EntityView &&view)
 {
     return std::forward<EntityView>(view).template component<C>();
 }
-
-//
-//
-// template <typename C, typename EntityView>
-// const C & component(ComponentTypeTag<C>, EntityView &&view)
-//     requires std::is_const_v<
-//         std::remove_reference_t<decltype(component<C>(view))>
-//     >
-// {
-//     return std::forward<EntityView>(view).template component<C>();
-// }
-//
-// template <typename C, typename EntityView>
-// C & component(ComponentTypeTag<C>, EntityView &&view)
-//     requires !std::is_const_v<
-//         std::remove_reference_t<decltype(component<C>(view))>
-//     >
-// {
-//     return std::forward<EntityView>(view).template component<C>();
-// }
-//
-
-
-
-// template <typename C, typename EntityView>
-// const C & component(EntityView &&view)
-// requires std::is_const_v<
-//     std::remove_reference_t<decltype(component<C>(view))>
-// >
-// {
-//     return std::forward<EntityView>(view).template component<C>();
-// }
-//
-// template <typename C, typename EntityView>
-// C & component(ComponentTypeTag<C>, EntityView &&view)
-// requires !std::is_const_v<
-//     std::remove_reference_t<decltype(component<C>(view))>
-// >
-// {
-//     return std::forward<EntityView>(view).template component<C>();
-// }
-//
-
-namespace details
-{
-template <typename System>
-using SystemPermissions = PermissionValidatorSystemAttribute<
-    typename System::ReadAccess,
-    typename System::WriteAccess
->;
-
-template <typename System, Component C>
-using ComponentReferenceType = std::conditional_t<
-    SystemPermissions<System>::template hasWriteAccess<C>(),
-    C &,
-    std::conditional_t<
-        SystemPermissions<System>::template hasReadAccess<C>(),
-        const C &,
-        void
-    >
->;
-}
-
-
 }
 
 /**
  * \brief This macro performs static_cast on the returned type of Entity View
  * thus turning the dependent name into a non-dependent one for the sake
  * of code auto-completion.
- * todo deal with const ref
  * \param entity_view
  * \param component_type
  */

@@ -11,17 +11,17 @@ namespace usagi
  */
 template <
     typename Database,
-    typename PermissionValidator
+    typename ComponentAccess
 >
 class EntityDatabaseViewUnfiltered
     : public EntityDatabaseInternalAccess<Database>
 {
 public:
     using DatabaseT = Database;
-    using PermissionValidatorT = PermissionValidator;
+    using ComponentAccessT = ComponentAccess;
     using IteratorT = EntityIterator<
         DatabaseT,
-        PermissionValidatorT
+        ComponentAccessT
     >;
 
     explicit EntityDatabaseViewUnfiltered(Database *database)

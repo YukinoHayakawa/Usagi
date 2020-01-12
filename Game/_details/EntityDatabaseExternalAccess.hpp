@@ -7,13 +7,13 @@ namespace usagi
 {
 template <
     typename Database,
-    typename PermissionValidator
+    typename ComponentAccess
 >
 class EntityDatabaseExternalAccess
 {
 public:
     using DatabaseT = Database;
-    using PermissionValidatorT = PermissionValidator;
+    using ComponentAccessT = ComponentAccess;
 
 private:
     DatabaseT *mDatabase = nullptr;
@@ -34,7 +34,7 @@ public:
     {
         return EntityDatabaseViewFiltered<
             DatabaseT,
-            PermissionValidatorT,
+            ComponentAccessT,
             decltype(include),
             decltype(exclude)
         >(mDatabase);
@@ -44,7 +44,7 @@ public:
     {
         return EntityDatabaseViewUnfiltered<
             DatabaseT,
-            PermissionValidatorT
+            ComponentAccessT
         >(mDatabase);
     }
 };

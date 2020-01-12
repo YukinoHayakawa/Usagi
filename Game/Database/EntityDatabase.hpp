@@ -2,10 +2,10 @@
 
 #include <tuple>
 
+#include <Usagi/Experimental/v2/Game/_details/ComponentAccessAllowAll.hpp>
 #include <Usagi/Experimental/v2/Game/_details/ComponentMask.hpp>
-#include <Usagi/Experimental/v2/Game/_details/EntityPage.hpp>
-#include <Usagi/Experimental/v2/Game/_details/PermissionValidatorAllowReadWrite.hpp>
 #include <Usagi/Experimental/v2/Game/_details/EntityIterator.hpp>
+#include <Usagi/Experimental/v2/Game/_details/EntityPage.hpp>
 #include <Usagi/Utility/Allocator/PoolAllocator.hpp>
 #include <Usagi/Utility/ParameterPackIndex.hpp>
 
@@ -112,7 +112,7 @@ public:
 
     /*
     template <
-        typename PermissionValidator,
+        typename ComponentAccess,
         typename... IncludeFilter,
         typename... ExcludeFilter
     >
@@ -122,19 +122,17 @@ public:
     {
         return EntityDatabaseView<
             EntityDatabase,
-            PermissionValidator,
+            ComponentAccess,
             decltype(include),
             decltype(exclude)
         >();
     }
     */
 
-    template <
-        typename PermissionValidator
-    >
+    template <typename ComponentAccess>
     auto createAccess()
     {
-        return EntityDatabaseAccess<EntityDatabase, PermissionValidator>(
+        return EntityDatabaseAccess<EntityDatabase, ComponentAccess>(
             *this
         );
     }
@@ -175,7 +173,7 @@ public:
 
             // todo: insert data by components instead of entities
 
-            EntityView<EntityDatabase, PermissionValidatorAllowReadWrite> view {
+            EntityView<EntityDatabase, ComponentAccessAllowAll> view {
                 this, page, j
             };
 
