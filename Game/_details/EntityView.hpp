@@ -85,8 +85,11 @@ public:
     }
 
     template <Component C>
-    C & addComponent() requires ComponentAccess::template WRITE<C>
+    C & addComponent()
     {
+        static_assert(ComponentAccess::template WRITE<C>,
+            "You need write access to this component to add it.");
+
         // Locate the component position in the storage
         auto &idx = mPage->template componentPageIndex<C>();
         auto &storage = this->mDatabase->template componentStorage<C>();
@@ -104,8 +107,11 @@ public:
     }
 
     template <Component C>
-    void removeComponent() requires ComponentAccess::template WRITE<C>
+    void removeComponent()
     {
+        static_assert(ComponentAccess::template WRITE<C>,
+            "You need write access to this component to remove it.");
+
         // Locate the component position in the storage
         auto &idx = mPage->template componentPageIndex<C>();
         auto &storage = this->mDatabase->template componentStorage<C>();
@@ -145,6 +151,13 @@ public:
         && ComponentAccess::template READ<C>
     {
         return componentAccess<C>();
+    }
+
+    template <Component C>
+    void component() const requires
+        !ComponentAccess::template READ<C>
+    {
+        static_assert(false, "You do not have access to this component.");
     }
 };
 
