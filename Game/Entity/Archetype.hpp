@@ -16,7 +16,7 @@ class Archetype
 public:
     Archetype() = default;
 
-    using component_filter = ComponentFilter<InitialComponents...>;
+    using ComponentFilterT = ComponentFilter<InitialComponents...>;
 
     template <typename... Args>
     explicit Archetype(Args &&... args)
