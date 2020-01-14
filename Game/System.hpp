@@ -67,4 +67,12 @@ concept System = requires(T t)
     // { T::ReadAccess };
     // { T::WriteAccess };
 };
+
+template <typename T>
+concept SystemHasReadAccessMask =
+    System<T> && requires (T) { T::ReadAccess; };
+
+template <typename T>
+concept SystemHasWriteAccessMask =
+    System<T> && requires (T) { T::WriteAccess; };
 }
