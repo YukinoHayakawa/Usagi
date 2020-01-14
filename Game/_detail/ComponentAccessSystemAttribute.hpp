@@ -3,6 +3,8 @@
 #include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 #include <Usagi/Experimental/v2/Game/System.hpp>
 
+#include "ComponentAccess.hpp"
+
 namespace usagi
 {
 namespace detail
@@ -30,30 +32,6 @@ template <System GameSystem, Component C>
     requires SystemHasWriteAccessMask<GameSystem>
 struct ComponentWriteMaskBitPresent<GameSystem, C>
     : std::bool_constant<GameSystem::WriteAccess::template HAS_COMPONENT<C>> {};
-
-// ============================================================================
-// Derived Trait Flags
-// ============================================================================
-
-template <System GameSystem, Component C>
-constexpr bool HasComponentWriteAccess =
-    ComponentWriteMaskBitPresent<GameSystem, C>::value;
-
-template <System GameSystem, Component C>
-constexpr bool HasComponentReadAccess =
-    HasComponentWriteAccess<GameSystem, C> ||
-    ComponentReadMaskBitPresent<GameSystem, C>::value;
-
-template <System GameSystem, Component C>
-using ComponentReferenceType = std::conditional_t<
-    HasComponentWriteAccess<GameSystem, C>,
-    C &,
-    std::conditional_t<
-        HasComponentReadAccess<GameSystem, C>,
-        const C &,
-        void
-    >
->;
 }
 
 // ============================================================================
@@ -65,10 +43,33 @@ struct ComponentAccessSystemAttribute
 {
     template <Component C>
     static constexpr bool READ =
-        detail::HasComponentReadAccess<GameSystem, C>;
+        detail::ComponentReadMaskBitPresent<GameSystem, C>::value;
 
     template <Component C>
     static constexpr bool WRITE =
-        detail::HasComponentWriteAccess<GameSystem, C>;
+        detail::ComponentWriteMaskBitPresent<GameSystem, C>::value;
 };
+
+// ============================================================================
+// Derived Trait Flags
+// ============================================================================
+
+template <System GameSystem, Component C>
+constexpr bool SystemHasComponentWriteAccess =
+    HasComponentWriteAccess<ComponentAccessSystemAttribute<GameSystem>, C>;
+
+template <System GameSystem, Component C>
+constexpr bool SystemHasComponentReadAccess =
+    HasComponentReadAccess<ComponentAccessSystemAttribute<GameSystem>, C>;
+
+template <System GameSystem, Component C>
+using ComponentReferenceType = std::conditional_t<
+    SystemHasComponentWriteAccess<GameSystem, C>,
+    C &,
+    std::conditional_t<
+        SystemHasComponentReadAccess<GameSystem, C>,
+        const C &,
+        void
+    >
+>;
 }
