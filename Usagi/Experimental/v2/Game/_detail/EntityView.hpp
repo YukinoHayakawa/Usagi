@@ -176,7 +176,7 @@ decltype(auto) component(EntityView &&view)
  * \param component_type
  */
 #define USAGI_COMPONENT(entity_view, component_type) \
-    static_cast<::usagi::details::ComponentReferenceType< \
+    static_cast<::usagi::detail::ComponentReferenceType< \
         std::remove_reference_t<decltype(*this)>, \
         component_type \
     >>(::usagi::component<component_type>(entity_view)) \

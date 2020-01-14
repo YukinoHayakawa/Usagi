@@ -2,10 +2,10 @@
 
 #include <tuple>
 
-#include <Usagi/Experimental/v2/Game/_details/ComponentAccessAllowAll.hpp>
-#include <Usagi/Experimental/v2/Game/_details/ComponentMask.hpp>
-#include <Usagi/Experimental/v2/Game/_details/EntityIterator.hpp>
-#include <Usagi/Experimental/v2/Game/_details/EntityPage.hpp>
+#include <Usagi/Experimental/v2/Game/_detail/ComponentAccessAllowAll.hpp>
+#include <Usagi/Experimental/v2/Game/_detail/ComponentMask.hpp>
+#include <Usagi/Experimental/v2/Game/_detail/EntityIterator.hpp>
+#include <Usagi/Experimental/v2/Game/_detail/EntityPage.hpp>
 #include <Usagi/Utility/Allocator/PoolAllocator.hpp>
 #include <Usagi/Utility/ParameterPackIndex.hpp>
 
