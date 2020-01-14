@@ -3,7 +3,8 @@
 #include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 
 #include "EntityDatabaseInternalAccess.hpp"
-#include "ComponentAccessSystemAttribute.hpp"
+#include "ComponentAccess.hpp"
+#include "ComponentFilter.hpp"
 
 namespace usagi
 {
@@ -85,11 +86,8 @@ public:
     }
 
     template <Component C>
-    C & addComponent()
+    C & addComponent() requires HasComponentWriteAccess<ComponentAccess, C>
     {
-        static_assert(ComponentAccess::template WRITE<C>,
-            "You need write access to this component to add it.");
-
         // Locate the component position in the storage
         auto &idx = mPage->template componentPageIndex<C>();
         auto &storage = this->mDatabase->template componentStorage<C>();
@@ -107,11 +105,8 @@ public:
     }
 
     template <Component C>
-    void removeComponent()
+    void removeComponent() requires HasComponentWriteAccess<ComponentAccess, C>
     {
-        static_assert(ComponentAccess::template WRITE<C>,
-            "You need write access to this component to remove it.");
-
         // Locate the component position in the storage
         auto &idx = mPage->template componentPageIndex<C>();
         auto &storage = this->mDatabase->template componentStorage<C>();
@@ -135,7 +130,7 @@ public:
      */
     template <Component C>
     C & component() requires
-        ComponentAccess::template WRITE<C>
+        HasComponentWriteAccess<ComponentAccess, C>
     {
         return componentAccess<C>();
     }
@@ -147,17 +142,10 @@ public:
      */
     template <Component C>
     const C & component() const requires
-        !ComponentAccess::template WRITE<C>
-        && ComponentAccess::template READ<C>
+        !HasComponentReadAccess<ComponentAccess, C>
+        && HasComponentReadAccess<ComponentAccess, C>
     {
         return componentAccess<C>();
-    }
-
-    template <Component C>
-    void component() const requires
-        !ComponentAccess::template READ<C>
-    {
-        static_assert(false, "You do not have access to this component.");
     }
 };
 
