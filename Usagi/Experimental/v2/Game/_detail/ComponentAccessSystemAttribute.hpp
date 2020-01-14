@@ -11,35 +11,25 @@ namespace detail
 // ReadMaskBit
 // ============================================================================
 
-template <System GameSystem, Component C, typename = std::void_t<>>
-struct ComponentReadMaskBitPresent : std::false_type
-{
-};
+template <System GameSystem, Component C>
+struct ComponentReadMaskBitPresent : std::false_type {};
 
 template <System GameSystem, Component C>
-struct ComponentReadMaskBitPresent<
-    GameSystem, C,
-    std::void_t<typename GameSystem::ReadAccess>
->: std::bool_constant<GameSystem::ReadAccess::template HAS_COMPONENT<C>>
-{
-};
+    requires SystemHasReadAccessMask<GameSystem>
+struct ComponentReadMaskBitPresent<GameSystem, C>
+    : std::bool_constant<GameSystem::ReadAccess::template HAS_COMPONENT<C>> {};
 
 // ============================================================================
 // WriteMaskBit
 // ============================================================================
 
-template <System GameSystem, Component C, typename = std::void_t<>>
-struct ComponentWriteMaskBitPresent : std::false_type
-{
-};
+template <System GameSystem, Component C>
+struct ComponentWriteMaskBitPresent : std::false_type {};
 
 template <System GameSystem, Component C>
-struct ComponentWriteMaskBitPresent<
-    GameSystem, C,
-    std::void_t<typename GameSystem::WriteAccess>
->: std::bool_constant<GameSystem::WriteAccess::template HAS_COMPONENT<C>>
-{
-};
+    requires SystemHasWriteAccessMask<GameSystem>
+struct ComponentWriteMaskBitPresent<GameSystem, C>
+    : std::bool_constant<GameSystem::WriteAccess::template HAS_COMPONENT<C>> {};
 
 // ============================================================================
 // Derived Trait Flags
