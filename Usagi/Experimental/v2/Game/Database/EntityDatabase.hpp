@@ -6,6 +6,7 @@
 #include <Usagi/Experimental/v2/Game/_detail/ComponentMask.hpp>
 #include <Usagi/Experimental/v2/Game/_detail/EntityIterator.hpp>
 #include <Usagi/Experimental/v2/Game/_detail/EntityPage.hpp>
+#include <Usagi/Experimental/v2/Game/Entity/Archetype.hpp>
 #include <Usagi/Utility/Allocator/PoolAllocator.hpp>
 #include <Usagi/Utility/ParameterPackIndex.hpp>
 
@@ -142,24 +143,10 @@ public:
     //     // todo
     // }
 
-    // todo: move to DbAccess?
-    // todo: universal reference?
-    template <
-        Component... InitialComponents
-    >
-    decltype(auto) create(
-        Archetype<InitialComponents...> &&archetype,
-        const std::size_t count = 1)
-    {
-        return create(archetype, count);
-    }
-
-    template <
-        Component... InitialComponents
-    >
+    template <Component... InitialComponents>
     auto create(
-        Archetype<InitialComponents...> &archetype,
-        const std::size_t count = 1)
+        const Archetype<InitialComponents...> &archetype,
+        const std::size_t count)
     {
         // todo locate a page which is likely to improve data coherence
         // auto &page = findCoherentPage<InitialComponents...>();

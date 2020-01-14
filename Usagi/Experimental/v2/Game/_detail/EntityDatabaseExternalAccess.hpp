@@ -30,7 +30,8 @@ public:
     >
     auto view(
         ComponentFilter<Include...> include,
-        ComponentFilter<Exclude...> exclude = { }) // default arguments via CTAD
+        // defaults to empty exclude mask via class template argument deduction
+        ComponentFilter<Exclude...> exclude = { })
     {
         return EntityDatabaseViewFiltered<
             DatabaseT,
@@ -46,6 +47,17 @@ public:
             DatabaseT,
             ComponentAccessT
         >(mDatabase);
+    }
+
+    template <Component... InitialComponents>
+    decltype(auto) create(
+        const Archetype<InitialComponents...> &archetype,
+        const std::size_t count = 1
+    ) requires (... && HasComponentWriteAccess<
+        ComponentAccessT, InitialComponents
+    >)
+    {
+        return mDatabase->create(archetype, count);
     }
 };
 }

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <cassert>
+
 #include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 
 #include "EntityDatabaseInternalAccess.hpp"
