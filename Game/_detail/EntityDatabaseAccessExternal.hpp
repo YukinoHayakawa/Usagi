@@ -9,7 +9,7 @@ template <
     typename Database,
     typename ComponentAccess
 >
-class EntityDatabaseExternalAccess
+class EntityDatabaseAccessExternal
 {
 public:
     using DatabaseT = Database;
@@ -19,15 +19,14 @@ private:
     DatabaseT *mDatabase = nullptr;
 
 public:
-    explicit EntityDatabaseExternalAccess(Database *database)
+    explicit EntityDatabaseAccessExternal(Database *database)
         : mDatabase(database)
     {
     }
 
-    template <
-        Component... Include,
-        Component... Exclude
-    >
+    template <typename>
+    void operator()(){}
+    template <Component... Include, Component... Exclude>
     auto view(
         ComponentFilter<Include...> include,
         // defaults to empty exclude mask via class template argument deduction
@@ -52,12 +51,13 @@ public:
     template <Component... InitialComponents>
     decltype(auto) create(
         const Archetype<InitialComponents...> &archetype,
-        const std::size_t count = 1
+        const std::size_t count = 1,
+        EntityId *id_output = nullptr
     ) requires (... && HasComponentWriteAccess<
         ComponentAccessT, InitialComponents
     >)
     {
-        return mDatabase->create(archetype, count);
+        return mDatabase->create(archetype, count, id_output);
     }
 };
 }

@@ -2,7 +2,7 @@
 #include <Usagi/Experimental/v2/Game/Database/EntityDatabase.hpp>
 #include <Usagi/Experimental/v2/Game/Entity/Archetype.hpp>
 #include <Usagi/Experimental/v2/Game/_detail/ComponentAccessSystemAttribute.hpp>
-#include <Usagi/Experimental/v2/Game/_detail/EntityDatabaseExternalAccess.hpp>
+#include <Usagi/Experimental/v2/Game/_detail/EntityDatabaseAccessExternal.hpp>
 
 namespace usagi
 {
@@ -26,7 +26,7 @@ struct System
     using WriteAccess = ArchetypeA::ComponentFilterT;
 };
 
-using Access = EntityDatabaseExternalAccess<
+using Access = EntityDatabaseAccessExternal<
     Database,
     ComponentAccessSystemAttribute<System>
 >;
@@ -34,7 +34,7 @@ using Access = EntityDatabaseExternalAccess<
 template <typename T>
 concept CanCreateA = requires (T t)
 {
-    EntityDatabaseExternalAccess<
+    EntityDatabaseAccessExternal<
         Database,
         ComponentAccessSystemAttribute<T>
     >(nullptr).create(ArchetypeA());
@@ -43,7 +43,7 @@ concept CanCreateA = requires (T t)
 template <typename T>
 concept CanCreateB = requires (T t)
 {
-    EntityDatabaseExternalAccess<
+    EntityDatabaseAccessExternal<
         Database,
         ComponentAccessSystemAttribute<T>
     >(nullptr).create(ArchetypeB());

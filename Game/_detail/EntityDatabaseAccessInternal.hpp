@@ -5,7 +5,7 @@ namespace usagi
 template <
     typename Database
 >
-class EntityDatabaseInternalAccess
+class EntityDatabaseAccessInternal
 {
 public:
     using DatabaseT = Database;
@@ -13,7 +13,7 @@ public:
 protected:
     DatabaseT *mDatabase = nullptr;
 
-    explicit EntityDatabaseInternalAccess(Database *database)
+    explicit EntityDatabaseAccessInternal(Database *database)
         : mDatabase(database)
     {
     }

@@ -4,7 +4,7 @@
 
 #include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 
-#include "EntityDatabaseInternalAccess.hpp"
+#include "EntityDatabaseAccessInternal.hpp"
 #include "ComponentAccess.hpp"
 #include "ComponentFilter.hpp"
 
@@ -15,7 +15,7 @@ template <
     typename ComponentAccess
 >
 class EntityView
-    : EntityDatabaseInternalAccess<Database>
+    : EntityDatabaseAccessInternal<Database>
 {
     using DatabaseT         = Database;
     using EntityPageT       = typename DatabaseT::EntityPageT;
@@ -55,7 +55,7 @@ public:
         DatabaseT *database,
         EntityPageT *page,
         const std::size_t index_in_page)
-        : EntityDatabaseInternalAccess<Database>(database)
+        : EntityDatabaseAccessInternal<Database>(database)
         , mPage(page)
         , mIndexInPage(index_in_page)
     {
