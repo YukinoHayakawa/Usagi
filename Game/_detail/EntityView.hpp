@@ -25,7 +25,7 @@ class EntityView
     std::size_t     mIndexInPage;
 
     template <Component C>
-    C & componentAccess()
+    C & componentAccess() const
     {
         // Locate the component in the storage
         auto &idx = mPage->template componentPageIndex<C>();
@@ -124,6 +124,12 @@ public:
         // the component page can be deallocated. -> in page iterator?
     }
 
+    void destroy()
+    {
+        // todo: release empty page
+        entityStateRef().owned.reset();
+    }
+
     // todo: compile time check of component type (type must be included in the db etc)
     /**
      * \brief Read & write access to the component.
@@ -144,7 +150,7 @@ public:
      */
     template <Component C>
     const C & component() const requires
-        !HasComponentReadAccess<ComponentAccess, C>
+        !HasComponentWriteAccess<ComponentAccess, C>
         && HasComponentReadAccess<ComponentAccess, C>
     {
         return componentAccess<C>();
@@ -166,8 +172,8 @@ decltype(auto) component(EntityView &&view)
  * \param component_type
  */
 #define USAGI_COMPONENT(entity_view, component_type) \
-    static_cast<::usagi::detail::ComponentReferenceType< \
-        std::remove_reference_t<decltype(*this)>, \
+    static_cast<::usagi::ComponentReferenceType< \
+        std::remove_pointer_t<decltype(this)>, \
         component_type \
     >>(::usagi::component<component_type>(entity_view)) \
 /**/

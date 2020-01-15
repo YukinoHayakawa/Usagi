@@ -36,10 +36,20 @@ static_assert(SystemHasComponentWriteAccess<
     SystemAccessTraitTest, ComponentA
 >);
 
+// TEST: Mutable reference
+static_assert(std::is_same_v<ComponentReferenceType<
+    SystemAccessTraitTest, ComponentA
+>, ComponentA &>);
+
 // TEST: No read access
 static_assert(!SystemHasComponentReadAccess<
     SystemAccessTraitTest, ComponentB
 >);
+
+// TEST: No reference (void)
+static_assert(std::is_same_v<ComponentReferenceType<
+    SystemAccessTraitTest, ComponentB
+>, void>);
 
 // TEST: No write access
 static_assert(!SystemHasComponentWriteAccess<
@@ -64,6 +74,11 @@ static_assert(SystemHasComponentReadAccess<
     SystemAccessTraitTest2, ComponentB
 >);
 
+// TEST: Const reference
+static_assert(std::is_same_v<ComponentReferenceType<
+    SystemAccessTraitTest2, ComponentB
+>, const ComponentB &>);
+
 // ============================================================================
 
 struct SystemAccessTraitTest3
@@ -75,6 +90,16 @@ struct SystemAccessTraitTest3
 static_assert(!SystemHasComponentWriteAccess<
     SystemAccessTraitTest3, ComponentA
 >);
+
+// TEST: Const reference
+static_assert(std::is_same_v<ComponentReferenceType<
+    SystemAccessTraitTest3, ComponentA
+>, const ComponentA &>);
+
+// TEST: No reference
+static_assert(std::is_same_v<ComponentReferenceType<
+    SystemAccessTraitTest3, ComponentB
+>, void>);
 
 // ============================================================================
 }
