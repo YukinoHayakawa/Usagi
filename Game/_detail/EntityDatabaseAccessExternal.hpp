@@ -24,8 +24,6 @@ public:
     {
     }
 
-    template <typename>
-    void operator()(){}
     template <Component... Include, Component... Exclude>
     auto view(
         ComponentFilter<Include...> include,
@@ -48,16 +46,22 @@ public:
         >(mDatabase);
     }
 
-    template <Component... InitialComponents>
+    template <
+        Component... InitialComponents,
+        typename EntityIdOutputIterator = std::nullptr_t
+    >
     decltype(auto) create(
-        const Archetype<InitialComponents...> &archetype,
+        Archetype<InitialComponents...> &archetype,
         const std::size_t count = 1,
-        EntityId *id_output = nullptr
+        EntityIdOutputIterator &&id_output = nullptr
     ) requires (... && HasComponentWriteAccess<
         ComponentAccessT, InitialComponents
     >)
     {
-        return mDatabase->create(archetype, count, id_output);
+        return mDatabase->create(
+            archetype, count,
+            std::forward<EntityIdOutputIterator>(id_output)
+        );
     }
 };
 }

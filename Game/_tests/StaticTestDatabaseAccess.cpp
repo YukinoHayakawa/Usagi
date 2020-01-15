@@ -32,21 +32,21 @@ using Access = EntityDatabaseAccessExternal<
 >;
 
 template <typename T>
-concept CanCreateA = requires (T t)
+concept CanCreateA = requires (T)
 {
     EntityDatabaseAccessExternal<
         Database,
         ComponentAccessSystemAttribute<T>
-    >(nullptr).create(ArchetypeA());
+    >(nullptr).create(std::declval<ArchetypeA&>());
 };
 
 template <typename T>
-concept CanCreateB = requires (T t)
+concept CanCreateB = requires (T)
 {
     EntityDatabaseAccessExternal<
         Database,
         ComponentAccessSystemAttribute<T>
-    >(nullptr).create(ArchetypeB());
+    >(nullptr).create(std::declval<ArchetypeB&>());
 };
 
 static_assert(CanCreateA<System>);
