@@ -3,7 +3,7 @@
 #include <iterator>
 
 #include "EntityView.hpp"
-#include "EntityDatabaseInternalAccess.hpp"
+#include "EntityDatabaseAccessInternal.hpp"
 
 namespace usagi
 {
@@ -21,7 +21,7 @@ template <
     typename ComponentAccess
 >
 class EntityIterator
-    : protected EntityDatabaseInternalAccess<Database>
+    : protected EntityDatabaseAccessInternal<Database>
 {
 public:
     using DatabaseT         = Database;
@@ -54,7 +54,7 @@ protected:
 
 public:
     explicit EntityIterator(DatabaseT *database)
-        : EntityDatabaseInternalAccess<Database>(database)
+        : EntityDatabaseAccessInternal<Database>(database)
     {
     }
 
@@ -62,7 +62,7 @@ public:
         DatabaseT *database,
         PageIteratorT page_cursor,
         const std::size_t index_in_page)
-        : EntityDatabaseInternalAccess<Database>(database)
+        : EntityDatabaseAccessInternal<Database>(database)
         , mPageCursor(std::move(page_cursor))
         , mIndexInPage(index_in_page)
     {

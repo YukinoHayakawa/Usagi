@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "EntityIterator.hpp"
-#include "EntityDatabaseInternalAccess.hpp"
+#include "EntityDatabaseAccessInternal.hpp"
 
 namespace usagi
 {
@@ -14,7 +14,7 @@ template <
     typename ComponentAccess
 >
 class EntityDatabaseViewUnfiltered
-    : public EntityDatabaseInternalAccess<Database>
+    : public EntityDatabaseAccessInternal<Database>
 {
 public:
     using DatabaseT = Database;
@@ -25,7 +25,7 @@ public:
     >;
 
     explicit EntityDatabaseViewUnfiltered(Database *database)
-        : EntityDatabaseInternalAccess<Database>(database)
+        : EntityDatabaseAccessInternal<Database>(database)
     {
     }
 
