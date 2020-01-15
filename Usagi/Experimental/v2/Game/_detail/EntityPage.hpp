@@ -37,6 +37,7 @@ struct EntityPage
 
     // Specify the range of entity id represented by this page
     std::uint64_t first_entity_id = -1;
+    std::uint16_t first_unused_index = 0;
 
     std::array<ComponentState, NumEntities> entity_states;
 

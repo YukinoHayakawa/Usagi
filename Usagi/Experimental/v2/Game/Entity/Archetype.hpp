@@ -4,14 +4,20 @@
 
 #include <Usagi/Experimental/v2/Game/_detail/ComponentFilter.hpp>
 
-#include "Component.hpp"
-
 namespace usagi
 {
 template <Component... InitialComponents>
 class Archetype
 {
     std::tuple<InitialComponents...> mInitialValues;
+
+    template <
+        std::uint16_t   EntityPageSize,
+        Component...    EnabledComponents
+    >
+    friend class EntityDatabase;
+
+    std::size_t mLastUsedPageIndex = -1;
 
 public:
     Archetype() = default;
@@ -25,13 +31,13 @@ public:
     }
 
     template <Component C>
-    auto & initialValue()
+    auto & val()
     {
         return std::get<C>(mInitialValues);
     }
 
     template <Component C>
-    auto & initialValue() const
+    auto & val() const
     {
         return std::get<C>(mInitialValues);
     }
