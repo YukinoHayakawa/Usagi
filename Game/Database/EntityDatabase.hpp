@@ -9,6 +9,7 @@
 #include <Usagi/Experimental/v2/Game/Entity/Archetype.hpp>
 #include <Usagi/Utility/Allocator/PoolAllocator.hpp>
 #include <Usagi/Utility/ParameterPackIndex.hpp>
+#include <Usagi/Experimental/v2/Game/_detail/EntityId.hpp>
 
 namespace usagi
 {
@@ -41,7 +42,7 @@ class EntityDatabase
     template <
         typename Database
     >
-    friend class EntityDatabaseInternalAccess;
+    friend class EntityDatabaseAccessInternal;
 
 public:
     constexpr static std::size_t ENTITY_PAGE_SIZE = EntityPageSize;
@@ -52,6 +53,7 @@ public:
     using ComponentMaskT        = typename EntityPageT::ComponentMaskT;
     using EntityPageAllocatorT  = PoolAllocator<EntityPageT>;
     using EntityPageIteratorT   = typename EntityPageAllocatorT::IteratorT;
+    using EntityUserViewT = EntityView<EntityDatabase, ComponentAccessAllowAll>;
 
 private:
     std::uint64_t mLastEntityId = 0;
@@ -71,23 +73,30 @@ private:
 
     std::tuple<ComponentStorageT<EnabledComponents>...> mComponentStorage;
 
-    /*
-    template <
-        Component... InitialComponents
-    >
+    template <Component... InitialComponents>
     EntityPageIteratorT findCoherentPage()
     {
-        return
+        // todo
     }
-    */
 
-    EntityPageT * allocateEntityPage()
+    struct EntityPageInfo
+    {
+        std::size_t index = -1;
+        EntityPageT *ptr = nullptr;
+    };
+
+    EntityPageInfo allocateEntityPage()
     {
         std::size_t page_idx = mEntityPages.allocate();
         EntityPageT &page = mEntityPages.block(page_idx);
+
         page.first_entity_id = mLastEntityId;
         mLastEntityId += EntityPageSize;
-        return &page;
+
+        return EntityPageInfo {
+            .index = page_idx,
+            .ptr = &page
+        };
     }
 
 public:
@@ -111,25 +120,6 @@ public:
         return mask;
     }
 
-    /*
-    template <
-        typename ComponentAccess,
-        typename... IncludeFilter,
-        typename... ExcludeFilter
-    >
-    auto view(
-        ComponentFilter<IncludeFilter...> include,
-        ComponentFilter<ExcludeFilter...> exclude) const
-    {
-        return EntityDatabaseView<
-            EntityDatabase,
-            ComponentAccess,
-            decltype(include),
-            decltype(exclude)
-        >();
-    }
-    */
-
     template <typename ComponentAccess>
     auto createAccess()
     {
@@ -142,16 +132,28 @@ public:
     // {
     //     // todo
     // }
+    //
+
+    auto entityView(const EntityId id)
+    {
+        return EntityUserViewT {
+            this,
+            id.page_id,
+            id.id % ENTITY_PAGE_SIZE
+        };
+    }
 
     template <Component... InitialComponents>
     auto create(
         const Archetype<InitialComponents...> &archetype,
-        const std::size_t count)
+        const std::size_t count,
+        EntityId *id_output)
     {
         // todo locate a page which is likely to improve data coherence
         // auto &page = findCoherentPage<InitialComponents...>();
 
-        EntityPageT *page = nullptr;
+        EntityPageInfo page;
+        EntityId last_entity_id;
 
         for(std::size_t i = 0, j = 0; i < count; ++i)
         {
@@ -160,17 +162,30 @@ public:
 
             // todo: insert data by components instead of entities
 
-            EntityView<EntityDatabase, ComponentAccessAllowAll> view {
-                this, page, j
+            EntityUserViewT view {
+                this, page.ptr, j
             };
 
             ((view.template addComponent<InitialComponents>()
                 = archetype.template initialValue<InitialComponents>()), ...);
 
+            last_entity_id = EntityId {
+                .page_id = page.index,
+                .id = page.ptr->first_entity_id + j
+            };
+
+            if(id_output)
+            {
+                *id_output = last_entity_id;
+                ++id_output;
+            }
+
             ++j;
             if(j == ENTITY_PAGE_SIZE)
                 j = 0;
         }
+
+        return last_entity_id;
     }
 
     template <Component T>

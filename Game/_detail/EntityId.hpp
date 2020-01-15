@@ -23,8 +23,8 @@ namespace usagi
  */
 struct EntityId
 {
+    std::uint64_t page_id;
     std::uint64_t id;
-    // std::uint64_t
 };
-static_assert(sizeof(EntityId) == sizeof(std::uint64_t));
+// static_assert(sizeof(EntityId) == sizeof(std::uint64_t));
 }
