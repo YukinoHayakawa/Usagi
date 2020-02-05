@@ -13,10 +13,16 @@ namespace virtual_memory
 std::size_t page_size();
 std::size_t round_up_to_page_size(std::size_t size_bytes);
 
+struct Allocation
+{
+    void *base_address = nullptr;
+    std::size_t length = 0;
+};
+
 // Reserve a virtual address range. If commit is true, the range is also
 // committed.
 // Throws std::bad_alloc if the allocation fails.
-void * allocate(std::size_t size_bytes, bool commit);
+Allocation allocate(std::size_t size_bytes, bool commit);
 
 // Commit a range of virtual address. The [ptr, ptr + size_bytes) must
 // be in a valid range returned by allocate().

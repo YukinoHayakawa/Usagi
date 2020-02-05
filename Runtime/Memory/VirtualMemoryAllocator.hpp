@@ -41,7 +41,7 @@ namespace usagi
 class VirtualMemoryAllocator
 {
     char *mBaseAddress = nullptr;
-    const std::size_t mReservedBytes = 0;
+    std::size_t mReservedBytes = 0;
     std::size_t mCommittedBytes = 0;
 
     std::size_t round_up_allocation_size_checked(std::size_t size_bytes) const;
