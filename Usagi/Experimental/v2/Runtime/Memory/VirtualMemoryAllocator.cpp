@@ -1,6 +1,6 @@
 ﻿#include "VirtualMemoryAllocator.hpp"
 
-#include <exception>
+#include <stdexcept>
 #include <cassert>
 
 #include <Usagi/Experimental/v2/Runtime/Platform/Kernel.hpp>
@@ -30,12 +30,11 @@ void VirtualMemoryAllocator::assert_allocation_happened() const
     assert(mCommittedBytes > 0);
 }
 
-VirtualMemoryAllocator::VirtualMemoryAllocator(std::size_t reserved_bytes)
-    : mReservedBytes(virtual_memory::round_up_to_page_size(reserved_bytes))
+VirtualMemoryAllocator::VirtualMemoryAllocator(const std::size_t reserved_bytes)
 {
-    mBaseAddress = static_cast<char*>(
-        virtual_memory::allocate(mReservedBytes, false)
-    );
+    const auto allocation = virtual_memory::allocate(mReservedBytes, false);
+    mBaseAddress = static_cast<char *>(allocation.base_address);
+    mReservedBytes = allocation.length;
 }
 
 VirtualMemoryAllocator::~VirtualMemoryAllocator()
