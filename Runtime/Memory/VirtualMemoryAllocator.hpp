@@ -48,6 +48,9 @@ class VirtualMemoryAllocator
     void assert_allocation_happened() const;
 
 public:
+    // The default constructor holds no memory, but may be convenient for
+    // client classes which doesn't initialize immediately during construction.
+    VirtualMemoryAllocator() = default;
     explicit VirtualMemoryAllocator(std::size_t reserved_bytes);
     ~VirtualMemoryAllocator();
 
@@ -57,6 +60,10 @@ public:
         , mCommittedBytes(other.mCommittedBytes)
     {
         other.mBaseAddress = nullptr;
+        // Ensure the correct behaviors of allocation functions on the moved
+        // object
+        other.mReservedBytes = 0;
+        other.mCommittedBytes = 0;
     }
 
     // Move assignment and copy ctor & assignment implicitly deleted.
@@ -64,7 +71,7 @@ public:
     void * allocate(std::size_t size);
     void * reallocate(void *old_ptr, std::size_t new_size);
     void deallocate(void *ptr);
-    std::size_t max_size() const;
+    std::size_t max_size() const noexcept;
 };
 
 static_assert(ReallocatableAllocator<VirtualMemoryAllocator>);
