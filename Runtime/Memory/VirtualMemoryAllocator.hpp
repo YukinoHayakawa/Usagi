@@ -46,6 +46,7 @@ class VirtualMemoryAllocator
 
     std::size_t round_up_allocation_size_checked(std::size_t size_bytes) const;
     void assert_allocation_happened() const;
+    static void check_positive_size(std::size_t size);
 
 public:
     // The default constructor holds no memory, but may be convenient for
