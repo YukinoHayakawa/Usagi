@@ -31,6 +31,12 @@ void VirtualMemoryAllocator::assert_allocation_happened() const
     assert(mCommittedBytes > 0);
 }
 
+void VirtualMemoryAllocator::check_positive_size(const std::size_t size)
+{
+    if(size == 0)
+        USAGI_THROW(std::bad_alloc());
+}
+
 VirtualMemoryAllocator::VirtualMemoryAllocator(const std::size_t reserved_bytes)
 {
     const auto allocation = virtual_memory::allocate(reserved_bytes, false);
@@ -50,6 +56,8 @@ VirtualMemoryAllocator::~VirtualMemoryAllocator()
 // Strong exception guarantee
 void * VirtualMemoryAllocator::allocate(const std::size_t size)
 {
+    check_positive_size(size);
+
     // If an allocation exists, fail all subsequent allocations.
     if(mCommittedBytes > 0)
         USAGI_THROW(std::bad_alloc());
@@ -73,6 +81,8 @@ void * VirtualMemoryAllocator::reallocate(
 {
     if(old_ptr != mBaseAddress)
         USAGI_THROW(std::bad_alloc());
+
+    check_positive_size(new_size);
 
     assert_allocation_happened();
 
