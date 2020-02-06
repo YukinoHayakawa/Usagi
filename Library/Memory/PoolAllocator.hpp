@@ -3,6 +3,9 @@
 #include <cassert>
 #include <cstddef>
 
+#include <Usagi/Experimental/v2/Library/Container/DynamicArray.hpp>
+#include <Usagi/Experimental/v2/Library/Concept/Rebindable.hpp>
+
 namespace usagi
 {
 /**
@@ -13,6 +16,8 @@ namespace usagi
  * does not change, otherwise the behavior for a T that is not memcpy-able is
  * undefined after the reallocation.
  *
+ * Object lifetime is managed.
+ *
  * TODO: lock-free
  * todo: dump & load from file
  * todo: allow using memory-mapped file in place of the vector storage
@@ -21,7 +26,7 @@ namespace usagi
  */
 template <
     typename T,
-    template <typename> typename Container
+    typename Container = DynamicArray<T>
 >
 class PoolAllocator
 {
@@ -29,13 +34,18 @@ class PoolAllocator
 
     union Block
     {
-        std::size_t next = INVALID_BLOCK;
-        std::byte data[sizeof T];
+        std::size_t next;
+        T data;
+
+        Block() { }
+        ~Block() { }
     };
 
-    static_assert(sizeof Block == sizeof T);
+    // static_assert(sizeof Block == sizeof T);
+    static_assert(Rebindable<Container, Block>);
 
-    Container<Block> mStorage;
+    using StorageT = typename Container::template rebind<Block>;
+    StorageT mStorage;
     std::size_t mFreeListHead = INVALID_BLOCK;
 
     Block & block(const std::size_t index)
@@ -50,13 +60,36 @@ class PoolAllocator
         return block(mFreeListHead);
     }
 
+    void release()
+    {
+        mFreeListHead = INVALID_BLOCK;
+    }
+
 public:
     PoolAllocator() = default;
+
+    using value_type = T;
+
+    explicit PoolAllocator(StorageT storage)
+        : mStorage(std::move(storage))
+    {
+        storage.clear();
+    }
+
+    PoolAllocator(PoolAllocator &&other) noexcept
+        : mStorage(std::move(other.mStorage))
+        , mFreeListHead(other.mFreeListHead)
+    {
+        other.release();
+    }
+
+    template <typename R>
+    using rebind = PoolAllocator<R, Container>;
 
     T & at(const std::size_t index)
     {
         auto &b = mStorage[index];
-        return reinterpret_cast<T*>(&b.data);
+        return *reinterpret_cast<T*>(&b.data);
     }
 
     template <typename... Args>
@@ -104,6 +137,13 @@ public:
     std::size_t capacity() const
     {
         return mStorage.capacity();
+    }
+
+    // This shall only be called once and only if the storage is not previously
+    // initialized.
+    void init_storage(const std::size_t reserved_size)
+    {
+        mStorage.allocator_reserve(reserved_size);
     }
 };
 }

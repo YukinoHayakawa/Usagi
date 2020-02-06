@@ -13,7 +13,8 @@ class Archetype
 
     template <
         std::uint16_t   EntityPageSize,
-        Component...    EnabledComponents
+        typename        ComponentFilter,
+        typename        Storage
     >
     friend class EntityDatabase;
 
