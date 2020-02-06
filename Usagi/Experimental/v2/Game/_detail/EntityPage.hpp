@@ -35,6 +35,7 @@ struct EntityPage
         return std::get<PageIndex<C>>(component_page_indices).index;
     }
 
+    std::size_t next_page = INVALID_PAGE;
     // Specify the range of entity id represented by this page
     std::uint64_t first_entity_id = -1;
     std::uint16_t first_unused_index = 0;

@@ -2,9 +2,7 @@
 
 namespace usagi
 {
-template <
-    typename Database
->
+template <typename Database>
 class EntityDatabaseAccessInternal
 {
 public:
@@ -20,12 +18,16 @@ protected:
 
     auto entityPageBegin() const
     {
-        return mDatabase->mEntityPages.begin();
+        return EntityPageIterator<DatabaseT>(
+            mDatabase, mDatabase->mFirstEntityPageIndex
+        );
     }
 
     auto entityPageEnd() const
     {
-        return mDatabase->mEntityPages.end();
+        return EntityPageIterator<DatabaseT>(
+            mDatabase, DatabaseT::EntityPageT::INVALID_PAGE
+        );
     }
 };
 }

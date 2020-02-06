@@ -34,7 +34,7 @@ class EntityView
         assert(hasComponents<C>());
         assert(idx != DatabaseT::EntityPageT::INVALID_PAGE);
         // Access the component in the storage page
-        return storage.block(idx)[mIndexInPage];
+        return storage.at(idx)[mIndexInPage];
     }
 
     auto & entityStateRef() const
@@ -97,13 +97,18 @@ public:
         assert(!hasComponents<C>());
         // If the component page hasn't be allocated yet, allocate it.
         if(idx == EntityPageT::INVALID_PAGE)
+        {
             idx = storage.allocate();
+            std::allocator_traits<std::remove_reference_t<decltype(storage)>>::
+                construct(storage, &storage.at(idx)
+            );
+        }
         // Turn on the owned component bit
         entityStateRef().owned |=
             this->mDatabase->template componentMaskBit<C>();
         // todo Mark entity page dirty - calc component mask in iterator dtor?
         // mDatabase->markEntityDirty(mId);
-        return storage.block(idx)[mIndexInPage];
+        return storage.at(idx)[mIndexInPage];
     }
 
     template <Component C>

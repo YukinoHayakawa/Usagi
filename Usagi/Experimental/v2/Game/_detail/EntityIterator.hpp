@@ -49,7 +49,7 @@ protected:
         assert(mIndexInPage < DatabaseT::ENTITY_PAGE_SIZE);
 
         return EntityView<DatabaseT, ComponentAccessT>(
-            this->mDatabase, &(*mPageCursor).data, mIndexInPage);
+            this->mDatabase, &*mPageCursor, mIndexInPage);
     }
 
 public:

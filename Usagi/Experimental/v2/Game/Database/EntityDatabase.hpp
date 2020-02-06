@@ -3,13 +3,15 @@
 #include <tuple>
 
 #include <Usagi/Experimental/v2/Game/_detail/ComponentAccessAllowAll.hpp>
+#include <Usagi/Experimental/v2/Game/_detail/ComponentFilter.hpp>
 #include <Usagi/Experimental/v2/Game/_detail/ComponentMask.hpp>
+#include <Usagi/Experimental/v2/Game/_detail/EntityId.hpp>
 #include <Usagi/Experimental/v2/Game/_detail/EntityIterator.hpp>
 #include <Usagi/Experimental/v2/Game/_detail/EntityPage.hpp>
+#include <Usagi/Experimental/v2/Game/_detail/EntityPageIterator.hpp>
 #include <Usagi/Experimental/v2/Game/Entity/Archetype.hpp>
-#include <Usagi/Utility/Allocator/PoolAllocator.hpp>
+#include <Usagi/Experimental/v2/Library/Memory/PoolAllocator.hpp>
 #include <Usagi/Utility/ParameterPackIndex.hpp>
-#include <Usagi/Experimental/v2/Game/_detail/EntityId.hpp>
 
 namespace usagi
 {
@@ -27,36 +29,49 @@ namespace usagi
  *
  * \tparam EntityPageSize Number of entities stored in each page. The
  * components storage will allocate components in the same unit.
- * \tparam EnabledComponents List of allowed component types. If there are
- * two identical types, the behavior depends on std::get().
+ * \tparam ComponentFilter List of allowed component types. There shall not
+ * be two identical types in the list.
  */
 template <
     std::uint16_t   EntityPageSize,
-    Component...    EnabledComponents
+    typename        ComponentFilter = ComponentFilter<>,
+    typename        Storage = PoolAllocator<int>
 >
 class EntityDatabase
 {
+public:
     // Should only be friend with the access with the same type of database,
     // but C++ does not allow being friend with partial class template
     // specializations.
-    template <
-        typename Database
-    >
+    template <typename Database>
     friend class EntityDatabaseAccessInternal;
 
-public:
+    template <typename Database>
+    friend class EntityPageIterator;
+
     constexpr static std::size_t ENTITY_PAGE_SIZE = EntityPageSize;
 
-    using EntityPageT       = EntityPage<
-        ENTITY_PAGE_SIZE, EnabledComponents...
+private:
+    template <Component... Components>
+    using PartialEntityPageT = EntityPage<
+        ENTITY_PAGE_SIZE, Components...
     >;
+
+    template<typename T>
+    using StorageT = typename Storage::template rebind<T>;
+
+public:
+    using ComponentFilterT      = ComponentFilter;
+    using EntityPageT           =
+        typename ComponentFilter::template Apply<PartialEntityPageT>;
     using ComponentMaskT        = typename EntityPageT::ComponentMaskT;
-    using EntityPageAllocatorT  = PoolAllocator<EntityPageT>;
-    using EntityPageIteratorT   = typename EntityPageAllocatorT::IteratorT;
+    using EntityPageAllocatorT  = StorageT<EntityPageT>;
+    using EntityPageIteratorT   = EntityPageIterator<EntityDatabase>;
     using EntityUserViewT = EntityView<EntityDatabase, ComponentAccessAllowAll>;
 
 private:
     std::uint64_t mLastEntityId = 0;
+    std::size_t mFirstEntityPageIndex = EntityPageT::INVALID_PAGE;
     EntityPageAllocatorT mEntityPages;
 
     /**
@@ -67,11 +82,14 @@ private:
     // std::vector<bool> mPageDisjunctionMaskDirtyFlags;
 
     template <Component C>
-    using ComponentStorageT = PoolAllocator<
-        std::array<C, ENTITY_PAGE_SIZE>
-    >;
+    using SingleComponentStorageT = StorageT<std::array<C, ENTITY_PAGE_SIZE>>;
 
-    std::tuple<ComponentStorageT<EnabledComponents>...> mComponentStorage;
+    using ComponentStorageT =
+        typename ComponentFilter::template NestedApply<
+            std::tuple,
+            SingleComponentStorageT
+        >;
+    ComponentStorageT mComponentStorage;
 
     struct EntityPageInfo
     {
@@ -82,10 +100,17 @@ private:
     EntityPageInfo allocateEntityPage()
     {
         std::size_t page_idx = mEntityPages.allocate();
-        EntityPageT &page = mEntityPages.block(page_idx);
+        EntityPageT &page = mEntityPages.at(page_idx);
+        std::allocator_traits<EntityPageAllocatorT>::construct(
+            mEntityPages, &page
+        );
 
         page.first_entity_id = mLastEntityId;
+        // Singly linked list of pages
+        page.next_page = mFirstEntityPageIndex;
+
         mLastEntityId += EntityPageSize;
+        mFirstEntityPageIndex = page_idx;
 
         return EntityPageInfo {
             .index = page_idx,
@@ -140,20 +165,52 @@ private:
 
         return EntityPageInfo {
             .index = page_idx,
-            .ptr = &mEntityPages.block(page_idx)
+            .ptr = &mEntityPages.at(page_idx)
         };
     }
 
+    void reserve_entity_page_storage(const std::size_t size)
+    {
+        mEntityPages.init_storage(size);
+    }
+
+    template <template <Component...> typename Filter, Component... Cs>
+    void reserve_component_storage(const std::size_t size, Filter<Cs...>)
+    {
+        (std::get<SingleComponentStorageT<Cs>>(mComponentStorage)
+            .init_storage(size), ...);
+    }
+
+    template <
+        Component C,
+        template <Component...> typename Filter,
+        Component... Cs
+    >
+    static constexpr ComponentMaskT componentMaskBit(Filter<Cs...>)
+    {
+        ComponentMaskT mask;
+        mask.set(ParameterPackIndex_v<C, Cs...>, 1);
+        // static_assert(mask.any());
+        return mask;
+    }
+
 public:
-    EntityDatabase() = default;
+    /**
+     * \brief
+     * \param pool_mem_reserve_size Default = 2^32 entries for both Entity Page
+     * Pool and Component Pools.
+     */
+    explicit EntityDatabase(
+        const std::size_t pool_mem_reserve_size = 1ull << 32)
+    {
+        reserve_entity_page_storage(pool_mem_reserve_size);
+        reserve_component_storage(pool_mem_reserve_size, ComponentFilterT());
+    }
 
     template <Component C>
     static constexpr ComponentMaskT componentMaskBit()
     {
-        ComponentMaskT mask;
-        mask.set(ParameterPackIndex_v<C, EnabledComponents...>, 1);
-        // static_assert(mask.any());
-        return mask;
+        return componentMaskBit<C>(ComponentFilterT());
     }
 
     template <Component... Components>
@@ -244,7 +301,7 @@ public:
     template <Component T>
     auto & componentStorage()
     {
-        return std::get<ComponentStorageT<T>>(mComponentStorage);
+        return std::get<SingleComponentStorageT<T>>(mComponentStorage);
     }
 };
 }

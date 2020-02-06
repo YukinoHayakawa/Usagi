@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <Usagi/Experimental/v2/Library/Concept/ReallocatableAllocator.hpp>
+#include <Usagi/Experimental/v2/Runtime/Memory/VirtualMemoryAllocator.hpp>
 
 namespace usagi
 {
@@ -23,7 +24,7 @@ namespace usagi
  */
 template <
     typename T,
-    ReallocatableAllocator Allocator
+    ReallocatableAllocator Allocator = VirtualMemoryAllocator<T>
 >
 class DynamicArray
 {
@@ -42,7 +43,12 @@ public:
     using const_reference = const value_type &;
     using size_type = std::size_t;
 
+    template <typename R>
+    using rebind = DynamicArray<R, Allocator>;
+
     // construct/copy/destroy
+
+    DynamicArray() = default;
 
     explicit DynamicArray(Allocator allocator) noexcept
         : mAllocator(std::move(allocator))
@@ -90,6 +96,14 @@ public:
     void shrink_to_fit()
     {
         reallocate_storage(mSize);
+    }
+
+    // Let the allocator reserve the memory range without committing.
+    // This shall only be called once and only if the allocator is not
+    // initialized.
+    void allocator_reserve(const std::size_t bytes)
+    {
+        mAllocator.reserve(bytes);
     }
 
     // element access
@@ -177,7 +191,7 @@ public:
     void clear() noexcept
     {
         for(std::size_t i = 0; i < mSize; ++i)
-            std::allocator_traits<Allocator>::destroy(mAllocator, mStorage[i]);
+            std::allocator_traits<Allocator>::destroy(mAllocator, &mStorage[i]);
         mSize = 0;
     }
 
@@ -191,7 +205,7 @@ private:
         if(mCapacity < new_size)
             reallocate_storage(new_size); // potentially throws
 
-        T *storage = mStorage[mSize];
+        T *storage = &mStorage[mSize];
         std::allocator_traits<Allocator>::construct(
             mAllocator, storage, std::forward<Args>(args)...
         );
@@ -211,7 +225,9 @@ private:
         // the objects on the freed region are already correctly destructed.
         const auto new_storage =
             mAllocator.reallocate(mStorage, sizeof T * size);
-        assert(new_storage == mStorage);
+        if(mStorage == nullptr)
+            mStorage = static_cast<T*>(new_storage);
+        assert(new_storage == static_cast<void*>(mStorage));
 
         mCapacity = size;
     }
