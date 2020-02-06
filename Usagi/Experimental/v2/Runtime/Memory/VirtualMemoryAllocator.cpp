@@ -10,8 +10,9 @@ namespace usagi
 {
 using namespace platform::kernel;
 
+// Strong exception guarantee
 std::size_t VirtualMemoryAllocator::round_up_allocation_size_checked(
-    std::size_t size_bytes) const
+    const std::size_t size_bytes) const
 {
     const auto new_committed_bytes =
         virtual_memory::round_up_to_page_size(size_bytes);
@@ -32,17 +33,21 @@ void VirtualMemoryAllocator::assert_allocation_happened() const
 
 VirtualMemoryAllocator::VirtualMemoryAllocator(const std::size_t reserved_bytes)
 {
-    const auto allocation = virtual_memory::allocate(mReservedBytes, false);
+    const auto allocation = virtual_memory::allocate(reserved_bytes, false);
     mBaseAddress = static_cast<char *>(allocation.base_address);
     mReservedBytes = allocation.length;
 }
 
 VirtualMemoryAllocator::~VirtualMemoryAllocator()
 {
+    // Ensure correct behavior of moved objects.
     if(mBaseAddress)
         virtual_memory::free(mBaseAddress, mReservedBytes);
+    mReservedBytes = 0;
+    mCommittedBytes = 0;
 }
 
+// Strong exception guarantee
 void * VirtualMemoryAllocator::allocate(const std::size_t size)
 {
     // If an allocation exists, fail all subsequent allocations.
@@ -54,12 +59,17 @@ void * VirtualMemoryAllocator::allocate(const std::size_t size)
 
     // Otherwise, commit the range of used memory and return the base address.
     virtual_memory::commit(mBaseAddress, new_committed_bytes);
+
+    // Commit changes to this object after successful operation
     mCommittedBytes = new_committed_bytes;
 
     return mBaseAddress;
 }
 
-void * VirtualMemoryAllocator::reallocate(void *old_ptr, std::size_t new_size)
+// Strong exception guarantee
+void * VirtualMemoryAllocator::reallocate(
+    void *old_ptr,
+    const std::size_t new_size)
 {
     if(old_ptr != mBaseAddress)
         USAGI_THROW(std::bad_alloc());
@@ -69,6 +79,7 @@ void * VirtualMemoryAllocator::reallocate(void *old_ptr, std::size_t new_size)
     const auto new_committed_bytes =
         round_up_allocation_size_checked(new_size);
 
+    // No change in amount of committed pages
     if(new_committed_bytes == mCommittedBytes)
         return mBaseAddress;
 
@@ -86,10 +97,13 @@ void * VirtualMemoryAllocator::reallocate(void *old_ptr, std::size_t new_size)
             mCommittedBytes - new_committed_bytes;
         virtual_memory::decommit(mBaseAddress + new_committed_bytes, distance);
     }
+
+    // Commit changes to this object after successful operation
     mCommittedBytes = new_committed_bytes;
     return mBaseAddress;
 }
 
+// Strong exception guarantee
 void VirtualMemoryAllocator::deallocate(void *ptr)
 {
     if(ptr != mBaseAddress)
