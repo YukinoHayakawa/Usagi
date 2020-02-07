@@ -45,8 +45,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -93,7 +93,10 @@
     <ClCompile Include="Core\Exception.cpp" />
     <ClCompile Include="Core\Logging.cpp" />
     <ClCompile Include="ECS\Game2.cpp" />
-    <ClCompile Include="Experimental\v2\Game\test.cpp" />
+    <ClCompile Include="Experimental\v2\Game\_test\StaticTestComponentConcept.cpp" />
+    <ClCompile Include="Experimental\v2\Game\_test\StaticTestComponentAccess.cpp" />
+    <ClCompile Include="Experimental\v2\Game\_test\StaticTestDatabaseAccess.cpp" />
+    <ClCompile Include="Experimental\v2\Runtime\Memory\VirtualMemoryAllocator.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\GameState.cpp" />
     <ClCompile Include="Game\GameStateManager.cpp" />
@@ -173,22 +176,33 @@
     <ClInclude Include="Core\Format.hpp" />
     <ClInclude Include="Experimental\v2\Game\Entity\Archetype.hpp" />
     <ClInclude Include="Experimental\v2\Game\Entity\Component.hpp" />
-    <ClInclude Include="Experimental\v2\Game\Concepts.hpp" />
-    <ClInclude Include="Experimental\v2\Game\details\AllowAllPermissionChecker.hpp" />
-    <ClInclude Include="Experimental\v2\Game\details\ComponentFilter.hpp" />
-    <ClInclude Include="Experimental\v2\Game\details\ComponentMask.hpp" />
-    <ClInclude Include="Experimental\v2\Game\details\EntityDatabaseInterface.hpp" />
-    <ClInclude Include="Experimental\v2\Game\details\EntityIterator.hpp" />
-    <ClInclude Include="Experimental\v2\Game\details\EntityView.hpp" />
-    <ClInclude Include="Experimental\v2\Game\details\SystemPermissionChecker.hpp" />
-    <ClInclude Include="Experimental\v2\Game\Entity\Entity.hpp" />
-    <ClInclude Include="Experimental\v2\Game\details\EntityDatabaseView.hpp" />
-    <ClInclude Include="Experimental\v2\Game\Database\EntityDatabase.hpp" />
-    <ClInclude Include="Experimental\v2\Game\details\EntityId.hpp" />
-    <ClInclude Include="Experimental\ECS\EntityManager.hpp" />
-    <ClInclude Include="Experimental\v2\Game\details\EntityPage.hpp" />
-    <ClInclude Include="Utility\Allocator\PoolAllocator.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentAccess.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentAccessAllowAll.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentAccessReadOnly.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentAccessSystemAttribute.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityPageIterator.hpp" />
+    <ClInclude Include="Experimental\v2\Library\Concept\Rebindable.hpp" />
+    <ClInclude Include="Experimental\v2\Library\Concept\ReallocatableAllocator.hpp" />
+    <ClInclude Include="Experimental\v2\Library\Container\DynamicArray.hpp" />
+    <ClInclude Include="Experimental\v2\Runtime\Platform\Kernel.hpp" />
+    <ClInclude Include="Experimental\v2\Runtime\RuntimeKernelServices.hpp" />
+    <ClInclude Include="Experimental\v2\Runtime\RuntimeServiceProvider.hpp" />
     <ClInclude Include="Experimental\v2\Game\System.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityDatabaseAccessExternal.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityDatabaseAccessInternal.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityDatabaseViewUnfiltered.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityIteratorFiltered.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentFilter.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentMask.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityIterator.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityView.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityDatabaseViewFiltered.hpp" />
+    <ClInclude Include="Experimental\v2\Game\Database\EntityDatabase.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityId.hpp" />
+    <ClInclude Include="Experimental\ECS\EntityManager.hpp" />
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityPage.hpp" />
+    <ClInclude Include="Experimental\v2\Runtime\Memory\VirtualMemoryAllocator.hpp" />
+    <ClInclude Include="Experimental\v2\Library\Memory\PoolAllocator.hpp" />
     <ClInclude Include="Math\Angle.hpp" />
     <ClInclude Include="Math\Bezier.hpp" />
     <ClInclude Include="Math\Bound.hpp" />
@@ -315,8 +329,10 @@
     <ClInclude Include="Utility\Functional.hpp" />
     <ClInclude Include="Utility\Hash.hpp" />
     <ClInclude Include="Utility\Iterator.hpp" />
+    <ClInclude Include="Utility\ParameterPackIndex.hpp" />
     <ClInclude Include="Utility\SortedArray.hpp" />
     <ClInclude Include="Utility\String.hpp" />
+    <ClInclude Include="Utility\PrintTimer.hpp" />
     <ClInclude Include="Utility\TypeTrait.hpp" />
     <ClInclude Include="Utility\Utf8Main.hpp" />
     <ClInclude Include="Utility\Math.hpp" />

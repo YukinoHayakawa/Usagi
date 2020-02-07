@@ -183,7 +183,16 @@
     <ClCompile Include="Core\Exception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Experimental\v2\Game\test.cpp">
+    <ClCompile Include="Experimental\v2\Runtime\Memory\VirtualMemoryAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\v2\Game\_test\StaticTestComponentAccess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\v2\Game\_test\StaticTestComponentConcept.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\v2\Game\_test\StaticTestDatabaseAccess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -734,40 +743,7 @@
     <ClInclude Include="Experimental\ECS\EntityManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\Allocator\PoolAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Experimental\v2\Game\Database\EntityDatabase.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\details\AllowAllPermissionChecker.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\details\ComponentFilter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\details\ComponentMask.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\details\EntityDatabaseInterface.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\details\EntityDatabaseView.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\details\EntityId.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\details\EntityIterator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\details\EntityPage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\details\EntityView.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\details\SystemPermissionChecker.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Experimental\v2\Game\Entity\Archetype.hpp">
@@ -776,13 +752,85 @@
     <ClInclude Include="Experimental\v2\Game\Entity\Component.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\Entity\Entity.hpp">
+    <ClInclude Include="Utility\ParameterPackIndex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Experimental\v2\Game\Concepts.hpp">
+    <ClInclude Include="Utility\PrintTimer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Experimental\v2\Game\System.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Runtime\RuntimeServiceProvider.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentAccessAllowAll.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentAccessReadOnly.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentAccessSystemAttribute.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentFilter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentMask.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityDatabaseViewFiltered.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityDatabaseViewUnfiltered.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityId.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityIterator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityIteratorFiltered.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityPage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityView.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\ComponentAccess.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityDatabaseAccessExternal.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityDatabaseAccessInternal.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Runtime\Memory\VirtualMemoryAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Library\Concept\ReallocatableAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Runtime\Platform\Kernel.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Library\Memory\PoolAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Runtime\RuntimeKernelServices.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Library\Concept\Rebindable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Game\_detail\EntityPageIterator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\v2\Library\Container\DynamicArray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
