@@ -12,9 +12,8 @@ class Archetype
     std::tuple<InitialComponents...> mInitialValues;
 
     template <
-        std::uint16_t   EntityPageSize,
-        typename        ComponentFilter,
-        typename        Storage
+        typename ComponentFilter,
+        typename Storage
     >
     friend class EntityDatabase;
 

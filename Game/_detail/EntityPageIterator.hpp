@@ -50,9 +50,9 @@ public:
         return dereference();
     }
 
-    reference operator->() const
+    pointer operator->() const
     {
-        return dereference();
+        return &dereference();
     }
 
     // Equality Comparators

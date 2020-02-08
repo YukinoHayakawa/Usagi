@@ -16,7 +16,7 @@ struct ComponentB
 {
 };
 
-using Database = EntityDatabase<16, ComponentFilter<ComponentA, ComponentB>>;
+using Database = EntityDatabase<ComponentFilter<ComponentA, ComponentB>>;
 
 using ArchetypeA = Archetype<ComponentA>;
 using ArchetypeB = Archetype<ComponentB>;

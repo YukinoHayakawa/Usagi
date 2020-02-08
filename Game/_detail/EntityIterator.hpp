@@ -27,6 +27,8 @@ public:
     using DatabaseT         = Database;
     using ComponentAccessT  = ComponentAccess;
     using PageIteratorT     = typename DatabaseT::EntityPageIteratorT;
+    using EntityPageT       = typename DatabaseT::EntityPageT;
+    using EntityIndexT      = typename EntityPageT::EntityIndexT;
 
     // Standard Iterator Traits
 
@@ -40,7 +42,7 @@ public:
 
 protected:
     PageIteratorT   mPageCursor     = this->entityPageBegin();
-    std::size_t     mIndexInPage    = 0;
+    EntityIndexT    mIndexInPage    = 0;
 
     auto currentView() const
     {
@@ -52,6 +54,12 @@ protected:
             this->mDatabase, &*mPageCursor, mIndexInPage);
     }
 
+    void next_page()
+    {
+        ++mPageCursor;
+        mIndexInPage = 0;
+    }
+
 public:
     explicit EntityIterator(DatabaseT *database)
         : EntityDatabaseAccessInternal<Database>(database)
@@ -61,7 +69,7 @@ public:
     EntityIterator(
         DatabaseT *database,
         PageIteratorT page_cursor,
-        const std::size_t index_in_page)
+        const EntityIndexT index_in_page)
         : EntityDatabaseAccessInternal<Database>(database)
         , mPageCursor(std::move(page_cursor))
         , mIndexInPage(index_in_page)
@@ -75,8 +83,7 @@ public:
         ++mIndexInPage;
         if(mIndexInPage == DatabaseT::ENTITY_PAGE_SIZE)
         {
-            ++mPageCursor;
-            mIndexInPage = 0;
+            next_page();
         }
         return *this;
     }

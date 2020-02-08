@@ -1,17 +1,16 @@
 ﻿#pragma once
 
 #include <tuple>
+#include <array>
 
 #include <Usagi/Experimental/v2/Game/_detail/ComponentAccessAllowAll.hpp>
 #include <Usagi/Experimental/v2/Game/_detail/ComponentFilter.hpp>
-#include <Usagi/Experimental/v2/Game/_detail/ComponentMask.hpp>
 #include <Usagi/Experimental/v2/Game/_detail/EntityId.hpp>
 #include <Usagi/Experimental/v2/Game/_detail/EntityIterator.hpp>
 #include <Usagi/Experimental/v2/Game/_detail/EntityPage.hpp>
 #include <Usagi/Experimental/v2/Game/_detail/EntityPageIterator.hpp>
 #include <Usagi/Experimental/v2/Game/Entity/Archetype.hpp>
 #include <Usagi/Experimental/v2/Library/Memory/PoolAllocator.hpp>
-#include <Usagi/Utility/ParameterPackIndex.hpp>
 
 namespace usagi
 {
@@ -20,22 +19,18 @@ namespace usagi
  * provides compile time access permission validation for the Executive
  * to prevent Systems from violating the data dependency.
  *
- * Entity Database consists of Entity Pages and Component Pages, each
- * allocated in the unit specified by EntityPageSize template parameter.
+ * Entity Database consists of Entity Pages and Component Pages.
  * The pages are stored in linear containers with internal pooling mechanism.
  * This arrangement makes it possible to directly dump and load the binary
  * data of the pages without any further processing. It is also possible to
  * map the memory onto disk files.
  *
- * \tparam EntityPageSize Number of entities stored in each page. The
- * components storage will allocate components in the same unit.
  * \tparam ComponentFilter List of allowed component types. There shall not
  * be two identical types in the list.
  */
 template <
-    std::uint16_t   EntityPageSize,
-    typename        ComponentFilter = ComponentFilter<>,
-    typename        Storage = PoolAllocator<int>
+    typename ComponentFilter = ComponentFilter<>,
+    typename Storage = PoolAllocator<int>
 >
 class EntityDatabase
 {
@@ -49,37 +44,24 @@ public:
     template <typename Database>
     friend class EntityPageIterator;
 
-    constexpr static std::size_t ENTITY_PAGE_SIZE = EntityPageSize;
-
 private:
-    template <Component... Components>
-    using PartialEntityPageT = EntityPage<
-        ENTITY_PAGE_SIZE, Components...
-    >;
-
     template<typename T>
     using StorageT = typename Storage::template rebind<T>;
 
 public:
     using ComponentFilterT      = ComponentFilter;
     using EntityPageT           =
-        typename ComponentFilter::template Apply<PartialEntityPageT>;
-    using ComponentMaskT        = typename EntityPageT::ComponentMaskT;
+        typename ComponentFilter::template Apply<EntityPage>;
     using EntityPageAllocatorT  = StorageT<EntityPageT>;
     using EntityPageIteratorT   = EntityPageIterator<EntityDatabase>;
     using EntityUserViewT = EntityView<EntityDatabase, ComponentAccessAllowAll>;
 
-private:
-    std::uint64_t mLastEntityId = 0;
-    std::size_t mFirstEntityPageIndex = EntityPageT::INVALID_PAGE;
-    EntityPageAllocatorT mEntityPages;
+    constexpr static std::size_t ENTITY_PAGE_SIZE = EntityPageT::PAGE_SIZE;
 
-    /**
-     * \brief Caches the disjunction of component flags in each page for
-     * faster page filtering.
-     */
-    // std::vector<ComponentMaskT> mPageDisjunctionMasks;
-    // std::vector<bool> mPageDisjunctionMaskDirtyFlags;
+private:
+    std::uint64_t           mLastEntityId = 0;
+    std::size_t             mFirstEntityPageIndex = EntityPageT::INVALID_PAGE;
+    EntityPageAllocatorT    mEntityPages;
 
     template <Component C>
     using SingleComponentStorageT = StorageT<std::array<C, ENTITY_PAGE_SIZE>>;
@@ -101,6 +83,7 @@ private:
     {
         std::size_t page_idx = mEntityPages.allocate();
         EntityPageT &page = mEntityPages.at(page_idx);
+
         std::allocator_traits<EntityPageAllocatorT>::construct(
             mEntityPages, &page
         );
@@ -109,7 +92,7 @@ private:
         // Singly linked list of pages
         page.next_page = mFirstEntityPageIndex;
 
-        mLastEntityId += EntityPageSize;
+        mLastEntityId += ENTITY_PAGE_SIZE;
         mFirstEntityPageIndex = page_idx;
 
         return EntityPageInfo {
@@ -181,19 +164,6 @@ private:
             .init_storage(size), ...);
     }
 
-    template <
-        Component C,
-        template <Component...> typename Filter,
-        Component... Cs
-    >
-    static constexpr ComponentMaskT componentMaskBit(Filter<Cs...>)
-    {
-        ComponentMaskT mask;
-        mask.set(ParameterPackIndex_v<C, Cs...>, 1);
-        // static_assert(mask.any());
-        return mask;
-    }
-
 public:
     /**
      * \brief
@@ -207,21 +177,6 @@ public:
         reserve_component_storage(pool_mem_reserve_size, ComponentFilterT());
     }
 
-    template <Component C>
-    static constexpr ComponentMaskT componentMaskBit()
-    {
-        return componentMaskBit<C>(ComponentFilterT());
-    }
-
-    template <Component... Components>
-    static constexpr ComponentMaskT buildComponentMask()
-    {
-        constexpr auto mask = (ComponentMaskT(0) | ... |
-            componentMaskBit<Components>());
-        // static_assert(mask.any());
-        return mask;
-    }
-
     template <typename ComponentAccess>
     auto createAccess()
     {
@@ -229,12 +184,6 @@ public:
             *this
         );
     }
-
-    // void markEntityDirty(const EntityId &id)
-    // {
-    //     // todo
-    // }
-    //
 
     auto entityView(const EntityId id)
     {

@@ -1,52 +1,98 @@
 ﻿#pragma once
 
-#include <array>
+#include <tuple>
 
 #include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
 
-#include "ComponentMask.hpp"
-
 namespace usagi
 {
-template <
-    std::uint16_t   NumEntities,
-    Component...    EnabledComponents
->
+template <Component... EnabledComponents>
 struct EntityPage
 {
-    using ComponentMaskT = ComponentMask<EnabledComponents...>;
+    // ============================ Types ============================== //
+
+    // Page size = 32
+    using EntityArrayT = std::uint32_t;
+
+    // Entity index range 0-31
+    using EntityIndexT = std::uint8_t;
+
     constexpr static std::size_t INVALID_PAGE = -1;
+    constexpr static EntityIndexT PAGE_SIZE = 32;
 
-    struct ComponentState
+    static_assert(PAGE_SIZE == CHAR_BIT * sizeof EntityArrayT);
+
+    template <Component C>
+    struct PageIndex // Wrapper class
     {
-        // Bitmask of created components of an entity
-        ComponentMaskT owned;
+        std::uint64_t index = INVALID_PAGE;
     };
 
     template <Component C>
-    struct PageIndex
+    struct ComponentEnableMask
     {
-        std::size_t index = INVALID_PAGE;
+        // The n-th bit is set if the n-th entity in this page has this
+        // component
+        EntityArrayT entity_array = 0;
     };
 
-    template <Component C>
-    std::size_t & componentPageIndex()
-    {
-        return std::get<PageIndex<C>>(component_page_indices).index;
-    }
+    // =========================== Metadata ============================= //
 
-    std::size_t next_page = INVALID_PAGE;
-    // Specify the range of entity id represented by this page
+    // singly linked list for page iteration. probably should be atomic.
+    std::uint64_t next_page = INVALID_PAGE;
+
+    // The id of the first entity in this page
     std::uint64_t first_entity_id = -1;
-    std::uint16_t first_unused_index = 0;
 
-    std::array<ComponentState, NumEntities> entity_states;
+    // The index of first empty entity available for allocation.
+    // This number only grows since entity ids are never reused.
+    // Range 0-31
+    std::uint8_t first_unused_index = 0;
 
-    // Bitwise-OR of component masks of all entities
-    // ComponentMaskT  page_component_mask;
+    // Any addition/removal of components or entities happened after previous
+    // reset of this flag
+    std::uint8_t dirty = false;
+
+    // ========================== Components ============================ //
+
+    std::tuple<ComponentEnableMask<EnabledComponents>...> component_masks;
 
     // index into the page pool of each component.
     // -1 if the page is not allocated
-    std::tuple<PageIndex<EnabledComponents>...> component_page_indices;
+    std::tuple<PageIndex<EnabledComponents>...> component_pages;
+
+    // =========================== Helpers ============================= //
+
+    template <Component C>
+    std::size_t & component_page_index()
+    {
+        return std::get<PageIndex<C>>(component_pages).index;
+    }
+
+    template <Component C>
+    auto & component_enable_mask()
+    {
+        return std::get<ComponentEnableMask<C>>(component_masks).entity_array;
+    }
+
+    template <Component C>
+    void set_component_bit(const EntityIndexT index)
+    {
+        // ideally a bts instruction
+        component_enable_mask<C>() |= 1u << index;
+    }
+
+    template <Component C>
+    void reset_component_bit(const EntityIndexT index)
+    {
+        // ideally a btr instruction
+        component_enable_mask<C>() &= ~(1u << index);
+    }
+
+    template <Component C>
+    bool component_bit(const EntityIndexT index)
+    {
+        return component_enable_mask<C>() & (1u << index);
+    }
 };
 }
