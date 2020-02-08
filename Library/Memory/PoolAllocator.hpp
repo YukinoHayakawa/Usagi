@@ -34,7 +34,7 @@ class PoolAllocator
 
     union Block
     {
-        std::size_t next;
+        std::size_t next = INVALID_BLOCK;
         T data;
 
         Block() { }
@@ -95,7 +95,7 @@ public:
     template <typename... Args>
     std::size_t allocate(Args &&...args)
     {
-        std::size_t idx = -1;
+        std::size_t idx;
         // Free block available -> use it
         if(mFreeListHead != INVALID_BLOCK)
         {
@@ -118,15 +118,8 @@ public:
         auto &fp = block(index);
 
         // Link the released block to the free list
-        if(mFreeListHead == INVALID_BLOCK)
-        {
-            mFreeListHead = index;
-        }
-        else
-        {
-            fp.next = mFreeListHead;
-            mFreeListHead = index;
-        }
+        fp.next = mFreeListHead;
+        mFreeListHead = index;
     }
 
     std::size_t size() const

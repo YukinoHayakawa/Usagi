@@ -37,6 +37,7 @@ private:
     typename EntityPageT::EntityArrayT mEntityIncludeMask;
     typename EntityPageT::EntityArrayT mEntityExcludeMask;
     typename EntityPageT::EntityArrayT mEntityFiltered;
+
     bool mUnencounteredPage = true;
 
     // only pay for what you use: only check for those components you are
@@ -48,7 +49,7 @@ private:
     bool check_include_component()
     {
         const auto mask = this->mPageCursor->
-            template component_enable_mask<C>();
+            template component_enabled_mask<C>();
 
         // no entity in this page has the designated component
         if(mask == 0)
@@ -72,7 +73,7 @@ private:
     bool check_exclude_component()
     {
         const auto mask = this->mPageCursor->
-            template component_enable_mask<C>();
+            template component_enabled_mask<C>();
 
         // all entity in this page have excluded component
         if(mask == -1)
