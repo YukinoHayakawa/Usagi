@@ -29,7 +29,7 @@ struct EntityPage
     };
 
     template <Component C>
-    struct ComponentEnableMask
+    struct ComponentEnabledMask
     {
         // The n-th bit is set if the n-th entity in this page has this
         // component
@@ -55,7 +55,7 @@ struct EntityPage
 
     // ========================== Components ============================ //
 
-    std::tuple<ComponentEnableMask<EnabledComponents>...> component_masks;
+    std::tuple<ComponentEnabledMask<EnabledComponents>...> component_masks;
 
     // index into the page pool of each component.
     // -1 if the page is not allocated
@@ -70,29 +70,29 @@ struct EntityPage
     }
 
     template <Component C>
-    auto & component_enable_mask()
+    auto & component_enabled_mask()
     {
-        return std::get<ComponentEnableMask<C>>(component_masks).entity_array;
+        return std::get<ComponentEnabledMask<C>>(component_masks).entity_array;
     }
 
     template <Component C>
     void set_component_bit(const EntityIndexT index)
     {
         // ideally a bts instruction
-        component_enable_mask<C>() |= 1u << index;
+        component_enabled_mask<C>() |= 1u << index;
     }
 
     template <Component C>
     void reset_component_bit(const EntityIndexT index)
     {
         // ideally a btr instruction
-        component_enable_mask<C>() &= ~(1u << index);
+        component_enabled_mask<C>() &= ~(1u << index);
     }
 
     template <Component C>
     bool component_bit(const EntityIndexT index)
     {
-        return component_enable_mask<C>() & (1u << index);
+        return component_enabled_mask<C>() & (1u << index);
     }
 };
 }

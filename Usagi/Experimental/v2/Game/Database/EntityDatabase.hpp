@@ -25,11 +25,11 @@ namespace usagi
  * data of the pages without any further processing. It is also possible to
  * map the memory onto disk files.
  *
- * \tparam ComponentFilter List of allowed component types. There shall not
+ * \tparam EnabledComponents List of allowed component types. There shall not
  * be two identical types in the list.
  */
 template <
-    typename ComponentFilter = ComponentFilter<>,
+    typename EnabledComponents = ComponentFilter<>,
     typename Storage = PoolAllocator<int>
 >
 class EntityDatabase
@@ -49,9 +49,9 @@ private:
     using StorageT = typename Storage::template rebind<T>;
 
 public:
-    using ComponentFilterT      = ComponentFilter;
+    using ComponentFilterT      = EnabledComponents;
     using EntityPageT           =
-        typename ComponentFilter::template Apply<EntityPage>;
+        typename EnabledComponents::template Apply<EntityPage>;
     using EntityPageAllocatorT  = StorageT<EntityPageT>;
     using EntityPageIteratorT   = EntityPageIterator<EntityDatabase>;
     using EntityUserViewT = EntityView<EntityDatabase, ComponentAccessAllowAll>;
@@ -67,7 +67,7 @@ private:
     using SingleComponentStorageT = StorageT<std::array<C, ENTITY_PAGE_SIZE>>;
 
     using ComponentStorageT =
-        typename ComponentFilter::template NestedApply<
+        typename EnabledComponents::template NestedApply<
             std::tuple,
             SingleComponentStorageT
         >;
@@ -160,8 +160,8 @@ private:
     template <template <Component...> typename Filter, Component... Cs>
     void reserve_component_storage(const std::size_t size, Filter<Cs...>)
     {
-        (std::get<SingleComponentStorageT<Cs>>(mComponentStorage)
-            .init_storage(size), ...);
+        (..., std::get<SingleComponentStorageT<Cs>>(mComponentStorage)
+            .init_storage(size));
     }
 
 public:
@@ -223,8 +223,8 @@ public:
             };
 
             // Initialize components for the new entity
-            ((view.template addComponent<InitialComponents>()
-                = archetype.template val<InitialComponents>()), ...);
+            (..., (view.template addComponent<InitialComponents>()
+                = archetype.template val<InitialComponents>()));
 
             last_entity_id = EntityId {
                 .page_id = page.index,
@@ -251,6 +251,74 @@ public:
     auto & componentStorage()
     {
         return std::get<SingleComponentStorageT<T>>(mComponentStorage);
+    }
+
+    /**
+     * \brief Release unused pages and clear dirty flags of pages.
+     */
+    void reclaim_pages()
+    {
+        std::size_t cur = mFirstEntityPageIndex;
+        std::size_t *prev_ptr = &mFirstEntityPageIndex;
+
+        while(cur != EntityPageT::INVALID_PAGE)
+        {
+            bool drop_page = true;
+            release_empty_component_pages(cur, ComponentFilterT(), drop_page);
+
+            EntityPageT &page = mEntityPages.at(cur);
+
+            if(drop_page)
+            {
+                // link previous page to the next page of current page
+                *prev_ptr = page.next_page;
+                // release page
+                mEntityPages.deallocate(cur);
+                // increment iteration position
+                cur = *prev_ptr;
+            }
+            else
+            {
+                // if next page was to be freed, this is the pointer to be
+                // updated.
+                prev_ptr = &page.next_page;
+                cur = page.next_page;
+            }
+        }
+    }
+
+private:
+    // returns if the page is entirely empty so it can be released
+    template <Component... C>
+    void release_empty_component_pages(
+        const std::size_t idx,
+        ComponentFilter<C...>,
+        bool &drop_page)
+    {
+        (..., release_empty_component_page<C>(idx, drop_page));
+    }
+
+    // returns if the component page is empty
+    template <Component C>
+    void release_empty_component_page(const std::size_t e_idx, bool &drop_page)
+    {
+        EntityPageT &page = mEntityPages.at(e_idx);
+        auto &c_idx = page.template component_page_index<C>();
+
+        // Not allocated
+        if(c_idx == EntityPageT::INVALID_PAGE)
+            return;
+
+        // Page in use
+        if(page.template component_enabled_mask<C>() != 0)
+        {
+            drop_page = false;
+            return;
+        }
+
+        // Free empty component page
+        componentStorage<C>().deallocate(c_idx);
+        c_idx = EntityPageT::INVALID_PAGE;
     }
 };
 }

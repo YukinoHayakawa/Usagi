@@ -49,7 +49,7 @@ class EntityView
     template <Component... C>
     void reset_component_bits(ComponentFilter<C...>)
     {
-        (mPage->template reset_component_bit<C>(mIndexInPage), ...);
+        (..., mPage->template reset_component_bit<C>(mIndexInPage));
     }
 
 public:
