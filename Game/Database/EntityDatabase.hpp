@@ -62,6 +62,8 @@ private:
     std::uint64_t           mLastEntityId = 0;
     std::size_t             mFirstEntityPageIndex = EntityPageT::INVALID_PAGE;
     EntityPageAllocatorT    mEntityPages;
+    // todo lockless
+    SpinLock                mEntityPageAllocationLock;
 
     template <Component C>
     using SingleComponentStorageT = StorageT<std::array<C, ENTITY_PAGE_SIZE>>;
@@ -88,12 +90,16 @@ private:
             mEntityPages, &page
         );
 
-        page.first_entity_id = mLastEntityId;
-        // Singly linked list of pages
-        page.next_page = mFirstEntityPageIndex;
+        {
+            std::lock_guard lock(mEntityPageAllocationLock);
 
-        mLastEntityId += ENTITY_PAGE_SIZE;
-        mFirstEntityPageIndex = page_idx;
+            page.first_entity_id = mLastEntityId;
+            // Singly linked list of pages
+            page.next_page = mFirstEntityPageIndex;
+
+            mLastEntityId += ENTITY_PAGE_SIZE;
+            mFirstEntityPageIndex = page_idx;
+        }
 
         return EntityPageInfo {
             .index = page_idx,
@@ -203,6 +209,11 @@ public:
         const std::size_t count,
         EntityIdOutputIterator id_output)
     {
+        // Note that if you create entities from multiple threads,
+        // the archetype must NOT be shared among the threads and ensure that
+        // only one thread is able to access the page referenced by
+        // the archetype.
+
         EntityPageInfo page = tryFindCoherentPage(archetype);
         EntityId last_entity_id;
 

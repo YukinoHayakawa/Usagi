@@ -39,6 +39,7 @@ private:
     typename EntityPageT::EntityArrayT mEntityFiltered;
 
     bool mUnencounteredPage = true;
+    BaseIteratorT mEnd;
 
     // only pay for what you use: only check for those components you are
     // interested in + early exit. more precise than bit-or of all entities.
@@ -95,7 +96,7 @@ private:
 
     void increment()
     {
-        while(this->mPageCursor != this->entityPageEnd())
+        while(*this != mEnd)
         {
             // Encountered a new page, perform early check
             if(mUnencounteredPage)
@@ -137,9 +138,12 @@ private:
     }
 
 public:
+    EntityIteratorFiltered() = default;
+
     explicit EntityIteratorFiltered(
         DatabaseT *database)
         : BaseIteratorT(database)
+        , mEnd(this->entity_page_end())
     {
         increment();
     }
@@ -147,8 +151,10 @@ public:
     EntityIteratorFiltered(
         DatabaseT *database,
         PageIteratorT page_cursor,
-        const EntityIndexT index_in_page)
+        const EntityIndexT index_in_page,
+        BaseIteratorT end)
         : BaseIteratorT(database, std::move(page_cursor), index_in_page)
+        , mEnd(std::move(end))
     {
         increment();
     }
