@@ -6,6 +6,8 @@
 #include <Usagi/Experimental/v2/Library/Container/DynamicArray.hpp>
 #include <Usagi/Experimental/v2/Library/Concept/Rebindable.hpp>
 
+#include "SpinLock.hpp"
+
 namespace usagi
 {
 /**
@@ -47,6 +49,8 @@ class PoolAllocator
     using StorageT = typename Container::template rebind<Block>;
     StorageT mStorage;
     std::size_t mFreeListHead = INVALID_BLOCK;
+    // todo lock free algorithm?
+    SpinLock mLock;
 
     Block & block(const std::size_t index)
     {
@@ -96,6 +100,9 @@ public:
     std::size_t allocate(Args &&...args)
     {
         std::size_t idx;
+
+        std::lock_guard lock(mLock);
+
         // Free block available -> use it
         if(mFreeListHead != INVALID_BLOCK)
         {
@@ -108,6 +115,7 @@ public:
             idx = mStorage.size();
             mStorage.emplace_back();
         }
+
         return idx;
     }
 
@@ -116,6 +124,8 @@ public:
         // Assume that the T in the block is correctly destructed,
         // which is none of our business.
         auto &fp = block(index);
+
+        std::lock_guard lock(mLock);
 
         // Link the released block to the free list
         fp.next = mFreeListHead;

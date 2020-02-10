@@ -38,12 +38,18 @@ public:
 
     auto begin()
     {
-        return IteratorT(this->mDatabase, this->entityPageBegin(), 0);
+        return IteratorT(
+            this->mDatabase, this->entity_page_begin(), 0,
+            { this->mDatabase, this->entity_page_end(), 0 }
+        );
     }
 
     auto end()
     {
-        return IteratorT(this->mDatabase, this->entityPageEnd(), 0);
+        return IteratorT(
+            this->mDatabase, this->entity_page_end(), 0,
+            { this->mDatabase, this->entity_page_end(), 0 }
+        );
     }
 };
 }

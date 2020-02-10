@@ -32,7 +32,7 @@ class EntityView
         auto &idx = mPage->template component_page_index<C>();
         auto &storage = this->mDatabase->template componentStorage<C>();
         // Ensure that the entity has the component
-        assert(hasComponents<C>());
+        assert(hasComponent<C>());
         assert(idx != DatabaseT::EntityPageT::INVALID_PAGE);
         // Access the component in the storage page
         return storage.at(idx)[mIndexInPage];

@@ -11,22 +11,27 @@ public:
 protected:
     DatabaseT *mDatabase = nullptr;
 
+    EntityDatabaseAccessInternal() = default;
+
     explicit EntityDatabaseAccessInternal(Database *database)
         : mDatabase(database)
     {
     }
 
-    auto entityPageBegin() const
+    auto entity_page_begin() const
     {
-        return EntityPageIterator<DatabaseT>(
-            mDatabase, mDatabase->mFirstEntityPageIndex
-        );
+        return entity_page_at_index(mDatabase->mFirstEntityPageIndex);
     }
 
-    auto entityPageEnd() const
+    auto entity_page_end() const
+    {
+        return entity_page_at_index(DatabaseT::EntityPageT::INVALID_PAGE);
+    }
+
+    auto entity_page_at_index(const std::size_t index) const
     {
         return EntityPageIterator<DatabaseT>(
-            mDatabase, DatabaseT::EntityPageT::INVALID_PAGE
+            mDatabase, index
         );
     }
 };

@@ -34,24 +34,25 @@ public:
 
     // todo: fix: in fact, this iterator returns a proxy object when dereferenced. since the proxy object is actually not a reference, this iterator does not satisfy any iterator category requirement.
     // boost::single_pass_traversal_tag
-    using iterator_category = std::input_iterator_tag;
+    using iterator_category = std::forward_iterator_tag;
     using value_type        = EntityView<DatabaseT, ComponentAccessT>;
-    using difference_type   = void;
+    using difference_type   = std::ptrdiff_t;
     using pointer           = void;
     using reference         = value_type;
 
 protected:
-    PageIteratorT   mPageCursor     = this->entityPageBegin();
+    PageIteratorT   mPageCursor;
     EntityIndexT    mIndexInPage    = 0;
 
     auto currentView() const
     {
         assert(this->mDatabase);
-        assert(mPageCursor != this->entityPageEnd());
+        assert(mPageCursor != this->entity_page_end());
         assert(mIndexInPage < DatabaseT::ENTITY_PAGE_SIZE);
 
         return EntityView<DatabaseT, ComponentAccessT>(
-            this->mDatabase, &*mPageCursor, mIndexInPage);
+            this->mDatabase, &mPageCursor.ref(), mIndexInPage
+        );
     }
 
     void next_page()
@@ -61,9 +62,12 @@ protected:
     }
 
 public:
+    EntityIterator() = default;
+
     explicit EntityIterator(DatabaseT *database)
         : EntityDatabaseAccessInternal<Database>(database)
     {
+        mPageCursor = this->entity_page_begin();
     }
 
     EntityIterator(
@@ -78,7 +82,7 @@ public:
 
     EntityIterator & operator++()
     {
-        assert(mPageCursor != this->entityPageEnd());
+        assert(mPageCursor != this->entity_page_end());
 
         ++mIndexInPage;
         if(mIndexInPage == DatabaseT::ENTITY_PAGE_SIZE)
@@ -107,8 +111,7 @@ public:
     {
         assert(lhs.mDatabase == rhs.mDatabase);
 
-        return lhs.mDatabase == rhs.mDatabase
-            && lhs.mPageCursor == rhs.mPageCursor
+        return lhs.mPageCursor == rhs.mPageCursor
             && lhs.mIndexInPage == rhs.mIndexInPage;
     }
 

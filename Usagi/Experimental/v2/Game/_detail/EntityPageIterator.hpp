@@ -8,22 +8,19 @@ template <typename Database>
 class EntityPageIterator
 {
 public:
-    using iterator_category = std::input_iterator_tag;
+    using iterator_category = std::forward_iterator_tag;
     using value_type        = typename Database::EntityPageT;
-    using difference_type   = int;
+    using difference_type   = std::ptrdiff_t;
     using pointer           = value_type *;
-    using reference         = value_type &;
+    using reference         = std::size_t;
 
 private:
     Database *mDatabase = nullptr;
     std::size_t mPageIndex = value_type::INVALID_PAGE;
 
-    reference dereference() const
-    {
-        return mDatabase->mEntityPages.at(mPageIndex);
-    }
-
 public:
+    EntityPageIterator() = default;
+
     EntityPageIterator(Database *database, const std::size_t page_index)
         : mDatabase(database)
         , mPageIndex(page_index)
@@ -34,7 +31,7 @@ public:
     {
         assert(mPageIndex != value_type::INVALID_PAGE);
 
-        mPageIndex = dereference().next_page;
+        mPageIndex = ref().next_page;
         return *this;
     }
 
@@ -45,14 +42,19 @@ public:
         return ret;
     }
 
+    auto & ref() const
+    {
+        return mDatabase->mEntityPages.at(mPageIndex);
+    }
+
     reference operator*() const
     {
-        return dereference();
+        return mPageIndex;
     }
 
     pointer operator->() const
     {
-        return &dereference();
+        return &ref();
     }
 
     // Equality Comparators
