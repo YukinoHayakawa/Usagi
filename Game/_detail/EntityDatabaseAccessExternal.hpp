@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Experimental/v2/Game/Entity/Archetype.hpp>
+#include <Usagi/Game/Entity/Archetype.hpp>
 
 #include "EntityDatabaseViewFiltered.hpp"
 #include "EntityDatabaseViewUnfiltered.hpp"

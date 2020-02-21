@@ -3,8 +3,8 @@
 #include <stdexcept>
 #include <cassert>
 
-#include <Usagi/Experimental/v2/Runtime/Platform/Kernel.hpp>
-#include <Usagi/Core/Exception.hpp>
+#include <Usagi/Runtime/Platform/Kernel.hpp>
+#include <Usagi/Runtime/ErrorHandling.hpp>
 
 namespace usagi
 {

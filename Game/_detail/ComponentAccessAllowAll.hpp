@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
+#include <Usagi/Game/Entity/Component.hpp>
 
 namespace usagi
 {

@@ -3,14 +3,14 @@
 #include <tuple>
 #include <array>
 
-#include <Usagi/Experimental/v2/Game/_detail/ComponentAccessAllowAll.hpp>
-#include <Usagi/Experimental/v2/Game/_detail/ComponentFilter.hpp>
-#include <Usagi/Experimental/v2/Game/_detail/EntityId.hpp>
-#include <Usagi/Experimental/v2/Game/_detail/EntityIterator.hpp>
-#include <Usagi/Experimental/v2/Game/_detail/EntityPage.hpp>
-#include <Usagi/Experimental/v2/Game/_detail/EntityPageIterator.hpp>
-#include <Usagi/Experimental/v2/Game/Entity/Archetype.hpp>
-#include <Usagi/Experimental/v2/Library/Memory/PoolAllocator.hpp>
+#include <Usagi/Game/_detail/ComponentAccessAllowAll.hpp>
+#include <Usagi/Game/_detail/ComponentFilter.hpp>
+#include <Usagi/Game/_detail/EntityId.hpp>
+#include <Usagi/Game/_detail/EntityIterator.hpp>
+#include <Usagi/Game/_detail/EntityPage.hpp>
+#include <Usagi/Game/_detail/EntityPageIterator.hpp>
+#include <Usagi/Game/Entity/Archetype.hpp>
+#include <Usagi/Library/Memory/PoolAllocator.hpp>
 
 namespace usagi
 {

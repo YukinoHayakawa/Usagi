@@ -2,8 +2,7 @@
 #include <memory>
 #include <vector>
 
-#include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
-#include <Usagi/Math/Matrix.hpp>
+#include <Usagi/Game/Entity/Component.hpp>
 
 namespace usagi
 {
@@ -21,12 +20,12 @@ static_assert(Component<Primitive> == true);
 
 // ============================================================================
 
-struct Math
-{
-    Vector3f a { 0, 0, 0};
-    Matrix4f b;
-};
-static_assert(Component<Math> == true);
+// struct Math
+// {
+//     Vector3f a { 0, 0, 0};
+//     Matrix4f b;
+// };
+// static_assert(Component<Math> == true);
 
 // ============================================================================
 

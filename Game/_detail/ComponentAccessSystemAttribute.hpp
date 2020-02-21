@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
-#include <Usagi/Experimental/v2/Game/System.hpp>
+#include <Usagi/Game/Entity/Component.hpp>
+#include <Usagi/Game/System.hpp>
 
 #include "ComponentAccess.hpp"
 

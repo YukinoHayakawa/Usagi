@@ -2,8 +2,8 @@
 
 #include <cassert>
 
-#include <Usagi/Experimental/v2/Game/Entity/Component.hpp>
-#include <Usagi/Experimental/v2/Library/Meta/Tag.hpp>
+#include <Usagi/Game/Entity/Component.hpp>
+#include <Usagi/Library/Meta/Tag.hpp>
 
 #include "EntityDatabaseAccessInternal.hpp"
 #include "ComponentAccess.hpp"

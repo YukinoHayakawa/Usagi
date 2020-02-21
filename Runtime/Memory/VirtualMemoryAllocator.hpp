@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-#include <Usagi/Experimental/v2/Library/Concept/ReallocatableAllocator.hpp>
+#include <Usagi/Library/Concept/ReallocatableAllocator.hpp>
 
 namespace usagi
 {

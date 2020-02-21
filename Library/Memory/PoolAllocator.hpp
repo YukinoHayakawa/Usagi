@@ -3,8 +3,8 @@
 #include <cassert>
 #include <cstddef>
 
-#include <Usagi/Experimental/v2/Library/Container/DynamicArray.hpp>
-#include <Usagi/Experimental/v2/Library/Concept/Rebindable.hpp>
+#include <Usagi/Library/Container/DynamicArray.hpp>
+#include <Usagi/Library/Concept/Rebindable.hpp>
 
 #include "SpinLock.hpp"
 
