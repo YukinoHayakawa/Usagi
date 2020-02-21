@@ -122,6 +122,7 @@
     <ClInclude Include="Runtime\ErrorHandling.hpp" />
     <ClInclude Include="Runtime\Memory\VirtualMemoryAllocator.hpp" />
     <ClInclude Include="Runtime\Platform\Kernel.hpp" />
+    <ClInclude Include="Runtime\Service.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\Memory\VirtualMemoryAllocator.cpp" />
