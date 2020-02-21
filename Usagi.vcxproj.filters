@@ -110,15 +110,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Game\_test\StaticTestComponentAccess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\_test\StaticTestComponentConcept.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\_test\StaticTestDatabaseAccess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\Memory\VirtualMemoryAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

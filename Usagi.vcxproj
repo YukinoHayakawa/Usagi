@@ -124,9 +124,6 @@
     <ClInclude Include="Runtime\Platform\Kernel.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Game\_test\StaticTestComponentAccess.cpp" />
-    <ClCompile Include="Game\_test\StaticTestComponentConcept.cpp" />
-    <ClCompile Include="Game\_test\StaticTestDatabaseAccess.cpp" />
     <ClCompile Include="Runtime\Memory\VirtualMemoryAllocator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
