@@ -7,7 +7,7 @@
 
 namespace usagi::platform::kernel
 {
-namespace virtual_memory
+namespace memory
 {
 // Get the page size in bytes.
 std::size_t page_size();

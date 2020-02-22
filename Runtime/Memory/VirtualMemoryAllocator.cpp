@@ -15,7 +15,7 @@ std::size_t VirtualMemoryAllocatorBase::round_up_allocation_size_checked(
     const std::size_t size_bytes) const
 {
     const auto new_committed_bytes =
-        virtual_memory::round_up_to_page_size(size_bytes);
+        memory::round_up_to_page_size(size_bytes);
 
     // If the requested size is larger than reserved size, fail.
     if(new_committed_bytes > mReservedBytes)
@@ -52,7 +52,7 @@ VirtualMemoryAllocatorBase::~VirtualMemoryAllocatorBase()
 {
     // Ensure correct behavior of moved objects.
     if(mBaseAddress)
-        virtual_memory::free(mBaseAddress, mReservedBytes);
+        memory::free(mBaseAddress, mReservedBytes);
     mReservedBytes = 0;
     mCommittedBytes = 0;
 }
@@ -62,7 +62,7 @@ void VirtualMemoryAllocatorBase::reserve(const std::size_t size_bytes)
     if(mBaseAddress)
         USAGI_THROW(std::runtime_error("Double initialization"));
 
-    const auto allocation = virtual_memory::allocate(size_bytes, false);
+    const auto allocation = memory::allocate(size_bytes, false);
     mBaseAddress = static_cast<char *>(allocation.base_address);
     mReservedBytes = allocation.length;
 }
@@ -80,7 +80,7 @@ void * VirtualMemoryAllocatorBase::allocate(const std::size_t size)
         round_up_allocation_size_checked(size);
 
     // Otherwise, commit the range of used memory and return the base address.
-    virtual_memory::commit(mBaseAddress, new_committed_bytes);
+    memory::commit(mBaseAddress, new_committed_bytes);
 
     // Commit changes to this object after successful operation
     mCommittedBytes = new_committed_bytes;
@@ -110,14 +110,14 @@ void * VirtualMemoryAllocatorBase::reallocate(
     {
         const auto distance =
             new_committed_bytes - mCommittedBytes;
-        virtual_memory::commit(mBaseAddress + mCommittedBytes, distance);
+        memory::commit(mBaseAddress + mCommittedBytes, distance);
     }
     // Release tail pages
     else
     {
         const auto distance =
             mCommittedBytes - new_committed_bytes;
-        virtual_memory::decommit(mBaseAddress + new_committed_bytes, distance);
+        memory::decommit(mBaseAddress + new_committed_bytes, distance);
     }
 
     // Commit changes to this object after successful operation
@@ -131,7 +131,7 @@ void VirtualMemoryAllocatorBase::deallocate(void *ptr)
     check_allocated_by_us(ptr);
     assert_allocation_happened();
 
-    virtual_memory::decommit(mBaseAddress, mCommittedBytes);
+    memory::decommit(mBaseAddress, mCommittedBytes);
     mCommittedBytes = 0;
 }
 }
