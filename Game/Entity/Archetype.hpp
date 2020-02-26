@@ -17,6 +17,7 @@ class Archetype
     >
     friend class EntityDatabase;
 
+    // bug: the page referred by this index could be invalid (freed or reused)
     std::size_t mLastUsedPageIndex = -1;
 
 public:

@@ -92,11 +92,17 @@
     <ClInclude Include="Library\Memory\SpinLock.hpp" />
     <ClInclude Include="Library\Meta\Tag.hpp" />
     <ClInclude Include="Runtime\ErrorHandling.hpp" />
+    <ClInclude Include="Runtime\File\MemoryMappedFile.hpp" />
+    <ClInclude Include="Runtime\File\RegularFile.hpp" />
+    <ClInclude Include="Runtime\Memory\Region.hpp" />
     <ClInclude Include="Runtime\Memory\VirtualMemoryAllocator.hpp" />
-    <ClInclude Include="Runtime\Platform\Kernel.hpp" />
+    <ClInclude Include="Runtime\Platform\File.hpp" />
+    <ClInclude Include="Runtime\Platform\Memory.hpp" />
     <ClInclude Include="Runtime\Service.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Runtime\File\MemoryMappedFile.cpp" />
+    <ClCompile Include="Runtime\File\RegularFile.cpp" />
     <ClCompile Include="Runtime\Memory\VirtualMemoryAllocator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

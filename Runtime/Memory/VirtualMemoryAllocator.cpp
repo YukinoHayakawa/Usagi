@@ -3,12 +3,12 @@
 #include <stdexcept>
 #include <cassert>
 
-#include <Usagi/Runtime/Platform/Kernel.hpp>
+#include <Usagi/Runtime/Platform/Memory.hpp>
 #include <Usagi/Runtime/ErrorHandling.hpp>
 
 namespace usagi
 {
-using namespace platform::kernel;
+using namespace platform;
 
 // Strong exception guarantee
 std::size_t VirtualMemoryAllocatorBase::round_up_allocation_size_checked(
