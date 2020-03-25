@@ -2,7 +2,7 @@
 
 #include <tuple>
 
-#include <Usagi/Game/_detail/ComponentFilter.hpp>
+#include <Usagi/Game/detail/ComponentFilter.hpp>
 
 namespace usagi
 {

@@ -60,7 +60,7 @@ public:
     }
 
     // This can be used with begin(), end() to implement parallelization
-    // with std::for_each. However, doing so might be efficient due to the
+    // with std::for_each. However, doing so might be inefficient due to the
     // amount of iterator pairs created. A better parallelization scheme
     // would divide the range of pages and directly iterate entities in the
     // divided ranges.

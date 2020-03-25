@@ -3,14 +3,15 @@
 #include <tuple>
 #include <array>
 
-#include <Usagi/Game/_detail/ComponentAccessAllowAll.hpp>
-#include <Usagi/Game/_detail/ComponentFilter.hpp>
-#include <Usagi/Game/_detail/EntityId.hpp>
-#include <Usagi/Game/_detail/EntityIterator.hpp>
-#include <Usagi/Game/_detail/EntityPage.hpp>
-#include <Usagi/Game/_detail/EntityPageIterator.hpp>
+#include <Usagi/Game/detail/ComponentAccessAllowAll.hpp>
+#include <Usagi/Game/detail/ComponentFilter.hpp>
+#include <Usagi/Game/detail/EntityId.hpp>
+#include <Usagi/Game/detail/EntityIterator.hpp>
+#include <Usagi/Game/detail/EntityPage.hpp>
+#include <Usagi/Game/detail/EntityPageIterator.hpp>
 #include <Usagi/Game/Entity/Archetype.hpp>
 #include <Usagi/Library/Memory/PoolAllocator.hpp>
+#include <Usagi/Library/Memory/LockGuard.hpp>
 
 namespace usagi
 {
@@ -91,7 +92,7 @@ private:
         );
 
         {
-            std::lock_guard lock(mEntityPageAllocationLock);
+            LockGuard lock(mEntityPageAllocationLock);
 
             page.first_entity_id = mLastEntityId;
             // Singly linked list of pages
