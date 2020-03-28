@@ -39,14 +39,6 @@ class EntityView
     }
 
     template <Component... C>
-    static constexpr auto buildComponentMask()
-    {
-        constexpr auto mask = DatabaseT::template buildComponentMask<C...>();
-        // static_assert(DatabaseT::template buildComponentMask<C...>() != 0);
-        return mask;
-    }
-
-    template <Component... C>
     void reset_component_bits(ComponentFilter<C...>)
     {
         (..., mPage->template reset_component_bit<C>(mIndexInPage));
