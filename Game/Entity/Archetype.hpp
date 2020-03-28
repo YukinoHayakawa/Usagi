@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <tuple>
+#include <cstdint>
 
 #include <Usagi/Game/detail/ComponentFilter.hpp>
 
@@ -17,7 +18,10 @@ class Archetype
     >
     friend class EntityDatabase;
 
-    // bug: the page referred by this index could be invalid (freed or reused)
+    // These two fields combinedly determine that whether the last used page
+    // can be reused. Beware that the the page index must refer to the same
+    // entity database.
+    std::uint64_t mLastUsedPageInitialId = -1;
     std::size_t mLastUsedPageIndex = -1;
 
 public:

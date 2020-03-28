@@ -144,7 +144,7 @@ private:
      * \return
      */
     template <Component... InitialComponents>
-    EntityPageInfo tryFindCoherentPage(
+    EntityPageInfo tryReuseCoherentPage(
             Archetype<InitialComponents...> &archetype)
     {
         const auto page_idx = archetype.mLastUsedPageIndex;
@@ -153,9 +153,20 @@ private:
         if(page_idx == -1)
             return allocateEntityPage();
 
+        // The page was deleted and the storage shrunk so the index refers to
+        // invalid memory
+        if(page_idx >= mEntityPages.size())
+            return allocateEntityPage();
+
+        auto ptr = &mEntityPages.at(page_idx);
+
+        // The page got recycled and was made into a new page
+        if(ptr->first_entity_id != archetype.mLastUsedPageInitialId)
+            return allocateEntityPage();
+
         return EntityPageInfo {
             .index = page_idx,
-            .ptr = &mEntityPages.at(page_idx)
+            .ptr = ptr
         };
     }
 
@@ -215,7 +226,7 @@ public:
         // only one thread is able to access the page referenced by
         // the archetype.
 
-        EntityPageInfo page = tryFindCoherentPage(archetype);
+        EntityPageInfo page = tryReuseCoherentPage(archetype);
         EntityId last_entity_id;
 
         for(std::size_t i = 0; i < count; ++i)
@@ -254,6 +265,9 @@ public:
             ++page.ptr->first_unused_index;
             // Record Page index hint
             archetype.mLastUsedPageIndex = page.index;
+            // The page may have been recycled and made into another page
+            // so check the id range to make sure it was the original one.
+            archetype.mLastUsedPageInitialId = page.ptr->first_entity_id;
         }
 
         return last_entity_id;
@@ -284,6 +298,9 @@ public:
             {
                 // link previous page to the next page of current page
                 *prev_ptr = page.next_page;
+                // clear the id range so it doesn't get accidentally
+                // recognized as a valid page
+                page.first_entity_id = -1;
                 // release page
                 mEntityPages.deallocate(cur);
                 // increment iteration position
