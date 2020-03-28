@@ -203,23 +203,23 @@ public:
         );
     }
 
-    auto entityView(const EntityId id)
+    auto entity_view(const EntityId id)
     {
         return EntityUserViewT {
             this,
-            id.page_id,
+            &mEntityPages.at(id.page_idx),
             id.id % ENTITY_PAGE_SIZE
         };
     }
 
     template <
         Component... InitialComponents,
-        typename EntityIdOutputIterator
+        typename EntityIdOutputIterator = std::nullptr_t
     >
     auto create(
         Archetype<InitialComponents...> &archetype,
-        const std::size_t count,
-        EntityIdOutputIterator id_output)
+        const std::size_t count = 1,
+        EntityIdOutputIterator id_output = { })
     {
         // Note that if you create entities from multiple threads,
         // the archetype must NOT be shared among the threads and ensure that
@@ -250,7 +250,7 @@ public:
                 = archetype.template val<InitialComponents>()));
 
             last_entity_id = EntityId {
-                .page_id = page.index,
+                .page_idx = page.index,
                 .id = page.ptr->first_entity_id + page.ptr->first_unused_index
             };
 
