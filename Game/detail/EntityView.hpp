@@ -26,13 +26,13 @@ class EntityView
     EntityIndexT    mIndexInPage;
 
     template <Component C>
-    C & componentAccess() const
+    C & component_access() const
     {
         // Locate the component in the storage
         auto &idx = mPage->template component_page_index<C>();
-        auto &storage = this->mDatabase->template componentStorage<C>();
+        auto &storage = this->mDatabase->template component_storage<C>();
         // Ensure that the entity has the component
-        assert(hasComponent<C>());
+        assert(has_component<C>());
         assert(idx != DatabaseT::EntityPageT::INVALID_PAGE);
         // Access the component in the storage page
         return storage.at(idx)[mIndexInPage];
@@ -56,26 +56,26 @@ public:
     }
 
     template <Component C>
-    bool hasComponent() const
+    bool has_component() const
     {
         return mPage->template component_bit<C>(mIndexInPage);
     }
 
     template <Component... C>
-    bool hasComponents() const
+    bool has_components() const
     {
-        return (... || hasComponent<C>());
+        return (... || has_component<C>());
     }
 
     template <Component C>
-    C & addComponent() requires HasComponentWriteAccess<ComponentAccess, C>
+    C & add_component() requires HasComponentWriteAccess<ComponentAccess, C>
     {
         // Locate the component position in the storage
         auto &idx = mPage->template component_page_index<C>();
-        auto &storage = this->mDatabase->template componentStorage<C>();
+        auto &storage = this->mDatabase->template component_storage<C>();
 
         // The entity shouldn't have the requested entity
-        assert(!hasComponent<C>());
+        assert(!has_component<C>());
 
         // If the component page hasn't be allocated yet, allocate it.
         if(idx == EntityPageT::INVALID_PAGE)
@@ -94,20 +94,20 @@ public:
     }
 
     template <Component C>
-    decltype(auto) addComponent(Tag<C>)
+    decltype(auto) add_component(Tag<C>)
     {
-        return addComponent<C>();
+        return add_component<C>();
     }
 
     template <Component C>
-    void removeComponent() requires HasComponentWriteAccess<ComponentAccess, C>
+    void remove_component() requires HasComponentWriteAccess<ComponentAccess, C>
     {
         // Locate the component position in the storage
         auto &idx = mPage->template component_page_index<C>();
-        auto &storage = this->mDatabase->template componentStorage<C>();
+        auto &storage = this->mDatabase->template component_storage<C>();
 
         // The entity should have the requested entity
-        assert(hasComponent<C>());
+        assert(has_component<C>());
         assert(idx != EntityPageT::INVALID_PAGE);
 
         mPage->template reset_component_bit<C>(mIndexInPage);
@@ -116,9 +116,9 @@ public:
     }
 
     template <Component C>
-    void removeComponent(Tag<C>)
+    void remove_component(Tag<C>)
     {
-        removeComponent<C>();
+        remove_component<C>();
     }
 
     // todo requires perm of all existing components?
@@ -140,7 +140,7 @@ public:
     C & component() requires
         HasComponentWriteAccess<ComponentAccess, C>
     {
-        return componentAccess<C>();
+        return component_access<C>();
     }
 
     /**
@@ -153,7 +153,7 @@ public:
         !HasComponentWriteAccess<ComponentAccess, C>
         && HasComponentReadAccess<ComponentAccess, C>
     {
-        return componentAccess<C>();
+        return component_access<C>();
     }
 };
 

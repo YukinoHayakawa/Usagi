@@ -61,7 +61,9 @@ public:
 
 private:
     std::uint64_t           mLastEntityId = 0;
+    // A linked list of entities is maintained in the order of entity id
     std::size_t             mFirstEntityPageIndex = EntityPageT::INVALID_PAGE;
+    std::size_t             mLastEntityPageIndex = EntityPageT::INVALID_PAGE;
     EntityPageAllocatorT    mEntityPages;
     // todo lockless
     SpinLock                mEntityPageAllocationLock;
@@ -82,7 +84,7 @@ private:
         EntityPageT *ptr = nullptr;
     };
 
-    EntityPageInfo allocateEntityPage()
+    EntityPageInfo allocate_entity_page()
     {
         std::size_t page_idx = mEntityPages.allocate();
         EntityPageT &page = mEntityPages.at(page_idx);
@@ -95,11 +97,29 @@ private:
             LockGuard lock(mEntityPageAllocationLock);
 
             page.first_entity_id = mLastEntityId;
-            // Singly linked list of pages
-            page.next_page = mFirstEntityPageIndex;
+
+            // Insert the new page at the end of linked list so that the
+            // entities are accessed in the incremental order of entity id
+            // when being iterated
+
+            // The linked list is empty and we are inserting the first page
+            if(mFirstEntityPageIndex == EntityPageT::INVALID_PAGE)
+            {
+                assert(mLastEntityPageIndex == EntityPageT::INVALID_PAGE);
+                mFirstEntityPageIndex = page_idx;
+                mLastEntityPageIndex = page_idx;
+            }
+            // The linked list has at least one page
+            else
+            {
+                assert(mLastEntityPageIndex != EntityPageT::INVALID_PAGE);
+                auto &last = mEntityPages.at(mLastEntityPageIndex);
+                assert(last.next_page == EntityPageT::INVALID_PAGE);
+                last.next_page = page_idx;
+                mLastEntityPageIndex = page_idx;
+            }
 
             mLastEntityId += ENTITY_PAGE_SIZE;
-            mFirstEntityPageIndex = page_idx;
         }
 
         return EntityPageInfo {
@@ -144,25 +164,25 @@ private:
      * \return
      */
     template <Component... InitialComponents>
-    EntityPageInfo tryReuseCoherentPage(
+    EntityPageInfo try_reuse_coherent_page(
             Archetype<InitialComponents...> &archetype)
     {
         const auto page_idx = archetype.mLastUsedPageIndex;
 
         // If this is a new Archetype instance, return a new page
         if(page_idx == -1)
-            return allocateEntityPage();
+            return allocate_entity_page();
 
         // The page was deleted and the storage shrunk so the index refers to
         // invalid memory
         if(page_idx >= mEntityPages.size())
-            return allocateEntityPage();
+            return allocate_entity_page();
 
         auto ptr = &mEntityPages.at(page_idx);
 
         // The page got recycled and was made into a new page
         if(ptr->first_entity_id != archetype.mLastUsedPageInitialId)
-            return allocateEntityPage();
+            return allocate_entity_page();
 
         return EntityPageInfo {
             .index = page_idx,
@@ -196,7 +216,7 @@ public:
     }
 
     template <typename ComponentAccess>
-    auto createAccess()
+    auto create_access()
     {
         return EntityDatabaseAccess<EntityDatabase, ComponentAccess>(
             *this
@@ -226,7 +246,7 @@ public:
         // only one thread is able to access the page referenced by
         // the archetype.
 
-        EntityPageInfo page = tryReuseCoherentPage(archetype);
+        EntityPageInfo page = try_reuse_coherent_page(archetype);
         EntityId last_entity_id;
 
         for(std::size_t i = 0; i < count; ++i)
@@ -236,7 +256,7 @@ public:
             // When the Page becomes empty, the Page will be recycled.
             if(page.ptr->first_unused_index == ENTITY_PAGE_SIZE)
             {
-                page = allocateEntityPage();
+                page = allocate_entity_page();
             }
 
             // todo: insert data by components instead of entities
@@ -246,7 +266,7 @@ public:
             };
 
             // Initialize components for the new entity
-            (..., (view.template addComponent<InitialComponents>()
+            (..., (view.template add_component<InitialComponents>()
                 = archetype.template val<InitialComponents>()));
 
             last_entity_id = EntityId {
@@ -274,7 +294,7 @@ public:
     }
 
     template <Component T>
-    auto & componentStorage()
+    auto & component_storage()
     {
         return std::get<SingleComponentStorageT<T>>(mComponentStorage);
     }
@@ -285,7 +305,8 @@ public:
     void reclaim_pages()
     {
         std::size_t cur = mFirstEntityPageIndex;
-        std::size_t *prev_ptr = &mFirstEntityPageIndex;
+        std::size_t *prev_next_ptr = &mFirstEntityPageIndex;
+        std::size_t prev = EntityPageT::INVALID_PAGE;
 
         while(cur != EntityPageT::INVALID_PAGE)
         {
@@ -296,21 +317,36 @@ public:
 
             if(drop_page)
             {
-                // link previous page to the next page of current page
-                *prev_ptr = page.next_page;
+                // link the previous page to the next page of current page.
+                // if this is the only page, this clears the linked list
+                // by setting mFirstEntityPageIndex to INVALID_PAGE because
+                // page.next_page would have that value.
+                *prev_next_ptr = page.next_page;
+                // this is the last page
+                if(page.next_page == EntityPageT::INVALID_PAGE)
+                {
+                    assert(cur == mLastEntityPageIndex);
+                    // if this was the only page, the list becomes empty
+                    mLastEntityPageIndex = prev;
+                }
                 // clear the id range so it doesn't get accidentally
                 // recognized as a valid page
                 page.first_entity_id = -1;
                 // release page
                 mEntityPages.deallocate(cur);
-                // increment iteration position
-                cur = *prev_ptr;
+                // increment iteration position.
+                // prev_ptr always points to a valid memory position even
+                // if the list was empty. when that is the case, it just
+                // points to mFirstEntityPageIndex.
+                cur = *prev_next_ptr;
+                // in this case the prev index doesn't have to updated
             }
             else
             {
                 // if next page was to be freed, this is the pointer to be
                 // updated.
-                prev_ptr = &page.next_page;
+                prev_next_ptr = &page.next_page;
+                prev = cur;
                 cur = page.next_page;
             }
         }
@@ -346,7 +382,7 @@ private:
         }
 
         // Free empty component page
-        componentStorage<C>().deallocate(c_idx);
+        component_storage<C>().deallocate(c_idx);
         c_idx = EntityPageT::INVALID_PAGE;
     }
 };
