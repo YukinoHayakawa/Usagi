@@ -123,6 +123,12 @@ private:
                 mUnencounteredPage = false;
             }
 
+            // Prevent accessing entities haven't been allocated
+            mEntityFiltered = _bzhi_u32(
+                mEntityFiltered,
+                this->mPageCursor->first_unused_index
+            );
+
             // No eligible entity left in this page.
             if(mEntityFiltered == 0)
             {

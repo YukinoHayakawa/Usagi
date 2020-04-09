@@ -84,6 +84,12 @@ public:
     {
         assert(mPageCursor != this->entity_page_end());
 
+        // beware that unfiltered entity iterators don't check for whether the
+        // position is before first_unused_index of the entity page. therefore,
+        // it is possible that data written to an entity not before
+        // first_unused_index could be overwritten by an insertion via
+        // an archetype.
+
         ++mIndexInPage;
         if(mIndexInPage == DatabaseT::ENTITY_PAGE_SIZE)
         {
