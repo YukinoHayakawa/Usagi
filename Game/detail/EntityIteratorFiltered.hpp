@@ -65,6 +65,8 @@ private:
     template <Component... C>
     bool check_include_components(ComponentFilter<C...>)
     {
+        // if sizeof...(C) == 0, this function returns true, turning this
+        // iterator into an unfiltered one.
         // guaranteed short circuiting based on left fold
         const bool predicate = (... && check_include_component<C>());
         return predicate;

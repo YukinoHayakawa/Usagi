@@ -244,7 +244,9 @@ public:
         // Note that if you create entities from multiple threads,
         // the archetype must NOT be shared among the threads and ensure that
         // only one thread is able to access the page referenced by
-        // the archetype.
+        // the archetype. Since entities are always created using archetypes
+        // and allocated pages are bound with the archetypes, it's guaranteed
+        // that no concurrent entity creation on one page will happen.
 
         EntityPageInfo page = try_reuse_coherent_page(archetype);
         EntityId last_entity_id;
@@ -323,9 +325,9 @@ public:
                 // page.next_page would have that value.
                 *prev_next_ptr = page.next_page;
                 // this is the last page
-                if(page.next_page == EntityPageT::INVALID_PAGE)
+                if(cur == mLastEntityPageIndex)
                 {
-                    assert(cur == mLastEntityPageIndex);
+                    assert(page.next_page == EntityPageT::INVALID_PAGE);
                     // if this was the only page, the list becomes empty
                     mLastEntityPageIndex = prev;
                 }

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "ComponentFilter.hpp"
-#include "EntityDatabaseViewUnfiltered.hpp"
+#include "EntityDatabaseAccessInternal.hpp"
 #include "EntityIteratorFiltered.hpp"
 
 namespace usagi
@@ -13,12 +13,8 @@ template <
     typename ExcludeFilter = ComponentFilter<>
 >
 class EntityDatabaseViewFiltered
-    : EntityDatabaseViewUnfiltered<Database, ComponentAccess>
+    : EntityDatabaseAccessInternal<Database>
 {
-    using BaseViewT = EntityDatabaseViewUnfiltered<
-        Database, ComponentAccess
-    >;
-
 public:
     using DatabaseT = Database;
     using ComponentAccessT = ComponentAccess;
@@ -32,7 +28,7 @@ public:
     >;
 
     explicit EntityDatabaseViewFiltered(DatabaseT *database)
-        : BaseViewT(database)
+        : EntityDatabaseAccessInternal<Database>(database)
     {
     }
 
