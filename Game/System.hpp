@@ -75,4 +75,12 @@ concept SystemHasReadAccessMask =
 template <typename T>
 concept SystemHasWriteAccessMask =
     System<T> && requires (T) { T::WriteAccess; };
+
+template <typename T>
+concept SystemHasReadAllAccess =
+    System<T> && requires (T) { T::ReadAllAccess; };
+
+template <typename T>
+concept SystemHasWriteAllAccess =
+    System<T> && requires (T) { T::WriteAllAccess; };
 }

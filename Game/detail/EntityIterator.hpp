@@ -44,7 +44,7 @@ protected:
     PageIteratorT   mPageCursor;
     EntityIndexT    mIndexInPage    = 0;
 
-    auto currentView() const
+    auto current_view() const
     {
         assert(this->mDatabase);
         assert(mPageCursor != this->entity_page_end());
@@ -107,7 +107,7 @@ public:
 
     reference operator*() const
     {
-        return currentView();
+        return current_view();
     }
 
     // Equality Comparators

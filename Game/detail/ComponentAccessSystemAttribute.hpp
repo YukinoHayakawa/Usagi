@@ -43,11 +43,13 @@ struct ComponentAccessSystemAttribute
 {
     template <Component C>
     static constexpr bool READ =
-        detail::ComponentReadMaskBitPresent<GameSystem, C>::value;
+        detail::ComponentReadMaskBitPresent<GameSystem, C>::value
+        || SystemHasReadAllAccess<GameSystem>;
 
     template <Component C>
     static constexpr bool WRITE =
-        detail::ComponentWriteMaskBitPresent<GameSystem, C>::value;
+        detail::ComponentWriteMaskBitPresent<GameSystem, C>::value
+        || SystemHasWriteAllAccess<GameSystem>;
 };
 
 // ============================================================================

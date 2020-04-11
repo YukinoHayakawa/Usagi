@@ -68,7 +68,8 @@ public:
     }
 
     template <Component C>
-    C & add_component() requires HasComponentWriteAccess<ComponentAccess, C>
+    C & add_component() requires
+        HasComponentWriteAccess<ComponentAccess, C>
     {
         // Locate the component position in the storage
         auto &idx = mPage->template component_page_index<C>();
@@ -100,7 +101,8 @@ public:
     }
 
     template <Component C>
-    void remove_component() requires HasComponentWriteAccess<ComponentAccess, C>
+    void remove_component() requires
+        HasComponentWriteAccess<ComponentAccess, C>
     {
         // Locate the component position in the storage
         auto &idx = mPage->template component_page_index<C>();
@@ -116,14 +118,20 @@ public:
     }
 
     template <Component C>
-    void remove_component(Tag<C>)
+    void remove_component(Tag<C>) requires
+        HasComponentWriteAccess<ComponentAccess, C>
     {
         remove_component<C>();
     }
 
-    // todo requires perm of all existing components?
-    // todo: release empty page
-    void destroy()
+    // requires write permissions to all components in the database.
+    // alternatively, only remove relevant components in an entity.
+    // if an entity does not have any component, it is considered removed.
+    void destroy() requires
+        HasComponentWriteAccesses<
+            ComponentAccess,
+            typename DatabaseT::ComponentFilterT
+        >
     {
         reset_component_bits(DatabaseT::ComponentFilterT());
 
