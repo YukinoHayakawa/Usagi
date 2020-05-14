@@ -15,7 +15,7 @@ concept Pageable =
 
 /*
 * A component is a set of semantically coherent variables, without any
-* direct references to memory and dynamic allocation so it is trvially
+* direct references to memory and dynamic allocation so it is trivially
 * copyable between devices.
 *
 * Alignment:

@@ -69,18 +69,18 @@ concept System = requires(T t)
 };
 
 template <typename T>
-concept SystemHasReadAccessMask =
+concept SystemDeclaresReadAccess =
     System<T> && requires (T) { T::ReadAccess; };
 
 template <typename T>
-concept SystemHasWriteAccessMask =
+concept SystemDeclaresWriteAccess =
     System<T> && requires (T) { T::WriteAccess; };
 
 template <typename T>
-concept SystemHasReadAllAccess =
+concept SystemDeclaresReadAllAccess =
     System<T> && requires (T) { T::ReadAllAccess; };
 
 template <typename T>
-concept SystemHasWriteAllAccess =
+concept SystemDeclaresWriteAllAccess =
     System<T> && requires (T) { T::WriteAllAccess; };
 }

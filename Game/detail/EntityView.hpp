@@ -69,7 +69,7 @@ public:
 
     template <Component C>
     C & add_component() requires
-        HasComponentWriteAccess<ComponentAccess, C>
+        CanWriteComponent<ComponentAccess, C>
     {
         // Locate the component position in the storage
         auto &idx = mPage->template component_page_index<C>();
@@ -102,7 +102,7 @@ public:
 
     template <Component C>
     void remove_component() requires
-        HasComponentWriteAccess<ComponentAccess, C>
+        CanWriteComponent<ComponentAccess, C>
     {
         // Locate the component position in the storage
         auto &idx = mPage->template component_page_index<C>();
@@ -119,7 +119,7 @@ public:
 
     template <Component C>
     void remove_component(Tag<C>) requires
-        HasComponentWriteAccess<ComponentAccess, C>
+        CanWriteComponent<ComponentAccess, C>
     {
         remove_component<C>();
     }
@@ -128,7 +128,7 @@ public:
     // alternatively, only remove relevant components in an entity.
     // if an entity does not have any component, it is considered removed.
     void destroy() requires
-        HasComponentWriteAccesses<
+        CanWriteComponentsByFilter<
             ComponentAccess,
             typename DatabaseT::ComponentFilterT
         >
@@ -146,7 +146,7 @@ public:
      */
     template <Component C>
     C & component() requires
-        HasComponentWriteAccess<ComponentAccess, C>
+        CanWriteComponent<ComponentAccess, C>
     {
         return component_access<C>();
     }
@@ -158,8 +158,8 @@ public:
      */
     template <Component C>
     const C & component() const requires
-        !HasComponentWriteAccess<ComponentAccess, C>
-        && HasComponentReadAccess<ComponentAccess, C>
+        !CanWriteComponent<ComponentAccess, C>
+        && CanReadComponent<ComponentAccess, C>
     {
         return component_access<C>();
     }
