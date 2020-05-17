@@ -64,8 +64,9 @@ namespace usagi
 template <typename T>
 concept System = requires(T t)
 {
-    // { T::ReadAccess };
-    // { T::WriteAccess };
+	// { T::ReadAccess };
+	// { T::WriteAccess };
+    requires true;
 };
 
 template <typename T>

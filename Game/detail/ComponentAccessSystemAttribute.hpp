@@ -91,7 +91,7 @@ constexpr ComponentAccess SystemHighestComponentAccess =
 // ============================================================================
 // Explicit System Component Access Filters
 // ============================================================================
-/*
+
 template <System GameSystem, bool = SystemDeclaresReadAccess<GameSystem>>
 struct ExplicitSystemComponentAccessTraitRead
 {
@@ -133,5 +133,11 @@ concept SystemExplicitComponentAccess =
         ExplicitSystemComponentAccessWrite<GameSystem>::
         template HAS_COMPONENT<Comp>)
 ;
-*/
+
+template <System GameSystem>
+using SystemExplicitComponentFilter =
+    FilterDeduplicatedT<FilterConcatenatedT<
+        ExplicitSystemComponentAccessRead<GameSystem>,
+        ExplicitSystemComponentAccessWrite<GameSystem>
+    >>;
 }

@@ -52,7 +52,7 @@ private:
 public:
     using ComponentFilterT      = EnabledComponents;
     using EntityPageT           =
-        typename EnabledComponents::template Apply<EntityPage>;
+        typename EnabledComponents::template rebind<EntityPage>;
     using EntityPageAllocatorT  = StorageT<EntityPageT>;
     using EntityPageIteratorT   = EntityPageIterator<EntityDatabase>;
     using EntityUserViewT = EntityView<EntityDatabase, ComponentAccessAllowAll>;
