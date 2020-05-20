@@ -72,7 +72,7 @@ private:
     using SingleComponentStorageT = StorageT<std::array<C, ENTITY_PAGE_SIZE>>;
 
     using ComponentStorageT =
-        typename EnabledComponents::template NestedApply<
+        typename EnabledComponents::template rebind_to_template<
             std::tuple,
             SingleComponentStorageT
         >;

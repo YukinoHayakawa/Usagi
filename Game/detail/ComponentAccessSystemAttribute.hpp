@@ -140,4 +140,34 @@ using SystemExplicitComponentFilter =
         ExplicitSystemComponentAccessRead<GameSystem>,
         ExplicitSystemComponentAccessWrite<GameSystem>
     >>;
+
+// ============================================================================
+// System Component Usage
+// ============================================================================
+
+template <System... Ss>
+struct SystemComponentUsageHelper;
+
+template <>
+struct SystemComponentUsageHelper<>
+{
+    using type = ComponentFilter<>;
+};
+
+template <System S, System... Ss>
+struct SystemComponentUsageHelper<S, Ss...>
+{
+    using type = FilterConcatenatedT<
+        FilterConcatenatedT<
+            ExplicitSystemComponentAccessRead<S>,
+            ExplicitSystemComponentAccessWrite<S>
+        >,
+        typename SystemComponentUsageHelper<Ss...>::type
+    >;
+};
+
+template <System... Ss>
+using SystemComponentUsage = FilterDeduplicatedT<
+    typename SystemComponentUsageHelper<Ss...>::type
+>;
 }

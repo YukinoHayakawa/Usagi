@@ -87,7 +87,7 @@ public:
         Archetype<InitialComponents...> &archetype,
         const std::size_t count = 1,
         EntityIdOutputIterator &&id_output = nullptr
-    ) requires (... && HasComponentWriteAccess<
+    ) requires (... && CanWriteComponent<
         ComponentAccessT, InitialComponents
     >)
     {
