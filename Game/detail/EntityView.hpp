@@ -133,7 +133,7 @@ public:
             typename DatabaseT::ComponentFilterT
         >
     {
-        reset_component_bits(DatabaseT::ComponentFilterT());
+        reset_component_bits(typename DatabaseT::ComponentFilterT());
 
         mPage->dirty = true;
     }
@@ -158,8 +158,8 @@ public:
      */
     template <Component C>
     const C & component() const requires
-        !CanWriteComponent<ComponentAccess, C>
-        && CanReadComponent<ComponentAccess, C>
+        (!CanWriteComponent<ComponentAccess, C>
+        && CanReadComponent<ComponentAccess, C>)
     {
         return component_access<C>();
     }

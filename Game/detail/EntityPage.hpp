@@ -20,7 +20,7 @@ struct EntityPage
     constexpr static std::size_t INVALID_PAGE = -1;
     constexpr static EntityIndexT PAGE_SIZE = 32;
 
-    static_assert(PAGE_SIZE == CHAR_BIT * sizeof EntityArrayT);
+    static_assert(PAGE_SIZE == CHAR_BIT * sizeof(EntityArrayT));
 
     template <Component C>
     struct PageIndex // Wrapper class

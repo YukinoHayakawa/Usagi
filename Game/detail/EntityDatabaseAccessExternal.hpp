@@ -16,9 +16,9 @@ class EntityDatabaseAccessExternal
     : protected EntityDatabaseAccessInternal<Database>
 {
 public:
-    using DatabaseT = Database;
-    using EntityPageT = typename DatabaseT::EntityPageT;
-    using ComponentAccessT = ComponentAccess;
+    using DatabaseT         = Database;
+    using EntityPageT       = typename DatabaseT::EntityPageT;
+    using ComponentAccessT  = ComponentAccess;
 
     EntityDatabaseAccessExternal() = default;
 

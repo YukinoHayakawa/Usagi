@@ -71,17 +71,17 @@ concept System = requires(T t)
 
 template <typename T>
 concept SystemDeclaresReadAccess =
-    System<T> && requires (T) { T::ReadAccess; };
+    System<T> && requires { typename T::ReadAccess; };
 
 template <typename T>
 concept SystemDeclaresWriteAccess =
-    System<T> && requires (T) { T::WriteAccess; };
+    System<T> && requires { typename T::WriteAccess; };
 
 template <typename T>
 concept SystemDeclaresReadAllAccess =
-    System<T> && requires (T) { T::ReadAllAccess; };
+    System<T> && requires { typename T::ReadAllAccess; };
 
 template <typename T>
 concept SystemDeclaresWriteAllAccess =
-    System<T> && requires (T) { T::WriteAllAccess; };
+    System<T> && requires { typename T::WriteAllAccess; };
 }

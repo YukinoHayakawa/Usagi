@@ -18,20 +18,20 @@ class EntityIteratorFiltered
     : EntityIterator<Database, ComponentAccess>
 {
 public:
-    using BaseIteratorT = EntityIterator<Database, ComponentAccess>;
-    using BaseIteratorT::DatabaseT;
-    using BaseIteratorT::ComponentAccessT;
-    using BaseIteratorT::PageIteratorT;
-    using BaseIteratorT::EntityPageT;
-    using BaseIteratorT::EntityIndexT;
+    using BaseIteratorT     = EntityIterator<Database, ComponentAccess>;
+    using DatabaseT         = typename BaseIteratorT::DatabaseT;
+    using ComponentAccessT  = typename BaseIteratorT::ComponentAccessT;
+    using PageIteratorT     = typename BaseIteratorT::PageIteratorT;
+    using EntityPageT       = typename BaseIteratorT::EntityPageT;
+    using EntityIndexT      = typename BaseIteratorT::EntityIndexT;
 
     // Standard Iterator Traits
 
-    using BaseIteratorT::iterator_category;
-    using BaseIteratorT::value_type;
-    using BaseIteratorT::difference_type;
-    using BaseIteratorT::pointer;
-    using BaseIteratorT::reference;
+    using iterator_category = typename BaseIteratorT::iterator_category;
+    using value_type = typename BaseIteratorT::value_type;
+    using difference_type = typename BaseIteratorT::difference_type;
+    using pointer = typename BaseIteratorT::pointer;
+    using reference = typename BaseIteratorT::reference;
 
 private:
     typename EntityPageT::EntityArrayT mEntityIncludeMask;

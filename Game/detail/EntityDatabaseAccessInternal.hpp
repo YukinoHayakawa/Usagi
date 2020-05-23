@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "EntityPageIterator.hpp"
+
 namespace usagi
 {
 template <typename Database>
