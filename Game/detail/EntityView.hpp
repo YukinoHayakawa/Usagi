@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cassert>
+#include <memory>
 
 #include <Usagi/Game/Entity/Component.hpp>
 #include <Usagi/Library/Meta/Tag.hpp>

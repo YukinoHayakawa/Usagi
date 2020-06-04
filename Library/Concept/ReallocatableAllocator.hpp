@@ -1,15 +1,15 @@
 ﻿#pragma once
 
-#include <cstddef>
+#include <concepts>
 
 namespace usagi
 {
 template <typename T>
 concept ReallocatableAllocator = requires (T t)
 {
-    { t.allocate(std::size_t()) } -> void *;
-    { t.reallocate(nullptr, std::size_t()) } -> void *;
-    { t.deallocate(nullptr) } -> void;
-    { t.max_size() } -> std::size_t;
+    { t.allocate(std::size_t()) } -> std::convertible_to<void *>;
+    { t.reallocate(nullptr, std::size_t()) } -> std::convertible_to<void *>;
+    { t.deallocate(nullptr) };
+    { t.max_size() } -> std::same_as<std::size_t>;
 };
 }

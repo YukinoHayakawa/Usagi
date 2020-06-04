@@ -224,7 +224,7 @@ private:
         // If the new capacity is smaller than the size, it is assumed that
         // the objects on the freed region are already correctly destructed.
         const auto new_storage =
-            mAllocator.reallocate(mStorage, sizeof T * size);
+            mAllocator.reallocate(mStorage, sizeof(T) * size);
         if(mStorage == nullptr)
             mStorage = static_cast<T*>(new_storage);
         assert(new_storage == static_cast<void*>(mStorage));

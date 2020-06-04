@@ -7,6 +7,7 @@
 #include <Usagi/Library/Concept/Rebindable.hpp>
 
 #include "SpinLock.hpp"
+#include "LockGuard.hpp"
 
 namespace usagi
 {
@@ -18,7 +19,8 @@ namespace usagi
  * does not change, otherwise the behavior for a T that is not memcpy-able is
  * undefined after the reallocation.
  *
- * Object lifetime is managed.
+ * Object lifetime is NOT managed. The client must initialize the allocated
+ * memory.
  *
  * TODO: lock-free
  * todo: dump & load from file
@@ -101,7 +103,7 @@ public:
     {
         std::size_t idx;
 
-        std::lock_guard lock(mLock);
+        LockGuard lock(mLock);
 
         // Free block available -> use it
         if(mFreeListHead != INVALID_BLOCK)
@@ -125,7 +127,7 @@ public:
         // which is none of our business.
         auto &fp = block(index);
 
-        std::lock_guard lock(mLock);
+        LockGuard lock(mLock);
 
         // Link the released block to the free list
         fp.next = mFreeListHead;
