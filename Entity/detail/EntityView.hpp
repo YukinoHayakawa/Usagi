@@ -3,7 +3,7 @@
 #include <cassert>
 #include <memory>
 
-#include <Usagi/Game/Entity/Component.hpp>
+#include <Usagi/Entity/Component.hpp>
 #include <Usagi/Library/Meta/Tag.hpp>
 
 #include "EntityDatabaseAccessInternal.hpp"

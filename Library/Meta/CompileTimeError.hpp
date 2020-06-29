@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace usagi
+namespace usagi::meta
 {
 template <typename T, typename AdditionalInfo, T SucceedValue>
 struct CompileTimeError

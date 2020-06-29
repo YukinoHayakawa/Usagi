@@ -2,7 +2,7 @@
 
 #include <tuple>
 
-#include <Usagi/Game/Entity/Component.hpp>
+#include <Usagi/Entity/Component.hpp>
 
 namespace usagi
 {

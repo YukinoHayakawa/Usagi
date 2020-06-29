@@ -3,15 +3,16 @@
 #include <tuple>
 #include <array>
 
-#include <Usagi/Game/detail/ComponentAccessAllowAll.hpp>
-#include <Usagi/Game/detail/ComponentFilter.hpp>
-#include <Usagi/Game/detail/EntityId.hpp>
-#include <Usagi/Game/detail/EntityIterator.hpp>
-#include <Usagi/Game/detail/EntityPage.hpp>
-#include <Usagi/Game/detail/EntityPageIterator.hpp>
-#include <Usagi/Game/Entity/Archetype.hpp>
 #include <Usagi/Library/Memory/PoolAllocator.hpp>
 #include <Usagi/Library/Memory/LockGuard.hpp>
+
+#include "Archetype.hpp"
+#include "detail/ComponentAccessAllowAll.hpp"
+#include "detail/ComponentFilter.hpp"
+#include "detail/EntityId.hpp"
+#include "detail/EntityIterator.hpp"
+#include "detail/EntityPage.hpp"
+#include "detail/EntityPageIterator.hpp"
 
 namespace usagi
 {

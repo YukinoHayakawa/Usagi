@@ -3,7 +3,7 @@
 #include <tuple>
 #include <cstdint>
 
-#include <Usagi/Game/detail/ComponentFilter.hpp>
+#include "detail/ComponentFilter.hpp"
 
 namespace usagi
 {
