@@ -20,13 +20,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -40,7 +37,6 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
@@ -50,7 +46,6 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -63,36 +58,44 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Game\Concepts.hpp" />
-    <ClInclude Include="Game\Database\EntityDatabase.hpp" />
-    <ClInclude Include="Game\Entity\Archetype.hpp" />
-    <ClInclude Include="Game\Entity\Component.hpp" />
-    <ClInclude Include="Game\System.hpp" />
-    <ClInclude Include="Game\detail\ComponentAccess.hpp" />
-    <ClInclude Include="Game\detail\ComponentAccessAllowAll.hpp" />
-    <ClInclude Include="Game\detail\ComponentAccessReadOnly.hpp" />
-    <ClInclude Include="Game\detail\ComponentAccessSystemAttribute.hpp" />
-    <ClInclude Include="Game\detail\ComponentFilter.hpp" />
-    <ClInclude Include="Game\detail\EntityDatabaseAccessExternal.hpp" />
-    <ClInclude Include="Game\detail\EntityDatabaseAccessInternal.hpp" />
-    <ClInclude Include="Game\detail\EntityDatabaseViewFiltered.hpp" />
-    <ClInclude Include="Game\detail\EntityDatabaseViewUnfiltered.hpp" />
-    <ClInclude Include="Game\detail\EntityId.hpp" />
-    <ClInclude Include="Game\detail\EntityIterator.hpp" />
-    <ClInclude Include="Game\detail\EntityIteratorFiltered.hpp" />
-    <ClInclude Include="Game\detail\EntityPage.hpp" />
-    <ClInclude Include="Game\detail\EntityPageIterator.hpp" />
-    <ClInclude Include="Game\detail\EntityPageViewFiltered.hpp" />
-    <ClInclude Include="Game\detail\EntityView.hpp" />
+    <ClInclude Include="Entity\EntityDatabase.hpp" />
+    <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />
+    <ClInclude Include="Executor\TaskGraph.hpp" />
+    <ClInclude Include="Entity\Archetype.hpp" />
+    <ClInclude Include="Entity\Component.hpp" />
+    <ClInclude Include="Entity\System.hpp" />
+    <ClInclude Include="Entity\detail\ComponentAccess.hpp" />
+    <ClInclude Include="Entity\detail\ComponentAccessAllowAll.hpp" />
+    <ClInclude Include="Entity\detail\ComponentAccessReadOnly.hpp" />
+    <ClInclude Include="Entity\detail\ComponentAccessSystemAttribute.hpp" />
+    <ClInclude Include="Entity\detail\ComponentFilter.hpp" />
+    <ClInclude Include="Entity\detail\EntityDatabaseAccessExternal.hpp" />
+    <ClInclude Include="Entity\detail\EntityDatabaseAccessInternal.hpp" />
+    <ClInclude Include="Entity\detail\EntityDatabaseViewFiltered.hpp" />
+    <ClInclude Include="Entity\detail\EntityDatabaseViewUnfiltered.hpp" />
+    <ClInclude Include="Entity\detail\EntityId.hpp" />
+    <ClInclude Include="Entity\detail\EntityIterator.hpp" />
+    <ClInclude Include="Entity\detail\EntityIteratorFiltered.hpp" />
+    <ClInclude Include="Entity\detail\EntityPage.hpp" />
+    <ClInclude Include="Entity\detail\EntityPageIterator.hpp" />
+    <ClInclude Include="Entity\detail\EntityPageViewFiltered.hpp" />
+    <ClInclude Include="Entity\detail\EntityView.hpp" />
+    <ClInclude Include="Executor\detail\CpgValidation.hpp" />
     <ClInclude Include="Library\Concept\ReallocatableAllocator.hpp" />
     <ClInclude Include="Library\Concept\Rebindable.hpp" />
     <ClInclude Include="Library\Container\DynamicArray.hpp" />
+    <ClInclude Include="Library\Graph\TopologicalSort.hpp" />
     <ClInclude Include="Library\Math\Rounding.hpp" />
     <ClInclude Include="Library\Memory\LockGuard.hpp" />
     <ClInclude Include="Library\Memory\PoolAllocator.hpp" />
     <ClInclude Include="Library\Memory\ReferenceCounted.hpp" />
     <ClInclude Include="Library\Memory\SpinLock.hpp" />
+    <ClInclude Include="Library\Meta\CompileTimeError.hpp" />
+    <ClInclude Include="Library\Graph\GraphAdjacencyMatrix.hpp" />
+    <ClInclude Include="Library\Meta\Stack.hpp" />
+    <ClInclude Include="Library\Meta\Queue.hpp" />
     <ClInclude Include="Library\Meta\Tag.hpp" />
+    <ClInclude Include="Library\Meta\Tuple.hpp" />
     <ClInclude Include="Runtime\ErrorHandling.hpp" />
     <ClInclude Include="Runtime\File\MemoryMappedFile.hpp" />
     <ClInclude Include="Runtime\File\RegularFile.hpp" />

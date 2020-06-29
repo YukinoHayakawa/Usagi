@@ -15,21 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game\Database\EntityDatabase.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\Entity\Archetype.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\Entity\Component.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\Concepts.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\System.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Library\Concept\ReallocatableAllocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -81,52 +66,91 @@
     <ClInclude Include="Library\Memory\LockGuard.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\ComponentAccess.hpp">
+    <ClInclude Include="Library\Meta\CompileTimeError.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\ComponentAccessAllowAll.hpp">
+    <ClInclude Include="Entity\EntityDatabase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\ComponentAccessReadOnly.hpp">
+    <ClInclude Include="Entity\Archetype.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\ComponentAccessSystemAttribute.hpp">
+    <ClInclude Include="Entity\Component.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\ComponentFilter.hpp">
+    <ClInclude Include="Entity\System.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\EntityDatabaseAccessExternal.hpp">
+    <ClInclude Include="Executor\TaskGraph.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\EntityDatabaseAccessInternal.hpp">
+    <ClInclude Include="Library\Meta\Queue.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\EntityDatabaseViewFiltered.hpp">
+    <ClInclude Include="Library\Meta\Stack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\EntityDatabaseViewUnfiltered.hpp">
+    <ClInclude Include="Library\Graph\GraphAdjacencyMatrix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\EntityId.hpp">
+    <ClInclude Include="Library\Graph\TopologicalSort.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\EntityIterator.hpp">
+    <ClInclude Include="Entity\detail\ComponentAccess.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\EntityIteratorFiltered.hpp">
+    <ClInclude Include="Entity\detail\ComponentAccessAllowAll.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\EntityPage.hpp">
+    <ClInclude Include="Entity\detail\ComponentAccessReadOnly.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\EntityPageIterator.hpp">
+    <ClInclude Include="Entity\detail\ComponentAccessSystemAttribute.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\EntityPageViewFiltered.hpp">
+    <ClInclude Include="Entity\detail\ComponentFilter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Game\detail\EntityView.hpp">
+    <ClInclude Include="Entity\detail\EntityDatabaseAccessExternal.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\detail\EntityDatabaseAccessInternal.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\detail\EntityDatabaseViewFiltered.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\detail\EntityDatabaseViewUnfiltered.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\detail\EntityId.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\detail\EntityIterator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\detail\EntityIteratorFiltered.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\detail\EntityPage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\detail\EntityPageIterator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\detail\EntityPageViewFiltered.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\detail\EntityView.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Tuple.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Executor\detail\CpgValidation.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Executor\detail\SystemAccessTraits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

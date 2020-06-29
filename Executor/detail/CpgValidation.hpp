@@ -14,7 +14,7 @@ enum class ErrorCode
     CPG_SHORTCUT_WRITE_SYSTEM,
 };
 
-using TaskGraphError = meta::CompileTimeError<
+using TaskGraphError = CompileTimeError<
     ErrorCode,
     int, // vertex index
     ErrorCode::SUCCEED
@@ -25,20 +25,22 @@ using TaskGraphErrorCode = TaskGraphError::ErrorCode;
 template <ErrorCode Code, int Vertex>
 using TaskGraphErrorCodeCheck = TaskGraphError::CheckErrorCode<Code, Vertex>;
 
-template <int Size>
-constexpr bool cpg_no_write_systems(const SystemPrecedenceGraph<Size> &cpg)
+template <std::size_t Size>
+constexpr bool sat_no_write_systems(const SystemAccessTraits<Size> &sat)
 {
     for(auto i = 0; i < Size; ++i)
     {
-        if(cpg.system_traits[i] == ComponentAccess::WRITE)
+        if(sat[i] == ComponentAccess::WRITE)
             return false;
     }
     return true;
 }
 
-template <int Size>
+template <int Size, std::size_t Ss = Size>
 constexpr TaskGraphErrorCode cpg_validate(
-    const SystemPrecedenceGraph<Size> &cpg)
+    const GraphAdjacencyMatrix<Size> &cpg,
+    const SystemAccessTraits<Ss> &sat
+)
 {
     // The cpg is validated as per the descriptions in:
     // https://yuki.moe/blog/index.php/2020/03/30/concurrent-entity-access/
@@ -46,7 +48,7 @@ constexpr TaskGraphErrorCode cpg_validate(
 
     // If all Systems are Read Systems, the dependencies among them are ignored.
 
-    if(cpg_no_write_systems(cpg))
+    if(sat_no_write_systems(sat))
         return TaskGraphErrorCode(ErrorCode::SUCCEED);
 
     // If there exists at least one Write System, the weight of the shortest
@@ -70,7 +72,9 @@ constexpr TaskGraphErrorCode cpg_validate(
     auto order = topological_sort(cpg);
     meta::Stack<Size> write_systems;
 
-    auto search = [&priority, &predecessor, &cpg, Begin, End](const int v)
+    auto search = [
+        &priority, &predecessor, &cpg, &sat, Begin, End
+    ](const int v)
     {
         int w = 0;
 
@@ -94,7 +98,7 @@ constexpr TaskGraphErrorCode cpg_validate(
             {
                 // link begin system to all systems with 0 in-degree
                 if(cpg.in_degree[i] > 0 ||
-                    cpg.system_traits[i] == ComponentAccess::NONE)
+                    sat[i] == ComponentAccess::NONE)
                     continue;
                 update(v, i);
             }
@@ -102,7 +106,7 @@ constexpr TaskGraphErrorCode cpg_validate(
         else
         {
             // this is expected to be either write or read, never none.
-            w = cpg.system_traits[v] == ComponentAccess::WRITE ? 1 : 0;
+            w = sat[v] == ComponentAccess::WRITE ? 1 : 0;
             // we have met a endpoint system, link it with the end system
             if(cpg.out_degree[v] == 0)
             {
@@ -126,10 +130,10 @@ constexpr TaskGraphErrorCode cpg_validate(
     while(!order.empty())
     {
         const auto s = order.pop();
-        if(cpg.system_traits[s] == ComponentAccess::NONE)
+        if(sat[s] == ComponentAccess::NONE)
             continue;
         // store write systems in reserve order
-        if(cpg.system_traits[s] == ComponentAccess::WRITE)
+        if(sat[s] == ComponentAccess::WRITE)
             write_systems.push(s);
         search(s);
     }
@@ -139,7 +143,7 @@ constexpr TaskGraphErrorCode cpg_validate(
     {
         const auto p = predecessor[cur];
         if(p == Begin) break;
-        if(cpg.system_traits[p] == ComponentAccess::WRITE)
+        if(sat[p] == ComponentAccess::WRITE)
         {
             const auto w = write_systems.pop();
             // an unmatch in the write system order. could be a write system
