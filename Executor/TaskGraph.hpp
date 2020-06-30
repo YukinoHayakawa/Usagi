@@ -4,6 +4,7 @@
 #include <Usagi/Entity/System.hpp>
 #include <Usagi/Entity/detail/ComponentAccessSystemAttribute.hpp>
 #include <Usagi/Library/Graph/GraphAdjacencyMatrix.hpp>
+#include <Usagi/Library/Graph/TopologicalSort.hpp>
 #include <Usagi/Library/Meta/Tuple.hpp>
 
 #include "detail/SystemAccessTraits.hpp"
@@ -52,15 +53,47 @@ public:
         return cpg;
     }
 
+    template <Component C>
+    constexpr GraphT transformed_component_precedence_graph() const
+    {
+        auto cpg = component_precedence_graph<C>();
+        // constexpr auto sat = system_access_traits<C>();
+        // constexpr auto tps = topological_sort(cpg);
+        //
+        // GraphT tcpg;
+        // int prev_sys = -1, next_sys = -1;
+        // while(!tps.empty())
+        // {
+        //
+        // }
+        // TODO impl transformation
+
+        return cpg;
+    }
+
     constexpr GraphT reduced_task_graph() const
     {
-        // for each type of component
-        // calculate cpg
-        // merge results into the base task graph
-        //
+        GraphT rtg;
+        rtg_helper(rtg, ComponentUsageT());
+        rtg.transitive_reduce();
+        return rtg;
     }
 
 private:
+    template <Component C>
+    constexpr void rtg_helper_c(GraphT &rtg) const
+    {
+        // calculate cpg & merge results into the base task graph
+        rtg |= transformed_component_precedence_graph<C>();
+    }
+
+    template <Component... Cs>
+    constexpr void rtg_helper(GraphT &rtg, ComponentFilter<Cs...>) const
+    {
+        // for each type of component
+        (..., rtg_helper_c<Cs>(rtg));
+    }
+
     template <Component C, std::size_t From, std::size_t To>
     constexpr void cpg_helper_edge(GraphT &cpg) const
     {
