@@ -1,6 +1,8 @@
 ﻿#pragma once
 
-namespace usagi
+#include <cstddef>
+
+namespace usagi::graph
 {
 template <int Size>
 struct AdjacencyMatrixFixed
@@ -11,10 +13,75 @@ struct AdjacencyMatrixFixed
 
     constexpr static std::size_t SIZE = Size;
 
-    static constexpr std::size_t size()
+    static constexpr std::size_t num_vertices()
     {
         return Size;
     }
+
+    /*
+     * Visitor Ranges
+     */
+
+    struct AdjacentVertexIterator
+    {
+        const AdjacencyMatrixFixed *instance = nullptr;
+        const int v = -1;
+        int i = -1;
+
+        constexpr int operator*() const
+        {
+            return i;
+        }
+
+        constexpr AdjacentVertexIterator & operator++()
+        {
+            while(true)
+            {
+                ++i;
+                if(i >= Size) break;
+                if(instance->has_edge(v, i)) break;
+            }
+            return *this;
+        }
+
+        constexpr bool operator==(const AdjacentVertexIterator &rhs) const
+        {
+            // todo: check iterator compatibility
+            return i == rhs.i;
+        }
+    };
+
+    struct AdjacentVertexRange
+    {
+        const AdjacencyMatrixFixed *instance = nullptr;
+        const int v = -1;
+
+        constexpr auto begin() const
+        {
+            auto iter = AdjacentVertexIterator { instance, v, -1 };
+            ++iter;
+            return iter;
+        }
+
+        constexpr auto end() const
+        {
+            return AdjacentVertexIterator { instance, v, Size };
+        }
+    };
+
+    constexpr auto adjacent_vertices(const int v) const
+    {
+        return AdjacentVertexRange { this, v };
+        // range-v3 doesn't really work with constexpr
+        // return ints(0, Size) | filter([this, v](const int u) constexpr
+        // {
+            // return has_edge(v, u);
+        // });
+    }
+
+    /*
+     * Edge Operations
+     */
 
     constexpr void add_edge(const int from, const int to)
     {
@@ -30,15 +97,19 @@ struct AdjacencyMatrixFixed
         --out_degree[from];
     }
 
-    constexpr bool is_root(const int v) const
-    {
-        return in_degree[v] == 0;
-    }
-
     constexpr bool has_edge(const int from, const int to) const
     {
         return matrix[from][to] != 0;
     }
+
+    constexpr bool is_source(const int v) const
+    {
+        return in_degree[v] == 0;
+    }
+
+    /*
+     * Equality Comparator
+     */
 
     constexpr bool equal(const AdjacencyMatrixFixed &rhs) const
     {

@@ -8,7 +8,7 @@ namespace usagi::graph
 namespace detail
 {
 template <
-    concepts::DirectedGraph Graph,
+    concepts::DirectedAcyclicGraph Graph,
     concepts::Stack<int> Stack = meta::Stack<Graph::Size>,
     typename Array = std::array<bool, Graph::Size>
 >
@@ -21,14 +21,10 @@ constexpr void topological_sort_helper(
     visited[v] = true;
 
     // visit children of v
-    for(auto i = 0; i < g.size(); ++i)
+    for(auto &&c : g.adjacent_vertices(v))
     {
-        // not child of v
-        if(g.matrix[v][i] == false)
-            continue;
-
-        if(!visited[i])
-            topological_sort_helper(g, i, stack, visited);
+        if(!visited[c])
+            topological_sort_helper(g, c, stack, visited);
     }
 
     // ensure the current vertex precedes the children when popping
@@ -39,7 +35,7 @@ constexpr void topological_sort_helper(
 
 // Ref: https://www.geeksforgeeks.org/topological-sorting/
 template <
-    concepts::DirectedGraph Graph,
+    concepts::DirectedAcyclicGraph Graph,
     concepts::Stack<int> Stack = meta::Stack<Graph::SIZE>,
     typename Array = std::array<bool, Graph::SIZE>
 >
@@ -48,7 +44,7 @@ constexpr auto topological_sort(const Graph &g)
     Stack stack;
     Array visited { };
 
-    for(auto v = 0; v < g.size(); ++v)
+    for(auto v = 0; v < g.num_vertices(); ++v)
         if(!visited[v])
             detail::topological_sort_helper(g, v, stack, visited);
 

@@ -26,19 +26,19 @@ constexpr bool is_cyclic_helper(
         visiting[v] = true;
 
         // visit children of v
-        for(auto i = 0; i < g.size(); ++i)
+        for(auto &&c : g.adjacent_vertices(v))
         {
             // not connected
-            if(g.has_edge(v, i) == false)
+            if(g.has_edge(v, c) == false)
                 continue;
             // new child, dive in
-            if(!visited[i])
+            if(!visited[c])
             {
-                if(is_cyclic_helper(g, i, visited, visiting))
+                if(is_cyclic_helper(g, c, visited, visiting))
                     return true;
             }
             // getting back to one of the ancestor -> a cycle was found
-            else if(visiting[i])
+            else if(visiting[c])
                 return true;
         }
 
@@ -58,7 +58,7 @@ constexpr bool is_cyclic(const Graph &g)
     BitArray visited { };
     BitArray visiting { };
 
-    for(auto i = 0; i < g.size(); ++i)
+    for(auto i = 0; i < g.num_vertices(); ++i)
     {
         if(detail::is_cyclic_helper(g, i, visited, visiting))
             return true;

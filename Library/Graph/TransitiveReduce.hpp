@@ -6,42 +6,35 @@ namespace usagi::graph
 {
 namespace detail
 {
-template <concepts::DirectedGraph Graph>
+template <concepts::DirectedAcyclicGraph Graph>
 constexpr void transitive_reduce_helper(
     Graph &g,
     const int v,
     const int child)
 {
     // visit indirect descendents of v through child
-    for(auto i = 0; i < g.size(); ++i)
+    for(auto &&c : g.adjacent_vertices(child))
     {
-        if(g.has_edge(child, i) == false)
-            continue;
-
         // otherwise, there is an indirect path from v to i, remove the
         // direct path from v to i.
-        g.remove_edge(v, i);
+        g.remove_edge(v, c);
 
-        transitive_reduce_helper(g, v, i);
+        transitive_reduce_helper(g, v, c);
     }
 }
 }
 
 // Ref: https://cs.stackexchange.com/a/29133
-template <concepts::DirectedGraph Graph>
+template <concepts::DirectedAcyclicGraph Graph>
 constexpr void transitive_reduce(Graph &g)
 {
     // perform DFS on all vertices, assuming the graph is a DAG
-    for(auto v = 0; v < g.size(); ++v)
+    for(auto v = 0; v < g.num_vertices(); ++v)
     {
         // visit children of v
-        for(auto i = 0; i < g.size(); ++i)
+        for(auto &&c : g.adjacent_vertices(v))
         {
-            // not child of v
-            if(g.has_edge(v, i) == false)
-                continue;
-
-            detail::transitive_reduce_helper(g, v, i);
+            detail::transitive_reduce_helper(g, v, c);
         }
     }
 }
