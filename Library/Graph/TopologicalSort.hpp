@@ -1,31 +1,34 @@
 ﻿#pragma once
 
+#include <Usagi/Concept/Type/Graph.hpp>
 #include <Usagi/Library/Meta/Stack.hpp>
 
-#include "GraphAdjacencyMatrix.hpp"
-
-namespace usagi
+namespace usagi::graph
 {
 namespace detail
 {
-template <int Size>
+template <
+    concepts::DirectedGraph Graph,
+    concepts::Stack<int> Stack = meta::Stack<Graph::Size>,
+    typename Array = std::array<bool, Graph::Size>
+>
 constexpr void topological_sort_helper(
-    const GraphAdjacencyMatrix<Size> &g,
+    const Graph &g,
     const int v,
-    meta::Stack<Size> &stack,
-    std::array<bool, Size> &visited)
+    Stack &stack,
+    Array &visited)
 {
     visited[v] = true;
 
     // visit children of v
-    for(auto i = 0; i < Size; ++i)
+    for(auto i = 0; i < g.size(); ++i)
     {
         // not child of v
         if(g.matrix[v][i] == false)
             continue;
 
         if(!visited[i])
-            topological_sort_helper<Size>(g, i, stack, visited);
+            topological_sort_helper(g, i, stack, visited);
     }
 
     // ensure the current vertex precedes the children when popping
@@ -35,17 +38,19 @@ constexpr void topological_sort_helper(
 }
 
 // Ref: https://www.geeksforgeeks.org/topological-sorting/
-template <int Size>
-constexpr auto topological_sort(const GraphAdjacencyMatrix<Size> &g)
+template <
+    concepts::DirectedGraph Graph,
+    concepts::Stack<int> Stack = meta::Stack<Graph::SIZE>,
+    typename Array = std::array<bool, Graph::SIZE>
+>
+constexpr auto topological_sort(const Graph &g)
 {
-    meta::Stack<Size> stack;
-    std::array<bool, Size> visited { };
+    Stack stack;
+    Array visited { };
 
-    for(auto v = 0; v < Size; ++v)
-    {
+    for(auto v = 0; v < g.size(); ++v)
         if(!visited[v])
-            detail::topological_sort_helper<Size>(g, v, stack, visited);
-    }
+            detail::topological_sort_helper(g, v, stack, visited);
 
     return stack;
 }

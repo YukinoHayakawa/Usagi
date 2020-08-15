@@ -4,7 +4,7 @@
 #include <cstddef>
 
 #include <Usagi/Library/Container/DynamicArray.hpp>
-#include <Usagi/Library/Concept/Rebindable.hpp>
+#include <Usagi/Concept/Type/Rebindable.hpp>
 
 #include "SpinLock.hpp"
 #include "LockGuard.hpp"

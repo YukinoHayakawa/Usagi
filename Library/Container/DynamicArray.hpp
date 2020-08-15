@@ -4,7 +4,7 @@
 #include <utility>
 #include <memory>
 
-#include <Usagi/Library/Concept/ReallocatableAllocator.hpp>
+#include <Usagi/Concept/Allocator/ReallocatableAllocator.hpp>
 #include <Usagi/Runtime/Memory/VirtualMemoryAllocator.hpp>
 
 namespace usagi

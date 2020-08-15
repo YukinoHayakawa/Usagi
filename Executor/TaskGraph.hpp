@@ -3,7 +3,7 @@
 #include <Usagi/Entity/EntityDatabase.hpp>
 #include <Usagi/Entity/System.hpp>
 #include <Usagi/Entity/detail/ComponentAccessSystemAttribute.hpp>
-#include <Usagi/Library/Graph/GraphAdjacencyMatrix.hpp>
+#include <Usagi/Library/Graph/AdjacencyMatrixFixed.hpp>
 #include <Usagi/Library/Graph/TopologicalSort.hpp>
 #include <Usagi/Library/Meta/Tuple.hpp>
 
@@ -17,7 +17,7 @@ class TaskGraph
 public:
     constexpr static std::size_t NUM_SYSTEMS = sizeof...(Sys);
     using SystemListT = std::tuple<Sys...>;
-    using GraphT = GraphAdjacencyMatrix<NUM_SYSTEMS>;
+    using GraphT = AdjacencyMatrixFixed<NUM_SYSTEMS>;
     using ComponentUsageT = SystemComponentUsage<Sys...>;
     using EntityDatabaseT = EntityDatabase<ComponentUsageT>;
 

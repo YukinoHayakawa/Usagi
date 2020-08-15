@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include <Usagi/Concept/Container/Stack.hpp>
+
 namespace usagi::meta
 {
 template <int Size>
@@ -24,5 +26,12 @@ struct Stack
     {
         return pos == 0;
     }
+
+    constexpr std::size_t size() const
+    {
+        return pos;
+    }
 };
 }
+
+static_assert(usagi::concepts::Stack<usagi::meta::Stack<1>, int>);
