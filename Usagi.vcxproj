@@ -20,10 +20,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>ClangCL</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>ClangCL</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -60,6 +62,17 @@
   <ItemGroup>
     <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />
+    <ClInclude Include="Concept\Container\Stack.hpp" />
+    <ClInclude Include="Library\Find.hpp" />
+    <ClInclude Include="Concept\Type\Graph.hpp" />
+    <ClInclude Include="Library\Graph\AdjacencyList.hpp" />
+    <ClInclude Include="Library\Graph\detail\DefaultGraphTraitDynamic.hpp" />
+    <ClInclude Include="Library\Graph\ExtractPath.hpp" />
+    <ClInclude Include="Library\Graph\IsCyclic.hpp" />
+    <ClInclude Include="Library\Graph\FindPath.hpp" />
+    <ClInclude Include="Library\Graph\TransitiveReduce.hpp" />
+    <ClInclude Include="Library\Graph\detail\DefaultGraphTraitStatic.hpp" />
+    <ClInclude Include="Scheduler\Scheduler.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />
     <ClInclude Include="Entity\Archetype.hpp" />
     <ClInclude Include="Entity\Component.hpp" />
@@ -81,8 +94,8 @@
     <ClInclude Include="Entity\detail\EntityPageViewFiltered.hpp" />
     <ClInclude Include="Entity\detail\EntityView.hpp" />
     <ClInclude Include="Executor\detail\CpgValidation.hpp" />
-    <ClInclude Include="Library\Concept\ReallocatableAllocator.hpp" />
-    <ClInclude Include="Library\Concept\Rebindable.hpp" />
+    <ClInclude Include="Concept\Allocator\ReallocatableAllocator.hpp" />
+    <ClInclude Include="Concept\Type\Rebindable.hpp" />
     <ClInclude Include="Library\Container\DynamicArray.hpp" />
     <ClInclude Include="Library\Graph\TopologicalSort.hpp" />
     <ClInclude Include="Library\Math\Rounding.hpp" />
@@ -91,7 +104,7 @@
     <ClInclude Include="Library\Memory\ReferenceCounted.hpp" />
     <ClInclude Include="Library\Memory\SpinLock.hpp" />
     <ClInclude Include="Library\Meta\CompileTimeError.hpp" />
-    <ClInclude Include="Library\Graph\GraphAdjacencyMatrix.hpp" />
+    <ClInclude Include="Library\Graph\AdjacencyMatrixFixed.hpp" />
     <ClInclude Include="Library\Meta\Stack.hpp" />
     <ClInclude Include="Library\Meta\Queue.hpp" />
     <ClInclude Include="Library\Meta\Tag.hpp" />
