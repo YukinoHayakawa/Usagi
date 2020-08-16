@@ -47,6 +47,8 @@ constexpr auto find_path_dag(
     {
         const auto v = ts.top();
         ts.pop();
+        // start from the source vertex
+        if(dist[v] == init_dist) continue;
         // visit children of v
         for(auto &&u : g.adjacent_vertices(v))
         {
@@ -60,7 +62,7 @@ constexpr auto find_path_dag(
         }
     }
 
-    return prev;
+    return std::make_tuple(prev, dist);
 }
 
 template <
