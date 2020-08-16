@@ -10,13 +10,13 @@ namespace detail
 {
 template <
     concepts::DirectedGraph Graph,
-    typename BitArray = std::array<bool, Graph::SIZE>
+    typename Traits
 >
 constexpr bool is_cyclic_helper(
     const Graph &g,
     int v,
-    BitArray &visited,
-    BitArray &visiting)
+    typename Traits::VertexAttributeArray<bool> &visited,
+    typename Traits::VertexAttributeArray<bool> &visiting)
 {
     if(!visited[v])
     {
@@ -34,7 +34,7 @@ constexpr bool is_cyclic_helper(
             // new child, dive in
             if(!visited[c])
             {
-                if(is_cyclic_helper(g, c, visited, visiting))
+                if(is_cyclic_helper<Graph, Traits>(g, c, visited, visiting))
                     return true;
             }
             // getting back to one of the ancestor -> a cycle was found
@@ -48,19 +48,31 @@ constexpr bool is_cyclic_helper(
 }
 }
 
+/**
+ * \brief Check whether the given directed graph has any cycle.
+ *
+ * Ref: https://www.geeksforgeeks.org/detect-cycle-in-a-graph/
+ * \tparam Graph
+ * \tparam Traits
+ * \param g
+ * \return
+ */
 template <
     concepts::DirectedGraph Graph,
-    typename BitArray = std::array<bool, Graph::SIZE>
+    typename Traits = typename Graph::trait_t
 >
-// Ref: https://www.geeksforgeeks.org/detect-cycle-in-a-graph/
 constexpr bool is_cyclic(const Graph &g)
 {
-    BitArray visited { };
-    BitArray visiting { };
+    auto traits = Traits(g);
+
+    typename Traits::VertexAttributeArray<bool> visited { };
+    typename Traits::VertexAttributeArray<bool> visiting { };
+    traits.prepare(visited);
+    traits.prepare(visiting);
 
     for(auto i = 0; i < g.num_vertices(); ++i)
     {
-        if(detail::is_cyclic_helper(g, i, visited, visiting))
+        if(detail::is_cyclic_helper<Graph, Traits>(g, i, visited, visiting))
             return true;
     }
     return false;

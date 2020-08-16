@@ -17,9 +17,14 @@ struct Stack
         stack[pos++] = value;
     }
 
-    constexpr int pop()
+    constexpr void pop()
     {
-        return stack[--pos];
+        --pos;
+    }
+
+    constexpr const int & top()
+    {
+        return stack[pos - 1];
     }
 
     constexpr bool empty() const

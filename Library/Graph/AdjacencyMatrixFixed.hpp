@@ -1,17 +1,18 @@
 ﻿#pragma once
 
-#include <cstddef>
+#include "detail/DefaultGraphTraitStatic.hpp"
 
 namespace usagi::graph
 {
 template <int Size>
-struct AdjacencyMatrixFixed
+class AdjacencyMatrixFixed
 {
     bool matrix[Size][Size] { };
     int in_degree[Size] { };
     int out_degree[Size] { };
 
-    constexpr static std::size_t SIZE = Size;
+public:
+    using trait_t = DefaultGraphTraitStatic<AdjacencyMatrixFixed<Size>, Size>;
 
     static constexpr std::size_t num_vertices()
     {
@@ -19,7 +20,7 @@ struct AdjacencyMatrixFixed
     }
 
     /*
-     * Visitor Ranges
+     * Adjancent Vertex Range
      */
 
     struct AdjacentVertexIterator

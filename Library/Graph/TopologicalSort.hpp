@@ -9,14 +9,13 @@ namespace detail
 {
 template <
     concepts::DirectedAcyclicGraph Graph,
-    concepts::Stack<int> Stack = meta::Stack<Graph::Size>,
-    typename Array = std::array<bool, Graph::Size>
+    typename Traits
 >
 constexpr void topological_sort_helper(
     const Graph &g,
     const int v,
-    Stack &stack,
-    Array &visited)
+    typename Traits::VertexIndexStack &stack,
+    typename Traits::VertexAttributeArray<bool> &visited)
 {
     visited[v] = true;
 
@@ -24,7 +23,7 @@ constexpr void topological_sort_helper(
     for(auto &&c : g.adjacent_vertices(v))
     {
         if(!visited[c])
-            topological_sort_helper(g, c, stack, visited);
+            topological_sort_helper<Graph, Traits>(g, c, stack, visited);
     }
 
     // ensure the current vertex precedes the children when popping
@@ -33,20 +32,33 @@ constexpr void topological_sort_helper(
 }
 }
 
-// Ref: https://www.geeksforgeeks.org/topological-sorting/
+/**
+ * \brief Obtain a topological order of the given DAG.
+ *
+ * Ref: https://www.geeksforgeeks.org/topological-sorting/
+ * \tparam Graph
+ * \tparam Traits
+ * \param g
+ * \return A stack containing one possible topological order of the given
+ * DAG. Read the order by popping elements from the stack until it becomes
+ * empty.
+ */
 template <
     concepts::DirectedAcyclicGraph Graph,
-    concepts::Stack<int> Stack = meta::Stack<Graph::SIZE>,
-    typename Array = std::array<bool, Graph::SIZE>
+    typename Traits = typename Graph::trait_t
 >
 constexpr auto topological_sort(const Graph &g)
 {
-    Stack stack;
-    Array visited { };
+    auto traits = Traits(g);
+
+    typename Traits::VertexIndexStack stack;
+    typename Traits::VertexAttributeArray<bool> visited { };
+    traits.prepare(visited);
 
     for(auto v = 0; v < g.num_vertices(); ++v)
         if(!visited[v])
-            detail::topological_sort_helper(g, v, stack, visited);
+            detail::topological_sort_helper<Graph, Traits>(
+                g, v, stack, visited);
 
     return stack;
 }
