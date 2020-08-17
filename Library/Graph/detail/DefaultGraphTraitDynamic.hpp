@@ -25,5 +25,10 @@ struct DefaultGraphTraitDynamic
     {
         size = g.num_vertices();
     }
+
+    explicit DefaultGraphTraitDynamic(const std::size_t size)
+    {
+        this->size = size;
+    }
 };
 }

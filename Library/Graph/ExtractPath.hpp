@@ -18,8 +18,8 @@ template <
     concepts::DirectedGraph Graph,
     typename Traits = typename Graph::trait_t
 >
-auto extract_path(
-    const typename Traits::VertexAttributeArray<int> &prev,
+auto path_to_stack(
+    const typename Traits::template VertexAttributeArray<int> &prev,
     const int src,
     const int dest)
 {
@@ -34,5 +34,40 @@ auto extract_path(
     stack.push(src);
 
     return stack;
+}
+
+template <
+    concepts::DirectedGraph Graph,
+    typename Traits = typename Graph::trait_t
+>
+auto stack_to_array(typename Traits::VertexIndexStack &&stack)
+{
+    Traits traits { stack.size() };
+    typename Traits::template VertexAttributeArray<int> array;
+    traits.prepare(array);
+
+    std::size_t i = 0;
+    while(!stack.empty())
+    {
+        array[i++] = stack.top();
+        stack.pop();
+    }
+
+    return array;
+}
+
+// todo: we can really use std::deque to avoid this extra work
+template <
+    concepts::DirectedGraph Graph,
+    typename Traits = typename Graph::trait_t
+>
+auto path_to_array(
+    const typename Traits::template VertexAttributeArray<int> &prev,
+    const int src,
+    const int dest)
+{
+    return stack_to_array<Graph, Traits>(
+        path_to_stack<Graph, Traits>(prev, src, dest)
+    );
 }
 }

@@ -13,10 +13,10 @@ class AdjacencyList
 {
 public:
     using trait_t = DefaultGraphTraitDynamic<AdjacencyList>;
-    using egde_weight_t = float;
+    using edge_weight_t = double;
 
 private:
-    using AdjList = std::map<int, egde_weight_t>;
+    using AdjList = std::map<int, edge_weight_t>;
     std::vector<AdjList> mAdjacentVertices;
 
 public:
@@ -87,7 +87,7 @@ public:
     constexpr void add_edge(
         const int from,
         const int to,
-        egde_weight_t weight = 0)
+        edge_weight_t weight = 0)
     {
         mAdjacentVertices[from].insert_or_assign(to, weight);
     }

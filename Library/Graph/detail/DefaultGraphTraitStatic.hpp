@@ -23,5 +23,9 @@ struct DefaultGraphTraitStatic
     explicit constexpr DefaultGraphTraitStatic(const G &g)
     {
     }
+
+    explicit constexpr DefaultGraphTraitStatic(const std::size_t size)
+    {
+    }
 };
 }

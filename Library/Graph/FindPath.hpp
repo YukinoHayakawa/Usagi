@@ -15,7 +15,8 @@ namespace usagi::graph
  * \param g
  * \param source
  * \return An array of parent vertex of each vertex that can be used to extract
- * the path from source to another vertex.
+ * the path from source to another vertex and an array of longest/shortest
+ * path length from the source to each vertex.
  */
 template <
     concepts::WeightedDirectedAcyclicGraph Graph,
@@ -25,13 +26,13 @@ template <
 constexpr auto find_path_dag(
     const Graph &g,
     const int source,
-    typename Graph::egde_weight_t init_dist,
+    typename Graph::edge_weight_t init_dist,
     Comparator cmp)
 {
     auto traits = Traits(g);
 
     typename Traits::VertexAttributeArray<int> prev { };
-    typename Traits::VertexAttributeArray<typename Graph::egde_weight_t> dist{};
+    typename Traits::VertexAttributeArray<typename Graph::edge_weight_t> dist{};
     traits.prepare(prev);
     traits.prepare(dist);
     std::fill(
@@ -74,8 +75,8 @@ constexpr decltype(auto) longest_path_dag(const Graph &g, const int source)
     return find_path_dag<Graph, Traits>(
         g,
         source,
-        std::numeric_limits<typename Graph::egde_weight_t>::min(),
-        std::greater<typename Graph::egde_weight_t>()
+        std::numeric_limits<typename Graph::edge_weight_t>::min(),
+        std::greater<typename Graph::edge_weight_t>()
     );
 }
 
@@ -88,8 +89,8 @@ constexpr decltype(auto) shortest_path_dag(const Graph &g, const int source)
     return find_path_dag<Graph, Traits>(
         g,
         source,
-        std::numeric_limits<typename Graph::egde_weight_t>::max(),
-        std::less<typename Graph::egde_weight_t>()
+        std::numeric_limits<typename Graph::edge_weight_t>::max(),
+        std::less<typename Graph::edge_weight_t>()
     );
 }
 }

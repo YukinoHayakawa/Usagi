@@ -28,10 +28,10 @@ concept DirectedGraph = requires(T t, int from, int to)
 template <typename T>
 concept WeightedGraph = requires(T t, int u, int v)
 {
-    typename T::egde_weight_t;
-    requires (std::signed_integral<typename T::egde_weight_t>
-        || std::floating_point<typename T::egde_weight_t>);
-    { t.edge_weight(u, v) } -> std::same_as<typename T::egde_weight_t>;
+    typename T::edge_weight_t;
+    requires (std::signed_integral<typename T::edge_weight_t>
+        || std::floating_point<typename T::edge_weight_t>);
+    { t.edge_weight(u, v) } -> std::same_as<typename T::edge_weight_t>;
 };
 
 template <typename T>
@@ -39,7 +39,7 @@ concept WeightedDirectedGraph = requires(
     T t,
     int from,
     int to,
-    typename T::egde_weight_t weight)
+    typename T::edge_weight_t weight)
 {
     { t.add_edge(from, to, weight) };
     { t.remove_edge(from, to) };

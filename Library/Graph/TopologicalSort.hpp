@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <Usagi/Concept/Type/Graph.hpp>
-#include <Usagi/Library/Meta/Stack.hpp>
 
 namespace usagi::graph
 {
@@ -15,7 +14,7 @@ constexpr void topological_sort_helper(
     const Graph &g,
     const int v,
     typename Traits::VertexIndexStack &stack,
-    typename Traits::VertexAttributeArray<bool> &visited)
+    typename Traits::template VertexAttributeArray<bool> &visited)
 {
     visited[v] = true;
 
@@ -52,7 +51,7 @@ constexpr auto topological_sort(const Graph &g)
     auto traits = Traits(g);
 
     typename Traits::VertexIndexStack stack;
-    typename Traits::VertexAttributeArray<bool> visited { };
+    typename Traits::template VertexAttributeArray<bool> visited { };
     traits.prepare(visited);
 
     for(auto v = 0; v < g.num_vertices(); ++v)

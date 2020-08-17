@@ -15,8 +15,8 @@ template <
 constexpr bool is_cyclic_helper(
     const Graph &g,
     int v,
-    typename Traits::VertexAttributeArray<bool> &visited,
-    typename Traits::VertexAttributeArray<bool> &visiting)
+    typename Traits::template VertexAttributeArray<bool> &visited,
+    typename Traits::template VertexAttributeArray<bool> &visiting)
 {
     if(!visited[v])
     {
@@ -65,8 +65,8 @@ constexpr bool is_cyclic(const Graph &g)
 {
     auto traits = Traits(g);
 
-    typename Traits::VertexAttributeArray<bool> visited { };
-    typename Traits::VertexAttributeArray<bool> visiting { };
+    typename Traits::template VertexAttributeArray<bool> visited { };
+    typename Traits::template VertexAttributeArray<bool> visiting { };
     traits.prepare(visited);
     traits.prepare(visiting);
 
