@@ -19,20 +19,22 @@ namespace usagi::graph
  * path length from the source to each vertex.
  */
 template <
-    concepts::WeightedDirectedAcyclicGraph Graph,
+    concepts::DirectedAcyclicGraph Graph,
     typename Traits = typename Graph::trait_t,
-    typename Comparator
+    typename EdgeWeight = typename Graph::edge_weight_t,
+    typename Comparator,
+    typename Source
 >
 constexpr auto find_path_dag(
     const Graph &g,
-    const int source,
-    typename Graph::edge_weight_t init_dist,
-    Comparator cmp)
+    EdgeWeight init_dist,
+    Comparator cmp,
+    Source source)
 {
     auto traits = Traits(g);
 
     typename Traits::VertexAttributeArray<int> prev { };
-    typename Traits::VertexAttributeArray<typename Graph::edge_weight_t> dist{};
+    typename Traits::VertexAttributeArray<EdgeWeight> dist{};
     traits.prepare(prev);
     traits.prepare(dist);
     std::fill(
@@ -40,7 +42,7 @@ constexpr auto find_path_dag(
         dist.end(),
         init_dist
     );
-    dist[source] = 0;
+    source(dist);
 
     auto ts = topological_sort(g);
 
@@ -53,7 +55,7 @@ constexpr auto find_path_dag(
         // visit children of v
         for(auto &&u : g.adjacent_vertices(v))
         {
-            const auto alt_path = dist[v] + g.edge_weight(v, u);
+            const auto alt_path = dist[v] + traits.edge_weight(g, v, u);
             // found a longer/shorter path via v to u
             if(cmp(alt_path, dist[u]))
             {
@@ -74,9 +76,9 @@ constexpr decltype(auto) longest_path_dag(const Graph &g, const int source)
 {
     return find_path_dag<Graph, Traits>(
         g,
-        source,
         std::numeric_limits<typename Graph::edge_weight_t>::min(),
-        std::greater<typename Graph::edge_weight_t>()
+        std::greater<typename Graph::edge_weight_t>(),
+        [source](auto &&dist) constexpr { dist[source] = 0; }
     );
 }
 
@@ -88,9 +90,9 @@ constexpr decltype(auto) shortest_path_dag(const Graph &g, const int source)
 {
     return find_path_dag<Graph, Traits>(
         g,
-        source,
         std::numeric_limits<typename Graph::edge_weight_t>::max(),
-        std::less<typename Graph::edge_weight_t>()
+        std::less<typename Graph::edge_weight_t>(),
+        [source](auto &&dist) constexpr { dist[source] = 0; }
     );
 }
 }

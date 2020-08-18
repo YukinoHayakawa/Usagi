@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <algorithm>
-
 #include <Usagi/Concept/Type/Graph.hpp>
 
 namespace usagi::graph
@@ -16,7 +14,6 @@ constexpr auto out_degree(const Graph &g)
 
     typename Traits::template VertexAttributeArray<int> out_deg { };
     traits.prepare(out_deg);
-    // std::fill(in_deg.begin(), in_deg.end(), 0);
 
     for(auto v = 0; v < g.num_vertices(); ++v)
         out_deg[v] = g.adjacent_vertices(v).size();
@@ -34,7 +31,6 @@ constexpr auto in_degree(const Graph &g)
 
     typename Traits::template VertexAttributeArray<int> in_deg { };
     traits.prepare(in_deg);
-    std::fill(in_deg.begin(), in_deg.end(), 0);
 
     for(auto v = 0; v < g.num_vertices(); ++v)
         for(auto c : g.adjacent_vertices(v))

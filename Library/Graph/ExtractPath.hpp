@@ -18,7 +18,7 @@ template <
     concepts::DirectedGraph Graph,
     typename Traits = typename Graph::trait_t
 >
-auto path_to_stack(
+constexpr auto path_to_stack(
     const typename Traits::template VertexAttributeArray<int> &prev,
     const int src,
     const int dest)
@@ -40,7 +40,7 @@ template <
     concepts::DirectedGraph Graph,
     typename Traits = typename Graph::trait_t
 >
-auto stack_to_array(typename Traits::VertexIndexStack stack)
+constexpr auto stack_to_array(typename Traits::VertexIndexStack stack)
 {
     Traits traits { stack.size() };
     typename Traits::template VertexAttributeArray<int> array;
@@ -61,7 +61,7 @@ template <
     concepts::DirectedGraph Graph,
     typename Traits = typename Graph::trait_t
 >
-auto path_to_array(
+constexpr auto path_to_array(
     const typename Traits::template VertexAttributeArray<int> &prev,
     const int src,
     const int dest)

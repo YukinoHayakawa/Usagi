@@ -20,12 +20,22 @@ struct DefaultGraphTraitStatic
 
     using VertexIndexStack = meta::Stack<Size>;
 
+    constexpr DefaultGraphTraitStatic() = default;
+
     explicit constexpr DefaultGraphTraitStatic(const G &g)
     {
     }
 
     explicit constexpr DefaultGraphTraitStatic(const std::size_t size)
     {
+    }
+
+    static constexpr auto edge_weight(
+        const G &g,
+        int u,
+        int v)
+    {
+        return g.edge_weight(u, v);
     }
 };
 }
