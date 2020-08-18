@@ -30,6 +30,7 @@ constexpr void transitive_reduce_helper(
 }
 }
 
+// todo: just flip the prev graph from longest_path_dag() might be faster?
 // Ref: https://cs.stackexchange.com/a/29133
 template <
     typename G,

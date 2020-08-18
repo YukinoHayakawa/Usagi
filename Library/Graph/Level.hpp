@@ -35,7 +35,7 @@ constexpr auto level(const G &g)
         }
     };
 
-    auto [prev, dist] = find_path_dag<G, LevelSearchTrait>(
+    auto [prev, lvl, ts] = find_path_dag<G, LevelSearchTrait>(
         g,
         std::numeric_limits<int>::min(),
         std::greater<int>(),
@@ -49,6 +49,7 @@ constexpr auto level(const G &g)
             }
         }
     );
-    return dist;
+
+    return std::make_tuple(std::move(lvl), std::move(ts));
 }
 }

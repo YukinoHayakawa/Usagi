@@ -65,7 +65,7 @@ constexpr auto find_path_dag(
         }
     }
 
-    return std::make_tuple(prev, dist);
+    return std::make_tuple(std::move(prev), std::move(dist), std::move(ts));
 }
 
 template <
