@@ -40,7 +40,7 @@ template <
     concepts::DirectedGraph Graph,
     typename Traits = typename Graph::trait_t
 >
-auto stack_to_array(typename Traits::VertexIndexStack &&stack)
+auto stack_to_array(typename Traits::VertexIndexStack stack)
 {
     Traits traits { stack.size() };
     typename Traits::template VertexAttributeArray<int> array;

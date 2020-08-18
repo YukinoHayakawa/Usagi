@@ -1,6 +1,9 @@
 ﻿#pragma once
 
 #include <concepts>
+#include <ranges>
+
+#include "Range.hpp"
 
 namespace usagi::concepts
 {
@@ -8,22 +11,22 @@ namespace usagi::concepts
  * Basic Graph Types
  */
 
-// todo: range of vertices
 template <typename T>
-concept Graph = requires(T t, int v)
+concept Graph = requires(T t, int v, int from, int to)
 {
     typename T::trait_t;
-    { t.adjacent_vertices(v) }; // -> range
+    { t.adjacent_vertices(v) } -> SizedRange;
     { t.num_vertices() } -> std::convertible_to<std::size_t>;
+    { t.has_edge(from, to) };
 };
 
 template <typename T>
 concept DirectedGraph = requires(T t, int from, int to)
 {
+    requires Graph<T>;
     { t.add_edge(from, to) };
     { t.remove_edge(from, to) };
-    { t.has_edge(from, to) };
-} && Graph<T>;
+};
 
 template <typename T>
 concept WeightedGraph = requires(T t, int u, int v)
@@ -41,10 +44,12 @@ concept WeightedDirectedGraph = requires(
     int to,
     typename T::edge_weight_t weight)
 {
+    requires Graph<T>;
+    requires WeightedGraph<T>;
     { t.add_edge(from, to, weight) };
     { t.remove_edge(from, to) };
     { t.has_edge(from, to) };
-} && Graph<T> && WeightedGraph<T>;
+};
 
 /*
  * DAG...

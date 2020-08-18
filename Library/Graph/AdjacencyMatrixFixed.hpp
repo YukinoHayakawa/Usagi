@@ -68,6 +68,15 @@ public:
         {
             return AdjacentVertexIterator { instance, v, Size };
         }
+
+        constexpr std::size_t size() const
+        {
+            return Size - std::count(
+                instance->matrix[v],
+                instance->matrix[v] + Size,
+                0
+            );
+        }
     };
 
     constexpr auto adjacent_vertices(const int v) const

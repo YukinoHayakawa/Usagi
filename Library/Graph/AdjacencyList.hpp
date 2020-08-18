@@ -68,6 +68,11 @@ public:
                 instance->mAdjacentVertices[v].end()
             };
         }
+
+        std::size_t size() const
+        {
+            return instance->mAdjacentVertices[v].size();
+        }
     };
 
     auto adjacent_vertices(const int v) const
