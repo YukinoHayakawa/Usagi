@@ -33,8 +33,8 @@ constexpr auto find_path_dag(
 {
     auto traits = Traits(g);
 
-    typename Traits::VertexAttributeArray<int> prev { };
-    typename Traits::VertexAttributeArray<EdgeWeight> dist{};
+    typename Traits::template VertexAttributeArray<int> prev { };
+    typename Traits::template VertexAttributeArray<EdgeWeight> dist { };
     traits.prepare(prev);
     traits.prepare(dist);
     std::fill(

@@ -17,7 +17,11 @@ constexpr auto level(const Graph &g)
     {
         const Graph &g;
 
-        constexpr explicit LevelSearchTrait(const Graph &g) : g(g) { }
+        constexpr explicit LevelSearchTrait(const Graph &g)
+            : Traits(g)
+            , g(g)
+        {
+        }
 
         constexpr auto edge_weight(const Graph &g, int u, int v) const
         {

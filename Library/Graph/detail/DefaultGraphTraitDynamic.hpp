@@ -21,8 +21,6 @@ struct DefaultGraphTraitDynamic
 
     using VertexIndexStack = std::stack<int>;
 
-    DefaultGraphTraitDynamic() = default;
-
     explicit DefaultGraphTraitDynamic(const G &g)
     {
         size = g.num_vertices();
