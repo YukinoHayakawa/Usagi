@@ -159,9 +159,6 @@
     <ClInclude Include="Concept\Type\Rebindable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Concept\Type\Graph.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Library\Graph\AdjacencyList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -174,16 +171,37 @@
     <ClInclude Include="Library\Graph\AdjacencyMatrixFixed.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Graph\detail\DefaultGraphTraitDynamic.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\detail\DefaultGraphTraitStatic.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Library\Graph\ExtractPath.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Graph\FindPath.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Algorithm\Max.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Graph\Degree.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Concept\Type\Range.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Graph\Level.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Graph\TopologicalSortLexical.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Graph\Graph.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Graph\detail\GraphTraitDynamicSize.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Graph\detail\GraphTraitFixedSize.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Graph\detail\GraphTrait.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

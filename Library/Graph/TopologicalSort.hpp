@@ -13,7 +13,9 @@ template <
 constexpr void topological_sort_helper(
     const G &g,
     const typename Traits::VertexIndexT v,
-    typename Traits::VertexIndexStack &stack,
+    typename Traits::template VertexAttributeArray<
+        typename Traits::VertexIndexT> &stack,
+    std::size_t &cur,
     typename Traits::template VertexAttributeArray<bool> &visited)
     requires DirectedAcyclicGraph<G, Traits>
 {
@@ -25,12 +27,12 @@ constexpr void topological_sort_helper(
     for(auto &&c : t.adjacent_vertices(g, v))
     {
         if(!visited[c])
-            topological_sort_helper<G, Traits>(g, c, stack, visited);
+            topological_sort_helper<G, Traits>(g, c, stack, cur, visited);
     }
 
     // ensure the current vertex precedes the children when popping
     // from the stack
-    stack.push(v);
+    stack[--cur] = v;
 }
 }
 
@@ -54,13 +56,17 @@ constexpr auto topological_sort(const G &g)
 {
     Traits t;
 
-    typename Traits::VertexIndexStack stack;
+    typename Traits::template VertexAttributeArray<
+        typename Traits::VertexIndexT> stack { };
     typename Traits::template VertexAttributeArray<bool> visited { };
+    t.resize(stack, t.num_vertices(g));
     t.resize(visited, t.num_vertices(g));
 
+    std::size_t cur = t.num_vertices(g);
     for(auto v = 0; v < t.num_vertices(g); ++v)
         if(!visited[v])
-            detail::topological_sort_helper<G, Traits>(g, v, stack, visited);
+            detail::topological_sort_helper<G, Traits>(
+                g, v, stack, cur, visited);
 
     return stack;
 }

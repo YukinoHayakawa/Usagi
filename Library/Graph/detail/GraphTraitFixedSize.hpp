@@ -1,6 +1,8 @@
 ﻿#pragma once
 
-#include <Usagi/Library/Meta/Stack.hpp>
+#include <array>
+
+// #include <Usagi/Library/Meta/Stack.hpp>
 
 #include "GraphTrait.hpp"
 
@@ -18,6 +20,6 @@ struct GraphTraitFixedSize
         /* no-op */
     }
 
-    using VertexIndexStack = meta::Stack<Size>;
+    // using VertexIndexStack = meta::Stack<Size>;
 };
 }

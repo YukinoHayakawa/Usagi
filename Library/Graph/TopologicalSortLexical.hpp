@@ -12,10 +12,7 @@ template <
 constexpr auto topological_sort_lexical_smallest(const G &g)
     requires DirectedAcyclicGraph<G, Traits>
 {
-    // todo perf
-    auto topo = stack_to_array<G, Traits>(g,
-        topological_sort<G, Traits>(g)
-    );
+    auto topo = topological_sort<G, Traits>(g);
     const auto lvl = level<G, Traits>(g);
 
     std::sort(topo.begin(), topo.end(), [&](

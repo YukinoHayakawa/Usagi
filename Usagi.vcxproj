@@ -60,18 +60,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Concept\Type\Range.hpp" />
     <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />
     <ClInclude Include="Concept\Container\Stack.hpp" />
+    <ClInclude Include="Library\Algorithm\Max.hpp" />
     <ClInclude Include="Library\Find.hpp" />
-    <ClInclude Include="Concept\Type\Graph.hpp" />
+    <ClInclude Include="Library\Graph\detail\GraphTrait.hpp" />
+    <ClInclude Include="Library\Graph\Graph.hpp" />
     <ClInclude Include="Library\Graph\AdjacencyList.hpp" />
-    <ClInclude Include="Library\Graph\detail\DefaultGraphTraitDynamic.hpp" />
+    <ClInclude Include="Library\Graph\Degree.hpp" />
+    <ClInclude Include="Library\Graph\detail\GraphTraitDynamicSize.hpp" />
+    <ClInclude Include="Library\Graph\detail\GraphTraitFixedSize.hpp" />
     <ClInclude Include="Library\Graph\ExtractPath.hpp" />
     <ClInclude Include="Library\Graph\IsCyclic.hpp" />
     <ClInclude Include="Library\Graph\FindPath.hpp" />
+    <ClInclude Include="Library\Graph\Level.hpp" />
+    <ClInclude Include="Library\Graph\TopologicalSortLexical.hpp" />
     <ClInclude Include="Library\Graph\TransitiveReduce.hpp" />
-    <ClInclude Include="Library\Graph\detail\DefaultGraphTraitStatic.hpp" />
     <ClInclude Include="Scheduler\Scheduler.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />
     <ClInclude Include="Entity\Archetype.hpp" />

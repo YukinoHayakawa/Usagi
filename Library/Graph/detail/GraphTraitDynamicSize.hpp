@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <stack>
+// #include <stack>
 #include <vector>
 
 #include "GraphTrait.hpp"
@@ -19,6 +19,6 @@ struct GraphTraitDynamicSize
         array.resize(size);
     }
 
-    using VertexIndexStack = std::stack<int>;
+    // using VertexIndexStack = std::stack<int>;
 };
 }

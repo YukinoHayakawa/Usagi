@@ -47,12 +47,9 @@ constexpr auto find_path_dag(
     );
     source(dist);
 
-    auto ts = topological_sort<G, Traits>(g);
-
-    while(!ts.empty())
+    const auto ts = topological_sort<G, Traits>(g);
+    for(auto v : ts)
     {
-        const auto v = ts.top();
-        ts.pop();
         // start from the source vertex
         if(dist[v] == init_dist) continue;
         // visit children of v
