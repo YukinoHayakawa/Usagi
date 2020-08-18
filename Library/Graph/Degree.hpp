@@ -1,39 +1,43 @@
 ﻿#pragma once
 
-#include <Usagi/Concept/Type/Graph.hpp>
+#include "Graph.hpp"
 
 namespace usagi::graph
 {
 template <
-    concepts::DirectedAcyclicGraph Graph,
-    typename Traits = typename Graph::trait_t
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr auto out_degree(const Graph &g)
+constexpr auto out_degree(const G &g)
+    requires DirectedAcyclicGraph<G, Traits>
 {
-    auto traits = Traits(g);
+    Traits t;
 
-    typename Traits::template VertexAttributeArray<int> out_deg { };
-    traits.prepare(out_deg);
+    typename Traits::template VertexAttributeArray<
+        typename Traits::VertexIndexT> out_deg { };
+    t.resize(out_deg, t.num_vertices(g));
 
-    for(auto v = 0; v < g.num_vertices(); ++v)
-        out_deg[v] = g.adjacent_vertices(v).size();
+    for(auto v = 0; v < t.num_vertices(g); ++v)
+        out_deg[v] = t.adjacent_vertices(g, v).size();
 
     return out_deg;
 }
 
 template <
-    concepts::DirectedAcyclicGraph Graph,
-    typename Traits = typename Graph::trait_t
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr auto in_degree(const Graph &g)
+constexpr auto in_degree(const G &g)
+    requires DirectedAcyclicGraph<G, Traits>
 {
-    auto traits = Traits(g);
+    Traits t;
 
-    typename Traits::template VertexAttributeArray<int> in_deg { };
-    traits.prepare(in_deg);
+    typename Traits::template VertexAttributeArray<
+        typename Traits::VertexIndexT> in_deg { };
+    t.resize(in_deg, t.num_vertices(g));
 
-    for(auto v = 0; v < g.num_vertices(); ++v)
-        for(auto c : g.adjacent_vertices(v))
+    for(auto v = 0; v < t.num_vertices(g); ++v)
+        for(auto c : t.adjacent_vertices(g, v))
             ++in_deg[c];
 
     return in_deg;

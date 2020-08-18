@@ -6,18 +6,22 @@
 namespace usagi::graph
 {
 template <
-    concepts::DirectedAcyclicGraph Graph,
-    typename Traits = typename Graph::trait_t
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr auto topological_sort_lexical_smallest(const Graph &g)
+constexpr auto topological_sort_lexical_smallest(const G &g)
+    requires DirectedAcyclicGraph<G, Traits>
 {
     // todo perf
-    auto topo = stack_to_array<Graph, Traits>(
-        topological_sort<Graph, Traits>(g)
+    auto topo = stack_to_array<G, Traits>(g,
+        topological_sort<G, Traits>(g)
     );
-    const auto lvl = level<Graph, Traits>(g);
+    const auto lvl = level<G, Traits>(g);
 
-    std::sort(topo.begin(), topo.end(), [&](int u, int v) constexpr {
+    std::sort(topo.begin(), topo.end(), [&](
+        const typename Traits::VertexIndexT u,
+        const typename Traits::VertexIndexT v
+    ) constexpr {
         if(lvl[u] < lvl[v]) return true;
         if(lvl[u] == lvl[v] && u < v) return true;
         return false;

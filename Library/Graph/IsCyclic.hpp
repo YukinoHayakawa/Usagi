@@ -2,22 +2,25 @@
 
 #include <array>
 
-#include <Usagi/Concept/Type/Graph.hpp>
+#include "Graph.hpp"
 
 namespace usagi::graph
 {
 namespace detail
 {
 template <
-    concepts::DirectedGraph Graph,
-    typename Traits
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
 constexpr bool is_cyclic_helper(
-    const Graph &g,
-    int v,
+    const G &g,
+    const typename Traits::VertexIndexT v,
     typename Traits::template VertexAttributeArray<bool> &visited,
     typename Traits::template VertexAttributeArray<bool> &visiting)
+    requires DirectedGraph<G, Traits>
 {
+    Traits t;
+
     if(!visited[v])
     {
         visited[v] = true;
@@ -26,15 +29,15 @@ constexpr bool is_cyclic_helper(
         visiting[v] = true;
 
         // visit children of v
-        for(auto &&c : g.adjacent_vertices(v))
+        for(auto &&c : t.adjacent_vertices(g, v))
         {
             // not connected
-            if(g.has_edge(v, c) == false)
+            if(t.has_edge(g, v, c) == false)
                 continue;
             // new child, dive in
             if(!visited[c])
             {
-                if(is_cyclic_helper<Graph, Traits>(g, c, visited, visiting))
+                if(is_cyclic_helper<G, Traits>(g, c, visited, visiting))
                     return true;
             }
             // getting back to one of the ancestor -> a cycle was found
@@ -58,21 +61,22 @@ constexpr bool is_cyclic_helper(
  * \return
  */
 template <
-    concepts::DirectedGraph Graph,
-    typename Traits = typename Graph::trait_t
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr bool is_cyclic(const Graph &g)
+constexpr bool is_cyclic(const G &g)
+    requires DirectedGraph<G, Traits>
 {
-    auto traits = Traits(g);
+    Traits t;
 
     typename Traits::template VertexAttributeArray<bool> visited { };
     typename Traits::template VertexAttributeArray<bool> visiting { };
-    traits.prepare(visited);
-    traits.prepare(visiting);
+    t.resize(visited, t.num_vertices(g));
+    t.resize(visiting, t.num_vertices(g));
 
-    for(auto i = 0; i < g.num_vertices(); ++i)
+    for(auto i = 0; i < t.num_vertices(g); ++i)
     {
-        if(detail::is_cyclic_helper<Graph, Traits>(g, i, visited, visiting))
+        if(detail::is_cyclic_helper<G, Traits>(g, i, visited, visiting))
             return true;
     }
     return false;

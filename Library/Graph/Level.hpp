@@ -1,40 +1,46 @@
 ﻿#pragma once
 
-#include <Usagi/Concept/Type/Graph.hpp>
-
+#include "Graph.hpp"
 #include "FindPath.hpp"
 #include "Degree.hpp"
 
 namespace usagi::graph
 {
 template <
-    concepts::DirectedAcyclicGraph Graph,
-    typename Traits = typename Graph::trait_t
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr auto level(const Graph &g)
+constexpr auto level(const G &g)
+    requires DirectedAcyclicGraph<G, Traits>
 {
     struct LevelSearchTrait : Traits
     {
-        const Graph &g;
+        using EdgeWeightT = int;
 
-        constexpr explicit LevelSearchTrait(const Graph &g)
-            : Traits(g)
-            , g(g)
+        constexpr auto set_edge_weight(
+            const G &g,
+            const typename G::VertexIndexT u,
+            const typename G::VertexIndexT v,
+            const int w)
         {
+            /* no-op */
         }
 
-        constexpr auto edge_weight(const Graph &g, int u, int v) const
+        constexpr auto edge_weight(
+            const G &g,
+            const typename Traits::VertexIndexT from,
+            const typename Traits::VertexIndexT to) const
         {
-            return g.has_edge(u, v) ? 1 : 0;
+            return g.has_edge(from, to) ? 1 : 0;
         }
     };
 
-    auto [prev, dist] = find_path_dag<Graph, LevelSearchTrait, int>(
+    auto [prev, dist] = find_path_dag<G, LevelSearchTrait>(
         g,
         std::numeric_limits<int>::min(),
         std::greater<int>(),
         [&g](auto &&dist) constexpr {
-            const auto in_deg = in_degree<Graph, Traits>(g);
+            const auto in_deg = in_degree<G, Traits>(g);
             for(int i = 0; auto deg : in_deg)
             {
                 if(deg == 0)

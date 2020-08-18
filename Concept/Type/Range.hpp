@@ -2,6 +2,7 @@
 
 namespace usagi::concepts
 {
+// todo c++20
 template <typename T>
 concept Range = requires(T t)
 {

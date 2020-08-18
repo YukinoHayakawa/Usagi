@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <tuple>
 #include <limits>
 
 #include "TopologicalSort.hpp"
@@ -19,24 +20,26 @@ namespace usagi::graph
  * path length from the source to each vertex.
  */
 template <
-    concepts::DirectedAcyclicGraph Graph,
-    typename Traits = typename Graph::trait_t,
-    typename EdgeWeight = typename Graph::edge_weight_t,
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT,
     typename Comparator,
     typename Source
 >
 constexpr auto find_path_dag(
-    const Graph &g,
-    EdgeWeight init_dist,
+    const G &g,
+    const typename Traits::EdgeWeightT init_dist,
     Comparator cmp,
     Source source)
+    requires WeightedDirectedAcyclicGraph<G, Traits>
 {
-    auto traits = Traits(g);
+    Traits t;
 
-    typename Traits::template VertexAttributeArray<int> prev { };
-    typename Traits::template VertexAttributeArray<EdgeWeight> dist { };
-    traits.prepare(prev);
-    traits.prepare(dist);
+    typename Traits::template VertexAttributeArray<
+        typename Traits::VertexIndexT> prev { };
+    typename Traits::template VertexAttributeArray<
+        typename Traits::EdgeWeightT> dist { };
+    t.resize(prev, t.num_vertices(g));
+    t.resize(dist, t.num_vertices(g));
     std::fill(
         dist.begin(),
         dist.end(),
@@ -44,7 +47,7 @@ constexpr auto find_path_dag(
     );
     source(dist);
 
-    auto ts = topological_sort(g);
+    auto ts = topological_sort<G, Traits>(g);
 
     while(!ts.empty())
     {
@@ -53,9 +56,9 @@ constexpr auto find_path_dag(
         // start from the source vertex
         if(dist[v] == init_dist) continue;
         // visit children of v
-        for(auto &&u : g.adjacent_vertices(v))
+        for(auto &&u : t.adjacent_vertices(g, v))
         {
-            const auto alt_path = dist[v] + traits.edge_weight(g, v, u);
+            const auto alt_path = dist[v] + t.edge_weight(g, v, u);
             // found a longer/shorter path via v to u
             if(cmp(alt_path, dist[u]))
             {
@@ -69,30 +72,40 @@ constexpr auto find_path_dag(
 }
 
 template <
-    concepts::WeightedDirectedAcyclicGraph Graph,
-    typename Traits = typename Graph::trait_t
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr decltype(auto) longest_path_dag(const Graph &g, const int source)
+constexpr decltype(auto) longest_path_dag(
+    const G &g,
+    const typename Traits::VertexIndexT source)
+    requires WeightedDirectedAcyclicGraph<G, Traits>
 {
-    return find_path_dag<Graph, Traits>(
+    return find_path_dag<G, Traits>(
         g,
-        std::numeric_limits<typename Graph::edge_weight_t>::min(),
-        std::greater<typename Graph::edge_weight_t>(),
-        [source](auto &&dist) constexpr { dist[source] = 0; }
+        std::numeric_limits<typename Traits::EdgeWeightT>::min(),
+        std::greater<typename Traits::EdgeWeightT>(),
+        [source](auto &&dist) constexpr {
+            dist[source] = typename Traits::VertexIndexT { };
+        }
     );
 }
 
 template <
-    concepts::WeightedDirectedAcyclicGraph Graph,
-    typename Traits = typename Graph::trait_t
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr decltype(auto) shortest_path_dag(const Graph &g, const int source)
+constexpr decltype(auto) shortest_path_dag(
+    const G &g,
+    const typename Traits::VertexIndexT source)
+    requires WeightedDirectedAcyclicGraph<G, Traits>
 {
-    return find_path_dag<Graph, Traits>(
+    return find_path_dag<G, Traits>(
         g,
-        std::numeric_limits<typename Graph::edge_weight_t>::max(),
-        std::less<typename Graph::edge_weight_t>(),
-        [source](auto &&dist) constexpr { dist[source] = 0; }
+        std::numeric_limits<typename Traits::EdgeWeightT>::max(),
+        std::less<typename Traits::EdgeWeightT>(),
+        [source](auto &&dist) constexpr {
+            dist[source] = typename Traits::VertexIndexT { };
+        }
     );
 }
 }

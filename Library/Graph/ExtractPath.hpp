@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Concept/Type/Graph.hpp>
+#include "Graph.hpp"
 
 namespace usagi::graph
 {
@@ -15,13 +15,15 @@ namespace usagi::graph
  * to read the path from the src vertex to dest vertex.
  */
 template <
-    concepts::DirectedGraph Graph,
-    typename Traits = typename Graph::trait_t
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
 constexpr auto path_to_stack(
-    const typename Traits::template VertexAttributeArray<int> &prev,
-    const int src,
-    const int dest)
+    const typename Traits::template VertexAttributeArray<
+        typename Traits::VertexIndexT> &prev,
+    const typename Traits::VertexIndexT src,
+    const typename Traits::VertexIndexT dest)
+    requires DirectedGraph<G, Traits>
 {
     typename Traits::VertexIndexStack stack;
 
@@ -37,14 +39,18 @@ constexpr auto path_to_stack(
 }
 
 template <
-    concepts::DirectedGraph Graph,
-    typename Traits = typename Graph::trait_t
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr auto stack_to_array(typename Traits::VertexIndexStack stack)
+constexpr auto stack_to_array(
+    const G &g,
+    typename Traits::VertexIndexStack stack)
+    requires DirectedGraph<G, Traits>
 {
-    Traits traits { stack.size() };
-    typename Traits::template VertexAttributeArray<int> array;
-    traits.prepare(array);
+    Traits t;
+    typename Traits::template VertexAttributeArray<
+        typename Traits::VertexIndexT> array;
+    t.resize(array, stack.size());
 
     std::size_t i = 0;
     while(!stack.empty())
@@ -58,16 +64,42 @@ constexpr auto stack_to_array(typename Traits::VertexIndexStack stack)
 
 // todo: we can really use std::deque to avoid this extra work
 template <
-    concepts::DirectedGraph Graph,
-    typename Traits = typename Graph::trait_t
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
 constexpr auto path_to_array(
-    const typename Traits::template VertexAttributeArray<int> &prev,
-    const int src,
-    const int dest)
+    const G &g,
+    const typename Traits::template VertexAttributeArray<
+        typename Traits::VertexIndexT> &prev,
+    const typename Traits::VertexIndexT src,
+    const typename Traits::VertexIndexT dest)
+    requires DirectedGraph<G, Traits>
 {
-    return stack_to_array<Graph, Traits>(
-        path_to_stack<Graph, Traits>(prev, src, dest)
+    return stack_to_array<G, Traits>(g,
+        path_to_stack<G, Traits>(prev, src, dest)
     );
 }
 }
+
+
+/*
+Traits t;
+typename Traits::template VertexAttributeArray<
+    typename Traits::VertexIndexT> array;
+t.resize(array, t.num_vertices(g));
+
+std::size_t i = 0;
+
+// use the array like a stack
+int cur = dest;
+while(cur != src)
+{
+    array[i++] = cur;
+    cur = prev[cur];
+}
+array[i++] = cur;
+
+std::reserve(array.begin(), array.begin() + i);
+
+return array;
+*/

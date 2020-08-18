@@ -1,28 +1,31 @@
 ﻿#pragma once
 
-#include <Usagi/Concept/Type/Graph.hpp>
+#include "Graph.hpp"
 
 namespace usagi::graph
 {
 namespace detail
 {
 template <
-    concepts::DirectedAcyclicGraph Graph,
-    typename Traits
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
 constexpr void topological_sort_helper(
-    const Graph &g,
-    const int v,
+    const G &g,
+    const typename Traits::VertexIndexT v,
     typename Traits::VertexIndexStack &stack,
     typename Traits::template VertexAttributeArray<bool> &visited)
+    requires DirectedAcyclicGraph<G, Traits>
 {
+    Traits t;
+
     visited[v] = true;
 
     // visit children of v
-    for(auto &&c : g.adjacent_vertices(v))
+    for(auto &&c : t.adjacent_vertices(g, v))
     {
         if(!visited[c])
-            topological_sort_helper<Graph, Traits>(g, c, stack, visited);
+            topological_sort_helper<G, Traits>(g, c, stack, visited);
     }
 
     // ensure the current vertex precedes the children when popping
@@ -43,21 +46,21 @@ constexpr void topological_sort_helper(
  * empty.
  */
 template <
-    concepts::DirectedAcyclicGraph Graph,
-    typename Traits = typename Graph::trait_t
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr auto topological_sort(const Graph &g)
+constexpr auto topological_sort(const G &g)
+    requires DirectedAcyclicGraph<G, Traits>
 {
-    auto traits = Traits(g);
+    Traits t;
 
     typename Traits::VertexIndexStack stack;
     typename Traits::template VertexAttributeArray<bool> visited { };
-    traits.prepare(visited);
+    t.resize(visited, t.num_vertices(g));
 
-    for(auto v = 0; v < g.num_vertices(); ++v)
+    for(auto v = 0; v < t.num_vertices(g); ++v)
         if(!visited[v])
-            detail::topological_sort_helper<Graph, Traits>(
-                g, v, stack, visited);
+            detail::topological_sort_helper<G, Traits>(g, v, stack, visited);
 
     return stack;
 }

@@ -3,20 +3,21 @@
 #include <vector>
 #include <map>
 
-#include <Usagi/Concept/Type/Graph.hpp>
+#include <Usagi/Library/Graph/Graph.hpp>
 
-#include "detail/DefaultGraphTraitDynamic.hpp"
+#include "detail/GraphTraitDynamicSize.hpp"
 
 namespace usagi::graph
 {
 class AdjacencyList
 {
 public:
-    using trait_t = DefaultGraphTraitDynamic<AdjacencyList>;
-    using edge_weight_t = double;
+    using EdgeWeightT = double;
+    using VertexIndexT = int;
+    constexpr static VertexIndexT INVALID_VERTEX_ID = -1;
 
 private:
-    using AdjList = std::map<int, edge_weight_t>;
+    using AdjList = std::map<VertexIndexT, EdgeWeightT>;
     std::vector<AdjList> mAdjacentVertices;
 
 public:
@@ -33,7 +34,7 @@ public:
     {
         AdjList::const_iterator iter;
 
-        constexpr int operator*() const
+        constexpr VertexIndexT operator*() const
         {
             return iter->first;
         }
@@ -53,7 +54,7 @@ public:
     struct AdjacentVertexRange
     {
         const AdjacencyList *instance = nullptr;
-        const int v = -1;
+        const VertexIndexT v = INVALID_VERTEX_ID;
 
         auto begin() const
         {
@@ -75,7 +76,7 @@ public:
         }
     };
 
-    auto adjacent_vertices(const int v) const
+    auto adjacent_vertices(const VertexIndexT v) const
     {
         return AdjacentVertexRange { this, v };
     }
@@ -89,20 +90,20 @@ public:
     * Edge Operations
     */
 
-    constexpr void add_edge(
-        const int from,
-        const int to,
-        edge_weight_t weight = 0)
+    void add_edge(
+        const VertexIndexT from,
+        const VertexIndexT to,
+        const EdgeWeightT weight = { })
     {
         mAdjacentVertices[from].insert_or_assign(to, weight);
     }
 
-    constexpr void remove_edge(const int from, const int to)
+    void remove_edge(const VertexIndexT from, const VertexIndexT to)
     {
         mAdjacentVertices[from].erase(to);
     }
 
-    constexpr bool has_edge(const int from, const int to) const
+    bool has_edge(const VertexIndexT from, const VertexIndexT to) const
     {
         return mAdjacentVertices[from].contains(to);
     }
@@ -111,11 +112,34 @@ public:
      * Edge Weight
      */
 
-    auto edge_weight(const int from, const int to) const
+    void set_edge_weight(
+        const VertexIndexT from,
+        const VertexIndexT to,
+        const EdgeWeightT w)
+    {
+        mAdjacentVertices[from].find(to)->second = w;
+    }
+
+    auto edge_weight(const VertexIndexT from, const VertexIndexT to) const
     {
         return mAdjacentVertices[from].find(to)->second;
     }
 };
 
-static_assert(concepts::WeightedDirectedAcyclicGraph<AdjacencyList>);
+template <>
+struct DefaultGraphTrait<AdjacencyList>
+{
+    struct Trait
+        : GraphTraitWeightedDirected<AdjacencyList>
+        , GraphTraitDynamicSize<AdjacencyList>
+    {
+    };
+
+    using TraitT = Trait;
+};
+
+static_assert(WeightedDirectedGraph<
+    AdjacencyList,
+    DefaultGraphTrait<AdjacencyList>::TraitT
+>);
 }

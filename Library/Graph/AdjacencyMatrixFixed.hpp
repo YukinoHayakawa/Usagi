@@ -1,6 +1,8 @@
 ﻿#pragma once
 
-#include "detail/DefaultGraphTraitStatic.hpp"
+#include "Graph.hpp"
+
+#include "detail/GraphTraitFixedSize.hpp"
 
 namespace usagi::graph
 {
@@ -8,11 +10,10 @@ template <int Size>
 class AdjacencyMatrixFixed
 {
     bool matrix[Size][Size] { };
-    int in_degree[Size] { };
-    int out_degree[Size] { };
 
 public:
-    using trait_t = DefaultGraphTraitStatic<AdjacencyMatrixFixed<Size>, Size>;
+    using VertexIndexT = int;
+    constexpr static VertexIndexT INVALID_VERTEX_ID = -1;
 
     static constexpr std::size_t num_vertices()
     {
@@ -26,10 +27,10 @@ public:
     struct AdjacentVertexIterator
     {
         const AdjacencyMatrixFixed *instance = nullptr;
-        const int v = -1;
-        int i = -1;
+        const VertexIndexT v = INVALID_VERTEX_ID;
+        VertexIndexT i = INVALID_VERTEX_ID;
 
-        constexpr int operator*() const
+        constexpr VertexIndexT operator*() const
         {
             return i;
         }
@@ -55,11 +56,13 @@ public:
     struct AdjacentVertexRange
     {
         const AdjacencyMatrixFixed *instance = nullptr;
-        const int v = -1;
+        const VertexIndexT v = INVALID_VERTEX_ID;
 
         constexpr auto begin() const
         {
-            auto iter = AdjacentVertexIterator { instance, v, -1 };
+            auto iter = AdjacentVertexIterator {
+                instance, v, INVALID_VERTEX_ID
+            };
             ++iter;
             return iter;
         }
@@ -79,11 +82,11 @@ public:
         }
     };
 
-    constexpr auto adjacent_vertices(const int v) const
+    constexpr auto adjacent_vertices(const VertexIndexT v) const
     {
         return AdjacentVertexRange { this, v };
         // range-v3 doesn't really work with constexpr
-        // return ints(0, Size) | filter([this, v](const int u) constexpr
+        // return ints(0, Size) | filter([this, v](const VertexIndexT u) constexpr
         // {
             // return has_edge(v, u);
         // });
@@ -93,28 +96,19 @@ public:
      * Edge Operations
      */
 
-    constexpr void add_edge(const int from, const int to)
+    constexpr void add_edge(const VertexIndexT from, const VertexIndexT to)
     {
         matrix[from][to] = 1;
-        ++in_degree[to];
-        ++out_degree[from];
     }
 
-    constexpr void remove_edge(const int from, const int to)
+    constexpr void remove_edge(const VertexIndexT from, const VertexIndexT to)
     {
         matrix[from][to] = 0;
-        --in_degree[to];
-        --out_degree[from];
     }
 
-    constexpr bool has_edge(const int from, const int to) const
+    constexpr bool has_edge(const VertexIndexT from, const VertexIndexT to) const
     {
         return matrix[from][to] != 0;
-    }
-
-    constexpr bool is_source(const int v) const
-    {
-        return in_degree[v] == 0;
     }
 
     /*
@@ -150,4 +144,21 @@ public:
         return !equal(rhs);
     }
 };
+
+template <int Size>
+struct DefaultGraphTrait<AdjacencyMatrixFixed<Size>>
+{
+    struct Trait
+        : GraphTraitDirected<AdjacencyMatrixFixed<Size>>
+        , GraphTraitFixedSize<AdjacencyMatrixFixed<Size>, Size>
+    {
+    };
+
+    using TraitT = Trait;
+};
+
+static_assert(DirectedGraph<
+    AdjacencyMatrixFixed<1>,
+    DefaultGraphTrait<AdjacencyMatrixFixed<1>>::TraitT
+>);
 }
