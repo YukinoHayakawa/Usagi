@@ -1,9 +1,62 @@
 ﻿#pragma once
 
+#include <algorithm>
+#include <iterator>
+
 #include "Graph.hpp"
 
 namespace usagi::graph
 {
+template <
+    typename G,
+    typename Traits = typename DefaultGraphTrait<G>::TraitT
+>
+class PathReverseIterator
+{
+    using VertexPrevArrayT = typename Traits::template VertexAttributeArray<
+        typename Traits::VertexIndexT
+    >;
+    using VertexIndexT = typename Traits::VertexIndexT;
+
+    const VertexPrevArrayT &prev;
+    VertexIndexT i;
+    VertexIndexT end;
+
+public:
+    using difference_type = int;
+    using value_type = int;
+    using pointer = void;
+    using reference = void;
+    using iterator_category = std::input_iterator_tag;
+
+    constexpr PathReverseIterator(
+        const VertexPrevArrayT &prev,
+        VertexIndexT i = Traits::INVALID_VERTEX_ID,
+        VertexIndexT end = Traits::INVALID_VERTEX_ID)
+        : prev(prev)
+        , i(i)
+        , end(end)
+    {
+    }
+
+    constexpr auto operator++()
+    {
+        if(i == end) i = Traits::INVALID_VERTEX_ID;
+        else i = prev[i];
+        return *this;
+    }
+
+    constexpr auto operator*() const
+    {
+        return i;
+    }
+
+    constexpr bool operator==(const PathReverseIterator &rhs) const
+    {
+        return i == rhs.i;
+    }
+};
+
 template <
     typename G,
     typename Traits = typename DefaultGraphTrait<G>::TraitT
@@ -15,79 +68,11 @@ constexpr auto path_length(
     const typename Traits::VertexIndexT dest)
     requires Graph<G, Traits>
 {
-    std::size_t i = 1; // dest
-
-    typename Traits::VertexIndexT cur = dest;
-    while(cur != src)
-    {
-        cur = prev[cur];
-        ++i;
-    }
-
-    return i;
+    return std::distance(
+        PathReverseIterator<G, Traits>(prev, dest, src),
+        PathReverseIterator<G, Traits>(prev)
+    );
 }
-
-/*
-/**
- * \brief Given an array containing the pervious vertex of each vertex,
- * track from dest vertex to src vertex to reconstruct a path.
- * \tparam T
- * \param prev
- * \param dest
- * \param src
- * \return A stack containing the reconstructed path. Pop elements from it
- * to read the path from the src vertex to dest vertex.
- #1#
-template <
-    typename G,
-    typename Traits = typename DefaultGraphTrait<G>::TraitT
->
-constexpr auto path_to_stack(
-    const typename Traits::template VertexAttributeArray<
-        typename Traits::VertexIndexT> &prev,
-    const typename Traits::VertexIndexT src,
-    const typename Traits::VertexIndexT dest)
-    requires DirectedGraph<G, Traits>
-{
-    typename Traits::VertexIndexStack stack;
-
-    int cur = dest;
-    while(cur != src)
-    {
-        stack.push(cur);
-        cur = prev[cur];
-    }
-    stack.push(src);
-
-    return stack;
-}
-*/
-
-/*
-template <
-    typename G,
-    typename Traits = typename DefaultGraphTrait<G>::TraitT
->
-constexpr auto stack_to_array(
-    const G &g,
-    typename Traits::VertexIndexStack stack)
-    requires DirectedGraph<G, Traits>
-{
-    Traits t;
-    typename Traits::template VertexAttributeArray<
-        typename Traits::VertexIndexT> array;
-    t.resize(array, stack.size());
-
-    std::size_t i = 0;
-    while(!stack.empty())
-    {
-        array[i++] = stack.top();
-        stack.pop();
-    }
-
-    return array;
-}
-*/
 
 template <
     typename G,
@@ -107,14 +92,10 @@ constexpr auto path_to_array(
         typename Traits::VertexIndexT> array;
     t.resize(array, length);
 
-    // use the array like a stack
-    int cur = dest;
-    while(cur != src)
-    {
-        array[--length] = cur;
-        cur = prev[cur];
-    }
-    array[--length] = cur;
+    auto cur = PathReverseIterator<G, Traits>(prev, dest, src);
+    auto end = PathReverseIterator<G, Traits>(prev);
+    // use the array like a stack by writing from the back
+    std::copy(cur, end, array.rbegin());
 
     return array;
 }

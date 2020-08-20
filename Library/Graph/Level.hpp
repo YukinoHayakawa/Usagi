@@ -50,6 +50,6 @@ constexpr auto level(const G &g)
         }
     );
 
-    return std::make_tuple(std::move(lvl), std::move(ts));
+    return std::make_tuple(std::move(prev), std::move(lvl), std::move(ts));
 }
 }

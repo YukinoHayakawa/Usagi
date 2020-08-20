@@ -21,8 +21,7 @@ constexpr void transitive_reduce_helper(
     // visit indirect descendents of v through child
     for(auto &&c : t.adjacent_vertices(g, child))
     {
-        // otherwise, there is an indirect path from v to i, remove the
-        // direct path from v to i.
+        // c is reachable via v-child-c so remove the direct v-c edge if any
         t.remove_edge(g, v, c);
 
         transitive_reduce_helper(g, v, c);
@@ -30,7 +29,11 @@ constexpr void transitive_reduce_helper(
 }
 }
 
-// todo: just flip the prev graph from longest_path_dag() might be faster?
+// Q: Just flip the prev graph from longest_path_dag() might be faster?
+// A: No. prev cannot deal with vertex whose outdegree > 1.
+// e.g. 0->1, 2->1, 2->2 cannot be correctly reduced.
+//
+// todo: Any faster algorithm?
 // Ref: https://cs.stackexchange.com/a/29133
 template <
     typename G,
