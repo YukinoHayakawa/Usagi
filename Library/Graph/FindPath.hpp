@@ -29,11 +29,10 @@ constexpr auto find_path_dag(
     const G &g,
     const typename Traits::EdgeWeightT init_dist,
     Comparator cmp,
-    Source source)
+    Source source,
+    Traits t = { })
     requires WeightedDirectedAcyclicGraph<G, Traits>
 {
-    Traits t;
-
     typename Traits::template VertexAttributeArray<
         typename Traits::VertexIndexT> prev { };
     typename Traits::template VertexAttributeArray<
@@ -47,7 +46,7 @@ constexpr auto find_path_dag(
     );
     source(dist);
 
-    const auto ts = topological_sort<G, Traits>(g);
+    const auto ts = topological_sort<G, Traits>(g, t);
     for(auto v : ts)
     {
         // start from the source vertex
@@ -75,7 +74,8 @@ template <
 >
 constexpr decltype(auto) longest_path_dag(
     const G &g,
-    const typename Traits::VertexIndexT source)
+    const typename Traits::VertexIndexT source,
+    Traits t = { })
     requires WeightedDirectedAcyclicGraph<G, Traits>
 {
     return find_path_dag<G, Traits>(
@@ -84,7 +84,8 @@ constexpr decltype(auto) longest_path_dag(
         std::greater<typename Traits::EdgeWeightT>(),
         [source](auto &&dist) constexpr {
             dist[source] = typename Traits::VertexIndexT { };
-        }
+        },
+        t
     );
 }
 
@@ -94,7 +95,8 @@ template <
 >
 constexpr decltype(auto) shortest_path_dag(
     const G &g,
-    const typename Traits::VertexIndexT source)
+    const typename Traits::VertexIndexT source,
+    Traits t = { })
     requires WeightedDirectedAcyclicGraph<G, Traits>
 {
     return find_path_dag<G, Traits>(
@@ -103,7 +105,8 @@ constexpr decltype(auto) shortest_path_dag(
         std::less<typename Traits::EdgeWeightT>(),
         [source](auto &&dist) constexpr {
             dist[source] = typename Traits::VertexIndexT { };
-        }
+        },
+        t
     );
 }
 }

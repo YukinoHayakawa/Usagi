@@ -16,11 +16,10 @@ constexpr bool is_cyclic_helper(
     const G &g,
     const typename Traits::VertexIndexT v,
     typename Traits::template VertexAttributeArray<bool> &visited,
-    typename Traits::template VertexAttributeArray<bool> &visiting)
+    typename Traits::template VertexAttributeArray<bool> &visiting,
+    Traits t)
     requires DirectedGraph<G, Traits>
 {
-    Traits t;
-
     if(!visited[v])
     {
         visited[v] = true;
@@ -37,7 +36,7 @@ constexpr bool is_cyclic_helper(
             // new child, dive in
             if(!visited[c])
             {
-                if(is_cyclic_helper<G, Traits>(g, c, visited, visiting))
+                if(is_cyclic_helper<G, Traits>(g, c, visited, visiting, t))
                     return true;
             }
             // getting back to one of the ancestor -> a cycle was found
@@ -64,11 +63,9 @@ template <
     typename G,
     typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr bool is_cyclic(const G &g)
+constexpr bool is_cyclic(const G &g, Traits t = { })
     requires DirectedGraph<G, Traits>
 {
-    Traits t;
-
     typename Traits::template VertexAttributeArray<bool> visited { };
     typename Traits::template VertexAttributeArray<bool> visiting { };
     t.resize(visited, t.num_vertices(g));
@@ -76,7 +73,7 @@ constexpr bool is_cyclic(const G &g)
 
     for(auto i = 0; i < t.num_vertices(g); ++i)
     {
-        if(detail::is_cyclic_helper<G, Traits>(g, i, visited, visiting))
+        if(detail::is_cyclic_helper<G, Traits>(g, i, visited, visiting, t))
             return true;
     }
     return false;

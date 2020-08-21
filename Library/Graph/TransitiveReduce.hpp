@@ -13,18 +13,17 @@ template <
 constexpr void transitive_reduce_helper(
     G &g,
     const typename Traits::VertexIndexT v,
-    const typename Traits::VertexIndexT child)
+    const typename Traits::VertexIndexT child,
+    Traits t)
     requires DirectedAcyclicGraph<G, Traits>
 {
-    Traits t;
-
     // visit indirect descendents of v through child
     for(auto &&c : t.adjacent_vertices(g, child))
     {
         // c is reachable via v-child-c so remove the direct v-c edge if any
         t.remove_edge(g, v, c);
 
-        transitive_reduce_helper(g, v, c);
+        transitive_reduce_helper<G, Traits>(g, v, c, t);
     }
 }
 }
@@ -39,18 +38,16 @@ template <
     typename G,
     typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr void transitive_reduce(G &g)
+constexpr void transitive_reduce(G &g, Traits t = { })
     requires DirectedAcyclicGraph<G, Traits>
 {
-    Traits t;
-
     // perform DFS on all vertices, assuming the graph is a DAG
     for(auto v = 0; v < t.num_vertices(g); ++v)
     {
         // visit children of v
         for(auto &&c : t.adjacent_vertices(g, v))
         {
-            detail::transitive_reduce_helper(g, v, c);
+            detail::transitive_reduce_helper<G, Traits>(g, v, c, t);
         }
     }
 }

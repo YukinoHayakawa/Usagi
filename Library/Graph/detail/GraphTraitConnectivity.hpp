@@ -2,9 +2,20 @@
 
 namespace usagi::graph
 {
+/**
+ * \brief This trait class allows searching paths through edges by counting the
+ * number of passed vertices.
+ * \tparam BaseTraits
+ * \tparam Weight
+ */
 template <typename BaseTraits, typename Weight = int>
 struct GraphTraitConnectivity : BaseTraits
 {
+    constexpr GraphTraitConnectivity(BaseTraits base = { })
+        : BaseTraits(base)
+    {
+    }
+
     using VertexWeightT = Weight;
     using EdgeWeightT = Weight;
 

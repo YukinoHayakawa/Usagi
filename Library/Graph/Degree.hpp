@@ -8,11 +8,9 @@ template <
     typename G,
     typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr auto out_degree(const G &g)
+constexpr auto out_degree(const G &g, Traits t = { })
     requires DirectedAcyclicGraph<G, Traits>
 {
-    Traits t;
-
     typename Traits::template VertexAttributeArray<
         typename Traits::VertexIndexT> out_deg { };
     t.resize(out_deg, t.num_vertices(g));
@@ -27,11 +25,9 @@ template <
     typename G,
     typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr auto in_degree(const G &g)
+constexpr auto in_degree(const G &g, Traits t = { })
     requires DirectedAcyclicGraph<G, Traits>
 {
-    Traits t;
-
     typename Traits::template VertexAttributeArray<
         typename Traits::VertexIndexT> in_deg { };
     t.resize(in_deg, t.num_vertices(g));

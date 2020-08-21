@@ -82,11 +82,10 @@ constexpr auto path_to_array(
     const typename Traits::template VertexAttributeArray<
         typename Traits::VertexIndexT> &prev,
     const typename Traits::VertexIndexT src,
-    const typename Traits::VertexIndexT dest)
+    const typename Traits::VertexIndexT dest,
+    Traits t = { })
     requires DirectedGraph<G, Traits>
 {
-    Traits t;
-
     auto length = path_length<G, Traits>(prev, src, dest);
     typename Traits::template VertexAttributeArray<
         typename Traits::VertexIndexT> array;

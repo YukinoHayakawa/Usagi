@@ -12,7 +12,7 @@ template <
     typename G,
     typename Traits = typename DefaultGraphTrait<G>::TraitT
 >
-constexpr auto level(const G &g)
+constexpr auto level(const G &g, Traits t = { })
     requires DirectedAcyclicGraph<G, Traits>
 {
     auto [prev, lvl, ts] = find_path_dag<G, GraphTraitConnectivity<Traits>>(
@@ -27,7 +27,8 @@ constexpr auto level(const G &g)
                     dist[i] = 0;
                 ++i;
             }
-        }
+        },
+        { t }
     );
 
     return std::make_tuple(std::move(prev), std::move(lvl), std::move(ts));
