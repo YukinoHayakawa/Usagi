@@ -67,6 +67,7 @@
     <ClInclude Include="Library\Algorithm\Max.hpp" />
     <ClInclude Include="Library\Find.hpp" />
     <ClInclude Include="Library\Graph\detail\GraphTrait.hpp" />
+    <ClInclude Include="Library\Graph\detail\GraphTraitConnectivity.hpp" />
     <ClInclude Include="Library\Graph\Graph.hpp" />
     <ClInclude Include="Library\Graph\AdjacencyList.hpp" />
     <ClInclude Include="Library\Graph\Degree.hpp" />

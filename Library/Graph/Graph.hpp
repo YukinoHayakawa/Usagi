@@ -18,6 +18,7 @@ concept Graph = requires(
     typename Traits::VertexIndexT u,
     typename Traits::VertexIndexT v)
 {
+    typename Traits::GraphT;
     typename Traits::VertexIndexT;
     { Traits::INVALID_VERTEX_ID } ->
         std::same_as<const typename Traits::VertexIndexT>;
@@ -46,9 +47,11 @@ concept WeightedGraph = requires(
     typename Traits::VertexIndexT v,
     typename Traits::EdgeWeightT w)
 {
+    typename Traits::VertexWeightT;
     typename Traits::EdgeWeightT;
+    requires std::is_signed_v<typename Traits::VertexWeightT>;
     requires std::is_signed_v<typename Traits::EdgeWeightT>;
-    { t.set_edge_weight(g, u, v, w) };
+    { t.vertex_weight(g, u) } -> std::same_as<typename Traits::VertexWeightT>;
     { t.edge_weight(g, u, v) } -> std::same_as<typename Traits::EdgeWeightT>;
 };
 
@@ -80,4 +83,16 @@ concept DirectedAcyclicGraph = DirectedGraph<G, Traits>;
 
 template <typename G, typename Traits>
 concept WeightedDirectedAcyclicGraph = WeightedDirectedGraph<G, Traits>;
+
+template <typename V>
+auto vertex_weight(V &&v)
+{
+    return v;
+}
+
+template <typename V, typename E>
+auto edge_weight(V &&v, E &&e)
+{
+    return e;
+}
 }

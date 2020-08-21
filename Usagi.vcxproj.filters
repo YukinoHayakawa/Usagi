@@ -204,6 +204,9 @@
     <ClInclude Include="Library\Graph\detail\GraphTrait.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Library\Graph\detail\GraphTraitConnectivity.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\Memory\VirtualMemoryAllocator.cpp">

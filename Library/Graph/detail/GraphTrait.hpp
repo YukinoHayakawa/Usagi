@@ -7,6 +7,7 @@ namespace usagi::graph
 template <typename G>
 struct GraphTrait
 {
+    using GraphT = G;
     using VertexIndexT = typename G::VertexIndexT;
     constexpr static VertexIndexT INVALID_VERTEX_ID = G::INVALID_VERTEX_ID;
 
@@ -43,15 +44,14 @@ struct GraphTraitDirected : GraphTrait<G>
 template <typename G>
 struct GraphTraitWeighted
 {
+    using VertexWeightT = typename G::VertexWeightT;
     using EdgeWeightT = typename G::EdgeWeightT;
 
-    constexpr auto set_edge_weight(
-        G &g,
-        const typename G::VertexIndexT u,
-        const typename G::VertexIndexT v,
-        const typename G::EdgeWeightT w)
+    constexpr auto vertex_weight(
+        const G &g,
+        const typename G::VertexIndexT u) const
     {
-        return g.set_edge_weight(u, v, w);
+        return g.vertex_weight(u);
     }
 
     constexpr auto edge_weight(

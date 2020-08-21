@@ -1,23 +1,29 @@
 ﻿#pragma once
 
+#include <tuple>
 #include <cassert>
 
 namespace usagi
 {
 template <typename Iter, typename Eval>
-auto max_value(Iter begin, Iter end, Eval eval)
+auto max_eval(Iter begin, Iter end, Eval eval)
 {
     assert(begin != end);
 
-    auto max = eval(*begin);
-    ++begin;
-    while(begin != end)
+    Iter max_iter = begin;
+    auto max_val = eval(*begin);
+    while(true)
     {
-        auto val = eval(*begin);
-        if(val > max) max = val;
         ++begin;
+        if(begin == end) break;
+        auto val = eval(*begin);
+        if(max_val < val)
+        {
+            max_iter = begin;
+            max_val = val;
+        }
     }
 
-    return max;
+    return std::make_tuple(max_iter, max_val);
 }
 }

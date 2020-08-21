@@ -4,6 +4,8 @@
 #include "FindPath.hpp"
 #include "Degree.hpp"
 
+#include "detail/GraphTraitConnectivity.hpp"
+
 namespace usagi::graph
 {
 template <
@@ -13,29 +15,7 @@ template <
 constexpr auto level(const G &g)
     requires DirectedAcyclicGraph<G, Traits>
 {
-    struct LevelSearchTrait : Traits
-    {
-        using EdgeWeightT = int;
-
-        constexpr auto set_edge_weight(
-            const G &g,
-            const typename G::VertexIndexT u,
-            const typename G::VertexIndexT v,
-            const int w)
-        {
-            /* no-op */
-        }
-
-        constexpr auto edge_weight(
-            const G &g,
-            const typename Traits::VertexIndexT from,
-            const typename Traits::VertexIndexT to) const
-        {
-            return g.has_edge(from, to) ? 1 : 0;
-        }
-    };
-
-    auto [prev, lvl, ts] = find_path_dag<G, LevelSearchTrait>(
+    auto [prev, lvl, ts] = find_path_dag<G, GraphTraitConnectivity<Traits>>(
         g,
         std::numeric_limits<int>::min(),
         std::greater<int>(),

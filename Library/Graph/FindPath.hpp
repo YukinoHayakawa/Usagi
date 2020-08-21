@@ -55,7 +55,8 @@ constexpr auto find_path_dag(
         // visit children of v
         for(auto &&u : t.adjacent_vertices(g, v))
         {
-            const auto alt_path = dist[v] + t.edge_weight(g, v, u);
+            const auto alt_path = dist[v] +
+                t.vertex_weight(g, v) + t.edge_weight(g, v, u);
             // found a longer/shorter path via v to u
             if(cmp(alt_path, dist[u]))
             {
