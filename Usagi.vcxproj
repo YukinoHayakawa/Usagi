@@ -80,6 +80,7 @@
     <ClInclude Include="Library\Graph\Level.hpp" />
     <ClInclude Include="Library\Graph\TopologicalSortLexical.hpp" />
     <ClInclude Include="Library\Graph\TransitiveReduce.hpp" />
+    <ClInclude Include="Library\Graph\Traversal.hpp" />
     <ClInclude Include="Library\Meta\Op.hpp" />
     <ClInclude Include="Scheduler\Scheduler.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />

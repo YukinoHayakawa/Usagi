@@ -101,7 +101,7 @@ public:
         return AdjacentVertexRange { this, v };
     }
 
-    std::size_t num_vertices() const
+    VertexIndexT num_vertices() const
     {
         return mVertices.size();
     }

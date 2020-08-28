@@ -213,6 +213,9 @@
     <ClInclude Include="Library\Meta\Op.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Library\Graph\Traversal.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\Memory\VirtualMemoryAllocator.cpp">
