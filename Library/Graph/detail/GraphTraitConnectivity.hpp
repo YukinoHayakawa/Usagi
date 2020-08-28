@@ -16,8 +16,7 @@ struct GraphTraitConnectivity : BaseTraits
     {
     }
 
-    using VertexWeightT = Weight;
-    using EdgeWeightT = Weight;
+    using WeightT = Weight;
 
     constexpr auto vertex_weight(
         const typename BaseTraits::GraphT &g,

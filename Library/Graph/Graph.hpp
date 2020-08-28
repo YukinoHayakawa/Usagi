@@ -37,6 +37,7 @@ concept DirectedGraph = requires(
     requires Graph<T, Traits>;
     { t.add_edge(g, from, to) };
     { t.remove_edge(g, from, to) };
+    // { t.clear_out_edges(g, from) };
 };
 
 template <typename T, typename Traits>
@@ -44,24 +45,16 @@ concept WeightedGraph = requires(
     T g,
     Traits t,
     typename Traits::VertexIndexT u,
-    typename Traits::VertexIndexT v,
-    typename Traits::EdgeWeightT w)
+    typename Traits::VertexIndexT v)
 {
-    typename Traits::VertexWeightT;
-    typename Traits::EdgeWeightT;
-    requires std::is_signed_v<typename Traits::VertexWeightT>;
-    requires std::is_signed_v<typename Traits::EdgeWeightT>;
-    { t.vertex_weight(g, u) } -> std::same_as<typename Traits::VertexWeightT>;
-    { t.edge_weight(g, u, v) } -> std::same_as<typename Traits::EdgeWeightT>;
+    typename Traits::WeightT;
+    requires std::is_arithmetic_v<typename Traits::WeightT>;
+    { t.vertex_weight(g, u) } -> std::same_as<typename Traits::WeightT>;
+    { t.edge_weight(g, u, v) } -> std::same_as<typename Traits::WeightT>;
 };
 
 template <typename T, typename Traits>
-concept WeightedDirectedGraph = requires(
-    T g,
-    Traits t,
-    typename Traits::VertexIndexT from,
-    typename Traits::VertexIndexT to,
-    typename Traits::EdgeWeightT weight)
+concept WeightedDirectedGraph = requires()
 {
     requires DirectedGraph<T, Traits>;
     requires WeightedGraph<T, Traits>;
@@ -85,13 +78,15 @@ template <typename G, typename Traits>
 concept WeightedDirectedAcyclicGraph = WeightedDirectedGraph<G, Traits>;
 
 template <typename V>
-auto vertex_weight(V &&v)
+auto eval_vertex_weight(V &&v)
+    requires std::is_arithmetic_v<std::remove_cvref_t<V>>
 {
     return v;
 }
 
 template <typename V, typename E>
-auto edge_weight(V &&v, E &&e)
+auto eval_edge_weight(V &&v, E &&e)
+    requires std::is_arithmetic_v<std::remove_cvref_t<E>>
 {
     return e;
 }

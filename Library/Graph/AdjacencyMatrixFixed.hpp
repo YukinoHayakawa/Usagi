@@ -111,6 +111,11 @@ public:
         return matrix[from][to] != 0;
     }
 
+    void clear_out_edges(const VertexIndexT from)
+    {
+        std::fill(matrix[from], matrix[from] + Size, 0);
+    }
+
     /*
      * Equality Comparator
      */

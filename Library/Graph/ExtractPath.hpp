@@ -18,32 +18,41 @@ class PathReverseIterator
     >;
     using VertexIndexT = typename Traits::VertexIndexT;
 
-    const VertexPrevArrayT &prev;
-    VertexIndexT i;
-    VertexIndexT end;
+    const VertexPrevArrayT *prev = nullptr;
+    VertexIndexT i = Traits::INVALID_VERTEX_ID;
+    VertexIndexT end = Traits::INVALID_VERTEX_ID;
 
 public:
     using difference_type = int;
     using value_type = int;
     using pointer = void;
-    using reference = void;
+    using reference = int;
     using iterator_category = std::input_iterator_tag;
 
-    constexpr PathReverseIterator(
+    constexpr PathReverseIterator() = default;
+
+    explicit constexpr PathReverseIterator(
         const VertexPrevArrayT &prev,
         VertexIndexT i = Traits::INVALID_VERTEX_ID,
         VertexIndexT end = Traits::INVALID_VERTEX_ID)
-        : prev(prev)
+        : prev(&prev)
         , i(i)
         , end(end)
     {
     }
 
-    constexpr auto operator++()
+    constexpr decltype(auto) operator++()
     {
         if(i == end) i = Traits::INVALID_VERTEX_ID;
-        else i = prev[i];
+        else i = (*prev)[i];
         return *this;
+    }
+
+    constexpr auto operator++(int)
+    {
+        auto old = *this;
+        ++(*this);
+        return old;
     }
 
     constexpr auto operator*() const

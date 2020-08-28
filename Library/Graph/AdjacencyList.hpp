@@ -18,11 +18,11 @@ public:
 
     using VertexIndexT = int;
     constexpr static VertexIndexT INVALID_VERTEX_ID = -1;
-    using VertexWeightT = decltype(graph::vertex_weight(
-        std::declval<VertexT>())
-    );
-    using EdgeWeightT = decltype(graph::edge_weight(
-        std::declval<VertexT>(), std::declval<EdgeT>())
+    using WeightT = decltype(
+        // Deduce the larger type to accomodate the values.
+        // Rely on ADL to avoid name clashing with class members.
+        eval_edge_weight(std::declval<VertexT>(), std::declval<EdgeT>()) +
+        eval_vertex_weight(std::declval<VertexT>())
     );
 
 private:
@@ -128,9 +128,19 @@ public:
         return mVertices[from].adj.contains(to);
     }
 
+    void clear_out_edges(const VertexIndexT from)
+    {
+        mVertices[from].adj.clear();
+    }
+
     /*
      * Vertex Data/Weight
      */
+
+    auto & vertex(const VertexIndexT v) const
+    {
+       return mVertices[v].data;
+    }
 
     auto & vertex(const VertexIndexT v)
     {
@@ -140,12 +150,17 @@ public:
     auto vertex_weight(const VertexIndexT v) const
     {
         const auto &vtx = mVertices[v];
-        return graph::vertex_weight(vtx.data);
+        return eval_vertex_weight(vtx.data);
     }
 
     /*
      * Edge Data/Weight
      */
+
+    auto & edge(const VertexIndexT from, const VertexIndexT to) const
+    {
+        return mVertices[from].find(to)->second;
+    }
 
     auto & edge(const VertexIndexT from, const VertexIndexT to)
     {
@@ -155,19 +170,19 @@ public:
     auto edge_weight(const VertexIndexT from, const VertexIndexT to) const
     {
         const auto &vtx = mVertices[from];
-        return graph::edge_weight(
+        return eval_edge_weight(
             vtx.data,
             vtx.adj.find(to)->second
         );
     }
 };
 
-template <>
-struct DefaultGraphTrait<AdjacencyList<>>
+template <typename V, typename E>
+struct DefaultGraphTrait<AdjacencyList<V, E>>
 {
     struct Trait
-        : GraphTraitWeightedDirected<AdjacencyList<>>
-        , GraphTraitDynamicSize<AdjacencyList<>>
+        : GraphTraitWeightedDirected<AdjacencyList<V, E>>
+        , GraphTraitDynamicSize<AdjacencyList<V, E>>
     {
     };
 

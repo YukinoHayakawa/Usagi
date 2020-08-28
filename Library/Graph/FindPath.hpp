@@ -11,9 +11,11 @@ namespace usagi::graph
  * \brief Finds a longest/shortest path from source to other vertices.
  *
  * Ref: https://www.geeksforgeeks.org/find-longest-path-directed-acyclic-graph/
- * \tparam Graph
+ * \tparam G
  * \tparam Traits
  * \param g
+ * \param init_dist
+ * \param cmp
  * \param source
  * \return An array of parent vertex of each vertex that can be used to extract
  * the path from source to another vertex and an array of longest/shortest
@@ -27,7 +29,7 @@ template <
 >
 constexpr auto find_path_dag(
     const G &g,
-    const typename Traits::EdgeWeightT init_dist,
+    const typename Traits::WeightT init_dist,
     Comparator cmp,
     Source source,
     Traits t = { })
@@ -36,7 +38,7 @@ constexpr auto find_path_dag(
     typename Traits::template VertexAttributeArray<
         typename Traits::VertexIndexT> prev { };
     typename Traits::template VertexAttributeArray<
-        typename Traits::EdgeWeightT> dist { };
+        typename Traits::WeightT> dist { };
     t.resize(prev, t.num_vertices(g));
     t.resize(dist, t.num_vertices(g));
     std::fill(
@@ -80,8 +82,8 @@ constexpr decltype(auto) longest_path_dag(
 {
     return find_path_dag<G, Traits>(
         g,
-        std::numeric_limits<typename Traits::EdgeWeightT>::min(),
-        std::greater<typename Traits::EdgeWeightT>(),
+        std::numeric_limits<typename Traits::WeightT>::min(),
+        std::greater<typename Traits::WeightT>(),
         [source](auto &&dist) constexpr {
             dist[source] = typename Traits::VertexIndexT { };
         },
@@ -101,8 +103,8 @@ constexpr decltype(auto) shortest_path_dag(
 {
     return find_path_dag<G, Traits>(
         g,
-        std::numeric_limits<typename Traits::EdgeWeightT>::max(),
-        std::less<typename Traits::EdgeWeightT>(),
+        std::numeric_limits<typename Traits::WeightT>::max(),
+        std::less<typename Traits::WeightT>(),
         [source](auto &&dist) constexpr {
             dist[source] = typename Traits::VertexIndexT { };
         },

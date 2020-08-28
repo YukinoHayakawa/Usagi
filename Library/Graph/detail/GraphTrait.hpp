@@ -11,17 +11,17 @@ struct GraphTrait
     using VertexIndexT = typename G::VertexIndexT;
     constexpr static VertexIndexT INVALID_VERTEX_ID = G::INVALID_VERTEX_ID;
 
-    constexpr auto adjacent_vertices(const G &g, VertexIndexT v) const
+    static constexpr auto adjacent_vertices(const G &g, VertexIndexT v)
     {
         return g.adjacent_vertices(v);
     }
 
-    constexpr auto num_vertices(const G &g) const
+    static constexpr auto num_vertices(const G &g)
     {
         return g.num_vertices();
     }
 
-    constexpr auto has_edge(const G &g, VertexIndexT u, VertexIndexT v) const
+    static constexpr auto has_edge(const G &g, VertexIndexT u, VertexIndexT v)
     {
         return g.has_edge(u, v);
     }
@@ -30,34 +30,48 @@ struct GraphTrait
 template <typename G>
 struct GraphTraitDirected : GraphTrait<G>
 {
-    constexpr auto add_edge(G &g, VertexIndexT u, VertexIndexT v) const
+    static constexpr auto add_edge(
+        G &g,
+        typename GraphTrait<G>::VertexIndexT u,
+        typename GraphTrait<G>::VertexIndexT v)
     {
         return g.add_edge(u, v);
     }
 
-    constexpr auto remove_edge(G &g, VertexIndexT u, VertexIndexT v) const
+    static constexpr auto remove_edge(
+        G &g,
+        typename GraphTrait<G>::VertexIndexT u,
+        typename GraphTrait<G>::VertexIndexT v)
     {
         return g.remove_edge(u, v);
     }
+
+    /*
+    static constexpr auto clear_out_edges(
+        G &g,
+        typename GraphTrait<G>::VertexIndexT u)
+    {
+        return g.clear_out_edges(u);
+    }
+    */
 };
 
 template <typename G>
 struct GraphTraitWeighted
 {
-    using VertexWeightT = typename G::VertexWeightT;
-    using EdgeWeightT = typename G::EdgeWeightT;
+    using WeightT = typename G::WeightT;
 
-    constexpr auto vertex_weight(
+    static constexpr auto vertex_weight(
         const G &g,
-        const typename G::VertexIndexT u) const
+        const typename G::VertexIndexT u)
     {
         return g.vertex_weight(u);
     }
 
-    constexpr auto edge_weight(
+    static constexpr auto edge_weight(
         const G &g,
         const typename G::VertexIndexT u,
-        const typename G::VertexIndexT v) const
+        const typename G::VertexIndexT v)
     {
         return g.edge_weight(u, v);
     }
