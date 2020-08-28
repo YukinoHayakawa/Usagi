@@ -207,6 +207,12 @@
     <ClInclude Include="Library\Graph\detail\GraphTraitConnectivity.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Library\Container\BinaryHeap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Op.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\Memory\VirtualMemoryAllocator.cpp">

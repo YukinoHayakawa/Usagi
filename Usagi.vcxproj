@@ -65,6 +65,7 @@
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />
     <ClInclude Include="Concept\Container\Stack.hpp" />
     <ClInclude Include="Library\Algorithm\Max.hpp" />
+    <ClInclude Include="Library\Container\BinaryHeap.hpp" />
     <ClInclude Include="Library\Find.hpp" />
     <ClInclude Include="Library\Graph\detail\GraphTrait.hpp" />
     <ClInclude Include="Library\Graph\detail\GraphTraitConnectivity.hpp" />
@@ -79,6 +80,7 @@
     <ClInclude Include="Library\Graph\Level.hpp" />
     <ClInclude Include="Library\Graph\TopologicalSortLexical.hpp" />
     <ClInclude Include="Library\Graph\TransitiveReduce.hpp" />
+    <ClInclude Include="Library\Meta\Op.hpp" />
     <ClInclude Include="Scheduler\Scheduler.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />
     <ClInclude Include="Entity\Archetype.hpp" />
