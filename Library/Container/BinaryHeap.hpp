@@ -51,8 +51,8 @@ template <
 class BinaryHeap
 {
     HeapArray mHeap;
-    Traits mTraits;
     Compare mCompare;
+    Traits mTraits;
 
     static constexpr std::size_t parent(const std::size_t node_idx)
     {
@@ -120,9 +120,9 @@ class BinaryHeap
     }
 
 public:
-    explicit BinaryHeap(Traits traits = { }, Compare compare = { })
-        : mTraits(std::move(traits))
-        , mCompare(std::move(compare))
+    explicit BinaryHeap(Compare compare = { }, Traits traits = { })
+        : mCompare(std::move(compare))
+        , mTraits(std::move(traits))
     {
     }
 

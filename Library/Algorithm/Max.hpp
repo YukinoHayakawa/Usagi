@@ -20,10 +20,10 @@ auto max_eval(Iter begin, Iter end, Eval eval)
         if(max_val < val)
         {
             max_iter = begin;
-            max_val = val;
+            max_val = std::move(val);
         }
     }
 
-    return std::make_tuple(max_iter, max_val);
+    return std::make_tuple(std::move(max_iter), std::move(max_val));
 }
 }
