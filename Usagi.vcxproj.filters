@@ -42,9 +42,6 @@
     <ClInclude Include="Runtime\Platform\Memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\File\MemoryMappedFile.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\File\RegularFile.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -216,15 +213,27 @@
     <ClInclude Include="Library\Graph\Traversal.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Library\Algorithm\Pairwise.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\ComponentReflection.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\File\MappedFileView.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\IO\Unicode.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\Memory\VirtualMemoryAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\File\MemoryMappedFile.cpp">
+    <ClCompile Include="Runtime\File\RegularFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\File\RegularFile.cpp">
+    <ClCompile Include="Runtime\File\MappedFileView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

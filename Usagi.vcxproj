@@ -61,10 +61,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Concept\Type\Range.hpp" />
+    <ClInclude Include="Entity\ComponentReflection.hpp">
+      <FileType>CppHeader</FileType>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
+    </ClInclude>
     <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />
     <ClInclude Include="Concept\Container\Stack.hpp" />
     <ClInclude Include="Library\Algorithm\Max.hpp" />
+    <ClInclude Include="Library\Algorithm\Pairwise.hpp" />
     <ClInclude Include="Library\Container\BinaryHeap.hpp" />
     <ClInclude Include="Library\Find.hpp" />
     <ClInclude Include="Library\Graph\detail\GraphTrait.hpp" />
@@ -82,6 +88,7 @@
     <ClInclude Include="Library\Graph\TransitiveReduce.hpp" />
     <ClInclude Include="Library\Graph\Traversal.hpp" />
     <ClInclude Include="Library\Meta\Op.hpp" />
+    <ClInclude Include="Runtime\IO\Unicode.hpp" />
     <ClInclude Include="Scheduler\Scheduler.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />
     <ClInclude Include="Entity\Archetype.hpp" />
@@ -120,7 +127,7 @@
     <ClInclude Include="Library\Meta\Tag.hpp" />
     <ClInclude Include="Library\Meta\Tuple.hpp" />
     <ClInclude Include="Runtime\ErrorHandling.hpp" />
-    <ClInclude Include="Runtime\File\MemoryMappedFile.hpp" />
+    <ClInclude Include="Runtime\File\MappedFileView.hpp" />
     <ClInclude Include="Runtime\File\RegularFile.hpp" />
     <ClInclude Include="Runtime\Memory\Region.hpp" />
     <ClInclude Include="Runtime\Memory\VirtualMemoryAllocator.hpp" />
@@ -129,7 +136,7 @@
     <ClInclude Include="Runtime\Service.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Runtime\File\MemoryMappedFile.cpp" />
+    <ClCompile Include="Runtime\File\MappedFileView.cpp" />
     <ClCompile Include="Runtime\File\RegularFile.cpp" />
     <ClCompile Include="Runtime\Memory\VirtualMemoryAllocator.cpp" />
   </ItemGroup>

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include <string>
+#include <cstdint>
+#include <string_view>
 
 #include <Usagi/Runtime/Memory/Region.hpp>
 
@@ -9,6 +10,8 @@ namespace usagi::platform::file
 #ifdef _WIN32
 using NativeFileHandle = void *;
 using NativeFileMappingObject = void *;
+#define USAGI_INVALID_FILE_HANDLE \
+    ((::usagi::platform::file::NativeFileHandle)(-1))
 #else
 using NativeFileHandle = int;
 using NativeFileMappingObject = int;
@@ -51,34 +54,6 @@ void close(NativeFileHandle file);
  */
 std::size_t size(NativeFileHandle file);
 
-/**
- * \brief Read bytes into the designated buffer.
- * \param file
- * \param offset
- * \param buf
- * \param size
- * \return Number of bytes read.
- */
-std::size_t read_at(
-    NativeFileHandle file,
-    std::size_t offset,
-    void *buf,
-    std::size_t size);
-
-/**
- * \brief Write bytes into the file.
- * \param file
- * \param offset
- * \param buf
- * \param size Number of bytes written.
- * \return
- */
-std::size_t write_at(
-    NativeFileHandle file,
-    std::size_t offset,
-    const void *buf,
-    std::size_t size);
-
 // ========================== Memory Mapping ================================ //
 
 enum MemoryMappingMode
@@ -93,14 +68,37 @@ struct MemoryMapping
     NativeFileMappingObject mapping;
 };
 
-// Create memory mapping for file.
-// Returns the actual affected memory region.
+/**
+ * \brief Creates a memory mapping to `file`. The file handle is not needed
+ * after the mapping is created. If `offset + length > size(file)`, the file
+ * size may be extended.
+ * \param file If `file == INVALID_FILE_HANDLE`, the mapping will be backed by
+ * page file. The effect would be reserving a range of virtual memory.
+ * \param mode
+ * \param offset
+ * \param length
+ * \param initial_commit Initial commit size.
+ * \return
+ */
 MemoryMapping map(
     NativeFileHandle file,
     MemoryMappingMode mode,
-    std::size_t max_size);
+    std::uint64_t offset,
+    std::uint64_t length,
+    std::uint64_t initial_commit);
 
-// Removes memory mapped file.
-// Returns the actual affected memory region.
+/**
+ * \brief Extend the size of the memory mapping. The old base address may
+ * be invalidated. The operation does not involve copying any memory content.
+ * \param mapping
+ * \param new_size
+ */
+void remap(MemoryMapping &mapping, std::uint64_t new_size);
+
+/**
+ * \brief Destroy the file mapping. Further access to the virtual addresses
+ * would cause access violation.
+ * \param mapping
+ */
 void unmap(const MemoryMapping &mapping);
 }

@@ -1,7 +1,16 @@
 ﻿#include "RegularFile.hpp"
 
+#include <cassert>
+
+#include "MappedFileView.hpp"
+
 namespace usagi
 {
+void RegularFile::reset_handle()
+{
+    mFileHandle = USAGI_INVALID_FILE_HANDLE;
+}
+
 RegularFile::RegularFile(
     std::u8string path,
     const platform::file::FileOpenMode mode,
@@ -9,15 +18,14 @@ RegularFile::RegularFile(
     : mUtf8Path(std::move(path))
     , mMode(mode)
 {
-    mFileHandle = platform::file::open(mUtf8Path, mode, options);
+    using namespace platform::file;
+    mFileHandle = open(mUtf8Path, mode, options);
+    assert(mFileHandle != USAGI_INVALID_FILE_HANDLE);
 }
 
 RegularFile::~RegularFile()
 {
-    if(mFileHandle)
-    {
-        platform::file::close(mFileHandle);
-    }
+    if(mFileHandle) platform::file::close(mFileHandle);
 }
 
 RegularFile::RegularFile(RegularFile &&other) noexcept
@@ -25,20 +33,19 @@ RegularFile::RegularFile(RegularFile &&other) noexcept
     , mFileHandle { other.mFileHandle }
     , mMode { other.mMode }
 {
-    other.mFileHandle = decltype(mFileHandle) { };
+    // resetting the file handle in the source instance so it doesn't get
+    // double released.
+    other.reset_handle();
 }
 
 RegularFile & RegularFile::operator=(RegularFile &&other) noexcept
 {
     if(this == &other)
         return *this;
-
     mUtf8Path = std::move(other.mUtf8Path);
     mFileHandle = other.mFileHandle;
     mMode = other.mMode;
-
-    other.mFileHandle = decltype(mFileHandle) { };
-
+    other.reset_handle();
     return *this;
 }
 
@@ -47,19 +54,25 @@ std::size_t RegularFile::size() const
     return platform::file::size(mFileHandle);
 }
 
-std::size_t RegularFile::read(
-    const std::size_t offset,
-    void *buf,
-    const std::size_t size)
+MappedFileView RegularFile::create_view(
+    std::uint64_t offset,
+    std::uint64_t length,
+    std::uint64_t commit,
+    void *base_address)
 {
-    return platform::file::read_at(mFileHandle, offset, buf, size);
-}
+    using namespace platform::file;
 
-std::size_t RegularFile::write(
-    const std::size_t offset,
-    const void *buf,
-    const std::size_t size)
-{
-    return platform::file::write_at(mFileHandle, offset, buf, size);
+    int mode = 0;
+
+    if(mMode & OPEN_READ) mode |= MAPPING_READ;
+    if(mMode & OPEN_WRITE) mode |= MAPPING_WRITE;
+
+    return {
+        this,
+        static_cast<MemoryMappingMode>(mode),
+        offset,
+        length,
+        commit
+    };
 }
 }
