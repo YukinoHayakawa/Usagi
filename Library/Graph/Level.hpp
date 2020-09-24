@@ -17,7 +17,7 @@ constexpr auto level(const G &g, Traits t = { })
 {
     auto [prev, lvl, ts] = find_path_dag<G, GraphTraitConnectivity<Traits>>(
         g,
-        std::numeric_limits<int>::min(),
+        std::numeric_limits<int>::lowest(),
         std::greater<int>(),
         [&g](auto &&dist) constexpr {
             const auto in_deg = in_degree<G, Traits>(g);

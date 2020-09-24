@@ -17,6 +17,7 @@ namespace usagi::graph
  * \param init_dist
  * \param cmp
  * \param source
+ * \param t
  * \return An array of parent vertex of each vertex that can be used to extract
  * the path from source to another vertex and an array of longest/shortest
  * path length from the source to each vertex.
@@ -91,7 +92,11 @@ constexpr auto find_path_all_dag(
         if(prev[i] != Traits::INVALID_VERTEX_ID)
             t.add_edge(out, i, prev[i]);
 
-    // visit all edges and insert edges that make paths of the same length
+    // visit all edges and insert edges that make paths of the same length.
+    // this works because the find_path_dag retains connectivity from source
+    // to other vertices. however, some edges making parallel longest paths
+    // were dropped because prev can only store one edge. this process
+    // basically restores those dropped edges.
     for(std::size_t v = 0; v < t.num_vertices(g); ++v)
         for(auto &&c : t.adjacent_vertices(g, v)) // visit edge v->c
             // edge of the same length but discarded in the single path search
@@ -114,10 +119,10 @@ constexpr decltype(auto) longest_path_dag(
 {
     return find_path_dag<G, Traits>(
         g,
-        std::numeric_limits<typename Traits::WeightT>::min(),
+        std::numeric_limits<typename Traits::WeightT>::lowest(),
         std::greater<typename Traits::WeightT>(),
         [source](auto &&dist) constexpr {
-            dist[source] = typename Traits::VertexIndexT { };
+            dist[source] = typename Traits::WeightT { };
         },
         t
     );
@@ -137,10 +142,10 @@ constexpr decltype(auto) longest_path_all_dag(
     return find_path_all_dag<G, Traits>(
         g,
         out,
-        std::numeric_limits<typename Traits::WeightT>::min(),
+        std::numeric_limits<typename Traits::WeightT>::lowest(),
         std::greater<typename Traits::WeightT>(),
         [source](auto &&dist) constexpr {
-            dist[source] = typename Traits::VertexIndexT { };
+            dist[source] = typename Traits::WeightT { };
         },
         t
     );
@@ -161,7 +166,7 @@ constexpr decltype(auto) shortest_path_dag(
         std::numeric_limits<typename Traits::WeightT>::max(),
         std::less<typename Traits::WeightT>(),
         [source](auto &&dist) constexpr {
-            dist[source] = typename Traits::VertexIndexT { };
+            dist[source] = typename Traits::WeightT { };
         },
         t
     );
