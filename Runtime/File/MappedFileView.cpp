@@ -40,6 +40,8 @@ MappedFileView::MappedFileView(
     std::uint64_t commit)
     : mMode(mode)
 {
+    check_page_aligned(offset, size);
+
     using namespace platform::file;
 
     mMapping = map(
@@ -82,6 +84,13 @@ void MappedFileView::decommit(std::uint64_t offset, std::size_t size)
     platform::memory::decommit(base_view_byte() + offset, size);
 }
 */
+
+void MappedFileView::remap(std::uint64_t new_size)
+{
+    check_page_aligned(0, new_size);
+
+    platform::file::remap(mMapping, new_size);
+}
 
 void MappedFileView::prefetch(
     const std::uint64_t offset,

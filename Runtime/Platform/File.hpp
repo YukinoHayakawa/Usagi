@@ -9,7 +9,16 @@ namespace usagi::platform::file
 {
 #ifdef _WIN32
 using NativeFileHandle = void *;
-using NativeFileMappingObject = void *;
+
+struct NativeFileMappingObject
+{
+    void *section_handle = nullptr;
+    // Original base address allocated by the operating system
+    void *base_address = nullptr;
+    // Original offset requested by the user
+    std::uint64_t offset = 0;
+    unsigned long protect = 0;
+};
 #define USAGI_INVALID_FILE_HANDLE \
     ((::usagi::platform::file::NativeFileHandle)(-1))
 #else
@@ -65,7 +74,9 @@ enum MemoryMappingMode
 struct MemoryMapping
 {
     MemoryRegion heap;
-    NativeFileMappingObject mapping;
+    // This contains internal bookkeeping information of native API.
+    // DO NOT MODIFY ITS CONTENT.
+    NativeFileMappingObject internal;
 };
 
 /**
@@ -90,6 +101,8 @@ MemoryMapping map(
 /**
  * \brief Extend the size of the memory mapping. The old base address may
  * be invalidated. The operation does not involve copying any memory content.
+ * If the mapping was created with an offset, the extended mapping will also
+ * be based on that offset.
  * \param mapping
  * \param new_size
  */
@@ -100,5 +113,5 @@ void remap(MemoryMapping &mapping, std::uint64_t new_size);
  * would cause access violation.
  * \param mapping
  */
-void unmap(const MemoryMapping &mapping);
+void unmap(MemoryMapping &mapping);
 }

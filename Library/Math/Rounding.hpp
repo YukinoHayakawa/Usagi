@@ -1,14 +1,15 @@
 ﻿#pragma once
 
 #include <cassert>
+#include <type_traits>
 
 namespace usagi
 {
 // https://stackoverflow.com/questions/3407012/c-rounding-up-to-the-nearest-multiple-of-a-number
 template <typename T>
 T round_up_unsigned(T num_to_round, T multiple)
+    requires std::is_unsigned_v<T>
 {
-    assert(num_to_round >= 0);
     assert(multiple > 0);
 
     const T remainder = num_to_round % multiple;
@@ -19,9 +20,20 @@ T round_up_unsigned(T num_to_round, T multiple)
 }
 
 template <typename T>
-T calculate_spanning_pages(T length, T page_length)
+T round_down_unsigned(T num_to_round, T multiple)
+    requires std::is_unsigned_v<T>
 {
-    assert(length >= 0);
+    assert(multiple > 0);
+
+    const T remainder = num_to_round % multiple;
+
+    return num_to_round - remainder;
+}
+
+template <typename T>
+T calculate_spanning_pages(T length, T page_length)
+    requires std::is_unsigned_v<T>
+{
     assert(page_length >= 1);
 
     T pages = length / page_length;

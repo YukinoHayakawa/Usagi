@@ -71,6 +71,8 @@ public:
         return static_cast<char *>(mMapping.heap.base_address);
     }
 
+    void remap(std::uint64_t new_size);
+
     // todo lock/unlock
 
     /*
