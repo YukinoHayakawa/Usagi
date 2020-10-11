@@ -1,4 +1,4 @@
-﻿#include "VirtualMemoryAllocator.hpp"
+﻿#include "VmAllocatorPagefileBacked.hpp"
 
 #include <stdexcept>
 #include <cassert>
@@ -11,7 +11,7 @@ namespace usagi
 using namespace platform;
 
 // Strong exception guarantee
-std::size_t VirtualMemoryAllocatorBase::round_up_allocation_size_checked(
+std::size_t VmAllocatorPagefileBacked::round_up_allocation_size_checked(
     const std::size_t size_bytes) const
 {
     const auto new_committed_bytes =
@@ -24,40 +24,48 @@ std::size_t VirtualMemoryAllocatorBase::round_up_allocation_size_checked(
     return new_committed_bytes;
 }
 
-void VirtualMemoryAllocatorBase::assert_allocation_happened() const
+void VmAllocatorPagefileBacked::assert_allocation_happened() const
 {
     // There is no way of knowing the base address except calling allocate().
     // Thus allocation must happened at least once.
     assert(mCommittedBytes > 0);
 }
 
-void VirtualMemoryAllocatorBase::check_positive_size(const std::size_t size)
+void VmAllocatorPagefileBacked::check_positive_size(const std::size_t size)
 {
     if(size == 0)
         USAGI_THROW(std::bad_alloc());
 }
 
-void VirtualMemoryAllocatorBase::check_allocated_by_us(void *ptr) const
+void VmAllocatorPagefileBacked::check_allocated_by_us(void *ptr) const
 {
     if(ptr != mBaseAddress)
         USAGI_THROW(std::bad_alloc());
 }
 
-VirtualMemoryAllocatorBase::VirtualMemoryAllocatorBase(const std::size_t reserved_bytes)
+VmAllocatorPagefileBacked::~VmAllocatorPagefileBacked()
 {
-    reserve(reserved_bytes);
-}
-
-VirtualMemoryAllocatorBase::~VirtualMemoryAllocatorBase()
-{
-    // Ensure correct behavior of moved objects.
+    // Ensure correct behavior of moved instances.
     if(mBaseAddress)
         memory::free(mBaseAddress, mReservedBytes);
     mReservedBytes = 0;
     mCommittedBytes = 0;
 }
 
-void VirtualMemoryAllocatorBase::reserve(const std::size_t size_bytes)
+VmAllocatorPagefileBacked::VmAllocatorPagefileBacked(
+    VmAllocatorPagefileBacked &&other) noexcept
+    : mBaseAddress(other.mBaseAddress)
+    , mReservedBytes(other.mReservedBytes)
+    , mCommittedBytes(other.mCommittedBytes)
+{
+    other.mBaseAddress = nullptr;
+    // Ensure the correct behaviors of allocation functions on the moved
+    // object
+    other.mReservedBytes = 0;
+    other.mCommittedBytes = 0;
+}
+
+void VmAllocatorPagefileBacked::reserve(const std::size_t size_bytes)
 {
     if(mBaseAddress)
         USAGI_THROW(std::runtime_error("Double initialization"));
@@ -68,13 +76,15 @@ void VirtualMemoryAllocatorBase::reserve(const std::size_t size_bytes)
 }
 
 // Strong exception guarantee
-void * VirtualMemoryAllocatorBase::allocate(const std::size_t size)
+void * VmAllocatorPagefileBacked::allocate(const std::size_t size)
 {
     check_positive_size(size);
 
     // If an allocation exists, fail all subsequent allocations.
     if(mCommittedBytes > 0)
         USAGI_THROW(std::bad_alloc());
+
+    if(!mBaseAddress) reserve(memory::round_up_to_page_size(size));
 
     const auto new_committed_bytes =
         round_up_allocation_size_checked(size);
@@ -89,7 +99,7 @@ void * VirtualMemoryAllocatorBase::allocate(const std::size_t size)
 }
 
 // Strong exception guarantee
-void * VirtualMemoryAllocatorBase::reallocate(
+void * VmAllocatorPagefileBacked::reallocate(
     void *old_ptr,
     const std::size_t new_size)
 {
@@ -126,7 +136,7 @@ void * VirtualMemoryAllocatorBase::reallocate(
 }
 
 // Strong exception guarantee
-void VirtualMemoryAllocatorBase::deallocate(void *ptr)
+void VmAllocatorPagefileBacked::deallocate(void *ptr)
 {
     check_allocated_by_us(ptr);
     assert_allocation_happened();

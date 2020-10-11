@@ -38,7 +38,7 @@ namespace usagi
  * can be used to implement dynamic vectors with zero expanding cost if the
  * maximum allocation size is known.
  */
-class VirtualMemoryAllocatorBase
+class VmAllocatorPagefileBacked
 {
     char *mBaseAddress = nullptr;
     std::size_t mReservedBytes = 0;
@@ -49,28 +49,17 @@ class VirtualMemoryAllocatorBase
     static void check_positive_size(std::size_t size);
     void check_allocated_by_us(void *ptr) const;
 
-public:
-    // The default constructor holds no memory, but may be convenient for
-    // client classes which doesn't initialize immediately during construction.
-    VirtualMemoryAllocatorBase() = default;
-    explicit VirtualMemoryAllocatorBase(std::size_t reserved_bytes);
-    ~VirtualMemoryAllocatorBase();
 
-    VirtualMemoryAllocatorBase(VirtualMemoryAllocatorBase &&other) noexcept
-        : mBaseAddress(other.mBaseAddress)
-        , mReservedBytes(other.mReservedBytes)
-        , mCommittedBytes(other.mCommittedBytes)
-    {
-        other.mBaseAddress = nullptr;
-        // Ensure the correct behaviors of allocation functions on the moved
-        // object
-        other.mReservedBytes = 0;
-        other.mCommittedBytes = 0;
-    }
+public:
+    VmAllocatorPagefileBacked() = default;
+    ~VmAllocatorPagefileBacked();
+
+    VmAllocatorPagefileBacked(VmAllocatorPagefileBacked &&other) noexcept;
+
+    void reserve(std::size_t size_bytes);
 
     // Move assignment and copy ctor & assignment implicitly deleted.
 
-    void reserve(std::size_t size_bytes);
     void * allocate(std::size_t size);
     void * reallocate(void *old_ptr, std::size_t new_size);
     void deallocate(void *ptr);
@@ -80,15 +69,5 @@ public:
         return mReservedBytes;
     }
 };
-
-static_assert(ReallocatableAllocator<VirtualMemoryAllocatorBase>);
-
-template <typename T>
-class VirtualMemoryAllocator : public VirtualMemoryAllocatorBase
-{
-public:
-    using VirtualMemoryAllocatorBase::VirtualMemoryAllocatorBase;
-
-    using value_type = T;
-};
+static_assert(ReallocatableAllocator<VmAllocatorPagefileBacked>);
 }
