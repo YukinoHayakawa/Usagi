@@ -1,8 +1,10 @@
 ﻿#pragma once
 
-#include <tuple>
+#include <cstdint>
+#include <array>
 
 #include <Usagi/Entity/Component.hpp>
+#include <Usagi/Library/Meta/Tuple.hpp>
 
 namespace usagi
 {
@@ -22,14 +24,12 @@ struct EntityPage
 
     static_assert(PAGE_SIZE == CHAR_BIT * sizeof(EntityArrayT));
 
-    template <Component C>
     struct PageIndex // Wrapper class
     {
         std::uint64_t index = INVALID_PAGE;
     };
 
-    template <Component C>
-    struct ComponentEnabledMask
+    struct EnabledMask
     {
         // The n-th bit is set if the n-th entity in this page has this
         // component
@@ -41,8 +41,7 @@ struct EntityPage
     // singly linked list for page iteration. probably should be atomic.
     std::uint64_t next_page = INVALID_PAGE;
 
-    // The id of the first entity in this page
-    std::uint64_t first_entity_id = -1;
+    std::uint64_t page_seq_id = -1;
 
     // The index of first empty entity available for allocation.
     // This number only grows since entity ids are never reused.
@@ -55,24 +54,28 @@ struct EntityPage
 
     // ========================== Components ============================ //
 
-    std::tuple<ComponentEnabledMask<EnabledComponents>...> component_masks;
+    std::array<EnabledMask, sizeof...(EnabledComponents)> component_masks;
 
     // index into the page pool of each component.
     // -1 if the page is not allocated
-    std::tuple<PageIndex<EnabledComponents>...> component_pages;
+    std::array<PageIndex, sizeof...(EnabledComponents)> component_pages;
 
     // =========================== Helpers ============================= //
 
     template <Component C>
+    constexpr static std::uint64_t COMPONENT_INDEX =
+        Index<C, std::tuple<EnabledComponents...>>::value;
+
+    template <Component C>
     std::size_t & component_page_index()
     {
-        return std::get<PageIndex<C>>(component_pages).index;
+        return component_pages[COMPONENT_INDEX<C>].index;
     }
 
     template <Component C>
     auto & component_enabled_mask()
     {
-        return std::get<ComponentEnabledMask<C>>(component_masks).entity_array;
+        return component_masks[COMPONENT_INDEX<C>].entity_array;
     }
 
     template <Component C>

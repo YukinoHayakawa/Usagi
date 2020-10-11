@@ -1,10 +1,13 @@
 ﻿#pragma once
 
-#include <tuple>
 #include <array>
+#include <tuple>
 
-#include <Usagi/Library/Memory/PoolAllocator.hpp>
+#include <Usagi/Library/Container/DynamicArray.hpp>
 #include <Usagi/Library/Memory/LockGuard.hpp>
+#include <Usagi/Library/Memory/PoolAllocator.hpp>
+#include <Usagi/Runtime/Memory/TypedAllocator.hpp>
+#include <Usagi/Runtime/Memory/VmAllocatorPagefileBacked.hpp>
 
 #include "Archetype.hpp"
 #include "detail/ComponentAccessAllowAll.hpp"
@@ -32,7 +35,10 @@ namespace usagi
  */
 template <
     typename EnabledComponents = ComponentFilter<>,
-    typename Storage = PoolAllocator<int>
+    typename Storage = PoolAllocator<
+        int,
+        DynamicArray<int, TypedAllocator<int, VmAllocatorPagefileBacked>>
+    >
 >
 class EntityDatabase
 {
@@ -60,11 +66,14 @@ public:
 
     constexpr static std::size_t ENTITY_PAGE_SIZE = EntityPageT::PAGE_SIZE;
 
+    static_assert(Memcpyable<EntityPageT>);
+
 private:
-    std::uint64_t           mLastEntityId = 0;
-    // A linked list of entities is maintained in the order of entity id
-    std::size_t             mFirstEntityPageIndex = EntityPageT::INVALID_PAGE;
-    std::size_t             mLastEntityPageIndex = EntityPageT::INVALID_PAGE;
+    // Count the allocation of Entity Pages
+    std::uint64_t           mEntityPageSeqId = 0;
+    // A linked list of entities is maintained in the order of Entity Page Ids
+    std::uint64_t           mFirstEntityPageIndex = EntityPageT::INVALID_PAGE;
+    std::uint64_t           mLastEntityPageIndex = EntityPageT::INVALID_PAGE;
     EntityPageAllocatorT    mEntityPages;
     // todo lockless
     SpinLock                mEntityPageAllocationLock;
@@ -97,7 +106,7 @@ private:
         {
             LockGuard lock(mEntityPageAllocationLock);
 
-            page.first_entity_id = mLastEntityId;
+            page.page_seq_id = mEntityPageSeqId;
 
             // Insert the new page at the end of linked list so that the
             // entities are accessed in the incremental order of entity id
@@ -120,7 +129,7 @@ private:
                 mLastEntityPageIndex = page_idx;
             }
 
-            mLastEntityId += ENTITY_PAGE_SIZE;
+            ++mEntityPageSeqId;
         }
 
         return EntityPageInfo {
@@ -182,7 +191,7 @@ private:
         auto ptr = &mEntityPages.at(page_idx);
 
         // The page got recycled and was made into a new page
-        if(ptr->first_entity_id != archetype.mLastUsedPageInitialId)
+        if(ptr->page_seq_id != archetype.mLastUsedPageSeqId)
             return allocate_entity_page();
 
         return EntityPageInfo {
@@ -204,43 +213,30 @@ private:
     }
 
 public:
-    /**
-     * \brief
-     * \param pool_mem_reserve_size Default = 2^32 entries for both Entity Page
-     * Pool and Component Pools.
-     */
-    explicit EntityDatabase(
-        const std::size_t pool_mem_reserve_size = 1ull << 32)
+    EntityDatabase()
     {
-        reserve_entity_page_storage(pool_mem_reserve_size);
-        reserve_component_storage(pool_mem_reserve_size, ComponentFilterT());
+        // todo remove
+        // reserve_entity_page_storage(pool_mem_reserve_size);
+        // reserve_component_storage(pool_mem_reserve_size, ComponentFilterT());
     }
 
     template <typename ComponentAccess>
     auto create_access()
     {
-        return EntityDatabaseAccess<EntityDatabase, ComponentAccess>(
-            *this
-        );
+        return EntityDatabaseAccess<EntityDatabase, ComponentAccess>(*this);
     }
 
     auto entity_view(const EntityId id)
     {
         return EntityUserViewT {
             this,
-            &mEntityPages.at(id.page_idx),
-            id.id % ENTITY_PAGE_SIZE
+            &mEntityPages.at(id.page),
+            id.offset
         };
     }
 
-    template <
-        Component... InitialComponents,
-        typename EntityIdOutputIterator = std::nullptr_t
-    >
-    auto create(
-        Archetype<InitialComponents...> &archetype,
-        const std::size_t count = 1,
-        EntityIdOutputIterator id_output = { })
+    template <Component... InitialComponents>
+    auto create(Archetype<InitialComponents...> &archetype)
     {
         // Note that if you create entities from multiple threads,
         // the archetype must NOT be shared among the threads and ensure that
@@ -250,50 +246,40 @@ public:
         // that no concurrent entity creation on one page will happen.
 
         EntityPageInfo page = try_reuse_coherent_page(archetype);
-        EntityId last_entity_id;
+        EntityId entity_id;
 
-        for(std::size_t i = 0; i < count; ++i)
+        // The Entity Page is full, allocate a new one.
+        // Note that the holes in an Entity Page is never used.
+        // When the Page becomes empty, the Page will be recycled.
+        if(page.ptr->first_unused_index == ENTITY_PAGE_SIZE)
         {
-            // The Entity Page is full, allocate a new one.
-            // Note that the holes in an Entity Page is never used.
-            // When the Page becomes empty, the Page will be recycled.
-            if(page.ptr->first_unused_index == ENTITY_PAGE_SIZE)
-            {
-                page = allocate_entity_page();
-            }
-
-            // todo: insert data by components instead of entities
-
-            EntityUserViewT view {
-                this, page.ptr, page.ptr->first_unused_index
-            };
-
-            // Initialize components for the new entity
-            (..., (view.template add_component<InitialComponents>()
-                = archetype.template val<InitialComponents>()));
-
-            last_entity_id = EntityId {
-                .page_idx = page.index,
-                .id = page.ptr->first_entity_id + page.ptr->first_unused_index
-            };
-
-            // If an output iterator is passed in, use it to write entity ids
-            if constexpr (!std::is_same_v<decltype(id_output), std::nullptr_t>)
-            {
-                *id_output = last_entity_id;
-                ++id_output;
-            }
-
-            // Mark the Entity slot as used
-            ++page.ptr->first_unused_index;
-            // Record Page index hint
-            archetype.mLastUsedPageIndex = page.index;
-            // The page may have been recycled and made into another page
-            // so check the id range to make sure it was the original one.
-            archetype.mLastUsedPageInitialId = page.ptr->first_entity_id;
+            page = allocate_entity_page();
         }
 
-        return last_entity_id;
+        // todo: insert data by components instead of entities
+
+        EntityUserViewT view {
+            this, page.ptr, page.ptr->first_unused_index
+        };
+
+        // Initialize components for the new entity
+        (..., (view.template add_component<InitialComponents>()
+            = archetype.template val<InitialComponents>()));
+
+        entity_id = EntityId {
+            .offset = page.ptr->first_unused_index,
+            .page = page.index
+        };
+
+        // Mark the Entity slot as used
+        ++page.ptr->first_unused_index;
+        // Record Page index hint
+        archetype.mLastUsedPageIndex = page.index;
+        // The page may have been recycled and made into another page
+        // so check the id range to make sure it was the original one.
+        archetype.mLastUsedPageSeqId = page.ptr->page_seq_id;
+
+        return entity_id;
     }
 
     template <Component T>
@@ -334,7 +320,7 @@ public:
                 }
                 // clear the id range so it doesn't get accidentally
                 // recognized as a valid page
-                page.first_entity_id = -1;
+                page.page_seq_id = -1;
                 // release page
                 mEntityPages.deallocate(cur);
                 // increment iteration position.

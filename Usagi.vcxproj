@@ -20,7 +20,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>ClangCL</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -60,6 +59,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Concept\Type\Memcpyable.hpp" />
     <ClInclude Include="Concept\Type\Range.hpp" />
     <ClInclude Include="Entity\ComponentReflection.hpp">
       <FileType>CppHeader</FileType>
@@ -89,6 +89,8 @@
     <ClInclude Include="Library\Graph\Traversal.hpp" />
     <ClInclude Include="Library\Meta\Op.hpp" />
     <ClInclude Include="Runtime\IO\Unicode.hpp" />
+    <ClInclude Include="Runtime\Memory\TypedAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\VmAllocatorFileBacked.hpp" />
     <ClInclude Include="Scheduler\Scheduler.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />
     <ClInclude Include="Entity\Archetype.hpp" />
@@ -130,7 +132,7 @@
     <ClInclude Include="Runtime\File\MappedFileView.hpp" />
     <ClInclude Include="Runtime\File\RegularFile.hpp" />
     <ClInclude Include="Runtime\Memory\Region.hpp" />
-    <ClInclude Include="Runtime\Memory\VirtualMemoryAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\VmAllocatorPagefileBacked.hpp" />
     <ClInclude Include="Runtime\Platform\File.hpp" />
     <ClInclude Include="Runtime\Platform\Memory.hpp" />
     <ClInclude Include="Runtime\Service.hpp" />
@@ -138,7 +140,8 @@
   <ItemGroup>
     <ClCompile Include="Runtime\File\MappedFileView.cpp" />
     <ClCompile Include="Runtime\File\RegularFile.cpp" />
-    <ClCompile Include="Runtime\Memory\VirtualMemoryAllocator.cpp" />
+    <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp" />
+    <ClCompile Include="Runtime\Memory\VmAllocatorFileBacked.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

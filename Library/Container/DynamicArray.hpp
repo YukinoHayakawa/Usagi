@@ -5,26 +5,21 @@
 #include <memory>
 
 #include <Usagi/Concept/Allocator/ReallocatableAllocator.hpp>
-#include <Usagi/Runtime/Memory/VirtualMemoryAllocator.hpp>
+#include <Usagi/Concept/Type/Memcpyable.hpp>
+#include <Usagi/Library/Math/Rounding.hpp>
 
 namespace usagi
 {
 /**
- * \brief A simple dynamic array which relies on the allocator's ability to
- * reallocate memory to grow the storage in-place. If the allocator cannot
- * handle the reallocation, further element insertions fail. The capacity grows
- * linearly with the amount of stored elements, means that it only grows the
- * size of storage by one element each time. The time complexity of the
- * insertion functions is thus dependent on the efficiency of the reallocate
- * function of the allocator.
- * If the allocator changes the base address during reallocation, the behavior
- * is undefined for non-memcpy-able contained types.
+ * \brief A dynamic array that grows linearly with the amount of elements.
+ * Ideally used with allocators that exploit virtual memory allocation
+ * mechanisms.
  * \tparam T The element type.
  * \tparam Allocator
  */
 template <
-    typename T,
-    ReallocatableAllocator Allocator = VirtualMemoryAllocator<T>
+    Memcpyable T,
+    ReallocatableAllocator Allocator
 >
 class DynamicArray
 {
@@ -33,6 +28,8 @@ class DynamicArray
     T *mStorage = nullptr;
     std::size_t mSize = 0;
     std::size_t mCapacity = 0;
+
+    constexpr static std::uint64_t ALLOCATION_SIZE = 0x10000; // 64 KiB
 
 public:
     // types
@@ -43,8 +40,8 @@ public:
     using const_reference = const value_type &;
     using size_type = std::size_t;
 
-    template <typename R>
-    using rebind = DynamicArray<R, Allocator>;
+    template <Memcpyable R>
+    using rebind = DynamicArray<R, typename Allocator::rebind<R>>;
 
     // construct/copy/destroy
 
@@ -72,6 +69,11 @@ public:
             clear();
     }
 
+    Allocator & allocator()
+    {
+        return mAllocator;
+    }
+
     // capacity
     [[nodiscard]] bool empty() const noexcept
     {
@@ -96,14 +98,6 @@ public:
     void shrink_to_fit()
     {
         reallocate_storage(mSize);
-    }
-
-    // Let the allocator reserve the memory range without committing.
-    // This shall only be called once and only if the allocator is not
-    // initialized.
-    void allocator_reserve(const std::size_t bytes)
-    {
-        mAllocator.reserve(bytes);
     }
 
     // element access
@@ -221,15 +215,18 @@ private:
     {
         // strong exception guarantee
 
+        const auto new_size = round_up_unsigned(
+            sizeof(T) * size, ALLOCATION_SIZE
+        );
+
         // If the new capacity is smaller than the size, it is assumed that
         // the objects on the freed region are already correctly destructed.
         const auto new_storage =
-            mAllocator.reallocate(mStorage, sizeof(T) * size);
-        if(mStorage == nullptr)
-            mStorage = static_cast<T*>(new_storage);
-        assert(new_storage == static_cast<void*>(mStorage));
+            mAllocator.reallocate(mStorage, new_size);
+        mStorage = static_cast<T*>(new_storage);
 
-        mCapacity = size;
+        // the reminder part not making up an object is dropped
+        mCapacity = new_size / sizeof(T);
     }
 
     void release()

@@ -27,9 +27,6 @@
     <ClInclude Include="Library\Meta\Tag.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Memory\VirtualMemoryAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\ErrorHandling.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -225,15 +222,30 @@
     <ClInclude Include="Runtime\IO\Unicode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Runtime\Memory\TypedAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Memory\VmAllocatorFileBacked.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Memory\VmAllocatorPagefileBacked.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Concept\Type\Memcpyable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Runtime\Memory\VirtualMemoryAllocator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\File\RegularFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\File\MappedFileView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Memory\VmAllocatorFileBacked.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -21,8 +21,8 @@ class Archetype
     // These two fields combinedly determine that whether the last used page
     // can be reused. Beware that the the page index must refer to the same
     // entity database.
-    std::uint64_t mLastUsedPageInitialId = -1;
-    std::size_t mLastUsedPageIndex = -1;
+    std::uint64_t mLastUsedPageSeqId = -1;
+    std::uint64_t mLastUsedPageIndex = -1;
 
 public:
     Archetype() = default;

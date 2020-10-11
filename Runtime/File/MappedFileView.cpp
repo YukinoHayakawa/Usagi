@@ -57,12 +57,12 @@ MappedFileView::~MappedFileView()
 {
     using namespace platform::file;
 
-    if(mMode & MAPPING_WRITE)
-    {
-        flush(0, mMapping.heap.length);
-    }
     if(mMapping.heap.base_address)
     {
+        if(mMode & MAPPING_WRITE)
+        {
+            flush(0, mMapping.heap.length);
+        }
         unmap(mMapping);
         reset();
     }

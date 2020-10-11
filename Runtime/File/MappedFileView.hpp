@@ -46,6 +46,7 @@ public:
         : mMapping { std::move(other.mMapping) }
         , mMode { other.mMode }
     {
+        other.reset();
     }
 
     MappedFileView & operator=(const MappedFileView &other) = delete;
@@ -56,6 +57,7 @@ public:
             return *this;
         mMapping = std::move(other.mMapping);
         mMode = other.mMode;
+        other.reset();
         return *this;
     }
 

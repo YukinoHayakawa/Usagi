@@ -79,22 +79,11 @@ public:
         >(this->mDatabase, page_idx);
     }
 
-    template <
-        Component... InitialComponents,
-        typename EntityIdOutputIterator = std::nullptr_t
-    >
-    decltype(auto) create(
-        Archetype<InitialComponents...> &archetype,
-        const std::size_t count = 1,
-        EntityIdOutputIterator &&id_output = nullptr
-    ) requires (... && CanWriteComponent<
-        ComponentAccessT, InitialComponents
-    >)
+    template <Component... InitialComponents>
+    decltype(auto) create(Archetype<InitialComponents...> &archetype)
+        requires (... && CanWriteComponent<ComponentAccessT, InitialComponents>)
     {
-        return this->mDatabase->create(
-            archetype, count,
-            std::forward<EntityIdOutputIterator>(id_output)
-        );
+        return this->mDatabase->create(archetype);
     }
 };
 }

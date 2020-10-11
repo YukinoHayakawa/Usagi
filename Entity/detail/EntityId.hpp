@@ -5,7 +5,7 @@
 namespace usagi
 {
 /**
- * \brief The Entity Id is a 64-bit integer for uniquely identifying an Entity
+ * \brief Entity Id is a 64-bit integer for uniquely identifying an Entity
  * in a specific Entity Database. Once an Entity is created (this is done
  * implicitly by inserting component at an empty slot in an Entity Page), its
  * Entity Id remains static until the page is destroyed. An Entity Page is
@@ -23,8 +23,15 @@ namespace usagi
  */
 struct EntityId
 {
-    std::uint64_t page_idx; // internal use only
-    std::uint64_t id;
+    // The index of the Entity in the Entity Page
+    std::uint64_t offset : 8;
+    // The index of the Entity Page in the pool allocator.
+    std::uint64_t page : 56;
+
+    operator std::uint64_t() const
+    {
+        return *reinterpret_cast<const std::uint64_t*>(this);
+    }
 };
-// static_assert(sizeof(EntityId) == sizeof(std::uint64_t));
+static_assert(sizeof(EntityId) == sizeof(std::uint64_t));
 }

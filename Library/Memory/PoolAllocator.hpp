@@ -3,7 +3,6 @@
 #include <cassert>
 #include <cstddef>
 
-#include <Usagi/Library/Container/DynamicArray.hpp>
 #include <Usagi/Concept/Type/Rebindable.hpp>
 
 #include "SpinLock.hpp"
@@ -30,7 +29,7 @@ namespace usagi
  */
 template <
     typename T,
-    typename Container = DynamicArray<T>
+    typename Container
 >
 class PoolAllocator
 {
@@ -42,10 +41,12 @@ class PoolAllocator
         T data;
 
         Block() { }
-        ~Block() { }
+        ~Block() = default;
     };
 
     // static_assert(sizeof Block == sizeof T);
+
+    // Rebind since the actual type is Block instead of T.
     static_assert(Rebindable<Container, Block>);
 
     using StorageT = typename Container::template rebind<Block>;
@@ -144,11 +145,9 @@ public:
         return mStorage.capacity();
     }
 
-    // This shall only be called once and only if the storage is not previously
-    // initialized.
-    void init_storage(const std::size_t reserved_size)
+    auto & storage()
     {
-        mStorage.allocator_reserve(reserved_size);
+        return mStorage;
     }
 };
 }
