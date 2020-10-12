@@ -49,7 +49,6 @@ class VmAllocatorPagefileBacked
     static void check_positive_size(std::size_t size);
     void check_allocated_by_us(void *ptr) const;
 
-
 public:
     VmAllocatorPagefileBacked() = default;
     ~VmAllocatorPagefileBacked();

@@ -200,24 +200,29 @@ private:
         };
     }
 
-    void reserve_entity_page_storage(const std::size_t size)
+    template <
+        typename Func,
+        template <Component...> typename Filter,
+        Component... Cs
+    >
+    void init_component_storage(Func &&func, Filter<Cs...>)
     {
-        mEntityPages.init_storage(size);
-    }
-
-    template <template <Component...> typename Filter, Component... Cs>
-    void reserve_component_storage(const std::size_t size, Filter<Cs...>)
-    {
-        (..., std::get<SingleComponentStorageT<Cs>>(mComponentStorage)
-            .init_storage(size));
+        (..., func(std::get<SingleComponentStorageT<Cs>>(mComponentStorage)));
     }
 
 public:
-    EntityDatabase()
+    EntityDatabase() = default;
+
+    template <typename Func>
+    void init_entity_page_storage(Func &&func)
     {
-        // todo remove
-        // reserve_entity_page_storage(pool_mem_reserve_size);
-        // reserve_component_storage(pool_mem_reserve_size, ComponentFilterT());
+        func(mEntityPages);
+    }
+
+    template <typename Func>
+    void init_component_storage(Func &&func)
+    {
+        init_component_storage(std::forward<Func>(func), ComponentFilterT());
     }
 
     template <typename ComponentAccess>

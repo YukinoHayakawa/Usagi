@@ -73,6 +73,9 @@ void * VmAllocatorFileBacked::allocate(std::size_t size)
 
 void * VmAllocatorFileBacked::reallocate(void *old_ptr, std::size_t new_size)
 {
+    if(old_ptr == nullptr)
+        return allocate(new_size);
+
     check_mapping_created(true);
     check_positive_size(new_size);
     check_allocated_by_us(old_ptr);
