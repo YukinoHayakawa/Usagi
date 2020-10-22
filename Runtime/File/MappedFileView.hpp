@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <utility>
+#include <string_view>
 
 #include <Usagi/Runtime/Platform/File.hpp>
 
@@ -23,13 +24,15 @@ class MappedFileView
     void check_write_access();
 
 public:
+    constexpr static std::uint64_t USE_FILE_SIZE = 0;
+
     /**
      * \brief Create a file mapping. If `file` is `nullptr`, the mapping will
      * be backed by page file.
      * \param file
      * \param mode
      * \param offset
-     * \param size
+     * \param size If 0, the original file size will be used.
      * \param commit
      */
     MappedFileView(
@@ -63,14 +66,19 @@ public:
 
     std::size_t max_size() const noexcept { return mMapping.heap.length; }
 
-    void * base_view()
+    void * base_view() const
     {
         return mMapping.heap.base_address;
     }
 
-    char * base_view_byte()
+    char * base_byte_view() const
     {
         return static_cast<char *>(mMapping.heap.base_address);
+    }
+
+    std::string_view base_string_view() const
+    {
+        return std::string_view(base_byte_view(), max_size());
     }
 
     void remap(std::uint64_t new_size);

@@ -1,7 +1,9 @@
 ﻿#include "MappedFileView.hpp"
 
 #include <cassert>
+#include <stdexcept>
 
+#include <Usagi/Runtime/ErrorHandling.hpp>
 #include <Usagi/Runtime/Platform/Memory.hpp>
 
 #include "RegularFile.hpp"
@@ -21,9 +23,11 @@ void MappedFileView::check_view(std::uint64_t offset, std::size_t size)
 
 void MappedFileView::check_page_aligned(std::uint64_t offset, std::size_t size)
 {
-    assert(reinterpret_cast<std::size_t>(base_view_byte() + offset)
-        % platform::memory::page_size() == 0);
-    assert(size % platform::memory::page_size() == 0);
+    assert(
+        reinterpret_cast<std::size_t>(base_byte_view() + offset)
+        % platform::memory::page_size() == 0
+    );
+    // assert(size % platform::memory::page_size() == 0);
     assert(size > 0);
 }
 
@@ -40,9 +44,17 @@ MappedFileView::MappedFileView(
     std::uint64_t commit)
     : mMode(mode)
 {
-    check_page_aligned(offset, size);
-
     using namespace platform::file;
+
+    if(!file && size == USE_FILE_SIZE)
+        USAGI_THROW(std::invalid_argument(
+            "The size of a pagefile-backed mapping must be specified.")
+        );
+
+    if(size == USE_FILE_SIZE)
+        size = file->size() - offset;
+
+    // check_page_aligned(offset, size);
 
     mMapping = map(
         file ? file->handle() : USAGI_INVALID_FILE_HANDLE,
@@ -87,7 +99,7 @@ void MappedFileView::decommit(std::uint64_t offset, std::size_t size)
 
 void MappedFileView::remap(std::uint64_t new_size)
 {
-    check_page_aligned(0, new_size);
+    // check_page_aligned(0, new_size);
 
     platform::file::remap(mMapping, new_size);
 }
@@ -98,7 +110,7 @@ void MappedFileView::prefetch(
 {
     check_view(offset, size);
 
-    platform::memory::prefetch(base_view_byte() + offset, size);
+    platform::memory::prefetch(base_byte_view() + offset, size);
 }
 
 void MappedFileView::offer(
@@ -108,7 +120,7 @@ void MappedFileView::offer(
     check_view(offset, size);
     check_page_aligned(offset, size);
 
-    platform::memory::offer(base_view_byte() + offset, size);
+    platform::memory::offer(base_byte_view() + offset, size);
 }
 
 void MappedFileView::flush(const std::uint64_t offset, std::uint64_t size)
@@ -118,6 +130,6 @@ void MappedFileView::flush(const std::uint64_t offset, std::uint64_t size)
     check_view(offset, size);
     check_write_access();
 
-    platform::memory::flush(base_view_byte() + offset, size);
+    platform::memory::flush(base_byte_view() + offset, size);
 }
 }

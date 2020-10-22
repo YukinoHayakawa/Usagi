@@ -1,6 +1,7 @@
 ﻿#include "VmAllocatorFileBacked.hpp"
 
 #include <cassert>
+#include <stdexcept>
 
 #include <Usagi/Runtime/ErrorHandling.hpp>
 #include <Usagi/Runtime/File/RegularFile.hpp>
