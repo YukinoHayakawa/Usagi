@@ -191,6 +191,9 @@ public:
     friend bool operator==(
         const EntityIteratorFiltered &lhs, const EntityIteratorFiltered &rhs)
     {
+        // check iterator compatibility
+        assert(lhs.mEnd == rhs.mEnd);
+
         return static_cast<const BaseIteratorT &>(lhs) ==
             static_cast<const BaseIteratorT &>(rhs);
     }

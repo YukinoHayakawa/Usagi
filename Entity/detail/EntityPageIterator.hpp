@@ -45,6 +45,7 @@ public:
 
     auto & ref() const
     {
+        assert(mPageIndex != value_type::INVALID_PAGE);
         return mDatabase->mEntityPages.at(mPageIndex);
     }
 
