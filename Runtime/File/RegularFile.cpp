@@ -12,14 +12,14 @@ void RegularFile::reset_handle()
 }
 
 RegularFile::RegularFile(
-    std::u8string path,
+    std::filesystem::path path,
     const platform::file::FileOpenMode mode,
     const platform::file::FileOpenOptions options)
-    : mUtf8Path(std::move(path))
+    : mFilePath(std::move(path))
     , mMode(mode)
 {
     using namespace platform::file;
-    mFileHandle = open(mUtf8Path, mode, options);
+    mFileHandle = open(mFilePath, mode, options);
     assert(mFileHandle != USAGI_INVALID_FILE_HANDLE);
 }
 
@@ -29,7 +29,7 @@ RegularFile::~RegularFile()
 }
 
 RegularFile::RegularFile(RegularFile &&other) noexcept
-    : mUtf8Path { std::move(other.mUtf8Path) }
+    : mFilePath { std::move(other.mFilePath) }
     , mFileHandle { other.mFileHandle }
     , mMode { other.mMode }
 {
@@ -42,7 +42,7 @@ RegularFile & RegularFile::operator=(RegularFile &&other) noexcept
 {
     if(this == &other)
         return *this;
-    mUtf8Path = std::move(other.mUtf8Path);
+    mFilePath = std::move(other.mFilePath);
     mFileHandle = other.mFileHandle;
     mMode = other.mMode;
     other.reset_handle();

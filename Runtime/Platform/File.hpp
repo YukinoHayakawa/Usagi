@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string_view>
+#include <filesystem>
 
 #include <Usagi/Runtime/Memory/Region.hpp>
 
@@ -46,7 +47,7 @@ enum FileOpenOptions
  * \return A native file handle pointing to path.
  */
 NativeFileHandle open(
-    std::u8string_view path,
+    const std::filesystem::path &path,
     FileOpenMode mode,
     FileOpenOptions options);
 

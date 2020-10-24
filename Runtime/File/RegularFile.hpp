@@ -8,7 +8,7 @@ namespace usagi
 {
 class RegularFile
 {
-    std::u8string mUtf8Path;
+    std::filesystem::path mFilePath;
     platform::file::NativeFileHandle mFileHandle = USAGI_INVALID_FILE_HANDLE;
     platform::file::FileOpenMode mMode;
 
@@ -16,8 +16,10 @@ class RegularFile
 
 public:
     RegularFile(
-        std::u8string path,
-        platform::file::FileOpenMode mode,
+        std::filesystem::path path,
+        platform::file::FileOpenMode mode = platform::file::FileOpenMode(
+            platform::file::OPEN_READ | platform::file::OPEN_WRITE
+        ),
         platform::file::FileOpenOptions options = { });
     ~RegularFile();
 
@@ -30,7 +32,7 @@ public:
      * File Handle Info
      */
 
-    std::u8string path() const { return mUtf8Path; }
+    std::filesystem::path path() const { return mFilePath; }
     platform::file::NativeFileHandle handle() const { return mFileHandle; }
     platform::file::FileOpenMode mode() const { return mMode; }
     std::size_t size() const;
@@ -55,9 +57,9 @@ public:
      * \return
      */
     MappedFileView create_view(
-        std::uint64_t offset,
-        std::uint64_t length,
-        std::uint64_t commit,
+        std::uint64_t offset = 0,
+        std::uint64_t length = MappedFileView::USE_FILE_SIZE,
+        std::uint64_t commit = 0,
         void *base_address = nullptr);
 };
 }

@@ -38,9 +38,9 @@ public:
     MappedFileView(
         RegularFile *file,
         platform::file::MemoryMappingMode mode,
-        std::uint64_t offset,
-        std::uint64_t size,
-        std::uint64_t commit);
+        std::uint64_t offset = 0,
+        std::uint64_t size = USE_FILE_SIZE,
+        std::uint64_t commit = 0);
     ~MappedFileView();
 
     MappedFileView(const MappedFileView &other) = delete;
