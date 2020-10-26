@@ -19,8 +19,8 @@ class VmAllocatorFileBacked
 
     static void check_positive_size(std::size_t size);
     void check_allocated_by_us(void *ptr);
-    void check_mapping_created(bool created);
-    void check_has_backing_file(bool has);
+    void check_mapping_created(bool created) const;
+    void check_has_backing_file(bool has) const;
 
 public:
     VmAllocatorFileBacked() = default;
@@ -28,6 +28,7 @@ public:
     VmAllocatorFileBacked & operator=(VmAllocatorFileBacked &&other) noexcept;
 
     void set_backing_file(std::filesystem::path file);
+    const std::filesystem::path & path() const { return mFilePath; }
 
     // Move assignment and copy ctor & assignment implicitly deleted.
 

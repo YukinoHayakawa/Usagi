@@ -51,6 +51,7 @@ MappedFileView::MappedFileView(
             "The size of a pagefile-backed mapping must be specified.")
         );
 
+    // since we have a handle to the file, it must exist.
     if(size == USE_FILE_SIZE)
         size = file->size() - offset;
 

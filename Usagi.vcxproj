@@ -66,12 +66,14 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
     </ClInclude>
+    <ClInclude Include="Runtime\Memory\PagedStorage.hpp" />
     <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />
     <ClInclude Include="Concept\Container\Stack.hpp" />
     <ClInclude Include="Library\Algorithm\Max.hpp" />
     <ClInclude Include="Library\Algorithm\Pairwise.hpp" />
     <ClInclude Include="Library\Container\BinaryHeap.hpp" />
+    <ClInclude Include="Library\Container\DynamicArray.hpp" />
     <ClInclude Include="Library\Find.hpp" />
     <ClInclude Include="Library\Graph\detail\GraphTrait.hpp" />
     <ClInclude Include="Library\Graph\detail\GraphTraitConnectivity.hpp" />
@@ -115,7 +117,6 @@
     <ClInclude Include="Executor\detail\CpgValidation.hpp" />
     <ClInclude Include="Concept\Allocator\ReallocatableAllocator.hpp" />
     <ClInclude Include="Concept\Type\Rebindable.hpp" />
-    <ClInclude Include="Library\Container\DynamicArray.hpp" />
     <ClInclude Include="Library\Graph\TopologicalSort.hpp" />
     <ClInclude Include="Library\Math\Rounding.hpp" />
     <ClInclude Include="Library\Memory\LockGuard.hpp" />

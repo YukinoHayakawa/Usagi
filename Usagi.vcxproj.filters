@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Library\Container\DynamicArray.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Library\Memory\PoolAllocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -232,6 +229,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Concept\Type\Memcpyable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Container\DynamicArray.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Memory\PagedStorage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

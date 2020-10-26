@@ -3,13 +3,27 @@
 #include <cassert>
 #include <cstddef>
 
-#include <Usagi/Concept/Type/Rebindable.hpp>
-
 #include "SpinLock.hpp"
 #include "LockGuard.hpp"
 
 namespace usagi
 {
+namespace detail::pool_alloc
+{
+constexpr static std::size_t INVALID_BLOCK = -1;
+
+template <typename T>
+union Block
+{
+    std::size_t next = INVALID_BLOCK;
+    T data;
+
+    Block() { }
+    ~Block() = default;
+
+    // static_assert(sizeof Block == sizeof T);
+};
+}
 /**
  * \brief An object pool which uses an internal container to store allocated
  * objects. The internal container holds a contiguous region of memory. When
@@ -29,65 +43,75 @@ namespace usagi
  */
 template <
     typename T,
-    typename Container
+    template <typename Elem> typename Container
 >
 class PoolAllocator
+    : protected Container<detail::pool_alloc::Block<T>>
 {
-    constexpr static std::size_t INVALID_BLOCK = -1;
 
-    union Block
+protected:
+    constexpr static std::size_t INVALID_BLOCK =
+        detail::pool_alloc::INVALID_BLOCK;
+
+    using Block = detail::pool_alloc::Block<T>;
+
+public:
+    using StorageT = Container<Block>;
+
+protected:
+    struct Meta
     {
-        std::size_t next = INVALID_BLOCK;
-        T data;
+        std::uint64_t free_list_head = INVALID_BLOCK;
+    } mMeta;
 
-        Block() { }
-        ~Block() = default;
-    };
-
-    // static_assert(sizeof Block == sizeof T);
-
-    // Rebind since the actual type is Block instead of T.
-    static_assert(Rebindable<Container, Block>);
-
-    using StorageT = typename Container::template rebind<Block>;
-    StorageT mStorage;
-    std::size_t mFreeListHead = INVALID_BLOCK;
     // todo lock free algorithm?
     SpinLock mLock;
 
+    auto & free_list_head() { return mMeta.free_list_head; };
+
     Block & block(const std::size_t index)
     {
-        return mStorage.at(index);
+        return StorageT::at(index);
     }
 
     Block & head_free_block()
     {
-        assert(!mStorage.empty());
-        assert(mFreeListHead != INVALID_BLOCK);
-        return block(mFreeListHead);
+        assert(!StorageT::empty());
+        assert(free_list_head() != INVALID_BLOCK);
+        return block(free_list_head());
     }
 
     void release()
     {
-        mFreeListHead = INVALID_BLOCK;
+        free_list_head() = INVALID_BLOCK;
     }
 
 public:
-    PoolAllocator() = default;
-
     using value_type = T;
 
-    explicit PoolAllocator(StorageT storage)
-        : mStorage(std::move(storage))
-    {
-        storage.clear();
-    }
+    PoolAllocator() = default;
+
+    PoolAllocator(const PoolAllocator &other) = delete;
 
     PoolAllocator(PoolAllocator &&other) noexcept
-        : mStorage(std::move(other.mStorage))
-        , mFreeListHead(other.mFreeListHead)
+        : StorageT { std::move(other) }
+        , mMeta { other.mMeta }
+        , mLock { std::move(other.mLock) }
     {
         other.release();
+    }
+
+    PoolAllocator & operator=(const PoolAllocator &other) = delete;
+
+    PoolAllocator & operator=(PoolAllocator &&other) noexcept
+    {
+        if(this == &other)
+            return *this;
+        StorageT::operator=(std::move(other));
+        free_list_head() = other.mFreeListHead;
+        mLock = std::move(other.mLock);
+        other.release();
+        return *this;
     }
 
     template <typename R>
@@ -95,7 +119,7 @@ public:
 
     T & at(const std::size_t index)
     {
-        auto &b = mStorage[index];
+        auto &b = (*this)[index];
         return *reinterpret_cast<T*>(&b.data);
     }
 
@@ -107,16 +131,16 @@ public:
         LockGuard lock(mLock);
 
         // Free block available -> use it
-        if(mFreeListHead != INVALID_BLOCK)
+        if(free_list_head() != INVALID_BLOCK)
         {
-            idx = mFreeListHead;
-            mFreeListHead = head_free_block().next;
+            idx = free_list_head();
+            free_list_head() = head_free_block().next;
         }
         // No free block available -> push new block. may throw std::bad_alloc
         else
         {
-            idx = mStorage.size();
-            mStorage.emplace_back();
+            idx = StorageT::size();
+            StorageT::emplace_back(std::forward<Args>(args)...);
         }
 
         return idx;
@@ -131,23 +155,19 @@ public:
         LockGuard lock(mLock);
 
         // Link the released block to the free list
-        fp.next = mFreeListHead;
-        mFreeListHead = index;
+        fp.next = free_list_head();
+        free_list_head() = index;
     }
 
+    // return the number of nodes, not amount of active allocations
     std::size_t size() const
     {
-        return mStorage.size();
+        return StorageT::size();
     }
 
     std::size_t capacity() const
     {
-        return mStorage.capacity();
-    }
-
-    auto & storage()
-    {
-        return mStorage;
+        return StorageT::capacity();
     }
 };
 }

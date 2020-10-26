@@ -1,0 +1,94 @@
+﻿#pragma once
+
+#include <Usagi/Concept/Type/Memcpyable.hpp>
+#include <Usagi/Library/Container/DynamicArray.hpp>
+#include <Usagi/Library/Memory/PoolAllocator.hpp>
+#include <Usagi/Runtime/Memory/TypedAllocator.hpp>
+#include <Usagi/Runtime/Memory/VmAllocatorFileBacked.hpp>
+#include <Usagi/Runtime/Memory/VmAllocatorPagefileBacked.hpp>
+
+namespace usagi
+{
+namespace detail::paged_storage
+{
+template <typename T>
+using PagefileBackedArray = DynamicArray<
+    T,
+    TypedAllocator<T, VmAllocatorPagefileBacked>
+>;
+
+template <typename T>
+using FileBackedArray = DynamicArray<
+    T,
+    TypedAllocator<T, VmAllocatorFileBacked>
+>;
+}
+
+/**
+ * \brief Storage for Entity Pages and Components that only to be preserved
+ * during runtime. Memory space is allocated via reserving and committing
+ * virtual memory.
+ * \tparam T
+ */
+template <Memcpyable T>
+class PagedStorageInMemory
+    : public PoolAllocator<T, detail::paged_storage::PagefileBackedArray>
+{
+    using PoolT = PoolAllocator<T, detail::paged_storage::PagefileBackedArray>;
+    using StorageT = typename PoolT::StorageT;
+
+public:
+    using PoolT::PoolT;
+
+    // Virtual memory reservation
+};
+
+/**
+ * \brief File-backed storage for Entity Pages and Components.
+ * \tparam T
+ */
+template <Memcpyable T>
+class PagedStorageFileBacked
+    : public PoolAllocator<T, detail::paged_storage::FileBackedArray>
+{
+    using PoolT = PoolAllocator<T, detail::paged_storage::FileBackedArray>;
+    using StorageT = typename PoolT::StorageT;
+
+    struct Meta
+    {
+        std::uint64_t pool_free_list_head;
+    };
+
+public:
+    explicit PagedStorageFileBacked(std::filesystem::path mapped_file)
+    {
+        // prepare memory-mapped allocator.
+        StorageT::mAllocator.set_backing_file(std::move(mapped_file));
+
+        // if there is already a file, restore metadata
+        if(exists(StorageT::mAllocator.path()))
+        {
+            // hopefully the file is not 0-sized or mapping may fail.
+
+            StorageT::rebase(
+                StorageT::mAllocator.allocate(MappedFileView::USE_FILE_SIZE),
+                false
+            );
+            PoolT::mMeta = *static_cast<typename PoolT::Meta*>(
+                StorageT::extra_header_space()
+            );
+        }
+
+        // otherwise it's a new file. initialization will be handled by the
+        // dynamic array. no extra action is needed.
+    }
+
+    ~PagedStorageFileBacked()
+    {
+        *static_cast<typename PoolT::Meta*>(StorageT::extra_header_space())
+            = PoolT::mMeta;
+
+        // file mapping automatically flushed by base destructor
+    }
+};
+}

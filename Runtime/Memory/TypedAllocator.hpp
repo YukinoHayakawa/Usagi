@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <Usagi/Concept/Allocator/ReallocatableAllocator.hpp>
-
 namespace usagi
 {
 template <typename T, typename AllocatorBase>

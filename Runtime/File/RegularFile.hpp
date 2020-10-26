@@ -15,7 +15,7 @@ class RegularFile
     void reset_handle();
 
 public:
-    RegularFile(
+    explicit RegularFile(
         std::filesystem::path path,
         platform::file::FileOpenMode mode = platform::file::FileOpenMode(
             platform::file::OPEN_READ | platform::file::OPEN_WRITE

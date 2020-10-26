@@ -10,22 +10,20 @@ namespace usagi
 {
 void VmAllocatorFileBacked::check_positive_size(const std::size_t size)
 {
-    if(size == 0)
-        USAGI_THROW(std::bad_alloc());
+    if(size == 0) USAGI_THROW(std::bad_alloc());
 }
 
 void VmAllocatorFileBacked::check_allocated_by_us(void *ptr)
 {
-    if(ptr != mMapping->base_view())
-        USAGI_THROW(std::bad_alloc());
+    if(ptr != mMapping->base_view()) USAGI_THROW(std::bad_alloc());
 }
 
-void VmAllocatorFileBacked::check_mapping_created(bool created)
+void VmAllocatorFileBacked::check_mapping_created(bool created) const
 {
     if(created != bool(mMapping)) USAGI_THROW(std::bad_alloc());
 }
 
-void VmAllocatorFileBacked::check_has_backing_file(bool has)
+void VmAllocatorFileBacked::check_has_backing_file(bool has) const
 {
     if(mFilePath.empty() == has) USAGI_THROW(std::bad_alloc());
 }
@@ -49,7 +47,8 @@ VmAllocatorFileBacked & VmAllocatorFileBacked::operator=(
 
 void VmAllocatorFileBacked::set_backing_file(std::filesystem::path file)
 {
-    assert(mFilePath.empty());
+    check_has_backing_file(false);
+
     mFilePath = std::move(file);
 }
 
@@ -57,7 +56,8 @@ void * VmAllocatorFileBacked::allocate(std::size_t size)
 {
     check_has_backing_file(true);
     check_mapping_created(false);
-    check_positive_size(size);
+    // if size == 0 the allocated size would equal to the current file size.
+    // check_positive_size(size);
 
     using namespace platform::file;
 
@@ -97,6 +97,6 @@ void VmAllocatorFileBacked::deallocate(void *ptr)
 std::size_t VmAllocatorFileBacked::max_size() const noexcept
 {
     if(mFilePath.empty()) return 0;
-    return std::filesystem::space(mFilePath).available + mMapping->max_size();
+    return space(mFilePath).available + mMapping->max_size();
 }
 }
