@@ -1,13 +1,10 @@
 ﻿#pragma once
 
 #include <array>
-#include <tuple>
 
-#include <Usagi/Library/Container/DynamicArray.hpp>
 #include <Usagi/Library/Memory/LockGuard.hpp>
-#include <Usagi/Library/Memory/PoolAllocator.hpp>
-#include <Usagi/Runtime/Memory/TypedAllocator.hpp>
-#include <Usagi/Runtime/Memory/VmAllocatorPagefileBacked.hpp>
+#include <Usagi/Library/Memory/SpinLock.hpp>
+#include <Usagi/Runtime/Memory/PagedStorage.hpp>
 
 #include "Archetype.hpp"
 #include "detail/ComponentAccessAllowAll.hpp"
@@ -19,6 +16,20 @@
 
 namespace usagi
 {
+namespace detail::entity
+{
+template <
+    template <typename T> typename Storage,
+    Component C,
+    Component... EnabledComponents
+>
+using ComponentStorageT = Storage<
+    std::array<
+        C,
+        EntityPage<EnabledComponents...>::PAGE_SIZE
+    >
+>;
+}
 /**
  * \brief Entity Database manages Entities and their Component data. It
  * provides compile time access permission validation for the Executive
@@ -34,13 +45,16 @@ namespace usagi
  * be two identical types in the list.
  */
 template <
-    typename EnabledComponents = ComponentFilter<>,
-    typename Storage = PoolAllocator<
-        int,
-        DynamicArray<int, TypedAllocator<int, VmAllocatorPagefileBacked>>
-    >
+    template <typename T> typename Storage,
+    Component... EnabledComponents
 >
 class EntityDatabase
+    // storage for entity pages
+    : protected Storage<EntityPage<EnabledComponents...>>
+    // storage for components
+    , protected detail::entity::ComponentStorageT<
+        Storage, EnabledComponents, EnabledComponents...
+    >...
 {
 public:
     // Should only be friend with the access with the same type of database,
@@ -52,15 +66,9 @@ public:
     template <typename Database>
     friend class EntityPageIterator;
 
-private:
-    template<typename T>
-    using StorageT = typename Storage::template rebind<T>;
-
-public:
-    using ComponentFilterT      = EnabledComponents;
-    using EntityPageT           =
-        typename EnabledComponents::template rebind<EntityPage>;
-    using EntityPageAllocatorT  = StorageT<EntityPageT>;
+    using ComponentFilterT      = ComponentFilter<EnabledComponents...>;
+    using EntityPageT           = EntityPage<EnabledComponents...>;
+    using EntityPageAllocatorT  = Storage<EntityPageT>;
     using EntityPageIteratorT   = EntityPageIterator<EntityDatabase>;
     using EntityUserViewT = EntityView<EntityDatabase, ComponentAccessAllowAll>;
 
@@ -68,25 +76,31 @@ public:
 
     static_assert(Memcpyable<EntityPageT>);
 
-private:
-    // Count the allocation of Entity Pages
-    std::uint64_t           mEntityPageSeqId = 0;
-    // A linked list of entities is maintained in the order of Entity Page Ids
-    std::uint64_t           mFirstEntityPageIndex = EntityPageT::INVALID_PAGE;
-    std::uint64_t           mLastEntityPageIndex = EntityPageT::INVALID_PAGE;
-    EntityPageAllocatorT    mEntityPages;
+protected:
+    struct Meta
+    {
+        // Count the allocation of Entity Pages
+        std::uint64_t entity_seq_id = 0;
+        // A linked list of entities is maintained in the order of allocation
+        std::uint64_t first_entity_page_idx = EntityPageT::INVALID_PAGE;
+        std::uint64_t last_entity_page_idx = EntityPageT::INVALID_PAGE;
+    } mMeta;
     // todo lockless
-    SpinLock                mEntityPageAllocationLock;
+    SpinLock mEntityPageAllocationLock;
 
-    template <Component C>
-    using SingleComponentStorageT = StorageT<std::array<C, ENTITY_PAGE_SIZE>>;
+    auto & entity_pages()
+    {
+        return static_cast<EntityPageAllocatorT&>(*this);
+    }
 
-    using ComponentStorageT =
-        typename EnabledComponents::template rebind_to_template<
-            std::tuple,
-            SingleComponentStorageT
-        >;
-    ComponentStorageT mComponentStorage;
+    template <Component T>
+    auto & component_storage()
+    {
+        using namespace detail::entity;
+        return static_cast<
+            ComponentStorageT<Storage, T, EnabledComponents...>&
+        >(*this);
+    }
 
     struct EntityPageInfo
     {
@@ -96,40 +110,40 @@ private:
 
     EntityPageInfo allocate_entity_page()
     {
-        std::size_t page_idx = mEntityPages.allocate();
-        EntityPageT &page = mEntityPages.at(page_idx);
+        std::size_t page_idx = entity_pages().allocate();
+        EntityPageT &page = entity_pages().at(page_idx);
 
         std::allocator_traits<EntityPageAllocatorT>::construct(
-            mEntityPages, &page
+            entity_pages(), &page
         );
 
         {
             LockGuard lock(mEntityPageAllocationLock);
 
-            page.page_seq_id = mEntityPageSeqId;
+            page.page_seq_id = mMeta.entity_seq_id;
 
             // Insert the new page at the end of linked list so that the
             // entities are accessed in the incremental order of entity id
             // when being iterated
 
             // The linked list is empty and we are inserting the first page
-            if(mFirstEntityPageIndex == EntityPageT::INVALID_PAGE)
+            if(mMeta.first_entity_page_idx == EntityPageT::INVALID_PAGE)
             {
-                assert(mLastEntityPageIndex == EntityPageT::INVALID_PAGE);
-                mFirstEntityPageIndex = page_idx;
-                mLastEntityPageIndex = page_idx;
+                assert(mMeta.last_entity_page_idx == EntityPageT::INVALID_PAGE);
+                mMeta.first_entity_page_idx = page_idx;
+                mMeta.last_entity_page_idx = page_idx;
             }
             // The linked list has at least one page
             else
             {
-                assert(mLastEntityPageIndex != EntityPageT::INVALID_PAGE);
-                auto &last = mEntityPages.at(mLastEntityPageIndex);
+                assert(mMeta.last_entity_page_idx != EntityPageT::INVALID_PAGE);
+                auto &last = entity_pages().at(mMeta.last_entity_page_idx);
                 assert(last.next_page == EntityPageT::INVALID_PAGE);
                 last.next_page = page_idx;
-                mLastEntityPageIndex = page_idx;
+                mMeta.last_entity_page_idx = page_idx;
             }
 
-            ++mEntityPageSeqId;
+            ++mMeta.entity_seq_id;
         }
 
         return EntityPageInfo {
@@ -185,10 +199,10 @@ private:
 
         // The page was deleted and the storage shrunk so the index refers to
         // invalid memory
-        if(page_idx >= mEntityPages.size())
+        if(page_idx >= entity_pages().size())
             return allocate_entity_page();
 
-        auto ptr = &mEntityPages.at(page_idx);
+        auto ptr = &entity_pages().at(page_idx);
 
         // The page got recycled and was made into a new page
         if(ptr->page_seq_id != archetype.mLastUsedPageSeqId)
@@ -200,6 +214,7 @@ private:
         };
     }
 
+    /*
     template <
         typename Func,
         template <Component...> typename Filter,
@@ -209,10 +224,12 @@ private:
     {
         (..., func(std::get<SingleComponentStorageT<Cs>>(mComponentStorage)));
     }
+    */
 
 public:
     EntityDatabase() = default;
 
+    /*
     template <typename Func>
     void init_entity_page_storage(Func &&func)
     {
@@ -224,6 +241,30 @@ public:
     {
         init_component_storage(std::forward<Func>(func), ComponentFilterT());
     }
+    */
+
+    /*
+    EntityDatabaseMetaInfo get_state() const
+    {
+        EntityDatabaseMetaInfo meta;
+
+        meta.entity_seq_id = mMeta.entity_seq_id;
+        meta.first_entity_page_idx = mMeta.first_entity_page_idx;
+        meta.last_entity_page_idx = mMeta.last_entity_page_idx;
+
+        return meta;
+    }
+
+    void restore_state(const EntityDatabaseMetaInfo &meta)
+    {
+        assert(entity_pages().size() > meta.first_entity_page_idx);
+        assert(entity_pages().size() > meta.last_entity_page_idx);
+
+        mMeta.entity_seq_id = meta.entity_seq_id;
+        mMeta.first_entity_page_idx = meta.first_entity_page_idx;
+        mMeta.last_entity_page_idx = meta.last_entity_page_idx;
+    }
+    */
 
     template <typename ComponentAccess>
     auto create_access()
@@ -235,7 +276,7 @@ public:
     {
         return EntityUserViewT {
             this,
-            &mEntityPages.at(id.page),
+            &entity_pages().at(id.page),
             id.offset
         };
     }
@@ -251,7 +292,6 @@ public:
         // that no concurrent entity creation on one page will happen.
 
         EntityPageInfo page = try_reuse_coherent_page(archetype);
-        EntityId entity_id;
 
         // The Entity Page is full, allocate a new one.
         // Note that the holes in an Entity Page is never used.
@@ -271,7 +311,7 @@ public:
         (..., (view.template add_component<InitialComponents>()
             = archetype.template val<InitialComponents>()));
 
-        entity_id = EntityId {
+        const EntityId entity_id = EntityId {
             .offset = page.ptr->first_unused_index,
             .page = page.index
         };
@@ -287,19 +327,13 @@ public:
         return entity_id;
     }
 
-    template <Component T>
-    auto & component_storage()
-    {
-        return std::get<SingleComponentStorageT<T>>(mComponentStorage);
-    }
-
     /**
      * \brief Release unused pages and clear dirty flags of pages.
      */
     void reclaim_pages()
     {
-        std::size_t cur = mFirstEntityPageIndex;
-        std::size_t *prev_next_ptr = &mFirstEntityPageIndex;
+        std::size_t cur = mMeta.first_entity_page_idx;
+        std::size_t *prev_next_ptr = &mMeta.first_entity_page_idx;
         std::size_t prev = EntityPageT::INVALID_PAGE;
 
         while(cur != EntityPageT::INVALID_PAGE)
@@ -307,31 +341,31 @@ public:
             bool drop_page = true;
             release_empty_component_pages(cur, ComponentFilterT(), drop_page);
 
-            EntityPageT &page = mEntityPages.at(cur);
+            EntityPageT &page = entity_pages().at(cur);
 
             if(drop_page)
             {
                 // link the previous page to the next page of current page.
                 // if this is the only page, this clears the linked list
-                // by setting mFirstEntityPageIndex to INVALID_PAGE because
-                // page.next_page would have that value.
+                // by setting mMeta.first_entity_page_idx to INVALID_PAGE
+                // because page.next_page would have that value.
                 *prev_next_ptr = page.next_page;
                 // this is the last page
-                if(cur == mLastEntityPageIndex)
+                if(cur == mMeta.last_entity_page_idx)
                 {
                     assert(page.next_page == EntityPageT::INVALID_PAGE);
                     // if this was the only page, the list becomes empty
-                    mLastEntityPageIndex = prev;
+                    mMeta.last_entity_page_idx = prev;
                 }
                 // clear the id range so it doesn't get accidentally
                 // recognized as a valid page
                 page.page_seq_id = -1;
                 // release page
-                mEntityPages.deallocate(cur);
+                entity_pages().deallocate(cur);
                 // increment iteration position.
                 // prev_ptr always points to a valid memory position even
                 // if the list was empty. when that is the case, it just
-                // points to mFirstEntityPageIndex.
+                // points to mMeta.first_entity_page_idx.
                 cur = *prev_next_ptr;
                 // in this case the prev index doesn't have to updated
             }
@@ -361,7 +395,7 @@ private:
     template <Component C>
     void release_empty_component_page(const std::size_t e_idx, bool &drop_page)
     {
-        EntityPageT &page = mEntityPages.at(e_idx);
+        EntityPageT &page = entity_pages().at(e_idx);
         auto &c_idx = page.template component_page_index<C>();
 
         // Not allocated
@@ -380,4 +414,10 @@ private:
         c_idx = EntityPageT::INVALID_PAGE;
     }
 };
+
+template <Component... EnabledComponents>
+using EntityDatabaseInMemory = EntityDatabase<
+    PagedStorageInMemory,
+    EnabledComponents...
+>;
 }

@@ -68,7 +68,6 @@ public:
         if(exists(StorageT::mAllocator.path()))
         {
             // hopefully the file is not 0-sized or mapping may fail.
-
             StorageT::rebase(
                 StorageT::mAllocator.allocate(MappedFileView::USE_FILE_SIZE),
                 false

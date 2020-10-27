@@ -31,7 +31,7 @@ class EntityView
     {
         // Locate the component in the storage
         auto &idx = mPage->template component_page_index<C>();
-        auto &storage = this->mDatabase->template component_storage<C>();
+        auto &storage = this->template component_storage<C>();
         // Ensure that the entity has the component
         assert(has_component<C>());
         assert(idx != DatabaseT::EntityPageT::INVALID_PAGE);
@@ -74,7 +74,7 @@ public:
     {
         // Locate the component position in the storage
         auto &idx = mPage->template component_page_index<C>();
-        auto &storage = this->mDatabase->template component_storage<C>();
+        auto &storage = this->template component_storage<C>();
 
         // The entity shouldn't have the requested entity
         assert(!has_component<C>());

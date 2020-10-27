@@ -13,8 +13,8 @@ class Archetype
     std::tuple<InitialComponents...> mInitialValues;
 
     template <
-        typename ComponentFilter,
-        typename Storage
+        template <typename T> typename Storage,
+        Component... EnabledComponents
     >
     friend class EntityDatabase;
 

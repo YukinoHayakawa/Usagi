@@ -22,7 +22,7 @@ protected:
 
     auto entity_page_begin() const
     {
-        return entity_page_at_index(mDatabase->mFirstEntityPageIndex);
+        return entity_page_at_index(mDatabase->mMeta.first_entity_page_idx);
     }
 
     auto entity_page_end() const
@@ -35,6 +35,12 @@ protected:
         return EntityPageIterator<DatabaseT>(
             mDatabase, index
         );
+    }
+
+    template <Component T>
+    auto & component_storage() const
+    {
+        return mDatabase->template component_storage<T>();
     }
 };
 }
