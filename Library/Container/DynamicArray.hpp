@@ -37,14 +37,18 @@ public:
 protected:
     Allocator mAllocator;
 
-    constexpr static std::uint64_t MAGIC_CHECK = 0x78994985f7a04928;
+    // constexpr static std::uint64_t MAGIC_CHECK = 0x7899'4985'f7a0'4928;
+    constexpr static std::uint16_t MAGIC_CHECK = 0x7899;
+    constexpr static std::uint16_t NUM_CHECKS = 4;
 
     struct Meta
     {
-        std::uint64_t magic_check = MAGIC_CHECK;
+        // this can be used by derived classes to insert more header checks
+        std::uint16_t header_check[NUM_CHECKS] = { MAGIC_CHECK, 0, 0, 0 };
         std::uint64_t size = 0;
         std::uint64_t capacity = 0;
     };
+    static_assert(sizeof(Meta) == 24);
 
     Meta *mBase = nullptr;
     T *mStorage = nullptr;
@@ -53,6 +57,7 @@ protected:
 
     constexpr static std::uint64_t HEADER_SIZE = 64; // 64 bytes
     constexpr static std::uint64_t ALLOCATION_SIZE = 0x10000; // 64 KiB
+    constexpr static std::uint64_t EXTRA_HEADER_BEGIN = 0;
 
     void check_boundary_access(size_type n) const
     {
@@ -64,12 +69,34 @@ protected:
         return mBase != nullptr;
     }
 
-    void * extra_header_space()
+    template <const std::size_t Index, std::uint16_t Magic>
+    void set_header_magic()
+    {
+        static_assert(Index < NUM_CHECKS);
+        assert(storage_initialized());
+        mBase->header_check[Index] = Magic;
+    }
+
+    template <const std::size_t Index, std::uint16_t Magic>
+    void check_header_magic()
+    {
+        static_assert(Index < NUM_CHECKS);
+        assert(storage_initialized());
+        if(mBase->header_check[Index] != Magic)
+        {
+            USAGI_THROW(std::runtime_error("Corrupted header."));
+        }
+    }
+
+    template <std::size_t Offset, typename Header>
+    auto & extra_header_space()
     {
         assert(mBase);
         // the rest space in the header could be used by derived classes
         // to store associated info. beware don't write pass the header region.
-        return mBase + 1;
+        return *reinterpret_cast<Header*>(
+            reinterpret_cast<char*>(mBase + 1) + Offset
+        );
     }
 
 public:
@@ -293,10 +320,8 @@ protected:
             static_cast<char*>(base_address) + HEADER_SIZE
         );
 
-        if(init_meta)
-            *mBase = Meta { };
-        else if(mBase->magic_check != MAGIC_CHECK)
-            USAGI_THROW(std::runtime_error("Corrupted array header."));
+        if(init_meta) *mBase = Meta { };
+        else check_header_magic<0, MAGIC_CHECK>();
     }
 };
 }

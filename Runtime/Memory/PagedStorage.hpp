@@ -51,13 +51,12 @@ template <Memcpyable T>
 class PagedStorageFileBacked
     : public PoolAllocator<T, detail::paged_storage::FileBackedArray>
 {
+protected:
     using PoolT = PoolAllocator<T, detail::paged_storage::FileBackedArray>;
     using StorageT = typename PoolT::StorageT;
 
-    struct Meta
-    {
-        std::uint64_t pool_free_list_head;
-    };
+    constexpr static std::uint16_t MAGIC_CHECK = 0x4985;
+    constexpr static std::uint64_t EXTRA_HEADER_BEGIN = sizeof(PoolT::Meta);
 
 public:
     explicit PagedStorageFileBacked(std::filesystem::path mapped_file)
@@ -74,9 +73,10 @@ public:
                 StorageT::mAllocator.allocate(MappedFileView::USE_FILE_SIZE),
                 false
             );
-            PoolT::mMeta = *static_cast<typename PoolT::Meta*>(
-                StorageT::extra_header_space()
-            );
+            StorageT::template check_header_magic<1, MAGIC_CHECK>();
+            PoolT::mMeta = StorageT::template extra_header_space<
+                0, typename PoolT::Meta
+            >();
         }
 
         // otherwise it's a new file. initialization will be handled by the
@@ -85,8 +85,10 @@ public:
 
     ~PagedStorageFileBacked()
     {
-        *static_cast<typename PoolT::Meta*>(StorageT::extra_header_space())
-            = PoolT::mMeta;
+        // save metadata to the header
+        StorageT::template extra_header_space<0, typename PoolT::Meta>() =
+            PoolT::mMeta;
+        StorageT::template set_header_magic<1, MAGIC_CHECK>();
 
         // file mapping automatically flushed by base destructor
     }

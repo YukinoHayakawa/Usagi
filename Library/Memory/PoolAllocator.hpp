@@ -59,6 +59,8 @@ public:
     using StorageT = Container<Block>;
 
 protected:
+    // Pool allocator cannot rely on that the underlying container provides
+    // extra header space. So the metadata has to be explicitly synced.
     struct Meta
     {
         std::uint64_t free_list_head = INVALID_BLOCK;
