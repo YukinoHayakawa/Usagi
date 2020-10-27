@@ -56,38 +56,42 @@ protected:
     using StorageT = typename PoolT::StorageT;
 
     constexpr static std::uint16_t MAGIC_CHECK = 0x4985;
-    constexpr static std::uint64_t EXTRA_HEADER_BEGIN = sizeof(PoolT::Meta);
 
 public:
+    PagedStorageFileBacked() = default;
+
     explicit PagedStorageFileBacked(std::filesystem::path mapped_file)
+    {
+        init(std::move(mapped_file));
+    }
+
+    // return true if it is restoring from existing file
+    bool init(std::filesystem::path mapped_file)
     {
         // prepare memory-mapped allocator.
         StorageT::mAllocator.set_backing_file(std::move(mapped_file));
 
         // if there is already a file, restore metadata
-        if(exists(StorageT::mAllocator.path()))
+        const bool file_exists = exists(StorageT::mAllocator.path());
+        if(file_exists)
         {
             // hopefully the file is not 0-sized or mapping may fail.
             StorageT::rebase(
                 StorageT::mAllocator.allocate(MappedFileView::USE_FILE_SIZE),
                 false
             );
-            StorageT::template check_header_magic<1, MAGIC_CHECK>();
-            PoolT::mMeta = StorageT::template extra_header_space<
-                0, typename PoolT::Meta
-            >();
         }
+        StorageT::template push_header<MAGIC_CHECK>(PoolT::mMeta, file_exists);
 
         // otherwise it's a new file. initialization will be handled by the
         // dynamic array. no extra action is needed.
+        return file_exists;
     }
 
     ~PagedStorageFileBacked()
     {
         // save metadata to the header
-        StorageT::template extra_header_space<0, typename PoolT::Meta>() =
-            PoolT::mMeta;
-        StorageT::template set_header_magic<1, MAGIC_CHECK>();
+        StorageT::template pop_header<MAGIC_CHECK>(PoolT::mMeta, true);
 
         // file mapping automatically flushed by base destructor
     }

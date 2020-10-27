@@ -68,7 +68,7 @@ public:
 
     using ComponentFilterT      = ComponentFilter<EnabledComponents...>;
     using EntityPageT           = EntityPage<EnabledComponents...>;
-    using EntityPageAllocatorT  = Storage<EntityPageT>;
+    using EntityPageStorageT    = Storage<EntityPageT>;
     using EntityPageIteratorT   = EntityPageIterator<EntityDatabase>;
     using EntityUserViewT = EntityView<EntityDatabase, ComponentAccessAllowAll>;
 
@@ -88,18 +88,16 @@ protected:
     // todo lockless
     SpinLock mEntityPageAllocationLock;
 
-    auto & entity_pages()
+    EntityPageStorageT &  entity_pages()
     {
-        return static_cast<EntityPageAllocatorT&>(*this);
+        return *this;
     }
 
-    template <Component T>
-    auto & component_storage()
+    template <Component C>
+    auto component_storage() -> detail::entity::ComponentStorageT<
+        Storage, C, EnabledComponents...> &
     {
-        using namespace detail::entity;
-        return static_cast<
-            ComponentStorageT<Storage, T, EnabledComponents...>&
-        >(*this);
+        return *this;
     }
 
     struct EntityPageInfo
@@ -113,7 +111,7 @@ protected:
         std::size_t page_idx = entity_pages().allocate();
         EntityPageT &page = entity_pages().at(page_idx);
 
-        std::allocator_traits<EntityPageAllocatorT>::construct(
+        std::allocator_traits<EntityPageStorageT>::construct(
             entity_pages(), &page
         );
 
@@ -214,57 +212,8 @@ protected:
         };
     }
 
-    /*
-    template <
-        typename Func,
-        template <Component...> typename Filter,
-        Component... Cs
-    >
-    void init_component_storage(Func &&func, Filter<Cs...>)
-    {
-        (..., func(std::get<SingleComponentStorageT<Cs>>(mComponentStorage)));
-    }
-    */
-
 public:
     EntityDatabase() = default;
-
-    /*
-    template <typename Func>
-    void init_entity_page_storage(Func &&func)
-    {
-        func(mEntityPages);
-    }
-
-    template <typename Func>
-    void init_component_storage(Func &&func)
-    {
-        init_component_storage(std::forward<Func>(func), ComponentFilterT());
-    }
-    */
-
-    /*
-    EntityDatabaseMetaInfo get_state() const
-    {
-        EntityDatabaseMetaInfo meta;
-
-        meta.entity_seq_id = mMeta.entity_seq_id;
-        meta.first_entity_page_idx = mMeta.first_entity_page_idx;
-        meta.last_entity_page_idx = mMeta.last_entity_page_idx;
-
-        return meta;
-    }
-
-    void restore_state(const EntityDatabaseMetaInfo &meta)
-    {
-        assert(entity_pages().size() > meta.first_entity_page_idx);
-        assert(entity_pages().size() > meta.last_entity_page_idx);
-
-        mMeta.entity_seq_id = meta.entity_seq_id;
-        mMeta.first_entity_page_idx = meta.first_entity_page_idx;
-        mMeta.last_entity_page_idx = meta.last_entity_page_idx;
-    }
-    */
 
     template <typename ComponentAccess>
     auto create_access()
@@ -418,6 +367,12 @@ private:
 template <Component... EnabledComponents>
 using EntityDatabaseInMemory = EntityDatabase<
     PagedStorageInMemory,
+    EnabledComponents...
+>;
+
+template <Component... EnabledComponents>
+using EntityDatabaseFileBacked = EntityDatabase<
+    PagedStorageFileBacked,
     EnabledComponents...
 >;
 }
