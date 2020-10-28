@@ -38,8 +38,8 @@ public:
 protected:
     Allocator mAllocator;
 
-    // constexpr static std::uint64_t MAGIC_CHECK = 0x7899'4985'f7a0'4928;
-    constexpr static std::uint16_t MAGIC_CHECK = 0x7899;
+    // dynamic array
+    constexpr static std::uint16_t MAGIC_CHECK = 0xDA01;
     constexpr static std::uint16_t MAX_HEADER_DEPTH = 4;
 
     // the rest space in the header could be used by derived classes
@@ -47,7 +47,7 @@ protected:
     struct Meta
     {
         // this can be used by derived classes to insert more header checks
-        std::uint16_t header_check[MAX_HEADER_DEPTH] = { MAGIC_CHECK, 0, 0, 0 };
+        std::uint16_t header_check[MAX_HEADER_DEPTH] = { };
         std::uint64_t size = 0;
         std::uint64_t capacity = 0;
     };
@@ -316,7 +316,7 @@ private:
         const auto new_storage = mAllocator.reallocate(mBase, alloc_size);
         rebase(new_storage, !storage_initialized());
         // the reminder part not making up an object is dropped
-        mBase->capacity = storage_size / sizeof(T);
+        mBase->capacity = (alloc_size - MAX_HEADER_SIZE) / sizeof(T);
     }
 
     void release()

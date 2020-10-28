@@ -55,7 +55,8 @@ protected:
     using PoolT = PoolAllocator<T, detail::paged_storage::FileBackedArray>;
     using StorageT = typename PoolT::StorageT;
 
-    constexpr static std::uint16_t MAGIC_CHECK = 0x4985;
+    // file-backed allocator
+    constexpr static std::uint16_t MAGIC_CHECK = 0xFA01;
 
 public:
     PagedStorageFileBacked() = default;
