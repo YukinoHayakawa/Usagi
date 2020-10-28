@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <tuple>
 #include <cstdint>
 
 #include "detail/ComponentFilter.hpp"
@@ -8,10 +7,8 @@
 namespace usagi
 {
 template <Component... InitialComponents>
-class Archetype
+class Archetype : InitialComponents...
 {
-    std::tuple<InitialComponents...> mInitialValues;
-
     template <
         template <typename T> typename Storage,
         Component... EnabledComponents
@@ -29,22 +26,21 @@ public:
 
     using ComponentFilterT = ComponentFilter<InitialComponents...>;
 
-    template <typename... Args>
-    explicit Archetype(Args &&... args)
-        : mInitialValues { std::forward<Args>(args)... }
+    explicit Archetype(InitialComponents &&... args)
+        : InitialComponents { std::forward<InitialComponents>(args) }...
     {
     }
 
     template <Component C>
-    auto & val()
+    auto val() -> C &
     {
-        return std::get<C>(mInitialValues);
+        return *this;
     }
 
     template <Component C>
-    auto & val() const
+    auto val() const -> const C &
     {
-        return std::get<C>(mInitialValues);
+        return *this;
     }
 };
 }

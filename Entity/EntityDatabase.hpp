@@ -187,7 +187,7 @@ protected:
      */
     template <Component... InitialComponents>
     EntityPageInfo try_reuse_coherent_page(
-            Archetype<InitialComponents...> &archetype)
+        Archetype<InitialComponents...> &archetype)
     {
         const auto page_idx = archetype.mLastUsedPageIndex;
 
