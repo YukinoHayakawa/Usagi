@@ -14,6 +14,7 @@ namespace usagi::platform::memory
 // Get the page size in bytes.
 std::size_t page_size();
 std::size_t round_up_to_page_size(std::size_t size_bytes);
+std::size_t round_down_to_page_size(std::size_t size_bytes);
 
 // Reserve a virtual address range. If commit is true, the range is also
 // committed.
@@ -51,6 +52,10 @@ MemoryRegion free(void *ptr, std::size_t size_bytes);
 // memory manager for other purposes.
 // Returns the actual affected memory region.
 MemoryRegion offer(void *ptr, std::size_t size_bytes);
+
+// Use zero pages to replace a range of committed virtual memory.
+// The memory range must be page-aligned.
+MemoryRegion zero_pages(void *ptr, std::size_t size_bytes);
 
 // ========================== Memory Mapping ================================ //
 

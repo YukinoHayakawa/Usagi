@@ -64,6 +64,7 @@ public:
         return *this;
     }
 
+    auto mode() const{ return mMode; }
     std::size_t max_size() const noexcept { return mMapping.heap.length; }
 
     void * base_view() const

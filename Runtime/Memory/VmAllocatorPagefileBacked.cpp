@@ -43,6 +43,12 @@ void VmAllocatorPagefileBacked::check_allocated_by_us(void *ptr) const
         USAGI_THROW(std::bad_alloc());
 }
 
+void VmAllocatorPagefileBacked::check_boundary(std::uint64_t size) const
+{
+    if(size > mCommittedBytes)
+        USAGI_THROW(std::bad_alloc());
+}
+
 VmAllocatorPagefileBacked::~VmAllocatorPagefileBacked()
 {
     // Ensure correct behavior of moved instances.
@@ -86,8 +92,7 @@ void * VmAllocatorPagefileBacked::allocate(const std::size_t size)
 
     if(!mBaseAddress) reserve(memory::round_up_to_page_size(size));
 
-    const auto new_committed_bytes =
-        round_up_allocation_size_checked(size);
+    const auto new_committed_bytes = round_up_allocation_size_checked(size);
 
     // Otherwise, commit the range of used memory and return the base address.
     memory::commit(mBaseAddress, new_committed_bytes);
@@ -108,8 +113,7 @@ void * VmAllocatorPagefileBacked::reallocate(
 
     check_positive_size(new_size);
 
-    const auto new_committed_bytes =
-        round_up_allocation_size_checked(new_size);
+    const auto new_committed_bytes = round_up_allocation_size_checked(new_size);
 
     // No change in amount of committed pages
     if(new_committed_bytes == mCommittedBytes)
@@ -118,15 +122,13 @@ void * VmAllocatorPagefileBacked::reallocate(
     // More pages to be committed
     if(new_committed_bytes > mCommittedBytes)
     {
-        const auto distance =
-            new_committed_bytes - mCommittedBytes;
+        const auto distance = new_committed_bytes - mCommittedBytes;
         memory::commit(mBaseAddress + mCommittedBytes, distance);
     }
     // Release tail pages
     else
     {
-        const auto distance =
-            mCommittedBytes - new_committed_bytes;
+        const auto distance = mCommittedBytes - new_committed_bytes;
         memory::decommit(mBaseAddress + new_committed_bytes, distance);
     }
 
@@ -143,5 +145,39 @@ void VmAllocatorPagefileBacked::deallocate(void *ptr)
 
     memory::decommit(mBaseAddress, mCommittedBytes);
     mCommittedBytes = 0;
+}
+
+void VmAllocatorPagefileBacked::zero_memory(
+    void *ptr,
+    const std::uint64_t offset,
+    std::size_t size)
+{
+    check_allocated_by_us(ptr);
+    check_boundary(offset + size);
+
+    if(size == 0) size = mCommittedBytes;
+
+    // * -> page alignments
+    // + -> zeroed using memset()
+    // ~ -> zeroed using zero pages
+    //         ++++++++~~~~~~~~~~~~~~~~++++++++
+    // *               *       *       *               *
+    // |.......|.......|.......|.......|.......|.......|
+    // base    begin   |               |       end     |
+    //                 begin_aligned   end_aligned     committed
+
+    char *base = static_cast<char*>(ptr);
+
+    const auto begin = offset;
+    const auto begin_aligned = memory::round_up_to_page_size(begin);
+    const auto end = offset + size;
+    const auto end_aligned = memory::round_down_to_page_size(end);
+
+    memory::zero_pages(
+        base + begin_aligned,
+        end_aligned - begin_aligned
+    );
+    if(begin_aligned > begin) memset(base + begin, 0, begin_aligned - begin);
+    if(end_aligned < end) memset(base + end_aligned, 0, end - end_aligned);
 }
 }

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cstddef>
+#include <cstdint>
 
 #include <Usagi/Concept/Allocator/ReallocatableAllocator.hpp>
 
@@ -48,6 +49,7 @@ class VmAllocatorPagefileBacked
     void assert_allocation_happened() const;
     static void check_positive_size(std::size_t size);
     void check_allocated_by_us(void *ptr) const;
+    void check_boundary(std::uint64_t size) const;
 
 public:
     VmAllocatorPagefileBacked() = default;
@@ -62,6 +64,16 @@ public:
     void * allocate(std::size_t size);
     void * reallocate(void *old_ptr, std::size_t new_size);
     void deallocate(void *ptr);
+
+    /**
+     * \brief Use zero pages to replace the content of specified range of
+     * memory. Non-page-aligned parts will be zeroed using `memset()`
+     * If `size == 0`, the whole allocated heap will be zeroed.
+     * \param ptr Must be the address returned by `allocate()` or `reallocate()`
+     * \param offset
+     * \param size
+     */
+    void zero_memory(void *ptr, std::uint64_t offset = 0, std::size_t size = 0);
 
     std::size_t max_size() const noexcept
     {
