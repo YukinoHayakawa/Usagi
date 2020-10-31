@@ -1,6 +1,10 @@
 ﻿#pragma once
 
+#include <type_traits>
+
 #include <Usagi/Entity/Component.hpp>
+#include <Usagi/Library/Meta/List.hpp>
+#include <Usagi/Library/Meta/Tag.hpp>
 
 namespace usagi
 {
@@ -11,17 +15,19 @@ namespace usagi
  * \tparam Components A sequence of component types.
  */
 template <Component... Components>
-struct ComponentFilter
+struct ComponentFilter : Tag<Components>...
 {
     template <Component C>
-    static constexpr bool HAS_COMPONENT =
-        std::disjunction_v<std::is_same<C, Components>...>;
+    static constexpr bool HAS_COMPONENT = std::is_base_of_v<
+        Tag<C>,
+        ComponentFilter
+    >;
 
     template <
         template <typename...>
         typename T
     >
-    using rebind = T<Components...>;
+    using apply = T<Components...>;
 
     template <
         template <typename...>
@@ -29,7 +35,7 @@ struct ComponentFilter
         template <typename>
         typename N
     >
-    using rebind_to_template = T<N<Components>...>;
+    using apply_with = T<N<Components>...>;
 };
 
 // Component Filter Deduplication
@@ -38,26 +44,22 @@ template <typename Lhs, typename Rhs>
 struct FilterDeduplicateHelper;
 
 template <Component... Cs>
-struct FilterDeduplicateHelper<ComponentFilter<Cs...>, ComponentFilter<>>
+struct FilterDeduplicateHelper<meta::List<Cs...>, meta::List<>>
 {
     using type = ComponentFilter<Cs...>;
 };
 
 template <Component... Cs, Component D, Component... Ds>
-struct FilterDeduplicateHelper<
-        ComponentFilter<Cs...>,
-        ComponentFilter<D, Ds...>
-    >
+struct FilterDeduplicateHelper<meta::List<Cs...>, meta::List<D, Ds...>>
 {
-    using type = std::conditional_t<
-        ComponentFilter<Cs...>::template HAS_COMPONENT<D>,
-        typename FilterDeduplicateHelper<
-            ComponentFilter<Cs...>, ComponentFilter<Ds...>
-        >::type,
-        typename FilterDeduplicateHelper<
-            ComponentFilter<Cs..., D>, ComponentFilter<Ds...>
-        >::type
-    >;
+    using type = typename FilterDeduplicateHelper<
+        std::conditional_t<
+            ComponentFilter<Cs...>::template HAS_COMPONENT<D>,
+            meta::List<Cs...>,
+            meta::List<Cs..., D>
+        >,
+        meta::List<Ds...>
+    >::type;
 };
 
 template <typename Filter>
@@ -67,7 +69,7 @@ template <Component... Cs>
 struct FilterDeduplicated<ComponentFilter<Cs...>>
 {
     using type = typename FilterDeduplicateHelper<
-        ComponentFilter<>, ComponentFilter<Cs...>
+        meta::List<>, meta::List<Cs...>
     >::type;
 };
 
