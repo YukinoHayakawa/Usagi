@@ -107,8 +107,10 @@ void MappedFileView::remap(std::uint64_t new_size)
 
 void MappedFileView::prefetch(
     const std::uint64_t offset,
-    const std::uint64_t size)
+    std::uint64_t size)
 {
+    size = size ? size : max_size() - offset;
+
     check_view(offset, size);
 
     platform::memory::prefetch(base_byte_view() + offset, size);
@@ -116,8 +118,10 @@ void MappedFileView::prefetch(
 
 void MappedFileView::offer(
     const std::uint64_t offset,
-    const std::uint64_t size)
+    std::uint64_t size)
 {
+    size = size ? size : max_size() - offset;
+
     check_view(offset, size);
     check_page_aligned(offset, size);
 
@@ -126,7 +130,7 @@ void MappedFileView::offer(
 
 void MappedFileView::flush(const std::uint64_t offset, std::uint64_t size)
 {
-    size = size ? size : max_size();
+    size = size ? size : max_size() - offset;
 
     check_view(offset, size);
     check_write_access();

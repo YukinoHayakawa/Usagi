@@ -96,17 +96,20 @@ public:
 
     // Prefetch the specified range into memory in a non-blocking way so that
     // subsequent accesses to the range could be potentially efficient.
-    void prefetch(std::uint64_t offset, std::uint64_t size);
+    // If `size == 0` the operation is performed on [offset, max_size - offset).
+    void prefetch(std::uint64_t offset = 0, std::uint64_t size = 0);
 
     // Declare that the specified range is no longer needed and can be released.
     // The pages may not be immediately recycled depending on the operating
     // system.
     // The range must be page-aligned. Otherwise it may cause later access
     // violations to neighbor pages.
-    void offer(std::uint64_t offset, std::uint64_t size);
+    // If `size == 0` the operation is performed on [offset, max_size - offset).
+    void offer(std::uint64_t offset = 0, std::uint64_t size = 0);
 
     // Synchronize the specified range to disk.
     // If the range is not page-aligned, all spanning pages will be flushed.
+    // If `size == 0` the operation is performed on [offset, max_size - offset).
     void flush(std::uint64_t offset = 0, std::uint64_t size = 0);
 };
 }
