@@ -237,6 +237,15 @@
     <ClInclude Include="Runtime\Memory\PagedStorage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Library\Meta\List.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Set.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Deduplicate.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\File\RegularFile.cpp">

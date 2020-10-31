@@ -3,8 +3,8 @@
 #include <type_traits>
 
 #include <Usagi/Entity/Component.hpp>
+#include <Usagi/Library/Meta/Deduplicate.hpp>
 #include <Usagi/Library/Meta/List.hpp>
-#include <Usagi/Library/Meta/Tag.hpp>
 
 namespace usagi
 {
@@ -39,57 +39,14 @@ struct ComponentFilter : Tag<Components>...
 };
 
 // Component Filter Deduplication
-
-template <typename Lhs, typename Rhs>
-struct FilterDeduplicateHelper;
-
-template <Component... Cs>
-struct FilterDeduplicateHelper<meta::List<Cs...>, meta::List<>>
-{
-    using type = ComponentFilter<Cs...>;
-};
-
-template <Component... Cs, Component D, Component... Ds>
-struct FilterDeduplicateHelper<meta::List<Cs...>, meta::List<D, Ds...>>
-{
-    using type = typename FilterDeduplicateHelper<
-        std::conditional_t<
-            ComponentFilter<Cs...>::template HAS_COMPONENT<D>,
-            meta::List<Cs...>,
-            meta::List<Cs..., D>
-        >,
-        meta::List<Ds...>
-    >::type;
-};
-
 template <typename Filter>
-struct FilterDeduplicated;
+using FilterDeduplicatedT = typename meta::Deduplicate<Filter>::type;
 
 template <Component... Cs>
-struct FilterDeduplicated<ComponentFilter<Cs...>>
-{
-    using type = typename FilterDeduplicateHelper<
-        meta::List<>, meta::List<Cs...>
-    >::type;
-};
-
-template <typename Filter>
-using FilterDeduplicatedT = typename FilterDeduplicated<Filter>::type;
-
-template <Component... Cs>
-using UniqueComponents = FilterDeduplicatedT<ComponentFilter<Cs...>>;
+using UniqueComponents =
+    typename meta::Deduplicate<ComponentFilter<Cs...>>::type;
 
 // Component Filter Concatenation
-
 template <typename Lhs, typename Rhs>
-struct FilterConcatenated;
-
-template <Component... Cs, Component... Ds>
-struct FilterConcatenated<ComponentFilter<Cs...>, ComponentFilter<Ds...>>
-{
-    using type = ComponentFilter<Cs..., Ds...>;
-};
-
-template <typename Lhs, typename Rhs>
-using FilterConcatenatedT = typename FilterConcatenated<Lhs, Rhs>::type;
+using FilterConcatenatedT = typename meta::Concatenate<Lhs, Rhs>::type;
 }

@@ -66,6 +66,9 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
     </ClInclude>
+    <ClInclude Include="Library\Meta\List.hpp" />
+    <ClInclude Include="Library\Meta\Set.hpp" />
+    <ClInclude Include="Library\Meta\Deduplicate.hpp" />
     <ClInclude Include="Runtime\Memory\PagedStorage.hpp" />
     <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />
