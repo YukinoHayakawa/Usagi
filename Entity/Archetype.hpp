@@ -26,7 +26,8 @@ public:
 
     using ComponentFilterT = ComponentFilter<InitialComponents...>;
 
-    explicit Archetype(InitialComponents &&... args)
+    explicit Archetype(InitialComponents &&... args) requires
+        (sizeof...(InitialComponents) > 0)
         : InitialComponents { std::forward<InitialComponents>(args) }...
     {
     }

@@ -9,6 +9,7 @@
 #include "Archetype.hpp"
 #include "detail/ComponentAccessAllowAll.hpp"
 #include "detail/ComponentFilter.hpp"
+#include "detail/EntityDatabaseAccessExternal.hpp"
 #include "detail/EntityId.hpp"
 #include "detail/EntityIterator.hpp"
 #include "detail/EntityPage.hpp"
@@ -18,16 +19,16 @@ namespace usagi
 {
 namespace detail::entity
 {
+// todo: bit flag components shouldn't have page index field in entity page
 template <
     template <typename T> typename Storage,
     Component C,
     Component... EnabledComponents
 >
-using ComponentStorageT = Storage<
-    std::array<
-        C,
-        EntityPage<EnabledComponents...>::PAGE_SIZE
-    >
+using ComponentStorageT = std::conditional_t<
+    IsFlagComponent<C>,
+    Tag<C>, // an empty struct for dispatching purpose only
+    Storage<std::array<C, EntityPage<EnabledComponents...>::PAGE_SIZE>>
 >;
 }
 /**
@@ -74,8 +75,6 @@ public:
 
     constexpr static std::size_t ENTITY_PAGE_SIZE = EntityPageT::PAGE_SIZE;
 
-    static_assert(Memcpyable<EntityPageT>);
-
 protected:
     struct Meta
     {
@@ -88,7 +87,7 @@ protected:
     // todo lockless
     SpinLock mEntityPageAllocationLock;
 
-    EntityPageStorageT &  entity_pages()
+    EntityPageStorageT & entity_pages()
     {
         return *this;
     }
@@ -96,6 +95,7 @@ protected:
     template <Component C>
     auto component_storage() -> detail::entity::ComponentStorageT<
         Storage, C, EnabledComponents...> &
+        requires (!IsFlagComponent<C>)
     {
         return *this;
     }
@@ -218,9 +218,12 @@ public:
     template <typename ComponentAccess>
     auto create_access()
     {
-        return EntityDatabaseAccess<EntityDatabase, ComponentAccess>(*this);
+        return EntityDatabaseAccessExternal<
+            EntityDatabase, ComponentAccess
+        >(this);
     }
 
+    // WARNING: This function bypasses component access checks.
     auto entity_view(const EntityId id)
     {
         return EntityUserViewT {
@@ -257,8 +260,9 @@ public:
         };
 
         // Initialize components for the new entity
-        (..., (view.template add_component<InitialComponents>()
-            = archetype.template val<InitialComponents>()));
+        (..., view.template add_component<InitialComponents>(
+            archetype.template val<InitialComponents>()
+        ));
 
         const EntityId entity_id = EntityId {
             .offset = page.ptr->first_unused_index,

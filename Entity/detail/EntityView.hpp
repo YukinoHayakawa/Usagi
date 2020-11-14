@@ -9,6 +9,7 @@
 #include "EntityDatabaseAccessInternal.hpp"
 #include "ComponentAccess.hpp"
 #include "ComponentFilter.hpp"
+#include "ComponentTrait.hpp"
 
 namespace usagi
 {
@@ -28,6 +29,7 @@ class EntityView
 
     template <Component C>
     C & component_access() const
+        requires (!IsFlagComponent<C>)
     {
         // Locate the component in the storage
         auto &idx = mPage->template component_page_index<C>();
@@ -69,30 +71,37 @@ public:
     }
 
     template <Component C>
-    C & add_component() requires
+    auto add_component(C val = { }) requires
         CanWriteComponent<ComponentAccess, C>
     {
-        // Locate the component position in the storage
-        auto &idx = mPage->template component_page_index<C>();
-        auto &storage = this->template component_storage<C>();
-
         // The entity shouldn't have the requested entity
         assert(!has_component<C>());
 
-        // If the component page hasn't be allocated yet, allocate it.
-        if(idx == EntityPageT::INVALID_PAGE)
+        if constexpr(IsFlagComponent<C>)
         {
-            idx = storage.allocate();
-            std::allocator_traits<std::remove_reference_t<decltype(storage)>>::
-                construct(storage, &storage.at(idx)
-            );
+            mPage->template set_component_bit<C>(mIndexInPage);
+            mPage->dirty = true;
         }
+        else
+        {
+            // Locate the component position in the storage
+            auto &idx = mPage->template component_page_index<C>();
+            auto &storage = this->template component_storage<C>();
 
-        mPage->template set_component_bit<C>(mIndexInPage);
+            // If the component page hasn't be allocated yet, allocate it.
+            if(idx == EntityPageT::INVALID_PAGE)
+            {
+                idx = storage.allocate();
+                std::allocator_traits<std::remove_reference_t<
+                    decltype(storage)
+                >>::construct(storage, &storage.at(idx));
+            }
 
-        mPage->dirty = true;
+            mPage->template set_component_bit<C>(mIndexInPage);
+            mPage->dirty = true;
 
-        return storage.at(idx)[mIndexInPage];
+            return storage.at(idx)[mIndexInPage] = val;
+        }
     }
 
     template <Component C>
@@ -105,16 +114,18 @@ public:
     void remove_component() requires
         CanWriteComponent<ComponentAccess, C>
     {
-        // Locate the component position in the storage
-        auto &idx = mPage->template component_page_index<C>();
-        auto &storage = this->mDatabase->template component_storage<C>();
+        if constexpr(!IsFlagComponent<C>)
+        {
+            // Locate the component position in the storage
+            auto &idx = mPage->template component_page_index<C>();
+            auto &storage = this->template component_storage<C>();
 
-        // The entity should have the requested entity
-        assert(has_component<C>());
-        assert(idx != EntityPageT::INVALID_PAGE);
+            // The entity should have the requested entity
+            assert(has_component<C>());
+            assert(idx != EntityPageT::INVALID_PAGE);
+        }
 
         mPage->template reset_component_bit<C>(mIndexInPage);
-
         mPage->dirty = true;
     }
 
@@ -135,7 +146,6 @@ public:
         >
     {
         reset_component_bits(typename DatabaseT::ComponentFilterT());
-
         mPage->dirty = true;
     }
 

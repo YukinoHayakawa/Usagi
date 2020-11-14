@@ -246,6 +246,9 @@
     <ClInclude Include="Library\Meta\Deduplicate.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Entity\detail\ComponentTrait.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\File\RegularFile.cpp">

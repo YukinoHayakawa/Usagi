@@ -11,7 +11,8 @@ namespace usagi
 /**
  * \brief Contains a list of component types which may be used to filter
  * entities or check access permissions.
- * todo ensure uniqueness of the component types
+ * Uniqueness of the component types is ensured by that having the same
+ * class as a direct base class for multiple times is not allowed.
  * \tparam Components A sequence of component types.
  */
 template <Component... Components>
