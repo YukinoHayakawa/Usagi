@@ -43,15 +43,23 @@ public:
         return ret;
     }
 
+    auto index() const
+    {
+        return mPageIndex;
+    }
+
     auto & ref() const
     {
         assert(mPageIndex != value_type::INVALID_PAGE);
-        return mDatabase->entity_pages().at(mPageIndex);
+        auto &p = mDatabase->entity_pages().at(mPageIndex);
+        // check for deallocated pages
+        assert(p.page_seq_id != -1);
+        return p;
     }
 
     reference operator*() const
     {
-        return mPageIndex;
+        return index();
     }
 
     pointer operator->() const

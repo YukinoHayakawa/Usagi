@@ -26,7 +26,7 @@ template <
     Component... EnabledComponents
 >
 using ComponentStorageT = std::conditional_t<
-    IsFlagComponent<C>,
+    TagComponent<C>,
     Tag<C>, // an empty struct for dispatching purpose only
     Storage<std::array<C, EntityPage<EnabledComponents...>::PAGE_SIZE>>
 >;
@@ -95,7 +95,7 @@ protected:
     template <Component C>
     auto component_storage() -> detail::entity::ComponentStorageT<
         Storage, C, EnabledComponents...> &
-        requires (!IsFlagComponent<C>)
+        requires (!TagComponent<C>)
     {
         return *this;
     }
@@ -228,7 +228,7 @@ public:
     {
         return EntityUserViewT {
             this,
-            &entity_pages().at(id.page),
+            id.page,
             id.offset
         };
     }
@@ -256,7 +256,7 @@ public:
         // todo: insert data by components instead of entities
 
         EntityUserViewT view {
-            this, page.ptr, page.ptr->first_unused_index
+            this, page.index, page.ptr->first_unused_index
         };
 
         // Initialize components for the new entity
@@ -264,7 +264,7 @@ public:
             archetype.template val<InitialComponents>()
         ));
 
-        const EntityId entity_id = EntityId {
+        const EntityId entity_id {
             .offset = page.ptr->first_unused_index,
             .page = page.index
         };
@@ -351,9 +351,15 @@ private:
         EntityPageT &page = entity_pages().at(e_idx);
         auto &c_idx = page.template component_page_index<C>();
 
-        // Not allocated
-        if(c_idx == EntityPageT::INVALID_PAGE)
+        const auto c_page_unallocated = c_idx == EntityPageT::INVALID_PAGE;
+        if constexpr(TagComponent<C>)
+        {
+            assert(c_page_unallocated);
+        }
+        else if(c_page_unallocated)
+        {
             return;
+        }
 
         // Page in use
         if(page.template component_enabled_mask<C>() != 0)
@@ -362,9 +368,12 @@ private:
             return;
         }
 
-        // Free empty component page
-        component_storage<C>().deallocate(c_idx);
-        c_idx = EntityPageT::INVALID_PAGE;
+        if constexpr(!TagComponent<C>)
+        {
+            // Free empty component page
+            component_storage<C>().deallocate(c_idx);
+            c_idx = EntityPageT::INVALID_PAGE;
+        }
     }
 };
 

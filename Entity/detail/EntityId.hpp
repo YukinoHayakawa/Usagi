@@ -15,7 +15,7 @@ namespace usagi
  * Entity Id is not explicitly created for every Entity. The Systems managed
  * by the ECS architecture should never explicitly refer to any Entity, since
  * that would forbid the System being reused with another Database. The Systems
- * should only access Entities via Entity Iterator.
+ * should only access Entities via Entity Iterator. (outdated)
  *
  * On the other hand, game logic outside the ECS architecture, such as input
  * handling and GUI, may want direct manipulation of some Entities. In such
@@ -24,9 +24,9 @@ namespace usagi
 struct EntityId
 {
     // The index of the Entity in the Entity Page
-    std::uint64_t offset : 8;
+    std::uint64_t offset : 8 = -1;
     // The index of the Entity Page in the pool allocator.
-    std::uint64_t page : 56;
+    std::uint64_t page : 56 = -1;
 
     operator std::uint64_t() const
     {

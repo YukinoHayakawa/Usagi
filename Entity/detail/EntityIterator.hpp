@@ -51,7 +51,7 @@ protected:
         assert(mIndexInPage < DatabaseT::ENTITY_PAGE_SIZE);
 
         return EntityView<DatabaseT, ComponentAccessT>(
-            this->mDatabase, &mPageCursor.ref(), mIndexInPage
+            this->mDatabase, mPageCursor.index(), mIndexInPage
         );
     }
 

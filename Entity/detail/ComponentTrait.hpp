@@ -5,12 +5,12 @@
 namespace usagi
 {
 template <typename C>
-concept IsFlagComponent = Component<C> && requires
+concept TagComponent = Component<C> && requires
 {
-    typename C::FlagComponent;
+    typename C::TagComponent;
 };
 }
 
-#define USAGI_DECL_FLAG_COMPONENT(name) \
-    struct name { using FlagComponent = void; } \
+#define USAGI_DECL_TAG_COMPONENT(name) \
+    struct name { using TagComponent = void; } \
 /**/

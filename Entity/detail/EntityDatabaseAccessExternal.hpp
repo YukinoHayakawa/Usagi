@@ -2,6 +2,7 @@
 
 #include <Usagi/Entity/Archetype.hpp>
 
+#include "ComponentAccessReadOnly.hpp"
 #include "EntityDatabaseViewFiltered.hpp"
 #include "EntityDatabaseViewUnfiltered.hpp"
 #include "EntityPageViewFiltered.hpp"
@@ -37,17 +38,42 @@ public:
         return this->entity_page_end();
     }
 
+    auto entity(EntityId id)
+    {
+        return EntityView<DatabaseT, ComponentAccessT>(
+            this->mDatabase,
+            id.page,
+            id.offset
+        );
+    }
+
+    /**
+     * \brief Returns a read-only view on all allocated entity pages. Beware
+     * that this view also visits uncreated entities in pages.
+     * BUG: unfiltered_view() can be used to obtain EntityId to entities that are not yet created. The obtained Id can be used with to create an EntityView and cause modifications to those uncreated entities.
+     * \return
+     */
     auto unfiltered_view()
     {
         return EntityDatabaseViewUnfiltered<
             DatabaseT,
-            ComponentAccessT
+            ComponentAccessReadOnly
         >(this->mDatabase);
     }
 
+    /**
+     * \brief Derive a view on the entity database based on the access traits
+     * used to instantiate this access object.
+     * \tparam Include
+     * \tparam Exclude
+     * \param include Leaving this field blank is effectively doing a
+     * SELECT *.
+     * \param exclude
+     * \return
+     */
     template <Component... Include, Component... Exclude>
     auto view(
-        ComponentFilter<Include...> include,
+        ComponentFilter<Include...> include = { },
         // defaults to empty exclude mask via class template argument deduction
         ComponentFilter<Exclude...> exclude = { })
     {
