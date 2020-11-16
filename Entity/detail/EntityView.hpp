@@ -61,6 +61,8 @@ class EntityView
     }
 
 public:
+    EntityView() = default;
+
     EntityView(
         DatabaseT *database,
         const std::size_t page_index,
@@ -167,7 +169,7 @@ public:
      * \return
      */
     template <Component C>
-    C & component() requires
+    C & component(C = {}) requires
         CanWriteComponent<ComponentAccess, C>
     {
         return component_access<C>();
@@ -179,7 +181,7 @@ public:
      * \return
      */
     template <Component C>
-    const C & component() const requires
+    const C & component(C = {}) const requires
         (!CanWriteComponent<ComponentAccess, C>
         && CanReadComponent<ComponentAccess, C>)
     {

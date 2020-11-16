@@ -19,6 +19,8 @@ struct EntityPage
     // Entity index range 0-31
     using EntityIndexT = std::uint8_t;
 
+    using FilterT = ComponentFilter<EnabledComponents...>;
+
     constexpr static std::size_t INVALID_PAGE = -1;
     constexpr static EntityIndexT PAGE_SIZE = 32;
 
@@ -63,19 +65,22 @@ struct EntityPage
     // =========================== Helpers ============================= //
 
     template <Component C>
-    constexpr static std::uint64_t COMPONENT_INDEX =
-        Index<C, std::tuple<EnabledComponents...>>::value;
+    constexpr static std::uint64_t component_index()
+        requires FilterT::template HAS_COMPONENT<C>
+    {
+        return Index<C, std::tuple<EnabledComponents...>>::value;
+    }
 
     template <Component C>
     std::size_t & component_page_index()
     {
-        return component_pages[COMPONENT_INDEX<C>].index;
+        return component_pages[component_index<C>()].index;
     }
 
     template <Component C>
     auto & component_enabled_mask()
     {
-        return component_masks[COMPONENT_INDEX<C>].entity_array;
+        return component_masks[component_index<C>()].entity_array;
     }
 
     template <Component C>

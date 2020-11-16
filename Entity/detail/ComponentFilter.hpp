@@ -37,7 +37,23 @@ struct ComponentFilter : Tag<Components>...
         typename N
     >
     using apply_with = T<N<Components>...>;
+
+    constexpr ComponentFilter() = default;
+
+    constexpr ComponentFilter(Components &&...)
+        requires (sizeof...(Components) > 0)
+    {
+    }
 };
+
+// Shortcut name
+// bug: waiting for P1814R0 to be implemented
+template <Component... Components>
+using C = struct ComponentFilter<Components...>;
+
+// CTAD guide
+// template <typename...>
+// ComponentFilter() -> ComponentFilter<>;
 
 // Component Filter Deduplication
 template <typename Filter>

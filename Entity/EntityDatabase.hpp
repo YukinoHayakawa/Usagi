@@ -253,29 +253,29 @@ public:
             page = allocate_entity_page();
         }
 
-        // todo: insert data by components instead of entities
+        // Mark the Entity slot as used
+        const auto inner_index = page.ptr->first_unused_index++;
+        // Record Page index hint
+        archetype.mLastUsedPageIndex = page.index;
+        // The page may have been recycled and made into another page
+        // so check the id range to make sure it was the original one.
+        archetype.mLastUsedPageSeqId = page.ptr->page_seq_id;
 
         EntityUserViewT view {
-            this, page.index, page.ptr->first_unused_index
+            this, page.index, inner_index
         };
 
+        // todo: insert data by components instead of entities
+        //
         // Initialize components for the new entity
         (..., view.template add_component<InitialComponents>(
             archetype.template val<InitialComponents>()
         ));
 
         const EntityId entity_id {
-            .offset = page.ptr->first_unused_index,
+            .offset = inner_index,
             .page = page.index
         };
-
-        // Mark the Entity slot as used
-        ++page.ptr->first_unused_index;
-        // Record Page index hint
-        archetype.mLastUsedPageIndex = page.index;
-        // The page may have been recycled and made into another page
-        // so check the id range to make sure it was the original one.
-        archetype.mLastUsedPageSeqId = page.ptr->page_seq_id;
 
         return entity_id;
     }
