@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <cstddef>
+
 namespace usagi
 {
 template <typename Base>

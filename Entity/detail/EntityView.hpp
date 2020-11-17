@@ -16,17 +16,20 @@ namespace usagi
 {
 template <
     typename Database,
-    typename ComponentAccess
+    typename ComponentAccess = ComponentAccessReadOnly
 >
 class EntityView
     : EntityDatabaseAccessInternal<Database>
 {
+    template <typename OtherDatabase, typename OtherAccess>
+    friend class EntityView;
+
     using DatabaseT         = Database;
     using EntityPageT       = typename DatabaseT::EntityPageT;
     using EntityIndexT      = typename EntityPageT::EntityIndexT;
 
     std::size_t     mPageIndex = EntityPageT::INVALID_PAGE;
-    EntityIndexT    mIndexInPage;
+    EntityIndexT    mIndexInPage = -1;
 
     void check_entity_created() const
     {
@@ -45,7 +48,7 @@ class EntityView
         check_entity_created();
 
         // Locate the component in the storage
-        auto &idx = page().component_page_index<C>();
+        auto idx = page().component_page_index<C>();
         auto &storage = this->template component_storage<C>();
         // Ensure that the entity has the component
         assert(has_component<C>());
@@ -58,6 +61,53 @@ class EntityView
     void reset_component_bits(ComponentFilter<C...>)
     {
         (..., page().reset_component_bit<C>(mIndexInPage));
+    }
+
+    /*
+     * Debugging Helpers
+     */
+
+    template <Component C>
+    using PlainValueT = std::conditional_t<
+        TagComponent<C>, BoolTag<C>, const C *
+    >;
+
+    template <Component... Cs>
+    static auto inspection_tuple_type(ComponentFilter<Cs...>)
+    {
+        return std::tuple<PlainValueT<Cs>...>();
+    }
+
+    using PlainValueTupleT = decltype(
+        inspection_tuple_type(typename DatabaseT::ComponentFilterT())
+    );
+
+    template <Component C>
+    PlainValueT<C> component_value_unchecked() const
+    {
+        if constexpr(TagComponent<C>)
+        {
+            return BoolTag<C> { has_component<C>() };
+        }
+        else
+        {
+            // Locate the component in the storage
+            auto idx = page().component_page_index<C>();
+            // Page not allocated
+            if(idx == DatabaseT::EntityPageT::INVALID_PAGE)
+                return nullptr;
+            if(!has_component<C>())
+                return nullptr;
+            auto &storage = this->template component_storage<C>();
+            // Access the component in the storage page
+            return &storage.at(idx)[mIndexInPage];
+        }
+    }
+
+    template <Component... Cs>
+    auto inspection_helper(ComponentFilter<Cs...>) const
+    {
+        return std::make_tuple(component_value_unchecked<Cs>()...);
     }
 
 public:
@@ -73,12 +123,27 @@ public:
     {
     }
 
+    template <typename OtherAccess>
+    EntityView(const EntityView<DatabaseT, OtherAccess> &other)
+        requires std::is_same_v<ComponentAccess, ComponentAccessReadOnly>
+        : EntityDatabaseAccessInternal<Database>(other.mDatabase)
+        , mPageIndex(other.mPageIndex)
+        , mIndexInPage(other.mIndexInPage)
+    {
+
+    }
+
     EntityId id() const
     {
         return {
             .offset = mIndexInPage,
             .page = mPageIndex
         };
+    }
+
+    PlainValueTupleT inspect() const
+    {
+        return inspection_helper(typename DatabaseT::ComponentFilterT());
     }
 
     template <Component C>
@@ -187,6 +252,11 @@ public:
     {
         return component_access<C>();
     }
+
+private:
+    using InspectOdrUse = std::enable_if_t<
+        &EntityView::inspect != nullptr, int
+    >;
 };
 
 template <Component C, typename EntityView>

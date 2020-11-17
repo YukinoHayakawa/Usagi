@@ -249,6 +249,9 @@
     <ClInclude Include="Entity\detail\ComponentTrait.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Library\Meta\Type.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\File\RegularFile.cpp">
@@ -263,5 +266,8 @@
     <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Usagi.natvis" />
   </ItemGroup>
 </Project>

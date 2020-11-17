@@ -13,6 +13,8 @@ struct EntityPage
 {
     // ============================ Types ============================== //
 
+    constexpr static std::size_t NUM_COMPONENTS = sizeof...(EnabledComponents);
+
     // Page size = 32
     using EntityArrayT = std::uint32_t;
 

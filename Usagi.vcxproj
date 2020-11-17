@@ -44,6 +44,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
     </Link>
+    <Lib />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -57,6 +58,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <Lib />
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Concept\Type\Memcpyable.hpp" />
@@ -70,6 +72,7 @@
     <ClInclude Include="Library\Meta\List.hpp" />
     <ClInclude Include="Library\Meta\Set.hpp" />
     <ClInclude Include="Library\Meta\Deduplicate.hpp" />
+    <ClInclude Include="Library\Meta\Type.hpp" />
     <ClInclude Include="Runtime\Memory\PagedStorage.hpp" />
     <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />
@@ -147,6 +150,9 @@
     <ClCompile Include="Runtime\File\RegularFile.cpp" />
     <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp" />
     <ClCompile Include="Runtime\Memory\VmAllocatorFileBacked.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Usagi.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

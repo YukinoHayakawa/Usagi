@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="usagi::EntityPage&lt;*&gt;">
+    <Intrinsic Name="_Size" Expression="(unsigned*)component_pages._Elems - (unsigned*)component_masks._Elems" />
+    <Expand HideRawView="true">
+      <CustomListItems>
+        <Variable Name="i" InitialValue="0" />
+        <Size>_Size() + 1</Size>
+        <!-- Added for better alignment -->
+        <Item Name=" ">""</Item>
+        <Loop>
+          <!-- Deallocated Pages -->
+          <If Condition="component_pages._Elems[i].index==-1ull">
+            <If Condition="component_masks._Elems[i].entity_array==0">
+              <Item Name="Page=[Unallocated]">"------------------------------"</Item>
+            </If>
+            <Else>
+              <Item Name="Page=[Unallocated]">component_masks._Elems[i].entity_array,bb</Item>
+            </Else>
+          </If>
+          <!-- Allocated Pages -->
+          <Else>
+            <If Condition="component_masks._Elems[i].entity_array==0">
+              <Item Name="Page={component_pages._Elems[i].index,h}">"------------------------------"</Item>
+            </If>
+            <Else>
+              <Item Name="Page={component_pages._Elems[i].index,h}">component_masks._Elems[i].entity_array,bb</Item>
+            </Else>
+          </Else>
+          <Exec>++i</Exec>
+        </Loop>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <Type Name="usagi::DynamicArray&lt;*&gt;">
+    <DisplayString>{{size = {mBase->size}}}</DisplayString>
+    <Expand>
+      <Item Name="[size]">mBase->size,d</Item>
+      <Item Name="[capacity]">mBase->capacity,d</Item>
+      <ArrayItems>
+        <Size>mBase->size,d</Size>
+        <ValuePointer>mStorage,d</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="usagi::EntityDatabase&lt;*&gt;">
+    <Intrinsic Name="_PageStorage" Expression="((EntityPageStorageT*)this)->mStorage"></Intrinsic>
+    <DisplayString>{{EntityPages...}}</DisplayString>
+    <Expand HideRawView="true">
+      <CustomListItems>
+        <Variable Name="p_index" InitialValue="-1ull" />
+        <Exec>p_index=mMeta.first_entity_page_idx</Exec>
+        <Loop>
+          <Break Condition="p_index == -1" />
+          <Item Name="[Page {p_index,d}]">_PageStorage()[p_index].data</Item>
+          <Exec>p_index = _PageStorage()[p_index].data.next_page</Exec>
+        </Loop>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <Type Name="usagi::EntityDatabaseAccessExternal&lt;*&gt;">
+    <DisplayString>[EntityDatabaseAccessExternal]</DisplayString>
+    <Expand>
+      <ExpandedItem>mDatabase</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <Type Name="usagi::EntityView&lt;*&gt;">
+    <Expand HideRawView="true">
+      <Item Name="[Page]">mPageIndex,d</Item>
+      <Item Name="[Offset]">(unsigned short)mIndexInPage,d</Item>
+    </Expand>
+  </Type>
+
+</AutoVisualizer>
