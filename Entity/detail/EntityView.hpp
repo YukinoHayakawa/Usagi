@@ -48,7 +48,7 @@ class EntityView
         check_entity_created();
 
         // Locate the component in the storage
-        auto idx = page().component_page_index<C>();
+        auto idx = page().template component_page_index<C>();
         auto &storage = this->template component_storage<C>();
         // Ensure that the entity has the component
         assert(has_component<C>());
@@ -60,7 +60,7 @@ class EntityView
     template <Component... C>
     void reset_component_bits(ComponentFilter<C...>)
     {
-        (..., page().reset_component_bit<C>(mIndexInPage));
+        (..., page().template reset_component_bit<C>(mIndexInPage));
     }
 
     /*
@@ -92,7 +92,7 @@ class EntityView
         else
         {
             // Locate the component in the storage
-            auto idx = page().component_page_index<C>();
+            auto idx = page().template component_page_index<C>();
             // Page not allocated
             if(idx == DatabaseT::EntityPageT::INVALID_PAGE)
                 return nullptr;
@@ -141,6 +141,9 @@ public:
         };
     }
 
+#ifdef __clang__
+    __attribute__((used))
+#endif
     PlainValueTupleT inspect() const
     {
         return inspection_helper(typename DatabaseT::ComponentFilterT());
@@ -149,7 +152,7 @@ public:
     template <Component C>
     bool has_component(C = {}) const
     {
-        return page().component_bit<C>(mIndexInPage);
+        return page().template component_bit<C>(mIndexInPage);
     }
 
     template <Component... C>
@@ -166,13 +169,13 @@ public:
 
         if constexpr(TagComponent<C>)
         {
-            page().set_component_bit<C>(mIndexInPage);
+            page().template set_component_bit<C>(mIndexInPage);
             page().dirty = true;
         }
         else
         {
             // Locate the component position in the storage
-            auto &idx = page().component_page_index<C>();
+            auto &idx = page().template component_page_index<C>();
             auto &storage = this->template component_storage<C>();
 
             // If the component page hasn't be allocated yet, allocate it.
@@ -184,7 +187,7 @@ public:
                 >>::construct(storage, &storage.at(idx));
             }
 
-            page().set_component_bit<C>(mIndexInPage);
+            page().template set_component_bit<C>(mIndexInPage);
             page().dirty = true;
 
             return storage.at(idx)[mIndexInPage] = val;
@@ -200,7 +203,7 @@ public:
         if constexpr(!TagComponent<C>)
         {
             // Locate the component position in the storage
-            auto &idx = page().component_page_index<C>();
+            auto &idx = page().template component_page_index<C>();
             auto &storage = this->template component_storage<C>();
 
             // The entity should have the requested entity
@@ -208,7 +211,7 @@ public:
             assert(idx != EntityPageT::INVALID_PAGE);
         }
 
-        page().reset_component_bit<C>(mIndexInPage);
+        page().template reset_component_bit<C>(mIndexInPage);
         page().dirty = true;
     }
 
@@ -252,11 +255,6 @@ public:
     {
         return component_access<C>();
     }
-
-private:
-    using InspectOdrUse = std::enable_if_t<
-        &EntityView::inspect != nullptr, int
-    >;
 };
 
 template <Component C, typename EntityView>

@@ -106,10 +106,10 @@ public:
     }
 
     template <Component... InitialComponents>
-    decltype(auto) create(Archetype<InitialComponents...> &archetype)
+    decltype(auto) insert(Archetype<InitialComponents...> &archetype)
         requires (... && CanWriteComponent<ComponentAccessT, InitialComponents>)
     {
-        return this->mDatabase->create(archetype);
+        return this->mDatabase->insert(archetype);
     }
 };
 }

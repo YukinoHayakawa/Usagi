@@ -234,7 +234,7 @@ public:
     }
 
     template <Component... InitialComponents>
-    auto create(Archetype<InitialComponents...> &archetype)
+    auto insert(Archetype<InitialComponents...> &archetype)
     {
         // Note that if you create entities from multiple threads,
         // the archetype must NOT be shared among the threads and ensure that
