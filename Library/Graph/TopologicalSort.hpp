@@ -39,9 +39,10 @@ constexpr void topological_sort_helper(
  * \brief Obtain a topological order of the given DAG.
  *
  * Ref: https://www.geeksforgeeks.org/topological-sorting/
- * \tparam Graph
+ * \tparam G
  * \tparam Traits
  * \param g
+ * \param t
  * \return A stack containing one possible topological order of the given
  * DAG. Read the order by popping elements from the stack until it becomes
  * empty.

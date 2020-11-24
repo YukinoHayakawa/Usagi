@@ -162,11 +162,12 @@ public:
     }
 
     template <Component C>
-    auto add_component(C val = { }) requires
+    decltype(auto) add_component(C val = { }) requires
         CanWriteComponent<ComponentAccess, C>
     {
         check_entity_created();
 
+        // todo: perf - avoid setting dirty bit if the component already presents
         if constexpr(TagComponent<C>)
         {
             page().template set_component_bit<C>(mIndexInPage);

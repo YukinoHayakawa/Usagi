@@ -71,7 +71,8 @@ public:
     using EntityPageT           = EntityPage<EnabledComponents...>;
     using EntityPageStorageT    = Storage<EntityPageT>;
     using EntityPageIteratorT   = EntityPageIterator<EntityDatabase>;
-    using EntityUserViewT = EntityView<EntityDatabase, ComponentAccessAllowAll>;
+    template <typename ComponentAccess>
+    using EntityUserViewT = EntityView<EntityDatabase, ComponentAccess>;
 
     constexpr static std::size_t ENTITY_PAGE_SIZE = EntityPageT::PAGE_SIZE;
 
@@ -223,10 +224,10 @@ public:
         >(this);
     }
 
-    // WARNING: This function bypasses component access checks.
+    template <typename ComponentAccess>
     auto entity_view(const EntityId id)
     {
-        return EntityUserViewT {
+        return EntityUserViewT<ComponentAccess> {
             this,
             id.page,
             id.offset
@@ -261,7 +262,7 @@ public:
         // so check the id range to make sure it was the original one.
         archetype.mLastUsedPageSeqId = page.ptr->page_seq_id;
 
-        EntityUserViewT view {
+        EntityUserViewT<ComponentAccessAllowAll> view {
             this, page.index, inner_index
         };
 

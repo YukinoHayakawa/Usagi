@@ -109,7 +109,9 @@ public:
     decltype(auto) insert(Archetype<InitialComponents...> &archetype)
         requires (... && CanWriteComponent<ComponentAccessT, InitialComponents>)
     {
-        return this->mDatabase->insert(archetype);
+        return this->mDatabase->template entity_view<ComponentAccess>(
+            this->mDatabase->insert(archetype)
+        );
     }
 };
 }

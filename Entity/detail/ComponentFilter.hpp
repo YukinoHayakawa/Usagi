@@ -66,4 +66,11 @@ using UniqueComponents =
 // Component Filter Concatenation
 template <typename Lhs, typename Rhs>
 using FilterConcatenatedT = typename meta::Concatenate<Lhs, Rhs>::type;
+
+template <typename Filter, Component... Cs>
+using CatComponentsUnique =
+    FilterDeduplicatedT<FilterConcatenatedT<
+        Filter,
+        ComponentFilter<Cs...>
+    >>;
 }

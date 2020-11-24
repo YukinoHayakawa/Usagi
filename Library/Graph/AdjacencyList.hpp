@@ -36,6 +36,8 @@ private:
     std::vector<VertexInfo> mVertices;
 
 public:
+    AdjacencyList() = default;
+
     explicit AdjacencyList(VertexIndexT num_vertices)
         : mVertices(num_vertices)
     {
@@ -136,6 +138,11 @@ public:
     /*
      * Vertex Data/Weight
      */
+
+    void resize(const std::size_t size)
+    {
+        mVertices.resize(size);
+    }
 
     auto & vertex(const VertexIndexT v) const
     {
