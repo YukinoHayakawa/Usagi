@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <vector>
+#include <utility>
 
 #include <Usagi/Library/Meta/Op.hpp>
 
@@ -44,6 +45,7 @@ struct HeapElementTraitNoop
 // todo interface needs cleaning up
 template <
     typename T,
+    typename Projection = std::identity,
     typename Compare = OpDeref<std::less<std::remove_pointer_t<T>>>,
     typename Traits = HeapElementTraitPtr<std::remove_pointer_t<T>>,
     typename HeapArray = std::vector<T>
@@ -51,7 +53,8 @@ template <
 class BinaryHeap
 {
     HeapArray mHeap;
-    Compare mCompare;
+    Projection mProj;
+    Compare mCmp;
     Traits mTraits;
 
     static constexpr std::size_t parent(const std::size_t node_idx)
@@ -84,7 +87,7 @@ class BinaryHeap
             idx > 0 /* has a parent */;
             idx = parent_idx, parent_idx = parent(idx))
         {
-            if(mCompare(mHeap[idx], mHeap[parent_idx]))
+            if(mCmp(mProj(mHeap[idx]), mProj(mHeap[parent_idx])))
                 swap(idx, parent_idx); // bubble up
         }
     }
@@ -95,7 +98,7 @@ class BinaryHeap
         std::size_t cur = index, min_child_;
         while((min_child_ = min_child(cur)) != INVALID_INDEX)
         {
-            if(mCompare(mHeap[cur], mHeap[min_child_]))
+            if(mCmp(mProj(mHeap[cur]), mProj(mHeap[min_child_])))
                 break;
             swap(cur, min_child_);
             cur = min_child_;
@@ -115,13 +118,17 @@ class BinaryHeap
             if(right >= size())
                 return left; // only have left node
             else
-                return mCompare(mHeap[left], mHeap[right])
+                return mCmp(mProj(mHeap[left]), mProj(mHeap[right]))
                     ? left : right;
     }
 
 public:
-    explicit BinaryHeap(Compare compare = { }, Traits traits = { })
-        : mCompare(std::move(compare))
+    explicit BinaryHeap(
+        Projection proj = { },
+        Compare compare = { },
+        Traits traits = { })
+        : mProj(std::move(proj))
+        , mCmp(std::move(compare))
         , mTraits(std::move(traits))
     {
     }
@@ -189,7 +196,7 @@ public:
     {
         // recover proper order. if the element is smaller than its parent
         // then bubble up. otherwise sink down.
-        if(index > 0 && mCompare(mHeap[index], mHeap[parent(index)]))
+        if(index > 0 && mCmp(mProj(mHeap[index]), mProj(mHeap[parent(index)])))
             bubble(index);
         else
             sink(index);
