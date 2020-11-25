@@ -102,6 +102,9 @@ template <System GameSystem>
 struct ExplicitSystemComponentAccessTraitRead<GameSystem, true>
 {
     using type = typename GameSystem::ReadAccess;
+
+    static_assert(IsComponentFilter<type>,
+        "ReadAccess is not a component filter.");
 };
 
 template <System GameSystem>
@@ -118,6 +121,9 @@ template <System GameSystem>
 struct ExplicitSystemComponentAccessTraitWrite<GameSystem, true>
 {
     using type = typename GameSystem::WriteAccess;
+
+    static_assert(IsComponentFilter<type>,
+        "WriteAccess is not a component filter.");
 };
 
 template <System GameSystem>

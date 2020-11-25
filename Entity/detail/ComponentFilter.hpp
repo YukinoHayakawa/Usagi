@@ -18,6 +18,8 @@ namespace usagi
 template <Component... Components>
 struct ComponentFilter : Tag<Components>...
 {
+    using IsComponentFilter = void;
+
     template <Component C>
     static constexpr bool HAS_COMPONENT = std::is_base_of_v<
         Tag<C>,

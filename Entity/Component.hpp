@@ -48,5 +48,15 @@ namespace usagi
  * https://docs.microsoft.com/en-us/cpp/cpp/trivial-standard-layout-and-pod-types
  */
 template <typename T>
-concept Component = Memcpyable<T>;
+concept IsComponentFilter = requires
+{
+    typename T::IsComponentFilter;
+};
+
+template <typename T>
+concept Component =
+    Memcpyable<T> &&
+    // prevent accidentally using the component filter as a component
+    !IsComponentFilter<T>
+;
 }
