@@ -8,7 +8,6 @@
 
 #include "ComponentAccess.hpp"
 #include "ComponentFilter.hpp"
-#include "ComponentTrait.hpp"
 #include "EntityDatabaseAccessInternal.hpp"
 #include "EntityId.hpp"
 

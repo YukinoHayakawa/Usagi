@@ -26,6 +26,9 @@ public:
 
     using ComponentFilterT = ComponentFilter<InitialComponents...>;
 
+    template <Component... Cs>
+    using Derived = Archetype<InitialComponents..., Cs...>;
+
     explicit Archetype(InitialComponents &&... args) requires
         (sizeof...(InitialComponents) > 0)
         : InitialComponents { std::forward<InitialComponents>(args) }...

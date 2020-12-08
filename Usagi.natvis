@@ -6,7 +6,7 @@
     <Expand HideRawView="true">
       <CustomListItems>
         <Variable Name="i" InitialValue="0" />
-        <Size>_Size() + 1</Size>
+        <Size>_Size()</Size>
         <!-- Added for better alignment -->
         <Item Name=" ">""</Item>
         <Loop>
