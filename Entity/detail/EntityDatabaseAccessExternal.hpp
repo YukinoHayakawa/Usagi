@@ -113,5 +113,12 @@ public:
             this->mDatabase->insert(archetype)
         );
     }
+
+    auto sample(auto &&rng, std::size_t limit = 10)
+    {
+        return this->mDatabase->template sample<ComponentAccess>(
+            rng, limit
+        );
+    }
 };
 }

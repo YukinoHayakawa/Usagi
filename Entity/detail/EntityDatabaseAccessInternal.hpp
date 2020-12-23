@@ -37,6 +37,11 @@ protected:
         );
     }
 
+    auto & entity_pages() const
+    {
+        return mDatabase->entity_pages();
+    }
+
     template <Component T>
     auto & component_storage() const
     {

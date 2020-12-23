@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include <array>
+#include <optional>
+#include <random>
 
 #include <Usagi/Library/Memory/LockGuard.hpp>
 #include <Usagi/Library/Memory/SpinLock.hpp>
@@ -225,13 +227,31 @@ public:
     }
 
     template <typename ComponentAccess>
-    auto entity_view(const EntityId id)
+    auto entity_view(const EntityId id) -> EntityUserViewT<ComponentAccess>
     {
-        return EntityUserViewT<ComponentAccess> {
-            this,
-            id.page,
-            id.offset
+        return { this, id.page, id.offset };
+    }
+
+    template <typename ComponentAccess>
+    auto sample(auto &&rng, std::size_t limit) ->
+        std::optional<EntityUserViewT<ComponentAccess>>
+    {
+        std::uniform_int_distribution<std::size_t> dice_page {
+            0, entity_pages().size()
         };
+        std::uniform_int_distribution<std::size_t> dice_offset {
+            0, ENTITY_PAGE_SIZE
+        };
+        for(; limit; --limit)
+        {
+            EntityUserViewT<ComponentAccess> view {
+                this,
+                dice_page(rng),
+                dice_offset(rng)
+            };
+            if(view.valid()) return view;
+        }
+        return { };
     }
 
     template <Component... InitialComponents>

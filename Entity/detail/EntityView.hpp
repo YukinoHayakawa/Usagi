@@ -129,7 +129,6 @@ public:
         , mPageIndex(other.mPageIndex)
         , mIndexInPage(other.mIndexInPage)
     {
-
     }
 
     EntityId id() const
@@ -138,6 +137,18 @@ public:
             .offset = mIndexInPage,
             .page = mPageIndex
         };
+    }
+
+    // Returns true only if this view actually points to some entity.
+    bool valid() const
+    {
+        // Page is in valid storage
+        return mPageIndex < this->entity_pages().size()
+        // Page is actively allocated
+            && page().page_seq_id != -1
+        // Entity is allocated
+            && mIndexInPage < page().first_unused_index;
+        // todo: recognize destroyed entity or not?
     }
 
 #ifdef __clang__
@@ -160,6 +171,8 @@ public:
         return (... || has_component<C>());
     }
 
+    // Existing component value will be overwritten when calling this
+    // function multiple times.
     template <Component C>
     decltype(auto) add_component(C val = { }) requires
         CanWriteComponent<ComponentAccess, C>
