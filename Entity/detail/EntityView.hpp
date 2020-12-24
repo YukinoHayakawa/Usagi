@@ -143,12 +143,16 @@ public:
     bool valid() const
     {
         // Page is in valid storage
-        return mPageIndex < this->entity_pages().size()
+        const auto c0 = mPageIndex < this->entity_pages().size();
+        if(!c0) return false;
+        const auto &page = this->entity_pages().at(mPageIndex);
         // Page is actively allocated
-            && page().page_seq_id != -1
+        const auto c1 = page.page_seq_id != -1;
+        if(!c1) return false;
         // Entity is allocated
-            && mIndexInPage < page().first_unused_index;
-        // todo: recognize destroyed entity or not?
+        const auto c2 = mIndexInPage < page.first_unused_index;
+        if(!c2) return false;
+        return true;
         // todo: recognize destroyed entity or not?
     }
 
