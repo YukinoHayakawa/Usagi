@@ -76,6 +76,8 @@ public:
         ComponentFilter<Include...> include = { },
         // defaults to empty exclude mask via class template argument deduction
         ComponentFilter<Exclude...> exclude = { })
+        requires (CanReadComponentsByFilter<ComponentAccess, decltype(include)>
+            && CanReadComponentsByFilter<ComponentAccess, decltype(exclude)>)
     {
         return EntityDatabaseViewFiltered<
             DatabaseT,
@@ -96,6 +98,8 @@ public:
         ComponentFilter<Include...> include,
         // defaults to empty exclude mask via class template argument deduction
         ComponentFilter<Exclude...> exclude = { })
+        requires (CanReadComponentsByFilter<ComponentAccess, decltype(include)>
+            && CanReadComponentsByFilter<ComponentAccess, decltype(exclude)>)
     {
         return EntityPageViewFiltered<
             DatabaseT,
@@ -117,13 +121,15 @@ public:
     template <Component... Include, Component... Exclude>
     auto sample(
         auto &&rng,
-        ComponentFilter<Include...> include_filter = { },
-        ComponentFilter<Exclude...> exclude_filter = { },
+        ComponentFilter<Include...> include = { },
+        ComponentFilter<Exclude...> exclude = { },
         const std::size_t limit = DatabaseT::ENTITY_PAGE_SIZE,
         typename DatabaseT::SamplingEventCounter *insights = nullptr)
+        requires (CanReadComponentsByFilter<ComponentAccess, decltype(include)>
+            && CanReadComponentsByFilter<ComponentAccess, decltype(exclude)>)
     {
         return this->mDatabase->template sample<ComponentAccess>(
-            rng, include_filter, exclude_filter, limit, insights
+            rng, include, exclude, limit, insights
         );
     }
 };

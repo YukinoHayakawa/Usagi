@@ -253,6 +253,7 @@ public:
         return SamplingEventCounter { };
     }
 
+    // todo: should newly inserted entities be visible to sampling process?
     template <
         typename ComponentAccess,
         Component... Include,
@@ -266,6 +267,7 @@ public:
         SamplingEventCounter *insights = nullptr) ->
         std::optional<EntityUserViewT<ComponentAccess>>
     {
+        // todo: hit rate may drop rapidly when page storage usage is sparse
         // todo: validate distribution
         std::uniform_int_distribution<std::size_t> dist {
             0, entity_pages().size() * ENTITY_PAGE_SIZE

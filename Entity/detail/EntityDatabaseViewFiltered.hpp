@@ -15,6 +15,9 @@ template <
 class EntityDatabaseViewFiltered
     : EntityDatabaseAccessInternal<Database>
 {
+    static_assert(CanReadComponentsByFilter<ComponentAccess, IncludeFilter>);
+    static_assert(CanReadComponentsByFilter<ComponentAccess, ExcludeFilter>);
+
 public:
     using DatabaseT = Database;
     using ComponentAccessT = ComponentAccess;

@@ -14,6 +14,9 @@ template <
 class EntityPageViewFiltered
     : protected EntityDatabaseAccessInternal<Database>
 {
+    static_assert(CanReadComponentsByFilter<ComponentAccess, IncludeFilter>);
+    static_assert(CanReadComponentsByFilter<ComponentAccess, ExcludeFilter>);
+
     std::size_t mPageIndex = EntityPageT::INVALID_PAGE;
 
 public:
