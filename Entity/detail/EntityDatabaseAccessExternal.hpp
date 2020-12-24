@@ -72,7 +72,7 @@ public:
      * \tparam Include
      * \tparam Exclude
      * \param include Leaving this field blank is effectively doing a
-     * SELECT *.
+     * SELECT * including destroyed entities whose storage is not freed.
      * \param exclude
      * \return
      */
@@ -157,6 +157,7 @@ public:
     {
         // todo: hit rate may drop rapidly when page storage usage is sparse. fallback to reservoir sampling?
         // todo: validate distribution
+        // todo: avoid destroyed entities
         std::uniform_int_distribution<std::size_t> dist {
             0, this->entity_pages().size() * DatabaseT::ENTITY_PAGE_SIZE
         };
