@@ -114,10 +114,16 @@ public:
         );
     }
 
-    auto sample(auto &&rng, std::size_t limit = 10)
+    template <Component... Include, Component... Exclude>
+    auto sample(
+        auto &&rng,
+        ComponentFilter<Include...> include_filter = { },
+        ComponentFilter<Exclude...> exclude_filter = { },
+        const std::size_t limit = DatabaseT::ENTITY_PAGE_SIZE,
+        typename DatabaseT::SamplingEventCounter *insights = nullptr)
     {
         return this->mDatabase->template sample<ComponentAccess>(
-            rng, limit
+            rng, include_filter, exclude_filter, limit, insights
         );
     }
 };

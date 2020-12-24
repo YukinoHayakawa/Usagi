@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <utility>
+#include <cassert>
 
 #include <Usagi/Library/Meta/Op.hpp>
 
@@ -132,6 +133,11 @@ public:
         , mTraits(std::move(traits))
     {
     }
+
+    BinaryHeap(const BinaryHeap &other) = delete;
+    BinaryHeap(BinaryHeap &&other) noexcept = default;
+    BinaryHeap & operator=(const BinaryHeap &other) = delete;
+    BinaryHeap & operator=(BinaryHeap &&other) noexcept = default;
 
     constexpr static std::size_t INVALID_INDEX = -1;
 

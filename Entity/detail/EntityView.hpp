@@ -50,7 +50,7 @@ class EntityView
         auto idx = page().template component_page_index<C>();
         auto &storage = this->template component_storage<C>();
         // Ensure that the entity has the component
-        assert(has_component<C>());
+        assert(include<C>());
         assert(idx != DatabaseT::EntityPageT::INVALID_PAGE);
         // Access the component in the storage page
         return storage.at(idx)[mIndexInPage];
@@ -86,7 +86,7 @@ class EntityView
     {
         if constexpr(TagComponent<C>)
         {
-            return BoolTag<C> { has_component<C>() };
+            return BoolTag<C> { include<C>() };
         }
         else
         {
@@ -95,7 +95,7 @@ class EntityView
             // Page not allocated
             if(idx == DatabaseT::EntityPageT::INVALID_PAGE)
                 return nullptr;
-            if(!has_component<C>())
+            if(!include<C>())
                 return nullptr;
             auto &storage = this->template component_storage<C>();
             // Access the component in the storage page
@@ -149,6 +149,7 @@ public:
         // Entity is allocated
             && mIndexInPage < page().first_unused_index;
         // todo: recognize destroyed entity or not?
+        // todo: recognize destroyed entity or not?
     }
 
 #ifdef __clang__
@@ -160,15 +161,41 @@ public:
     }
 
     template <Component C>
-    bool has_component(C = {}) const
+    bool include(C) const
     {
         return page().template component_bit<C>(mIndexInPage);
     }
 
     template <Component... C>
-    bool has_components() const
+    bool include() const
     {
-        return (... || has_component<C>());
+        // default to true when parameter pack C is empty
+        return (... && include(C{}));
+    }
+
+    template <Component... C>
+    bool include(ComponentFilter<C...>) const
+    {
+        return include<C...>();
+    }
+
+    template <Component C>
+    bool exclude(C) const
+    {
+        return !include(C{});
+    }
+
+    template <Component... C>
+    bool exclude() const
+    {
+        // default to true when parameter pack C is empty
+        return (... && exclude(C{}));
+    }
+
+    template <Component... C>
+    bool exclude(ComponentFilter<C...>) const
+    {
+        return exclude<C...>();
     }
 
     // Existing component value will be overwritten when calling this
@@ -220,7 +247,7 @@ public:
             auto &storage = this->template component_storage<C>();
 
             // The entity should have the requested entity
-            assert(has_component<C>());
+            assert(include<C>());
             assert(idx != EntityPageT::INVALID_PAGE);
         }
 

@@ -232,24 +232,72 @@ public:
         return { this, id.page, id.offset };
     }
 
-    template <typename ComponentAccess>
-    auto sample(auto &&rng, std::size_t limit) ->
+    struct SamplingEventCounter
+    {
+        std::size_t num_invalid = 0;
+        std::size_t num_include_unsatisfied = 0;
+        std::size_t num_exclude_unsatisfied = 0;
+
+        auto & operator+=(const SamplingEventCounter &rhs)
+        {
+            num_invalid += rhs.num_invalid;
+            num_include_unsatisfied += rhs.num_include_unsatisfied;
+            num_exclude_unsatisfied += rhs.num_exclude_unsatisfied;
+
+            return *this;
+        }
+    };
+
+    auto create_sampling_counter() const
+    {
+        return SamplingEventCounter { };
+    }
+
+    template <
+        typename ComponentAccess,
+        Component... Include,
+        Component... Exclude
+    >
+    auto sample(
+        auto &&rng,
+        ComponentFilter<Include...> include_filter = { },
+        ComponentFilter<Exclude...> exclude_filter = { },
+        const std::size_t limit = ENTITY_PAGE_SIZE,
+        SamplingEventCounter *insights = nullptr) ->
         std::optional<EntityUserViewT<ComponentAccess>>
     {
-        std::uniform_int_distribution<std::size_t> dice_page {
-            0, entity_pages().size()
+        // todo: validate distribution
+        std::uniform_int_distribution<std::size_t> dist {
+            0, entity_pages().size() * ENTITY_PAGE_SIZE
         };
-        std::uniform_int_distribution<std::size_t> dice_offset {
-            0, ENTITY_PAGE_SIZE
-        };
-        for(; limit; --limit)
+        SamplingEventCounter counter;
+        // limit the number of attempts since it's possible for the database
+        // to be completely empty.
+        for(std::size_t i = 0; i < limit; ++i)
         {
-            EntityUserViewT<ComponentAccess> view {
-                this,
-                dice_page(rng),
-                dice_offset(rng)
-            };
-            if(view.valid()) return view;
+            const auto seq = dist(rng);
+            const auto page = seq / ENTITY_PAGE_SIZE;
+            const auto offset = seq % ENTITY_PAGE_SIZE;
+
+            EntityUserViewT<ComponentAccess> view { this, page, offset };
+            // rejection sampling
+            if(!view.valid())
+            {
+                ++counter.num_invalid;
+                continue;
+            }
+            if(!view.include(include_filter))
+            {
+                ++counter.num_include_unsatisfied;
+                continue;
+            }
+            if(!view.exclude(exclude_filter))
+            {
+                ++counter.num_exclude_unsatisfied;
+                continue;
+            }
+            if(insights) *insights = counter;
+            return view;
         }
         return { };
     }

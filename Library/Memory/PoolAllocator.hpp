@@ -151,7 +151,7 @@ public:
     void deallocate(const std::size_t index) noexcept
     {
         // Assume that the T in the block is correctly destructed,
-        // which is none of our business.
+        // which should be properly handled elsewhere.
         auto &fp = block(index);
 
         LockGuard lock(mLock);
