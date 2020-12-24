@@ -68,19 +68,20 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
     </ClInclude>
+    <ClInclude Include="Entity\EntityDatabase.hpp" />
+    <ClInclude Include="Library\Sampling\NBestSampler.hpp" />
+    <ClInclude Include="Library\Sampling\ReservoirSampler.hpp" />
     <ClInclude Include="Library\Meta\List.hpp" />
     <ClInclude Include="Library\Meta\Set.hpp" />
     <ClInclude Include="Library\Meta\Deduplicate.hpp" />
     <ClInclude Include="Library\Meta\Type.hpp" />
     <ClInclude Include="Runtime\Memory\PagedStorage.hpp" />
-    <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />
     <ClInclude Include="Concept\Container\Stack.hpp" />
     <ClInclude Include="Library\Algorithm\Max.hpp" />
     <ClInclude Include="Library\Algorithm\Pairwise.hpp" />
     <ClInclude Include="Library\Container\BinaryHeap.hpp" />
     <ClInclude Include="Library\Container\DynamicArray.hpp" />
-    <ClInclude Include="Library\Find.hpp" />
     <ClInclude Include="Library\Graph\detail\GraphTrait.hpp" />
     <ClInclude Include="Library\Graph\detail\GraphTraitConnectivity.hpp" />
     <ClInclude Include="Library\Graph\Graph.hpp" />

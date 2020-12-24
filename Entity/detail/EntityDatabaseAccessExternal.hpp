@@ -123,42 +123,6 @@ public:
         );
     }
 
-    template <Component... Include, Component... Exclude>
-    std::size_t sample_reservoir(
-        auto &&rng,
-        std::size_t sample_size,
-        auto &output_vector,
-        ComponentFilter<Include...> include = { },
-        ComponentFilter<Exclude...> exclude = { })
-        requires (CanReadComponentsByFilter<ComponentAccess, decltype(include)>
-            && CanReadComponentsByFilter<ComponentAccess, decltype(exclude)>)
-    {
-        std::size_t num_visited = 0;
-
-        for(auto &&e : view(include, exclude))
-        {
-            // fill the reservoir array
-            if(num_visited < sample_size)
-            {
-                output_vector.push_back(e);
-            }
-            // replace elements with gradually decreasing probability
-            else
-            {
-                const std::uniform_int_distribution<std::size_t> dist {
-                    0, num_visited
-                };
-                if(const auto idx = dist(rng); idx < sample_size)
-                {
-                    output_vector[idx] = e;
-                }
-            }
-            ++num_visited;
-        }
-
-        return num_visited;
-    }
-
     struct SamplingEventCounter
     {
         std::size_t num_invalid = 0;
@@ -182,7 +146,7 @@ public:
 
     // todo: should newly inserted entities be visible to sampling process?
     template <Component... Include, Component... Exclude>
-    std::optional<EntityViewT> sample_random_access_single(
+    std::optional<EntityViewT> sample(
         auto &&rng,
         ComponentFilter<Include...> include = { },
         ComponentFilter<Exclude...> exclude = { },

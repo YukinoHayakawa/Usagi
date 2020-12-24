@@ -2,7 +2,7 @@
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="usagi::EntityPage&lt;*&gt;">
-    <Intrinsic Name="_Size" Expression="(unsigned*)component_pages._Elems - (unsigned*)component_masks._Elems" />
+    <Intrinsic Name="_Size" Expression="sizeof(component_pages._Elems)/sizeof(unsigned)" />
     <Expand HideRawView="true">
       <CustomListItems>
         <Variable Name="i" InitialValue="0" />
