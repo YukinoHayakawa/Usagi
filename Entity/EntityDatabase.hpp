@@ -1,8 +1,6 @@
 ﻿#pragma once
 
 #include <array>
-#include <optional>
-#include <random>
 
 #include <Usagi/Library/Memory/LockGuard.hpp>
 #include <Usagi/Library/Memory/SpinLock.hpp>
@@ -230,78 +228,6 @@ public:
     auto entity_view(const EntityId id) -> EntityUserViewT<ComponentAccess>
     {
         return { this, id.page, id.offset };
-    }
-
-    struct SamplingEventCounter
-    {
-        std::size_t num_invalid = 0;
-        std::size_t num_include_unsatisfied = 0;
-        std::size_t num_exclude_unsatisfied = 0;
-
-        auto & operator+=(const SamplingEventCounter &rhs)
-        {
-            num_invalid += rhs.num_invalid;
-            num_include_unsatisfied += rhs.num_include_unsatisfied;
-            num_exclude_unsatisfied += rhs.num_exclude_unsatisfied;
-
-            return *this;
-        }
-    };
-
-    auto create_sampling_counter() const
-    {
-        return SamplingEventCounter { };
-    }
-
-    // todo: should newly inserted entities be visible to sampling process?
-    template <
-        typename ComponentAccess,
-        Component... Include,
-        Component... Exclude
-    >
-    auto sample(
-        auto &&rng,
-        ComponentFilter<Include...> include_filter = { },
-        ComponentFilter<Exclude...> exclude_filter = { },
-        const std::size_t limit = ENTITY_PAGE_SIZE,
-        SamplingEventCounter *insights = nullptr) ->
-        std::optional<EntityUserViewT<ComponentAccess>>
-    {
-        // todo: hit rate may drop rapidly when page storage usage is sparse
-        // todo: validate distribution
-        std::uniform_int_distribution<std::size_t> dist {
-            0, entity_pages().size() * ENTITY_PAGE_SIZE
-        };
-        SamplingEventCounter counter;
-        // limit the number of attempts since it's possible for the database
-        // to be completely empty.
-        for(std::size_t i = 0; i < limit; ++i)
-        {
-            const auto seq = dist(rng);
-            const auto page = seq / ENTITY_PAGE_SIZE;
-            const auto offset = seq % ENTITY_PAGE_SIZE;
-
-            EntityUserViewT<ComponentAccess> view { this, page, offset };
-            // rejection sampling
-            if(!view.valid())
-            {
-                ++counter.num_invalid;
-                continue;
-            }
-            if(!view.include(include_filter))
-            {
-                ++counter.num_include_unsatisfied;
-                continue;
-            }
-            if(!view.exclude(exclude_filter))
-            {
-                ++counter.num_exclude_unsatisfied;
-                continue;
-            }
-            if(insights) *insights = counter;
-            return view;
-        }
-        return { };
     }
 
     template <Component... InitialComponents>

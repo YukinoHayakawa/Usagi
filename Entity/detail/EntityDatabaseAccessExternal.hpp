@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#include <optional>
+#include <random>
+
 #include <Usagi/Entity/Archetype.hpp>
 
 #include "ComponentAccessReadOnly.hpp"
@@ -20,6 +23,8 @@ public:
     using DatabaseT         = Database;
     using EntityPageT       = typename DatabaseT::EntityPageT;
     using ComponentAccessT  = ComponentAccess;
+    using EntityViewT       =
+        typename DatabaseT::template EntityUserViewT<ComponentAccess>;
 
     EntityDatabaseAccessExternal() = default;
 
@@ -119,18 +124,108 @@ public:
     }
 
     template <Component... Include, Component... Exclude>
-    auto sample(
+    std::size_t sample_reservoir(
+        auto &&rng,
+        std::size_t sample_size,
+        auto &output_vector,
+        ComponentFilter<Include...> include = { },
+        ComponentFilter<Exclude...> exclude = { })
+        requires (CanReadComponentsByFilter<ComponentAccess, decltype(include)>
+            && CanReadComponentsByFilter<ComponentAccess, decltype(exclude)>)
+    {
+        std::size_t num_visited = 0;
+
+        for(auto &&e : view(include, exclude))
+        {
+            // fill the reservoir array
+            if(num_visited < sample_size)
+            {
+                output_vector.push_back(e);
+            }
+            // replace elements with gradually decreasing probability
+            else
+            {
+                const std::uniform_int_distribution<std::size_t> dist {
+                    0, num_visited
+                };
+                if(const auto idx = dist(rng); idx < sample_size)
+                {
+                    output_vector[idx] = e;
+                }
+            }
+            ++num_visited;
+        }
+
+        return num_visited;
+    }
+
+    struct SamplingEventCounter
+    {
+        std::size_t num_invalid = 0;
+        std::size_t num_include_unsatisfied = 0;
+        std::size_t num_exclude_unsatisfied = 0;
+
+        auto & operator+=(const SamplingEventCounter &rhs)
+        {
+            num_invalid += rhs.num_invalid;
+            num_include_unsatisfied += rhs.num_include_unsatisfied;
+            num_exclude_unsatisfied += rhs.num_exclude_unsatisfied;
+
+            return *this;
+        }
+    };
+
+    auto create_sampling_counter() const
+    {
+        return SamplingEventCounter { };
+    }
+
+    // todo: should newly inserted entities be visible to sampling process?
+    template <Component... Include, Component... Exclude>
+    std::optional<EntityViewT> sample_random_access_single(
         auto &&rng,
         ComponentFilter<Include...> include = { },
         ComponentFilter<Exclude...> exclude = { },
         const std::size_t limit = DatabaseT::ENTITY_PAGE_SIZE,
-        typename DatabaseT::SamplingEventCounter *insights = nullptr)
+        SamplingEventCounter *insights = nullptr)
         requires (CanReadComponentsByFilter<ComponentAccess, decltype(include)>
             && CanReadComponentsByFilter<ComponentAccess, decltype(exclude)>)
     {
-        return this->mDatabase->template sample<ComponentAccess>(
-            rng, include, exclude, limit, insights
-        );
+        // todo: hit rate may drop rapidly when page storage usage is sparse. fallback to reservoir sampling?
+        // todo: validate distribution
+        std::uniform_int_distribution<std::size_t> dist {
+            0, this->entity_pages().size() * DatabaseT::ENTITY_PAGE_SIZE
+        };
+        SamplingEventCounter counter;
+        // limit the number of attempts since it's possible for the database
+        // to be completely empty.
+        for(std::size_t i = 0; i < limit; ++i)
+        {
+            const auto seq = dist(rng);
+            const auto page = seq / DatabaseT::ENTITY_PAGE_SIZE;
+            const auto offset = seq % DatabaseT::ENTITY_PAGE_SIZE;
+
+            EntityViewT view { this->mDatabase, page, offset };
+            // rejection sampling
+            if(!view.valid())
+            {
+                ++counter.num_invalid;
+                continue;
+            }
+            if(!view.include(include))
+            {
+                ++counter.num_include_unsatisfied;
+                continue;
+            }
+            if(!view.exclude(exclude))
+            {
+                ++counter.num_exclude_unsatisfied;
+                continue;
+            }
+            if(insights) *insights = counter;
+            return view;
+        }
+        return { };
     }
 };
 }
