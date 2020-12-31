@@ -57,6 +57,7 @@ protected:
 
     // file-backed allocator
     constexpr static std::uint16_t MAGIC_CHECK = 0xFA01;
+    bool mHeaderInitialized = false;
 
 public:
     PagedStorageFileBacked() = default;
@@ -83,6 +84,7 @@ public:
             );
         }
         StorageT::template push_header<MAGIC_CHECK>(PoolT::mMeta, file_exists);
+        mHeaderInitialized = true;
 
         // otherwise it's a new file. initialization will be handled by the
         // dynamic array. no extra action is needed.
@@ -92,8 +94,10 @@ public:
     ~PagedStorageFileBacked()
     {
         // save metadata to the header
-        StorageT::template pop_header<MAGIC_CHECK>(PoolT::mMeta, true);
-
+        if(mHeaderInitialized)
+        {
+            StorageT::template pop_header<MAGIC_CHECK>(PoolT::mMeta, true);
+        }
         // file mapping automatically flushed by base destructor
     }
 };

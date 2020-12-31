@@ -3,12 +3,12 @@
 #include <cassert>
 #include <memory>
 #include <utility>
-#include <stdexcept>
 
 #include <Usagi/Concept/Allocator/ReallocatableAllocator.hpp>
 #include <Usagi/Concept/Type/Memcpyable.hpp>
 #include <Usagi/Library/Math/Rounding.hpp>
 #include <Usagi/Runtime/ErrorHandling.hpp>
+#include <Usagi/Runtime/ExceptionHeaderCorruption.hpp>
 
 namespace usagi
 {
@@ -85,7 +85,7 @@ protected:
         {
             assert(storage_initialized());
             if(mBase->header_check[mHeaderIndex] != Magic)
-                USAGI_THROW(std::runtime_error("Corrupted header."));
+                USAGI_THROW(ExceptionHeaderCorruption("Corrupted header."));
             header = *reinterpret_cast<Header*>(
                 reinterpret_cast<char*>(mBase) + mHeaderOffset
             );
