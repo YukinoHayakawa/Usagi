@@ -266,7 +266,7 @@ public:
         //
         // Initialize components for the new entity
         (..., view.template add_component<InitialComponents>(
-            archetype.template val<InitialComponents>()
+            archetype.template component<InitialComponents>()
         ));
 
         const EntityId entity_id {

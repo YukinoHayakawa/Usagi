@@ -299,6 +299,21 @@ public:
     {
         return component_access<C>();
     }
+
+    template <Component C>
+    C & operator()(C) requires
+        CanWriteComponent<ComponentAccess, C>
+    {
+        return component<C>();
+    }
+
+    template <Component C>
+    const C & operator()(C) const requires
+        (!CanWriteComponent<ComponentAccess, C>
+        && CanReadComponent<ComponentAccess, C>)
+    {
+        return component<C>();
+    }
 };
 
 template <Component C, typename EntityView>

@@ -36,14 +36,36 @@ public:
     }
 
     template <Component C>
-    auto val() -> C &
+    C & component()
     {
         return *this;
     }
 
     template <Component C>
-    auto val() const -> const C &
+    const C & component() const
     {
+        return *this;
+    }
+
+    template <Component C>
+    C & operator()(C)
+    {
+        return *this;
+    }
+
+    template <Component C>
+    const C & operator()(C) const
+    {
+        return *this;
+    }
+
+    // Copy from existing entity view.
+    template <typename EntityViewT>
+    Archetype & operator=(EntityViewT &&view)
+    {
+        (..., (
+            component<InitialComponents>() = view.component(InitialComponents())
+        ));
         return *this;
     }
 };
