@@ -20,6 +20,8 @@ struct ComponentFilter : Tag<Components>...
 {
     using IsComponentFilter = void;
 
+    static constexpr std::size_t NUM_COMPONENTS = sizeof...(Components);
+
     template <Component C>
     static constexpr bool HAS_COMPONENT = std::is_base_of_v<
         Tag<C>,
@@ -31,6 +33,12 @@ struct ComponentFilter : Tag<Components>...
         typename T
     >
     using apply = T<Components...>;
+
+    template <typename Func>
+    static void map_types(Func &&func)
+    {
+        (..., func.template operator()<Components>());
+    }
 
     template <
         template <typename...>

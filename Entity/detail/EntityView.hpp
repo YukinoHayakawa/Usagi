@@ -234,7 +234,8 @@ public:
             page().template set_component_bit<C>(mIndexInPage);
             page().dirty = true;
 
-            return storage.at(idx)[mIndexInPage] = val;
+            auto &ref = storage.at(idx)[mIndexInPage];
+            return ref = val;
         }
     }
 
@@ -244,14 +245,16 @@ public:
     {
         check_entity_created();
 
+        // The entity should have the requested entity
+        assert(include<C>());
+
         if constexpr(!TagComponent<C>)
         {
+            [[maybe_unused]]
             // Locate the component position in the storage
             auto &idx = page().template component_page_index<C>();
-            auto &storage = this->template component_storage<C>();
+            // auto &storage = this->template component_storage<C>();
 
-            // The entity should have the requested entity
-            assert(include<C>());
             assert(idx != EntityPageT::INVALID_PAGE);
         }
 

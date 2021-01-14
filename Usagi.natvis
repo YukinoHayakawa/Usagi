@@ -3,7 +3,7 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="usagi::EntityPage&lt;*&gt;">
     <Intrinsic Name="_Size" Expression="sizeof(component_pages._Elems)/sizeof(unsigned)" />
-    <Expand HideRawView="true">
+    <Expand HideRawView="false">
       <CustomListItems>
         <Variable Name="i" InitialValue="0" />
         <Size>_Size()</Size>
@@ -49,7 +49,7 @@
   <Type Name="usagi::EntityDatabase&lt;*&gt;">
     <Intrinsic Name="_PageStorage" Expression="((EntityPageStorageT*)this)->mStorage"></Intrinsic>
     <DisplayString>{{EntityPages...}}</DisplayString>
-    <Expand HideRawView="true">
+    <Expand HideRawView="false">
       <CustomListItems>
         <Variable Name="p_index" InitialValue="-1ull" />
         <Exec>p_index=mMeta.first_entity_page_idx</Exec>

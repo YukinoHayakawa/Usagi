@@ -182,6 +182,8 @@ protected:
      * assume that the previous point holds, the Page utilization should be
      * reasonably good.
      *
+     * Bug: Worst case space complexity is 32x, which could be observed in scenarios where Entities are destroyed in a random manner, such as genetic algorithms. Consider inventing a better mechanism.
+     *
      * \tparam InitialComponents
      * \param archetype
      * \return
