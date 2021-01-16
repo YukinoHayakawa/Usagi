@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <vector>
-#include <map>
+#include <ranges>
 
 #include <Usagi/Library/Graph/Graph.hpp>
 
@@ -26,7 +26,7 @@ public:
     );
 
 private:
-    using AdjacentVertices = std::map<VertexIndexT, EdgeT>;
+    using AdjacentVertices = std::vector<std::pair<VertexIndexT, EdgeT>>;
 
     struct VertexInfo
     {
@@ -117,17 +117,17 @@ public:
         const VertexIndexT to,
         const EdgeT edge = { })
     {
-        mVertices[from].adj.insert_or_assign(to, edge);
+        mVertices[from].adj.emplace_back(to, edge);
     }
 
     void remove_edge(const VertexIndexT from, const VertexIndexT to)
     {
-        mVertices[from].adj.erase(to);
+        erase_if(mVertices[from].adj, [&](auto &&p) { return p.first == to; });
     }
 
     bool has_edge(const VertexIndexT from, const VertexIndexT to) const
     {
-        return mVertices[from].adj.contains(to);
+        return find_edge(from, to) != mVertices[from].adj.end();
     }
 
     void clear_out_edges(const VertexIndexT from)
@@ -177,9 +177,19 @@ public:
     auto edge_weight(const VertexIndexT from, const VertexIndexT to) const
     {
         const auto &vtx = mVertices[from];
+
         return eval_edge_weight(
             vtx.data,
-            vtx.adj.find(to)->second
+            find_edge(from, to)->second
+        );
+    }
+
+protected:
+    auto find_edge(const VertexIndexT from, const VertexIndexT to) const
+    {
+        return std::ranges::find_if(
+            mVertices[from].adj,
+            [&](auto &&p) { return p.first == to; }
         );
     }
 };
