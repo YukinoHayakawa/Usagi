@@ -63,9 +63,9 @@ public:
     template <typename EntityViewT>
     Archetype & operator=(EntityViewT &&view)
     {
-        (..., (
-            component<InitialComponents>() = view.component(InitialComponents())
-        ));
+        (..., (component<InitialComponents>() =
+            view.component(Tag<InitialComponents>()
+        )));
         return *this;
     }
 };

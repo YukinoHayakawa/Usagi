@@ -269,8 +269,9 @@ public:
         // todo: insert data by components instead of entities
         //
         // Initialize components for the new entity
-        (..., view.template add_component<InitialComponents>(
-            archetype.template component<InitialComponents>()
+        (..., (
+            view.template add_component<InitialComponents>() =
+                archetype.template component<InitialComponents>()
         ));
 
         const EntityId entity_id {

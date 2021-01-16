@@ -165,7 +165,7 @@ public:
     }
 
     template <Component C>
-    bool include(C) const
+    bool include(Tag<C>) const
     {
         return page().template component_bit<C>(mIndexInPage);
     }
@@ -174,7 +174,7 @@ public:
     bool include() const
     {
         // default to true when parameter pack C is empty
-        return (... && include(C{}));
+        return (... && include(Tag<C>{}));
     }
 
     template <Component... C>
@@ -184,16 +184,16 @@ public:
     }
 
     template <Component C>
-    bool exclude(C) const
+    bool exclude(Tag<C>) const
     {
-        return !include(C{});
+        return !include(Tag<C>{});
     }
 
     template <Component... C>
     bool exclude() const
     {
         // default to true when parameter pack C is empty
-        return (... && exclude(C{}));
+        return (... && exclude(Tag<C>{}));
     }
 
     template <Component... C>
@@ -205,7 +205,7 @@ public:
     // Existing component value will be overwritten when calling this
     // function multiple times.
     template <Component C>
-    decltype(auto) add_component(C val = { }) requires
+    decltype(auto) add_component(Tag<C> = { }) requires
         CanWriteComponent<ComponentAccess, C>
     {
         check_entity_created();
@@ -234,13 +234,15 @@ public:
             page().template set_component_bit<C>(mIndexInPage);
             page().dirty = true;
 
+            // todo init perf.
             auto &ref = storage.at(idx)[mIndexInPage];
-            return ref = val;
+            ref = C { };
+            return ref;
         }
     }
 
     template <Component C>
-    void remove_component(C = {}) requires
+    void remove_component(Tag<C> = {}) requires
         CanWriteComponent<ComponentAccess, C>
     {
         check_entity_created();
@@ -284,7 +286,7 @@ public:
      * \return
      */
     template <Component C>
-    C & component(C = {}) requires
+    C & component(Tag<C> = {}) requires
         CanWriteComponent<ComponentAccess, C>
     {
         return component_access<C>();
@@ -296,7 +298,7 @@ public:
      * \return
      */
     template <Component C>
-    const C & component(C = {}) const requires
+    const C & component(Tag<C> = {}) const requires
         (!CanWriteComponent<ComponentAccess, C>
         && CanReadComponent<ComponentAccess, C>)
     {
@@ -304,14 +306,14 @@ public:
     }
 
     template <Component C>
-    C & operator()(C) requires
+    C & operator()(Tag<C>) requires
         CanWriteComponent<ComponentAccess, C>
     {
         return component<C>();
     }
 
     template <Component C>
-    const C & operator()(C) const requires
+    const C & operator()(Tag<C>) const requires
         (!CanWriteComponent<ComponentAccess, C>
         && CanReadComponent<ComponentAccess, C>)
     {
