@@ -52,7 +52,8 @@ class VmAllocatorPagefileBacked
     void check_boundary(std::uint64_t size) const;
 
 public:
-    VmAllocatorPagefileBacked() = default;
+    // Reserve 16GiB by default
+    explicit VmAllocatorPagefileBacked(std::size_t reserve_size = 1ull << 34);
     ~VmAllocatorPagefileBacked();
 
     VmAllocatorPagefileBacked(VmAllocatorPagefileBacked &&other) noexcept;

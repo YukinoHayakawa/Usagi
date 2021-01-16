@@ -49,6 +49,11 @@ void VmAllocatorPagefileBacked::check_boundary(std::uint64_t size) const
         USAGI_THROW(std::bad_alloc());
 }
 
+VmAllocatorPagefileBacked::VmAllocatorPagefileBacked(std::size_t reserve_size)
+{
+    reserve(reserve_size);
+}
+
 VmAllocatorPagefileBacked::~VmAllocatorPagefileBacked()
 {
     // Ensure correct behavior of moved instances.
