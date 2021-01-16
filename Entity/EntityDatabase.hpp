@@ -69,6 +69,7 @@ public:
 
     using ComponentFilterT      = ComponentFilter<EnabledComponents...>;
     using EntityPageT           = EntityPage<EnabledComponents...>;
+    using EntityIndexT          = typename EntityPageT::EntityIndexT;
     using EntityPageStorageT    = Storage<EntityPageT>;
     using EntityPageIteratorT   = EntityPageIterator<EntityDatabase>;
     template <typename ComponentAccess>
@@ -243,21 +244,22 @@ public:
         // that no concurrent entity creation on one page will happen.
 
         EntityPageInfo page = try_reuse_coherent_page(archetype);
+        EntityIndexT inner_index;
 
-        // The Entity Page is full, allocate a new one.
-        // Note that the holes in an Entity Page is never used.
-        // When the Page becomes empty, the Page will be recycled.
-        if(page.ptr->first_unused_index == ENTITY_PAGE_SIZE)
+        // Try to allocate an empty slot from the entity page.
+        // If the Entity Page is full, allocate a new one.
+        if((inner_index = page.ptr->allocate()) == ENTITY_PAGE_SIZE)
         {
             page = allocate_entity_page();
+            inner_index = page.ptr->allocate();
         }
+        assert(inner_index < ENTITY_PAGE_SIZE);
 
-        // Mark the Entity slot as used
-        const auto inner_index = page.ptr->first_unused_index++;
         // Record Page index hint
         archetype.mLastUsedPageIndex = page.index;
-        // The page may have been recycled and made into another page
-        // so check the id range to make sure it was the original one.
+        // It's possible that an entity page referenced by an archetype to
+        // be recycled before next use. This sequential ID is assigned to
+        // detect such cases.
         archetype.mLastUsedPageSeqId = page.ptr->page_seq_id;
 
         EntityUserViewT<ComponentAccessAllowAll> view {
@@ -290,12 +292,13 @@ public:
 
         while(cur != EntityPageT::INVALID_PAGE)
         {
-            bool drop_page = true;
-            release_empty_component_pages(cur, ComponentFilterT(), drop_page);
+            EntityIndexT usage_mask = 0;
+            release_empty_component_pages(cur, ComponentFilterT(), usage_mask);
 
             EntityPageT &page = entity_pages().at(cur);
+            page.free_mask = ~usage_mask;
 
-            if(drop_page)
+            if(usage_mask == 0)
             {
                 // link the previous page to the next page of current page.
                 // if this is the only page, this clears the linked list
@@ -338,14 +341,16 @@ private:
     void release_empty_component_pages(
         const std::size_t idx,
         ComponentFilter<C...>,
-        bool &drop_page)
+        EntityIndexT &usage_mask)
     {
-        (..., release_empty_component_page<C>(idx, drop_page));
+        (..., release_empty_component_page<C>(idx, usage_mask));
     }
 
     // returns if the component page is empty
     template <Component C>
-    void release_empty_component_page(const std::size_t e_idx, bool &drop_page)
+    void release_empty_component_page(
+        const std::size_t e_idx,
+        EntityIndexT &usage_mask)
     {
         EntityPageT &page = entity_pages().at(e_idx);
         auto &c_idx = page.template component_page_index<C>();
@@ -360,10 +365,12 @@ private:
             return;
         }
 
-        // Page in use
-        if(page.template component_enabled_mask<C>() != 0)
+        const auto mask = page.template component_enabled_mask<C>();
+        usage_mask |= mask;
+
+        // Component page in use
+        if(mask != 0)
         {
-            drop_page = false;
             return;
         }
 

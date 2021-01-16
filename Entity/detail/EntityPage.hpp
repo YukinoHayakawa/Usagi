@@ -1,7 +1,9 @@
 ﻿#pragma once
 
-#include <cstdint>
 #include <array>
+#include <cstdint>
+#include <limits>
+#include <immintrin.h>
 
 #include <Usagi/Entity/Component.hpp>
 #include <Usagi/Library/Meta/Tuple.hpp>
@@ -26,7 +28,7 @@ struct EntityPage
     constexpr static std::size_t INVALID_PAGE = -1;
     constexpr static EntityIndexT PAGE_SIZE = 32;
 
-    static_assert(PAGE_SIZE == CHAR_BIT * sizeof(EntityArrayT));
+    static_assert(PAGE_SIZE == std::numeric_limits<EntityArrayT>::digits);
 
     struct PageIndex // Wrapper class
     {
@@ -44,13 +46,20 @@ struct EntityPage
 
     // singly linked list for page iteration. probably should be atomic.
     std::uint64_t next_page = INVALID_PAGE;
-
     std::uint64_t page_seq_id = -1;
 
     // The index of first empty entity available for allocation.
     // This number only grows since entity ids are never reused.
     // Range 0-31
-    std::uint8_t first_unused_index = 0;
+    // std::uint8_t first_unused_index = 0;
+
+    // A mask indicating the positions having any components. An entity index
+    // without any component is regarded as deleted and can be reused, since
+    // it won't be accessed by any filter.
+    // Corresponding bit is set to 0 when the entity is created. The mask is
+    // recalculated during reclaim_pages().
+    // todo: whether newly created entities will be accessed by filtered entity iterator depends on the relative positions of the iterator and the page had entities inserted.
+    EntityIndexT free_mask = -1;
 
     // Any addition/removal of components or entities happened after previous
     // reset of this flag
@@ -65,6 +74,15 @@ struct EntityPage
     std::array<PageIndex, sizeof...(EnabledComponents)> component_pages;
 
     // =========================== Helpers ============================= //
+
+    EntityIndexT allocate()
+    {
+        const EntityIndexT first_free = _tzcnt_u32(free_mask);
+        // If the page has no free slots, this assignment will not has any
+        // effect since blsr will return 0 for 0.
+        free_mask = _blsr_u32(free_mask);
+        return first_free;
+    }
 
     template <Component C>
     constexpr static std::uint64_t component_index()

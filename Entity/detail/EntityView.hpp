@@ -32,7 +32,7 @@ class EntityView
 
     void check_entity_created() const
     {
-        assert(mIndexInPage < page().first_unused_index);
+        // assert(mIndexInPage < page().first_unused_index);
     }
 
     auto & page() const
@@ -150,8 +150,8 @@ public:
         const auto c1 = page.page_seq_id != -1;
         if(!c1) return false;
         // Entity is allocated
-        const auto c2 = mIndexInPage < page.first_unused_index;
-        if(!c2) return false;
+        // const auto c2 = mIndexInPage < page.first_unused_index;
+        // if(!c2) return false;
         return true;
         // todo: recognize destroyed entity or not?
     }
