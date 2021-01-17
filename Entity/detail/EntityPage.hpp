@@ -59,7 +59,7 @@ struct EntityPage
     // Corresponding bit is set to 0 when the entity is created. The mask is
     // recalculated during reclaim_pages().
     // todo: whether newly created entities will be accessed by filtered entity iterator depends on the relative positions of the iterator and the page had entities inserted.
-    EntityIndexT free_mask = -1;
+    EntityArrayT free_mask = -1;
 
     // Any addition/removal of components or entities happened after previous
     // reset of this flag

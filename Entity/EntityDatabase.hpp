@@ -70,6 +70,7 @@ public:
     using ComponentFilterT      = ComponentFilter<EnabledComponents...>;
     using EntityPageT           = EntityPage<EnabledComponents...>;
     using EntityIndexT          = typename EntityPageT::EntityIndexT;
+    using EntityArrayT          = typename EntityPageT::EntityArrayT;
     using EntityPageStorageT    = Storage<EntityPageT>;
     using EntityPageIteratorT   = EntityPageIterator<EntityDatabase>;
     template <typename ComponentAccess>
@@ -293,7 +294,7 @@ public:
 
         while(cur != EntityPageT::INVALID_PAGE)
         {
-            EntityIndexT usage_mask = 0;
+            EntityArrayT usage_mask = 0;
             release_empty_component_pages(cur, ComponentFilterT(), usage_mask);
 
             EntityPageT &page = entity_pages().at(cur);
@@ -342,7 +343,7 @@ private:
     void release_empty_component_pages(
         const std::size_t idx,
         ComponentFilter<C...>,
-        EntityIndexT &usage_mask)
+        EntityArrayT &usage_mask)
     {
         (..., release_empty_component_page<C>(idx, usage_mask));
     }
@@ -351,7 +352,7 @@ private:
     template <Component C>
     void release_empty_component_page(
         const std::size_t e_idx,
-        EntityIndexT &usage_mask)
+        EntityArrayT &usage_mask)
     {
         EntityPageT &page = entity_pages().at(e_idx);
         auto &c_idx = page.template component_page_index<C>();
