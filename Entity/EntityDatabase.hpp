@@ -211,10 +211,29 @@ protected:
         if(ptr->page_seq_id != archetype.mLastUsedPageSeqId)
             return allocate_entity_page();
 
-        return EntityPageInfo {
-            .index = page_idx,
-            .ptr = ptr
-        };
+        return { .index = page_idx, .ptr = ptr };
+    }
+
+    EntityPageInfo first_page_vacancy()
+    {
+        EntityDatabaseAccessExternal<
+            EntityDatabase, ComponentAccessReadOnly
+        > range { this };
+
+        auto begin = range.begin();
+        auto end = range.end();
+
+        while(begin != end)
+        {
+            if(begin->free_mask != 0)
+                break;
+            ++begin;
+        }
+
+        if(begin == end)
+            return allocate_entity_page();
+
+        return { .index = begin.index(), .ptr = &begin.ref() };
     }
 
 public:
@@ -244,7 +263,9 @@ public:
         // and allocated pages are bound with the archetypes, it's guaranteed
         // that no concurrent entity creation on one page will happen.
 
-        EntityPageInfo page = try_reuse_coherent_page(archetype);
+        // bug: this is a temporary hack to the worst space complexity faced by current applications. component coherence must be carefully addressed later.
+        EntityPageInfo page = first_page_vacancy();
+        // EntityPageInfo page = try_reuse_coherent_page(archetype);
         EntityIndexT inner_index;
 
         // Try to allocate an empty slot from the entity page.
