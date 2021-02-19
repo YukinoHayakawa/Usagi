@@ -4,6 +4,7 @@
 
 #include <Usagi/Library/Memory/LockGuard.hpp>
 #include <Usagi/Library/Memory/SpinLock.hpp>
+#include <Usagi/Runtime/ErrorHandling.hpp>
 #include <Usagi/Runtime/Memory/PagedStorage.hpp>
 
 #include "Archetype.hpp"
@@ -19,18 +20,46 @@ namespace usagi
 {
 namespace detail::entity
 {
-// todo: bit flag components shouldn't have page index field in entity page
 template <
     template <typename T> typename Storage,
-    Component C,
-    Component... EnabledComponents
+    Component C
 >
 using ComponentStorageT = std::conditional_t<
     TagComponent<C>,
     Tag<C>, // an empty struct for dispatching purpose only
-    Storage<std::array<C, EntityPage<EnabledComponents...>::PAGE_SIZE>>
+    Storage<std::array<C, EntityPageMeta::PAGE_SIZE>>
 >;
 }
+
+namespace entity
+{
+enum class InsertionPolicy
+{
+    // Use the first empty slot find in the entity database. Efficient in
+    // memory consumption but no data coherence is considered. Suitable when
+    // data are highly homogeneous and entity removal pattern is random.
+    FIRST_VACANCY,
+
+    // Reuse the previously used page referred by the archetype. Removed
+    // entities will not be reused. Suitable when entity removal pattern is
+    // nearly FIFO and entities has to be iterated in the order of insertion
+    // (by archetype).
+    REUSE_ARCHETYPE_PAGE,
+};
+
+template <
+    template <typename T> typename Storage = PagedStorageInMemory,
+    InsertionPolicy Insertion = InsertionPolicy::REUSE_ARCHETYPE_PAGE
+>
+struct EntityDatabaseConfiguration
+{
+    template <typename T>
+    using StorageT = Storage<T>;
+
+    constexpr static InsertionPolicy INSERTION_POLICY = Insertion;
+};
+}
+
 /**
  * \brief Entity Database manages Entities and their Component data. It
  * provides compile time access permission validation for the Executive
@@ -46,17 +75,20 @@ using ComponentStorageT = std::conditional_t<
  * be two identical types in the list.
  */
 template <
-    template <typename T> typename Storage,
+    typename Config,
     Component... EnabledComponents
 >
 class EntityDatabase
     // storage for entity pages
-    : protected Storage<EntityPage<EnabledComponents...>>
+    : protected Config::template StorageT<EntityPage<EnabledComponents...>>
     // storage for components
     , protected detail::entity::ComponentStorageT<
-        Storage, EnabledComponents, EnabledComponents...
+        Config::template StorageT, EnabledComponents
     >...
 {
+    template <typename T>
+    using StorageT = typename Config::template StorageT<T>;
+
 public:
     // Should only be friend with the access with the same type of database,
     // but C++ does not allow being friend with partial class template
@@ -71,7 +103,7 @@ public:
     using EntityPageT           = EntityPage<EnabledComponents...>;
     using EntityIndexT          = typename EntityPageT::EntityIndexT;
     using EntityArrayT          = typename EntityPageT::EntityArrayT;
-    using EntityPageStorageT    = Storage<EntityPageT>;
+    using EntityPageStorageT    = StorageT<EntityPageT>;
     using EntityPageIteratorT   = EntityPageIterator<EntityDatabase>;
     template <typename ComponentAccess>
     using EntityUserViewT = EntityView<EntityDatabase, ComponentAccess>;
@@ -96,8 +128,7 @@ protected:
     }
 
     template <Component C>
-    auto component_storage() -> detail::entity::ComponentStorageT<
-        Storage, C, EnabledComponents...> &
+    auto component_storage() -> detail::entity::ComponentStorageT<StorageT, C> &
         requires (!TagComponent<C>)
     {
         return *this;
@@ -263,9 +294,20 @@ public:
         // and allocated pages are bound with the archetypes, it's guaranteed
         // that no concurrent entity creation on one page will happen.
 
-        // bug: this is a temporary hack to the worst space complexity faced by current applications. component coherence must be carefully addressed later.
-        EntityPageInfo page = first_page_vacancy();
-        // EntityPageInfo page = try_reuse_coherent_page(archetype);
+        using entity::InsertionPolicy;
+
+        EntityPageInfo page;
+        switch(Config::INSERTION_POLICY)
+        {
+            // bug: this is a temporary hack to the worst space complexity faced by current applications. component coherence must be carefully addressed later.
+            case InsertionPolicy::FIRST_VACANCY:
+                page = first_page_vacancy(); break;
+            case InsertionPolicy::REUSE_ARCHETYPE_PAGE:
+                page = try_reuse_coherent_page(archetype); break;
+            default: USAGI_UNREACHABLE();
+        }
+
+        // EntityPageInfo
         EntityIndexT inner_index;
 
         // Try to allocate an empty slot from the entity page.
@@ -405,16 +447,4 @@ private:
         }
     }
 };
-
-template <Component... EnabledComponents>
-using EntityDatabaseInMemory = EntityDatabase<
-    PagedStorageInMemory,
-    EnabledComponents...
->;
-
-template <Component... EnabledComponents>
-using EntityDatabaseFileBacked = EntityDatabase<
-    PagedStorageFileBacked,
-    EnabledComponents...
->;
 }

@@ -10,7 +10,7 @@ template <Component... InitialComponents>
 class Archetype : InitialComponents...
 {
     template <
-        template <typename T> typename Storage,
+        typename Config,
         Component... EnabledComponents
     >
     friend class EntityDatabase;
@@ -48,13 +48,13 @@ public:
     }
 
     template <Component C>
-    C & operator()(C)
+    C & operator()(ComponentFilter<C>)
     {
         return *this;
     }
 
     template <Component C>
-    const C & operator()(C) const
+    const C & operator()(ComponentFilter<C>) const
     {
         return *this;
     }
@@ -64,7 +64,7 @@ public:
     Archetype & operator=(EntityViewT &&view)
     {
         (..., (component<InitialComponents>() =
-            view.component(Tag<InitialComponents>()
+            view.component(ComponentFilter<InitialComponents>()
         )));
         return *this;
     }

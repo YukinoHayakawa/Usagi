@@ -165,7 +165,7 @@ public:
     }
 
     template <Component C>
-    bool include(Tag<C>) const
+    bool include(ComponentFilter<C>) const
     {
         return page().template component_bit<C>(mIndexInPage);
     }
@@ -174,30 +174,32 @@ public:
     bool include() const
     {
         // default to true when parameter pack C is empty
-        return (... && include(Tag<C>{}));
+        return (... && include(ComponentFilter<C>{}));
     }
 
     template <Component... C>
     bool include(ComponentFilter<C...>) const
+        requires (sizeof...(C) > 1)
     {
         return include<C...>();
     }
 
     template <Component C>
-    bool exclude(Tag<C>) const
+    bool exclude(ComponentFilter<C>) const
     {
-        return !include(Tag<C>{});
+        return !include(ComponentFilter<C>{});
     }
 
     template <Component... C>
     bool exclude() const
     {
         // default to true when parameter pack C is empty
-        return (... && exclude(Tag<C>{}));
+        return (... && exclude(ComponentFilter<C>{}));
     }
 
     template <Component... C>
     bool exclude(ComponentFilter<C...>) const
+        requires (sizeof...(C) > 1)
     {
         return exclude<C...>();
     }
@@ -205,7 +207,7 @@ public:
     // Existing component value will be overwritten when calling this
     // function multiple times.
     template <Component C>
-    decltype(auto) add_component(Tag<C> = { }) requires
+    decltype(auto) add_component(ComponentFilter<C> = { }) requires
         CanWriteComponent<ComponentAccess, C>
     {
         check_entity_created();
@@ -242,7 +244,7 @@ public:
     }
 
     template <Component C>
-    void remove_component(Tag<C> = {}) requires
+    void remove_component(ComponentFilter<C> = {}) requires
         CanWriteComponent<ComponentAccess, C>
     {
         check_entity_created();
@@ -286,7 +288,7 @@ public:
      * \return
      */
     template <Component C>
-    C & component(Tag<C> = {}) requires
+    C & component(ComponentFilter<C> = {}) requires
         CanWriteComponent<ComponentAccess, C>
     {
         return component_access<C>();
@@ -298,7 +300,7 @@ public:
      * \return
      */
     template <Component C>
-    const C & component(Tag<C> = {}) const requires
+    const C & component(ComponentFilter<C> = {}) const requires
         (!CanWriteComponent<ComponentAccess, C>
         && CanReadComponent<ComponentAccess, C>)
     {
@@ -306,14 +308,14 @@ public:
     }
 
     template <Component C>
-    C & operator()(Tag<C>) requires
+    C & operator()(ComponentFilter<C>) requires
         CanWriteComponent<ComponentAccess, C>
     {
         return component<C>();
     }
 
     template <Component C>
-    const C & operator()(Tag<C>) const requires
+    const C & operator()(ComponentFilter<C>) const requires
         (!CanWriteComponent<ComponentAccess, C>
         && CanReadComponent<ComponentAccess, C>)
     {

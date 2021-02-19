@@ -4,6 +4,7 @@
 
 namespace usagi
 {
+// Ref: https://docs.microsoft.com/en-us/cpp/cpp/trivial-standard-layout-and-pod-types
 template <typename T>
 concept Memcpyable =
     // T has a determinative order of member variables and does not have

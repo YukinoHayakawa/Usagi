@@ -10,20 +10,14 @@
 
 namespace usagi
 {
-template <Component... EnabledComponents>
-struct EntityPage
+// Type-irrelevant data of Entity Page.
+struct EntityPageMeta
 {
-    // ============================ Types ============================== //
-
-    constexpr static std::size_t NUM_COMPONENTS = sizeof...(EnabledComponents);
-
     // Page size = 32
     using EntityArrayT = std::uint32_t;
 
     // Entity index range 0-31
     using EntityIndexT = std::uint8_t;
-
-    using FilterT = ComponentFilter<EnabledComponents...>;
 
     constexpr static std::size_t INVALID_PAGE = -1;
     constexpr static EntityIndexT PAGE_SIZE = 32;
@@ -41,7 +35,12 @@ struct EntityPage
         // component
         EntityArrayT entity_array = 0;
     };
+};
 
+// todo: bit flag components shouldn't have page index field in entity page
+template <Component... EnabledComponents>
+struct EntityPage : EntityPageMeta
+{
     // =========================== Metadata ============================= //
 
     // singly linked list for page iteration. probably should be atomic.
@@ -65,15 +64,21 @@ struct EntityPage
     // reset of this flag
     std::uint8_t dirty = false;
 
+    // ============================ Types =============================== //
+
+    constexpr static std::size_t NUM_COMPONENTS = sizeof...(EnabledComponents);
+
+    using FilterT = ComponentFilter<EnabledComponents...>;
+
     // ========================== Components ============================ //
 
-    std::array<EnabledMask, sizeof...(EnabledComponents)> component_masks;
+    std::array<EnabledMask, NUM_COMPONENTS> component_masks;
 
     // index into the page pool of each component.
     // -1 if the page is not allocated
-    std::array<PageIndex, sizeof...(EnabledComponents)> component_pages;
+    std::array<PageIndex, NUM_COMPONENTS> component_pages;
 
-    // =========================== Helpers ============================= //
+    // =========================== Accessors ============================ //
 
     EntityIndexT allocate()
     {
