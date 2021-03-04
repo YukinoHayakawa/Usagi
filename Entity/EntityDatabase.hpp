@@ -18,19 +18,6 @@
 
 namespace usagi
 {
-namespace detail::entity
-{
-template <
-    template <typename T> typename Storage,
-    Component C
->
-using ComponentStorageT = std::conditional_t<
-    TagComponent<C>,
-    Tag<C>, // an empty struct for dispatching purpose only
-    Storage<std::array<C, EntityPageMeta::PAGE_SIZE>>
->;
-}
-
 namespace entity
 {
 enum class InsertionPolicy
@@ -58,6 +45,19 @@ struct EntityDatabaseConfiguration
 
     constexpr static InsertionPolicy INSERTION_POLICY = Insertion;
 };
+}
+
+namespace detail::entity
+{
+template <
+    template <typename T> typename Storage,
+    Component C
+>
+using ComponentStorageT = std::conditional_t<
+    TagComponent<C>,
+    Tag<C>, // an empty struct for dispatching purpose only
+    Storage<std::array<C, EntityPageMeta::PAGE_SIZE>>
+>;
 }
 
 /**
@@ -447,4 +447,12 @@ private:
         }
     }
 };
+
+template <
+    Component... EnabledComponents
+>
+using EntityDatabaseDefaultConfig = EntityDatabase<
+    entity::EntityDatabaseConfiguration<>,
+    EnabledComponents...
+>;
 }

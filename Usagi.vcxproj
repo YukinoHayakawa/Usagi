@@ -69,6 +69,7 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
     </ClInclude>
     <ClInclude Include="Entity\EntityDatabase.hpp" />
+    <ClInclude Include="Library\Container\FixedCapacityString.hpp" />
     <ClInclude Include="Library\Math\Quadratic.hpp" />
     <ClInclude Include="Library\Math\Range.hpp" />
     <ClInclude Include="Library\Sampling\NBestSampler.hpp" />
