@@ -4,6 +4,8 @@
 #include <memory>
 #include <type_traits>
 
+#include <Usagi/Library/Meta/Tag.hpp>
+
 namespace usagi
 {
 template <typename T>

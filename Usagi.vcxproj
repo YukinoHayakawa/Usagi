@@ -72,6 +72,7 @@
     <ClInclude Include="Library\Container\FixedCapacityString.hpp" />
     <ClInclude Include="Library\Math\Quadratic.hpp" />
     <ClInclude Include="Library\Math\Range.hpp" />
+    <ClInclude Include="Library\Noncopyable.hpp" />
     <ClInclude Include="Library\Sampling\NBestSampler.hpp" />
     <ClInclude Include="Library\Sampling\ReservoirSampler.hpp" />
     <ClInclude Include="Library\Meta\List.hpp" />
