@@ -27,6 +27,8 @@ public:
     VmAllocatorFileBacked(VmAllocatorFileBacked &&other) noexcept;
     VmAllocatorFileBacked & operator=(VmAllocatorFileBacked &&other) noexcept;
 
+    using value_type = void;
+
     void set_backing_file(std::filesystem::path file);
     const std::filesystem::path & path() const { return mFilePath; }
 

@@ -54,9 +54,10 @@ class VmAllocatorPagefileBacked
 public:
     // Reserve 16GiB by default
     explicit VmAllocatorPagefileBacked(std::size_t reserve_size = 1ull << 34);
+    VmAllocatorPagefileBacked(VmAllocatorPagefileBacked &&other) noexcept;
     ~VmAllocatorPagefileBacked();
 
-    VmAllocatorPagefileBacked(VmAllocatorPagefileBacked &&other) noexcept;
+    using value_type = void;
 
     void reserve(std::size_t size_bytes);
 
@@ -76,10 +77,11 @@ public:
      */
     void zero_memory(void *ptr, std::uint64_t offset = 0, std::size_t size = 0);
 
-    std::size_t max_size() const noexcept
-    {
-        return mReservedBytes;
-    }
+    void * base_address() const { return mBaseAddress; }
+    std::size_t reserved_bytes() const { return mReservedBytes; }
+    std::size_t committed_bytes() const { return mCommittedBytes; }
+
+    std::size_t max_size() const noexcept { return mReservedBytes; }
 };
 static_assert(ReallocatableAllocator<VmAllocatorPagefileBacked>);
 }

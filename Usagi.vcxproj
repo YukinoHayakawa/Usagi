@@ -104,6 +104,7 @@
     <ClInclude Include="Runtime\IO\Unicode.hpp" />
     <ClInclude Include="Runtime\Memory\TypedAllocator.hpp" />
     <ClInclude Include="Runtime\Memory\VmAllocatorFileBacked.hpp" />
+    <ClInclude Include="Runtime\WeakSingleton.hpp" />
     <ClInclude Include="Scheduler\Scheduler.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />
     <ClInclude Include="Entity\Archetype.hpp" />
