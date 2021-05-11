@@ -25,7 +25,7 @@ struct SimplePlatformService
         return *mServiceImpl.get();
     }
 
-    // A dispatch tag is used because template parameters of a constructor
+    // A dispatch tag is used here because template parameters of a constructor
     // cannot be specified explicitly.
     // See: https://stackoverflow.com/questions/26553803/derive-from-template-constructor-of-template-base-class
     template <typename ServiceImplT, typename... Args>

@@ -70,6 +70,7 @@
     </ClInclude>
     <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Library\Container\FixedCapacityString.hpp" />
+    <ClInclude Include="Library\Utility\EnumTranslation.hpp" />
     <ClInclude Include="Library\Math\Quadratic.hpp" />
     <ClInclude Include="Library\Math\Range.hpp" />
     <ClInclude Include="Library\Noncopyable.hpp" />
