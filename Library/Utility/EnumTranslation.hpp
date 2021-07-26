@@ -34,20 +34,28 @@ struct EnumTranslator
     }
 };
 
-template <typename SrcEnum, typename DestEnum>
+template <typename SrcEnum, typename DestEnum, typename CastEnum = DestEnum>
 class EnumAcceptor
 {
-    SrcEnum mValue;
+    DestEnum mValue;
 
 public:
     EnumAcceptor(SrcEnum val)
-        : mValue(val)
+        : EnumAcceptor { val }
     {
     }
 
-    operator DestEnum() const
+    EnumAcceptor(std::initializer_list<SrcEnum> list)
     {
-        return EnumTranslator<SrcEnum, DestEnum>().from(mValue);
+        DestEnum val = 0;
+        for(auto &&src : list)
+            val |= EnumTranslator<SrcEnum, DestEnum>().from(src);
+        mValue = val;
+    }
+
+    operator CastEnum() const
+    {
+        return static_cast<CastEnum>(mValue);
     }
 };
 }
