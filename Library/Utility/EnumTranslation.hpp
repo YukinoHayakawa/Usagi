@@ -40,6 +40,12 @@ class EnumAcceptor
     DestEnum mValue;
 
 public:
+    EnumAcceptor() = default;
+    EnumAcceptor(const EnumAcceptor &other) = default;
+    EnumAcceptor(EnumAcceptor &&other) noexcept = default;
+    EnumAcceptor & operator=(const EnumAcceptor &other) = default;
+    EnumAcceptor & operator=(EnumAcceptor &&other) noexcept = default;
+
     // If the enum values are mutually exclusive, the binary operators are
     // logically unavailable and we do not use them here.
     EnumAcceptor(SrcEnum val)
