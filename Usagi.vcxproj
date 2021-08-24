@@ -70,6 +70,7 @@
     </ClInclude>
     <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Library\Container\FixedCapacityString.hpp" />
+    <ClInclude Include="Library\Utility\BitMask.hpp" />
     <ClInclude Include="Library\Utility\EnumTranslation.hpp" />
     <ClInclude Include="Library\Math\Quadratic.hpp" />
     <ClInclude Include="Library\Math\Range.hpp" />
@@ -80,6 +81,7 @@
     <ClInclude Include="Library\Meta\Set.hpp" />
     <ClInclude Include="Library\Meta\Deduplicate.hpp" />
     <ClInclude Include="Library\Meta\Type.hpp" />
+    <ClInclude Include="Library\Utility\Pointer.hpp" />
     <ClInclude Include="Library\Utility\String.hpp" />
     <ClInclude Include="Runtime\ExceptionHeaderCorruption.hpp" />
     <ClInclude Include="Runtime\Memory\PagedStorage.hpp" />
