@@ -40,14 +40,19 @@ class EnumAcceptor
     DestEnum mValue;
 
 public:
+    // If the enum values are mutually exclusive, the binary operators are
+    // logically unavailable and we do not use them here.
     EnumAcceptor(SrcEnum val)
-        : EnumAcceptor { val }
     {
+        DestEnum dst_val = EnumTranslator<SrcEnum, DestEnum>().from(val);
+        mValue = dst_val;
     }
 
+    // This constructor bitwise-or all the flags together if the enum values
+    // are used as bit flags. 
     EnumAcceptor(std::initializer_list<SrcEnum> list)
     {
-        DestEnum val = 0;
+        DestEnum val { 0 };
         for(auto &&src : list)
             val |= EnumTranslator<SrcEnum, DestEnum>().from(src);
         mValue = val;
@@ -55,7 +60,7 @@ public:
 
     operator CastEnum() const
     {
-        return static_cast<CastEnum>(mValue);
+        return CastEnum(mValue);
     }
 };
 }
