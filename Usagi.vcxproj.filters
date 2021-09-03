@@ -258,9 +258,6 @@
     <ClInclude Include="Library\Math\Quadratic.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Math\Range.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Library\Container\FixedCapacityString.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -280,6 +277,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Utility\Pointer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Algorithm\Container.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

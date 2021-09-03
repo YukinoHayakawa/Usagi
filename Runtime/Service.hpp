@@ -49,6 +49,24 @@ struct SimplePlatformService
 private:
     std::unique_ptr<ServiceBaseT> mServiceImpl;
 };
+
+template <typename ServiceT>
+struct LazyInitService
+{
+    using ServiceT = ServiceT;
+
+    ServiceT& get_service()
+    {
+        if(!mServiceImpl)
+        {
+            mServiceImpl = std::make_unique<ServiceT>();
+        }
+        return *mServiceImpl.get();
+    }
+
+private:
+    std::unique_ptr<ServiceT> mServiceImpl;
+};
 }
 
 // Cast the Runtime to the specified Service Implementation.
@@ -73,4 +91,8 @@ private:
 
 #define USAGI_DECL_PLATFORM_SERVICE(svc_name, base) \
 using svc_name = ::usagi::SimplePlatformService<base>; \
+/**/
+
+#define USAGI_DECL_ALIAS_SERVICE(svc_name, impl_name) \
+using svc_name = impl_name; \
 /**/
