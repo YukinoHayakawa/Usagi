@@ -79,9 +79,12 @@ concept SystemDeclaresWriteAccess =
 
 template <typename T>
 concept SystemDeclaresReadAllAccess =
-    System<T> && requires { typename T::ReadAllAccess; };
+    SystemDeclaresReadAccess<T> &&
+    std::is_same_v<typename T::ReadAccess, AllComponents>;
+
 
 template <typename T>
 concept SystemDeclaresWriteAllAccess =
-    System<T> && requires { typename T::WriteAllAccess; };
+    SystemDeclaresWriteAccess<T> &&
+    std::is_same_v<typename T::WriteAccess, AllComponents>;
 }

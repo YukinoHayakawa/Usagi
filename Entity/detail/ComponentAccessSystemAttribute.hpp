@@ -43,13 +43,11 @@ struct ComponentAccessSystemAttribute
 {
     template <Component C>
     static constexpr bool READ =
-        detail::ComponentReadMaskBitPresent<GameSystem, C>::value
-        || SystemDeclaresReadAllAccess<GameSystem>;
+        detail::ComponentReadMaskBitPresent<GameSystem, C>::value;
 
     template <Component C>
     static constexpr bool WRITE =
-        detail::ComponentWriteMaskBitPresent<GameSystem, C>::value
-        || SystemDeclaresWriteAllAccess<GameSystem>;
+        detail::ComponentWriteMaskBitPresent<GameSystem, C>::value;
 };
 
 // ============================================================================
@@ -92,7 +90,11 @@ constexpr ComponentAccess SystemHighestComponentAccess =
 // Explicit System Component Access Filters
 // ============================================================================
 
-template <System GameSystem, bool = SystemDeclaresReadAccess<GameSystem>>
+template <
+    System GameSystem,
+    bool = SystemDeclaresReadAccess<GameSystem> &&
+        !SystemDeclaresReadAllAccess<GameSystem>
+>
 struct ExplicitSystemComponentAccessTraitRead
 {
     using type = ComponentFilter<>;
@@ -111,7 +113,11 @@ template <System GameSystem>
 using ExplicitSystemComponentAccessRead =
     typename ExplicitSystemComponentAccessTraitRead<GameSystem>::type;
 
-template <System GameSystem, bool = SystemDeclaresWriteAccess<GameSystem>>
+template <
+    System GameSystem,
+    bool = SystemDeclaresWriteAccess<GameSystem> &&
+        !SystemDeclaresWriteAllAccess<GameSystem>
+>
 struct ExplicitSystemComponentAccessTraitWrite
 {
     using type = ComponentFilter<>;

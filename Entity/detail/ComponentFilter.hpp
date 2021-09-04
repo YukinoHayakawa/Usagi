@@ -56,6 +56,12 @@ struct ComponentFilter : Tag<Components>...
     }
 };
 
+struct AllComponents
+{
+    template <Component C>
+    static constexpr bool HAS_COMPONENT = true;
+};
+
 // Shortcut name
 // bug: waiting for P1814R0 to be implemented
 template <Component... Components>
