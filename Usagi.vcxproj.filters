@@ -30,7 +30,7 @@
     <ClInclude Include="Library\Math\Rounding.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Service.hpp">
+    <ClInclude Include="Runtime\Service\Service.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Platform\Memory.hpp">
@@ -264,7 +264,7 @@
     <ClInclude Include="Runtime\WeakSingleton.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Noncopyable.hpp">
+    <ClInclude Include="Library\Memory\Noncopyable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Utility\EnumTranslation.hpp">
@@ -280,6 +280,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Algorithm\Container.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Memory\RawResource.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Service\SimplePlatformService.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Service\LazyInitService.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Service\SimpleCacheService.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

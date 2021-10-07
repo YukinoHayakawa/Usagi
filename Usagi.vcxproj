@@ -71,10 +71,11 @@
     <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Library\Algorithm\Container.hpp" />
     <ClInclude Include="Library\Container\FixedCapacityString.hpp" />
+    <ClInclude Include="Library\Memory\RawResource.hpp" />
     <ClInclude Include="Library\Utility\BitMask.hpp" />
     <ClInclude Include="Library\Utility\EnumTranslation.hpp" />
     <ClInclude Include="Library\Math\Quadratic.hpp" />
-    <ClInclude Include="Library\Noncopyable.hpp" />
+    <ClInclude Include="Library\Memory\Noncopyable.hpp" />
     <ClInclude Include="Library\Sampling\NBestSampler.hpp" />
     <ClInclude Include="Library\Sampling\ReservoirSampler.hpp" />
     <ClInclude Include="Library\Meta\List.hpp" />
@@ -109,6 +110,9 @@
     <ClInclude Include="Runtime\IO\Unicode.hpp" />
     <ClInclude Include="Runtime\Memory\TypedAllocator.hpp" />
     <ClInclude Include="Runtime\Memory\VmAllocatorFileBacked.hpp" />
+    <ClInclude Include="Runtime\Service\LazyInitService.hpp" />
+    <ClInclude Include="Runtime\Service\SimpleCacheService.hpp" />
+    <ClInclude Include="Runtime\Service\SimplePlatformService.hpp" />
     <ClInclude Include="Runtime\WeakSingleton.hpp" />
     <ClInclude Include="Scheduler\Scheduler.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />
@@ -153,7 +157,7 @@
     <ClInclude Include="Runtime\Memory\VmAllocatorPagefileBacked.hpp" />
     <ClInclude Include="Runtime\Platform\File.hpp" />
     <ClInclude Include="Runtime\Platform\Memory.hpp" />
-    <ClInclude Include="Runtime\Service.hpp" />
+    <ClInclude Include="Runtime\Service\Service.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\File\MappedFileView.cpp" />
