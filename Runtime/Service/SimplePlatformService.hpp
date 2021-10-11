@@ -4,11 +4,12 @@
 #include <type_traits>
 
 #include <Usagi/Library/Meta/Tag.hpp>
+#include <Usagi/Library/Memory/Noncopyable.hpp>
 
 namespace usagi
 {
 template <typename ServiceBaseT>
-struct SimplePlatformService
+struct SimplePlatformService : Noncopyable
 {
     using ServiceT = ServiceBaseT;
 

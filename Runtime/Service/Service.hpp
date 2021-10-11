@@ -2,6 +2,8 @@
 
 #include <concepts>
 
+#include <Usagi/Library/Memory/Noncopyable.hpp>
+
 namespace usagi
 {
 template <typename T>
@@ -9,7 +11,7 @@ concept Service = requires (T t)
 {
     { T::ServiceT };
     { t.get_service() } -> std::convertible_to<typename T::ServiceT &>;
-};
+} && std::is_base_of_v<Noncopyable, T>;
 }
 
 // Cast the Runtime to the specified Service Implementation.

@@ -8,8 +8,8 @@ namespace usagi
 {
 // Manages resource without proper RAII on its own.
 template <
-    typename InitFunc,
-    typename DestroyFunc
+    typename InitFunc = void(*)(),
+    typename DestroyFunc = void(*)()
 >
 class RawResource : Noncopyable
 {

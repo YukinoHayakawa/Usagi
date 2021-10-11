@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "detail/ComponentFilter.hpp"
+
 namespace usagi
 {
 // Systems
@@ -81,7 +83,6 @@ template <typename T>
 concept SystemDeclaresReadAllAccess =
     SystemDeclaresReadAccess<T> &&
     std::is_same_v<typename T::ReadAccess, AllComponents>;
-
 
 template <typename T>
 concept SystemDeclaresWriteAllAccess =

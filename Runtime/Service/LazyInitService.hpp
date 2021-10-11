@@ -2,10 +2,12 @@
 
 #include <memory>
 
+#include <Usagi/Library/Memory/Noncopyable.hpp>
+
 namespace usagi
 {
 template <typename ServiceT>
-struct LazyInitService
+struct LazyInitService : Noncopyable
 {
     using ServiceT = ServiceT;
 
