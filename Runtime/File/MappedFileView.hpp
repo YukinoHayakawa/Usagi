@@ -67,6 +67,11 @@ public:
     auto mode() const{ return mMode; }
     std::size_t max_size() const noexcept { return mMapping.heap.length; }
 
+    MemoryRegion memory_region() const
+    {
+        return mMapping.heap;
+    }
+
     void * base_view() const
     {
         return mMapping.heap.base_address;
