@@ -124,6 +124,7 @@ private:
             }
 
             // Prevent accessing entities haven't been allocated
+            // todo: whether allowing accessing unallocated entities depends on the insertion policy of the database. if any vacancy could be used (which is a temporary hack to some specific problem that requires that performance), this should be disabled. but if a archetype page policy is used, this should be enabled to ensure the correct iterator behavior. the insertion policy should be rethought of.
             // mEntityFiltered = _bzhi_u32(
             //     mEntityFiltered,
             //     this->mPageCursor->first_unused_index
