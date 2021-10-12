@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <algorithm>
+
 #include "Level.hpp"
 
 namespace usagi::graph
