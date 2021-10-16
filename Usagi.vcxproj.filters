@@ -294,6 +294,18 @@
     <ClInclude Include="Runtime\Service\SimpleCacheService.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Library\Memory\StackPolymorphicObject.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Memory\Nonmovable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Task.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\TaskExecutor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\File\RegularFile.cpp">

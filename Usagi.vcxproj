@@ -71,6 +71,8 @@
     <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Library\Algorithm\Container.hpp" />
     <ClInclude Include="Library\Container\FixedCapacityString.hpp" />
+    <ClInclude Include="Library\Memory\Nonmovable.hpp" />
+    <ClInclude Include="Library\Memory\StackPolymorphicObject.hpp" />
     <ClInclude Include="Library\Memory\RawResource.hpp" />
     <ClInclude Include="Library\Utility\BitMask.hpp" />
     <ClInclude Include="Library\Utility\EnumTranslation.hpp" />
@@ -113,6 +115,8 @@
     <ClInclude Include="Runtime\Service\LazyInitService.hpp" />
     <ClInclude Include="Runtime\Service\SimpleCacheService.hpp" />
     <ClInclude Include="Runtime\Service\SimplePlatformService.hpp" />
+    <ClInclude Include="Runtime\Task.hpp" />
+    <ClInclude Include="Runtime\TaskExecutor.hpp" />
     <ClInclude Include="Runtime\WeakSingleton.hpp" />
     <ClInclude Include="Scheduler\Scheduler.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />

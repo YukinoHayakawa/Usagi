@@ -3,6 +3,7 @@
 #include <utility>
 #include <string_view>
 
+#include <Usagi/Library/Memory/Noncopyable.hpp>
 #include <Usagi/Runtime/Platform/File.hpp>
 
 namespace usagi
@@ -11,7 +12,7 @@ class RegularFile;
 
 // Memory-mapped files. The mapped region can be immediately used after mapping.
 // Hint functions can be used to explicitly manage physical memory usage.
-class MappedFileView
+class MappedFileView : Noncopyable
 {
     platform::file::MemoryMapping mMapping;
     platform::file::MemoryMappingMode mMode;
@@ -25,6 +26,8 @@ class MappedFileView
 
 public:
     constexpr static std::uint64_t USE_FILE_SIZE = 0;
+
+    MappedFileView() = default;
 
     /**
      * \brief Create a file mapping. If `file` is `nullptr`, the mapping will
