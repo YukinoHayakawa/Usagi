@@ -115,6 +115,7 @@
     <ClInclude Include="Runtime\Service\LazyInitService.hpp" />
     <ClInclude Include="Runtime\Service\SimpleCacheService.hpp" />
     <ClInclude Include="Runtime\Service\SimplePlatformService.hpp" />
+    <ClInclude Include="Runtime\Service\SimpleService.hpp" />
     <ClInclude Include="Runtime\Task.hpp" />
     <ClInclude Include="Runtime\TaskExecutor.hpp" />
     <ClInclude Include="Runtime\WeakSingleton.hpp" />
