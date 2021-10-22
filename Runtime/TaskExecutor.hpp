@@ -11,6 +11,11 @@ class TaskExecutor
 public:
     virtual ~TaskExecutor() = default;
 
-    virtual void submit(std::unique_ptr<Task> task) = 0;
+    constexpr static std::uint64_t INVALID_TASK = -1;
+
+    // A task id will be returned for tracking its status.
+    virtual std::uint64_t submit(
+        std::unique_ptr<Task> task,
+        std::uint64_t wait_on = INVALID_TASK) = 0;
 };
 }

@@ -12,7 +12,7 @@ namespace usagi
 {
 template <
     typename BaseT,
-    std::size_t MaxSize = 128
+    std::size_t MaxSize = 64
 >
 class StackPolymorphicObject : Noncopyable, Nonmovable
 {
