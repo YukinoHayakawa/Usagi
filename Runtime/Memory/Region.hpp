@@ -8,6 +8,11 @@ struct ReadonlyMemoryRegion
 {
     const void *base_address = nullptr;
     std::size_t length = 0;
+
+    operator bool() const
+    {
+        return base_address && length;
+    }
 };
 
 struct MemoryRegion
