@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include <memory>
+#include <vector>
+#include <optional>
 
 namespace usagi
 {
@@ -16,6 +18,6 @@ public:
     // A task id will be returned for tracking its status.
     virtual std::uint64_t submit(
         std::unique_ptr<Task> task,
-        std::uint64_t wait_on = INVALID_TASK) = 0;
+        std::optional<std::vector<std::uint64_t>> wait_on = { }) = 0;
 };
 }
