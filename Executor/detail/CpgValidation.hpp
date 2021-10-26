@@ -38,9 +38,9 @@ constexpr bool sat_no_write_systems(const SystemAccessTraits<Size> &sat)
 
 template <int Size, std::size_t Ss = Size>
 constexpr TaskGraphErrorCode cpg_validate(
-    const AdjacencyMatrixFixed<Size> &cpg,
+    const graph::AdjacencyMatrixFixed<Size> &cpg,
     const SystemAccessTraits<Ss> &sat,
-    AdjacencyMatrixFixed<Size> *reduced = nullptr
+    graph::AdjacencyMatrixFixed<Size> *reduced = nullptr
 )
 {
     // The cpg is validated as per the descriptions in:
@@ -72,7 +72,7 @@ constexpr TaskGraphErrorCode cpg_validate(
 
     auto order = graph::topological_sort(cpg);
     meta::Stack<Size> write_systems;
-    AdjacencyMatrixFixed<Size> tcpg;
+    graph::AdjacencyMatrixFixed<Size> tcpg;
 
     auto search = [
         &priority, &predecessor, &cpg, &sat, Begin, End

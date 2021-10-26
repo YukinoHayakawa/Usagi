@@ -17,7 +17,7 @@ class TaskGraph
 public:
     constexpr static std::size_t NUM_SYSTEMS = sizeof...(Sys);
     using SystemListT = std::tuple<Sys...>;
-    using GraphT = AdjacencyMatrixFixed<NUM_SYSTEMS>;
+    using GraphT = graph::AdjacencyMatrixFixed<NUM_SYSTEMS>;
     using ComponentUsageT = SystemComponentUsage<Sys...>;
     using EntityDatabaseT = EntityDatabase<ComponentUsageT>;
 
