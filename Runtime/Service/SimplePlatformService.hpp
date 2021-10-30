@@ -15,7 +15,7 @@ struct SimplePlatformService : Noncopyable
 
     ServiceT &get_service()
     {
-        return *mServiceImpl.get();
+        return *mServiceImpl;
     }
 
     // A dispatch tag is used here because template parameters of a constructor
@@ -36,7 +36,7 @@ struct SimplePlatformService : Noncopyable
     {
         mServiceImpl = std::make_unique<ServiceImplT>(
             std::forward<Args>(args)...
-            );
+        );
     }
 
 private:

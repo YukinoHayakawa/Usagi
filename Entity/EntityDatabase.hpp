@@ -304,7 +304,7 @@ public:
                 page = first_page_vacancy(); break;
             case InsertionPolicy::REUSE_ARCHETYPE_PAGE:
                 page = try_reuse_coherent_page(archetype); break;
-            default: USAGI_UNREACHABLE();
+            default: USAGI_INVALID_ENUM_VALUE();
         }
 
         // EntityPageInfo
