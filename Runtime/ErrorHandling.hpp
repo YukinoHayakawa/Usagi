@@ -13,4 +13,5 @@ public:
 
 // todo stacktrace
 #define USAGI_THROW(exception) throw exception
-#define USAGI_UNREACHABLE() throw ::usagi::ExceptionUnreachableCode("")
+#define USAGI_UNREACHABLE(msg) throw ::usagi::ExceptionUnreachableCode(msg)
+#define USAGI_INVALID_ENUM_VALUE() USAGI_UNREACHABLE("Invalid enum value.")
