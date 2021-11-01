@@ -20,6 +20,7 @@ template <
 class EntityView
     : EntityDatabaseAccessInternal<Database>
 {
+public:
     template <typename OtherDatabase, typename OtherAccess>
     friend class EntityView;
 
@@ -27,6 +28,7 @@ class EntityView
     using EntityPageT       = typename DatabaseT::EntityPageT;
     using EntityIndexT      = typename EntityPageT::EntityIndexT;
 
+private:
     std::size_t     mPageIndex = EntityPageT::INVALID_PAGE;
     EntityIndexT    mIndexInPage = -1;
 

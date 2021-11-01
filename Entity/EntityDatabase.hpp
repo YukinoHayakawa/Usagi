@@ -278,10 +278,17 @@ public:
         >(this);
     }
 
-    template <typename ComponentAccess>
-    auto entity_view(const EntityId id) -> EntityUserViewT<ComponentAccess>
+    template <
+        typename ComponentAccess,
+        typename ViewT = EntityUserViewT<ComponentAccess>
+    >
+    ViewT entity_view(const EntityId id)
     {
-        return { this, id.page, id.offset };
+        return {
+            this,
+            id.page,
+            static_cast<typename ViewT::EntityIndexT>(id.offset)
+        };
     }
 
     template <Component... InitialComponents>
