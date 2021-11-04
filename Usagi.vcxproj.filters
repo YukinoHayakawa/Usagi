@@ -132,9 +132,6 @@
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scheduler\Scheduler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Concept\Container\Stack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -326,5 +323,10 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Usagi.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Export.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,0 +1,9 @@
+; Exports symbols referenced by JIT compiled code.
+
+LIBRARY USAGI
+EXPORTS
+    ??_7type_info@@6B@
+    __security_check_cookie
+    __security_cookie
+    ; Reallocation could happen when inserting entities to the database.
+    ?reallocate@VmAllocatorFileBacked@usagi@@QEAAPEAXPEAX_K@Z

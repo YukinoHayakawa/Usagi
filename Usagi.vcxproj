@@ -43,7 +43,11 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
     </Link>
+    <Lib />
+    <Lib />
+    <Lib />
     <Lib />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -57,7 +61,12 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
     </Link>
+    <Lib />
+    <Lib />
+    <Lib />
+    <Lib />
     <Lib />
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -119,7 +128,6 @@
     <ClInclude Include="Runtime\Task.hpp" />
     <ClInclude Include="Runtime\TaskExecutor.hpp" />
     <ClInclude Include="Runtime\WeakSingleton.hpp" />
-    <ClInclude Include="Scheduler\Scheduler.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />
     <ClInclude Include="Entity\Archetype.hpp" />
     <ClInclude Include="Entity\Component.hpp" />
@@ -172,6 +180,9 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Usagi.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Export.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
