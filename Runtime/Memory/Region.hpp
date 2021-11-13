@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cstddef>
+#include <string_view>
 
 namespace usagi
 {
@@ -12,6 +13,21 @@ struct ReadonlyMemoryRegion
     operator bool() const
     {
         return base_address && length;
+    }
+
+    static ReadonlyMemoryRegion from_string_view(std::string_view str)
+    {
+        return { str.data(), str.size() };
+    }
+
+    std::string_view to_string_view() const
+    {
+        return { static_cast<const char *>(base_address), length };
+    }
+
+    const char * as_chars() const
+    {
+        return static_cast<const char *>(base_address);
     }
 };
 

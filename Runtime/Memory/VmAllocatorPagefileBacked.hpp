@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include <Usagi/Concept/Allocator/ReallocatableAllocator.hpp>
+#include <Usagi/Library/Memory/Noncopyable.hpp>
 
 namespace usagi
 {
@@ -39,7 +40,7 @@ namespace usagi
  * can be used to implement dynamic vectors with zero expanding cost if the
  * maximum allocation size is known.
  */
-class VmAllocatorPagefileBacked
+class VmAllocatorPagefileBacked : Noncopyable
 {
     char *mBaseAddress = nullptr;
     std::size_t mReservedBytes = 0;
@@ -72,8 +73,6 @@ public:
      * memory. Non-page-aligned parts will be zeroed using `memset()`
      * If `size == 0`, the whole allocated heap will be zeroed.
      * \param ptr Must be the address returned by `allocate()` or `reallocate()`
-     * \param offset
-     * \param size
      */
     void zero_memory(void *ptr, std::uint64_t offset = 0, std::size_t size = 0);
 

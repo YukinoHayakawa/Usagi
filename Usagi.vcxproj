@@ -95,6 +95,7 @@
     <ClInclude Include="Library\Meta\Type.hpp" />
     <ClInclude Include="Library\Utility\Pointer.hpp" />
     <ClInclude Include="Library\Utility\String.hpp" />
+    <ClInclude Include="Library\Utility\Variant.hpp" />
     <ClInclude Include="Runtime\ExceptionHeaderCorruption.hpp" />
     <ClInclude Include="Runtime\Memory\PagedStorage.hpp" />
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />

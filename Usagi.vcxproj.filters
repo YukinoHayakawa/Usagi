@@ -306,6 +306,9 @@
     <ClInclude Include="Runtime\Service\SimpleService.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Library\Utility\Variant.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\File\RegularFile.cpp">
