@@ -20,30 +20,34 @@ namespace usagi
 {
 namespace entity
 {
-enum class InsertionPolicy
+// These policies are declared as tag classes to avoid the problem of having
+// an integer in the mangled type of instantiated database type. Such an
+// integer makes it harder when we want to inject database access type into
+// JIT codes.
+namespace insertion_policy
 {
-    // Use the first empty slot find in the entity database. Efficient in
-    // memory consumption but no data coherence is considered. Suitable when
-    // data are highly homogeneous and entity removal pattern is random.
-    FIRST_VACANCY,
+// Use the first empty slot find in the entity database. Efficient in
+// memory consumption but no data coherence is considered. Suitable when
+// data are highly homogeneous and entity removal pattern is random.
+struct FirstVacancy;
 
-    // Reuse the previously used page referred by the archetype. Removed
-    // entities will not be reused. Suitable when entity removal pattern is
-    // nearly FIFO and entities has to be iterated in the order of insertion
-    // (by archetype).
-    REUSE_ARCHETYPE_PAGE,
-};
+// Reuse the previously used page referred by the archetype. Removed
+// entities will not be reused. Suitable when entity removal pattern is
+// nearly FIFO and entities has to be iterated in the order of insertion
+// (by archetype).
+struct ReuseArchetypePage;
+}
 
 template <
     template <typename T> typename Storage = PagedStorageInMemory,
-    InsertionPolicy Insertion = InsertionPolicy::REUSE_ARCHETYPE_PAGE
+    typename InsertionPolicy = insertion_policy::ReuseArchetypePage
 >
 struct EntityDatabaseConfiguration
 {
     template <typename T>
     using StorageT = Storage<T>;
 
-    constexpr static InsertionPolicy INSERTION_POLICY = Insertion;
+    using InsertionPolicyT = InsertionPolicy;
 };
 }
 
@@ -88,6 +92,7 @@ class EntityDatabase
 {
     template <typename T>
     using StorageT = typename Config::template StorageT<T>;
+    using InsertionPolicyT = typename Config::InsertionPolicyT;
 
 public:
     // Should only be friend with the access with the same type of database,
@@ -301,18 +306,20 @@ public:
         // and allocated pages are bound with the archetypes, it's guaranteed
         // that no concurrent entity creation on one page will happen.
 
-        using entity::InsertionPolicy;
-
         EntityPageInfo page;
-        switch(Config::INSERTION_POLICY)
-        {
-            // bug: this is a temporary hack to the worst space complexity faced by current applications. component coherence must be carefully addressed later.
-            case InsertionPolicy::FIRST_VACANCY:
-                page = first_page_vacancy(); break;
-            case InsertionPolicy::REUSE_ARCHETYPE_PAGE:
-                page = try_reuse_coherent_page(archetype); break;
-            default: USAGI_INVALID_ENUM_VALUE();
-        }
+
+        using namespace entity::insertion_policy;
+
+        // bug: this is a temporary hack to the worst space complexity faced by current applications. component coherence must be carefully addressed later.
+        if constexpr(std::is_same_v<InsertionPolicyT, FirstVacancy>)
+            page = first_page_vacancy();
+        else if constexpr(std::is_same_v<InsertionPolicyT, ReuseArchetypePage>)
+            page = try_reuse_coherent_page(archetype);
+        else
+            // Always fails, but since its a dependent expression it won't
+            // cause the program to be ill-formed.
+            // https://stackoverflow.com/questions/38304847/constexpr-if-and-static-assert
+            static_assert(!sizeof(EntityDatabase), "Invalid insertion policy.");
 
         // EntityPageInfo
         EntityIndexT inner_index;
