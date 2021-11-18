@@ -16,16 +16,17 @@ public:
     using VertexT = Vertex;
     using EdgeT = Edge;
 
-    using VertexIndexT = int;
+    using VertexIndexT = std::uint64_t;
     constexpr static VertexIndexT INVALID_VERTEX_ID = -1;
     using WeightT = decltype(
         // Deduce the larger type to accomodate the values.
         // Rely on ADL to avoid name clashing with class members.
-        eval_edge_weight(std::declval<VertexT>(), std::declval<EdgeT>()) +
-        eval_vertex_weight(std::declval<VertexT>())
+        // bug
+        eval_edge_weight(std::declval<VertexT>(), std::declval<EdgeT>()) + 0
+        // eval_vertex_weight(std::declval<VertexT>())
     );
 
-private:
+protected:
     using AdjacentVertices = std::vector<std::pair<VertexIndexT, EdgeT>>;
 
     struct VertexInfo
