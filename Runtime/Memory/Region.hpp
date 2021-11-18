@@ -25,6 +25,16 @@ struct ReadonlyMemoryRegion
         return { static_cast<const char *>(base_address), length };
     }
 
+    // Return a string view with UTF-8 BOM removed if any.
+    std::string_view bom_free_string_view() const
+    {
+        auto view = to_string_view();
+        if(view.size() >= 3)
+            if(view.substr(0, 3) == "\xef\xbb\xbf")
+                view = view.substr(3);
+        return view;
+    }
+
     const char * as_chars() const
     {
         return static_cast<const char *>(base_address);
