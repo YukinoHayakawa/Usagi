@@ -6,7 +6,7 @@
 
 #include <Usagi/Concept/Allocator/ReallocatableAllocator.hpp>
 #include <Usagi/Concept/Type/Memcpyable.hpp>
-#include <Usagi/Library/Math/Rounding.hpp>
+#include <Usagi/Library/Memory/Alignment.hpp>
 #include <Usagi/Runtime/ErrorHandling.hpp>
 #include <Usagi/Runtime/ExceptionHeaderCorruption.hpp>
 
@@ -307,7 +307,7 @@ private:
         // strong exception guarantee
 
         const auto storage_size = sizeof(T) * size;
-        const auto alloc_size = round_up_unsigned(
+        const auto alloc_size = align_up(
             MAX_HEADER_SIZE + storage_size, ALLOCATION_SIZE
         );
 

@@ -15,7 +15,7 @@ std::size_t VmAllocatorPagefileBacked::round_up_allocation_size_checked(
     const std::size_t size_bytes) const
 {
     const auto new_committed_bytes =
-        memory::round_up_to_page_size(size_bytes);
+        memory::align_up_to_page_size(size_bytes);
 
     // If the requested size is larger than reserved size, fail.
     if(new_committed_bytes > mReservedBytes)
@@ -95,7 +95,7 @@ void * VmAllocatorPagefileBacked::allocate(const std::size_t size)
     if(mCommittedBytes > 0)
         USAGI_THROW(std::bad_alloc());
 
-    if(!mBaseAddress) reserve(memory::round_up_to_page_size(size));
+    if(!mBaseAddress) reserve(memory::align_up_to_page_size(size));
 
     const auto new_committed_bytes = round_up_allocation_size_checked(size);
 
@@ -174,9 +174,9 @@ void VmAllocatorPagefileBacked::zero_memory(
     char *base = static_cast<char*>(ptr);
 
     const auto begin = offset;
-    const auto begin_aligned = memory::round_up_to_page_size(begin);
+    const auto begin_aligned = memory::align_up_to_page_size(begin);
     const auto end = offset + size;
-    const auto end_aligned = memory::round_down_to_page_size(end);
+    const auto end_aligned = memory::align_down_to_page_size(end);
 
     memory::zero_pages(
         base + begin_aligned,

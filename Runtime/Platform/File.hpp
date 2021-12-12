@@ -4,7 +4,7 @@
 #include <string_view>
 #include <filesystem>
 
-#include <Usagi/Runtime/Memory/Region.hpp>
+#include <Usagi/Runtime/Memory/View.hpp>
 
 namespace usagi::platform::file
 {
@@ -74,7 +74,7 @@ enum MemoryMappingMode
 
 struct MemoryMapping
 {
-    MemoryRegion heap;
+    MemoryView heap;
     // This contains internal bookkeeping information of native API.
     // DO NOT MODIFY ITS CONTENT.
     NativeFileMappingObject internal;

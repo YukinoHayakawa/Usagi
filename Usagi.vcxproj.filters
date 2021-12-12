@@ -27,7 +27,7 @@
     <ClInclude Include="Runtime\ErrorHandling.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Math\Rounding.hpp">
+    <ClInclude Include="Library\Memory\Alignment.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Service\Service.hpp">
@@ -42,13 +42,10 @@
     <ClInclude Include="Runtime\Platform\File.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Memory\Region.hpp">
+    <ClInclude Include="Runtime\Memory\View.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Memory\ReferenceCounted.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Memory\LockGuard.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\CompileTimeError.hpp">
@@ -291,9 +288,6 @@
     <ClInclude Include="Runtime\Service\SimpleCacheService.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Memory\StackPolymorphicObject.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Library\Memory\Nonmovable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -309,6 +303,24 @@
     <ClInclude Include="Library\Utility\Variant.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Runtime\Memory\RefCounted.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\File\FilesystemWatcher.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Graph\HeterogeneousGraph.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Memory\MemoryArena.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Memory\Size.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Encoding\Unicode.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\File\RegularFile.cpp">
@@ -321,6 +333,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Encoding\Unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

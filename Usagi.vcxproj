@@ -80,8 +80,10 @@
     <ClInclude Include="Entity\EntityDatabase.hpp" />
     <ClInclude Include="Library\Algorithm\Container.hpp" />
     <ClInclude Include="Library\Container\FixedCapacityString.hpp" />
+    <ClInclude Include="Library\Graph\HeterogeneousGraph.hpp" />
     <ClInclude Include="Library\Memory\Nonmovable.hpp" />
-    <ClInclude Include="Library\Memory\StackPolymorphicObject.hpp" />
+    <ClInclude Include="Library\Memory\Size.hpp" />
+    <ClInclude Include="Library\Memory\MemoryArena.hpp" />
     <ClInclude Include="Library\Memory\RawResource.hpp" />
     <ClInclude Include="Library\Utility\BitMask.hpp" />
     <ClInclude Include="Library\Utility\EnumTranslation.hpp" />
@@ -97,6 +99,7 @@
     <ClInclude Include="Library\Utility\String.hpp" />
     <ClInclude Include="Library\Utility\Variant.hpp" />
     <ClInclude Include="Runtime\ExceptionHeaderCorruption.hpp" />
+    <ClInclude Include="Runtime\File\FilesystemWatcher.hpp" />
     <ClInclude Include="Runtime\Memory\PagedStorage.hpp" />
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />
     <ClInclude Include="Concept\Container\Stack.hpp" />
@@ -120,7 +123,9 @@
     <ClInclude Include="Library\Graph\Traversal.hpp" />
     <ClInclude Include="Library\Meta\Op.hpp" />
     <ClInclude Include="Runtime\IO\Unicode.hpp" />
+    <ClInclude Include="Runtime\Memory\RefCounted.hpp" />
     <ClInclude Include="Runtime\Memory\TypedAllocator.hpp" />
+    <ClInclude Include="Runtime\Encoding\Unicode.hpp" />
     <ClInclude Include="Runtime\Memory\VmAllocatorFileBacked.hpp" />
     <ClInclude Include="Runtime\Service\LazyInitService.hpp" />
     <ClInclude Include="Runtime\Service\SimpleCacheService.hpp" />
@@ -153,8 +158,7 @@
     <ClInclude Include="Concept\Allocator\ReallocatableAllocator.hpp" />
     <ClInclude Include="Concept\Type\Rebindable.hpp" />
     <ClInclude Include="Library\Graph\TopologicalSort.hpp" />
-    <ClInclude Include="Library\Math\Rounding.hpp" />
-    <ClInclude Include="Library\Memory\LockGuard.hpp" />
+    <ClInclude Include="Library\Memory\Alignment.hpp" />
     <ClInclude Include="Library\Memory\PoolAllocator.hpp" />
     <ClInclude Include="Library\Memory\ReferenceCounted.hpp" />
     <ClInclude Include="Library\Memory\SpinLock.hpp" />
@@ -167,13 +171,14 @@
     <ClInclude Include="Runtime\ErrorHandling.hpp" />
     <ClInclude Include="Runtime\File\MappedFileView.hpp" />
     <ClInclude Include="Runtime\File\RegularFile.hpp" />
-    <ClInclude Include="Runtime\Memory\Region.hpp" />
+    <ClInclude Include="Runtime\Memory\View.hpp" />
     <ClInclude Include="Runtime\Memory\VmAllocatorPagefileBacked.hpp" />
     <ClInclude Include="Runtime\Platform\File.hpp" />
     <ClInclude Include="Runtime\Platform\Memory.hpp" />
     <ClInclude Include="Runtime\Service\Service.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Runtime\Encoding\Unicode.cpp" />
     <ClCompile Include="Runtime\File\MappedFileView.cpp" />
     <ClCompile Include="Runtime\File\RegularFile.cpp" />
     <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp" />
