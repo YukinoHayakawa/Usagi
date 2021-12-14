@@ -9,7 +9,7 @@
 namespace usagi
 {
 template <std::size_t MaxSize = 64>
-class MemoryArena
+class MemoryArenaBase
 {
 	std::array<char, MaxSize> mMemory { };
 	SmallestCapableType<MaxSize> mCursor { };
@@ -40,5 +40,5 @@ public:
 	}
 };
 
-using MemoryArenaDefaultSize = MemoryArena<>;
+using MemoryArena = MemoryArenaBase<>;
 }

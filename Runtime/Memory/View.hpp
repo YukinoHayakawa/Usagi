@@ -17,21 +17,23 @@ class MemoryViewBase
     const void *mBaseAddress = nullptr;
     std::size_t mSize = 0;
 
-    static bool IsMutable()
+    constexpr static bool IsMutable()
     {
         return Mutability == MemoryViewMutability::MUTABLE;
     }
 
-    static bool IsReadonly()
+    constexpr static bool IsReadonly()
     {
         return Mutability == MemoryViewMutability::READONLY;
     }
 
 public:
+    MemoryViewBase() = default;
+
     MemoryViewBase(const void *base_address, const std::size_t size)
         // If the view is constructed with a pointer to const address,
         // subsequent modification to the pointed region cannot be allowed.
-        requires IsReadonly()
+        requires (IsReadonly())
         : mBaseAddress(base_address)
         , mSize(size)
     {
@@ -45,16 +47,35 @@ public:
 
     explicit MemoryViewBase(const std::string_view str)
         // Preserve the semantic of string_view as a readonly view of a string.
-        requires IsReadonly()
+        requires (IsReadonly())
         : mBaseAddress(str.data())
         , mSize(str.size())
     {
     }
 
+    template <MemoryViewMutability OtherMutability>
+    MemoryViewBase(const MemoryViewBase<OtherMutability> &other)
+        requires (IsReadonly() || other.IsMutable())
+        : mBaseAddress { other.mBaseAddress }
+        , mSize { other.mSize }
+    {
+    }
+
+    template <MemoryViewMutability OtherMutability>
+    MemoryViewBase & operator=(const MemoryViewBase<OtherMutability> &other)
+        requires (IsReadonly() || other.IsMutable())
+    {
+        if(this == &other)
+            return *this;
+        mBaseAddress = other.mBaseAddress;
+        mSize = other.mSize;
+        return *this;
+    }
+
     const void * base_address() const { return mBaseAddress; }
 
     void * mutable_base_address() const
-        requires IsMutable()
+        requires (IsMutable())
     {
         return const_cast<void *>(mBaseAddress);
     }

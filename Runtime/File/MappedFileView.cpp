@@ -12,13 +12,13 @@ namespace usagi
 {
 void MappedFileView::reset()
 {
-    mMapping.heap.base_address = nullptr;
+    mMapping = platform::file::MemoryMapping();
 }
 
 void MappedFileView::check_view(std::uint64_t offset, std::size_t size)
 {
-    assert(offset <= mMapping.heap.length);
-    assert(offset + size <= mMapping.heap.length);
+    assert(offset <= mMapping.heap.size());
+    assert(offset + size <= mMapping.heap.size());
 }
 
 void MappedFileView::check_page_aligned(std::uint64_t offset, std::size_t size)
@@ -70,11 +70,11 @@ MappedFileView::~MappedFileView()
 {
     using namespace platform::file;
 
-    if(mMapping.heap.base_address)
+    if(mMapping.heap.base_address())
     {
         if(mMode & MAPPING_WRITE)
         {
-            flush(0, mMapping.heap.length);
+            flush(0, mMapping.heap.size());
         }
         unmap(mMapping);
         reset();

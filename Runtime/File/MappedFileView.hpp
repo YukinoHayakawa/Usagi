@@ -15,7 +15,10 @@ class RegularFile;
 class MappedFileView : Noncopyable
 {
     platform::file::MemoryMapping mMapping;
-    platform::file::MemoryMappingMode mMode;
+    platform::file::MemoryMappingMode mMode =
+        static_cast<platform::file::MemoryMappingMode>(
+            platform::file::MAPPING_READ |
+            platform::file::MAPPING_WRITE);
 
     void reset();
 
@@ -68,7 +71,7 @@ public:
     }
 
     auto mode() const{ return mMode; }
-    std::size_t max_size() const noexcept { return mMapping.heap.length; }
+    std::size_t max_size() const noexcept { return mMapping.heap.size(); }
 
     MemoryView memory_region() const
     {
@@ -77,12 +80,12 @@ public:
 
     void * base_view() const
     {
-        return mMapping.heap.base_address;
+        return mMapping.heap.mutable_base_address();
     }
 
     char * base_byte_view() const
     {
-        return static_cast<char *>(mMapping.heap.base_address);
+        return static_cast<char *>(mMapping.heap.mutable_base_address());
     }
 
     std::string_view base_string_view() const
