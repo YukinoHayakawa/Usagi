@@ -1,9 +1,8 @@
 ﻿#pragma once
 
 #include <array>
+#include <mutex>
 
-#include <Usagi/Library/Memory/LockGuard.hpp>
-#include <Usagi/Library/Memory/SpinLock.hpp>
 #include <Usagi/Runtime/ErrorHandling.hpp>
 #include <Usagi/Runtime/Memory/PagedStorage.hpp>
 
@@ -124,8 +123,7 @@ protected:
         std::uint64_t first_entity_page_idx = EntityPageT::INVALID_PAGE;
         std::uint64_t last_entity_page_idx = EntityPageT::INVALID_PAGE;
     } mMeta;
-    // todo lockless
-    SpinLock mEntityPageAllocationLock;
+    std::mutex mEntityPageAllocationLock;
 
     EntityPageStorageT & entity_pages()
     {
@@ -154,34 +152,32 @@ protected:
             entity_pages(), &page
         );
 
+        std::unique_lock lock(mEntityPageAllocationLock);
+
+        page.page_seq_id = mMeta.entity_seq_id;
+
+        // Insert the new page at the end of linked list so that the
+        // entities are accessed in the incremental order of entity id
+        // when being iterated
+
+        // The linked list is empty and we are inserting the first page
+        if(mMeta.first_entity_page_idx == EntityPageT::INVALID_PAGE)
         {
-            LockGuard lock(mEntityPageAllocationLock);
-
-            page.page_seq_id = mMeta.entity_seq_id;
-
-            // Insert the new page at the end of linked list so that the
-            // entities are accessed in the incremental order of entity id
-            // when being iterated
-
-            // The linked list is empty and we are inserting the first page
-            if(mMeta.first_entity_page_idx == EntityPageT::INVALID_PAGE)
-            {
-                assert(mMeta.last_entity_page_idx == EntityPageT::INVALID_PAGE);
-                mMeta.first_entity_page_idx = page_idx;
-                mMeta.last_entity_page_idx = page_idx;
-            }
-            // The linked list has at least one page
-            else
-            {
-                assert(mMeta.last_entity_page_idx != EntityPageT::INVALID_PAGE);
-                auto &last = entity_pages().at(mMeta.last_entity_page_idx);
-                assert(last.next_page == EntityPageT::INVALID_PAGE);
-                last.next_page = page_idx;
-                mMeta.last_entity_page_idx = page_idx;
-            }
-
-            ++mMeta.entity_seq_id;
+            assert(mMeta.last_entity_page_idx == EntityPageT::INVALID_PAGE);
+            mMeta.first_entity_page_idx = page_idx;
+            mMeta.last_entity_page_idx = page_idx;
         }
+        // The linked list has at least one page
+        else
+        {
+            assert(mMeta.last_entity_page_idx != EntityPageT::INVALID_PAGE);
+            auto &last = entity_pages().at(mMeta.last_entity_page_idx);
+            assert(last.next_page == EntityPageT::INVALID_PAGE);
+            last.next_page = page_idx;
+            mMeta.last_entity_page_idx = page_idx;
+        }
+
+        ++mMeta.entity_seq_id;
 
         return EntityPageInfo {
             .index = page_idx,
@@ -362,6 +358,8 @@ public:
 
     /**
      * \brief Release unused pages and clear dirty flags of pages.
+     * Note: this is meant to be used when all other operations are finished.
+     * Synchronization is performed externally.
      */
     void reclaim_pages()
     {

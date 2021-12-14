@@ -18,9 +18,6 @@
     <ClInclude Include="Library\Memory\PoolAllocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Memory\SpinLock.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Library\Meta\Tag.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

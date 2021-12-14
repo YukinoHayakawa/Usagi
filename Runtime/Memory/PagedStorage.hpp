@@ -67,6 +67,7 @@ public:
         init(std::move(mapped_file));
     }
 
+    // todo automatically save database header when an operation is committed
     // return true if it is restoring from existing file
     bool init(std::filesystem::path mapped_file)
     {
