@@ -50,4 +50,31 @@ template <
 using ApplyIfNotVoidT = typename ConditionalApply<
     Template, !std::is_same_v<T, void>, Otherwise, T
 >::type;
+
+template <typename T>
+struct ExtractFirstTemplateParameter;
+
+template <
+    template <typename...> typename T,
+    typename First,
+    typename... Args
+>
+struct ExtractFirstTemplateParameter<T<First, Args...>>
+{
+    using type = First;
+};
+
+template <typename T>
+struct ExtractSecondTemplateParameter;
+
+template <
+    template <typename...> typename T,
+    typename First,
+    typename Second,
+    typename... Args
+>
+struct ExtractSecondTemplateParameter<T<First, Second, Args...>>
+{
+    using type = Second;
+};
 }
