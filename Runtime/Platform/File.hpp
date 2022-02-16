@@ -8,6 +8,27 @@
 
 namespace usagi::platform::file
 {
+// File not found.
+class ExceptionFileNotFound final : public std::runtime_error
+{
+public:
+    using std::runtime_error::runtime_error;
+};
+
+// Permission denied.
+class ExceptionFileAccessDenied final : public std::runtime_error
+{
+public:
+    using std::runtime_error::runtime_error;
+};
+
+// File currently used by another program.
+class ExceptionFileBusy final : public std::runtime_error
+{
+public:
+    using std::runtime_error::runtime_error;
+};
+
 #ifdef _WIN32
 using NativeFileHandle = void *;
 
@@ -32,6 +53,13 @@ enum FileOpenMode
     OPEN_READ                   = 1 << 0,
     OPEN_WRITE                  = 1 << 1,
 };
+//
+// enum FileShareMode
+// {
+//     SHARE_READ                  = 1 << 0,
+//     SHARE_WRITE                 = 1 << 1,
+//     SHARE_DELETE                = 1 << 2,
+// };
 
 enum FileOpenOptions
 {
@@ -51,6 +79,13 @@ NativeFileHandle open(
     FileOpenMode mode,
     FileOpenOptions options);
 
+// Same as open(), but platform-specific error codes are translated into
+// exceptions defined above.
+NativeFileHandle open_exception_translated(
+    const std::filesystem::path &path,
+    FileOpenMode mode,
+    FileOpenOptions options);
+
 /**
  * \brief Close native file handle.
  * \param file
@@ -63,6 +98,18 @@ void close(NativeFileHandle file);
  * \return Current file size in bytes.
  */
 std::size_t size(NativeFileHandle file);
+std::uint64_t id(NativeFileHandle file);
+std::uint64_t last_modification_time(NativeFileHandle file);
+
+/*
+ * Atomically replace a file with another file and optionally backup the
+ * original file.
+ */
+void replace_file(
+    const std::filesystem::path &replaced_file,
+    const std::filesystem::path &replacement_file,
+    bool backup,
+    const std::filesystem::path &backup_name);
 
 // ========================== Memory Mapping ================================ //
 

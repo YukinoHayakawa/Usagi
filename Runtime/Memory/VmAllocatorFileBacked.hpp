@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <optional>
 
-#include <Usagi/Concept/Allocator/ReallocatableAllocator.hpp>
+#include <Usagi/Concepts/Allocator/ReallocatableAllocator.hpp>
 #include <Usagi/Runtime/File/MappedFileView.hpp>
 
 namespace usagi

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Concept/Type/Memcpyable.hpp>
+#include <Usagi/Concepts/Type/Memcpyable.hpp>
 #include <Usagi/Library/Container/DynamicArray.hpp>
 #include <Usagi/Library/Memory/PoolAllocator.hpp>
 #include <Usagi/Runtime/Memory/TypedAllocator.hpp>

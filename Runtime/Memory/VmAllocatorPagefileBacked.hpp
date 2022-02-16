@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#include <Usagi/Concept/Allocator/ReallocatableAllocator.hpp>
+#include <Usagi/Concepts/Allocator/ReallocatableAllocator.hpp>
 #include <Usagi/Library/Memory/Noncopyable.hpp>
 
 namespace usagi

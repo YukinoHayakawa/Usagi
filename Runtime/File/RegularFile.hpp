@@ -37,6 +37,9 @@ public:
     platform::file::NativeFileHandle handle() const { return mFileHandle; }
     platform::file::FileOpenMode mode() const { return mMode; }
     std::size_t size() const;
+    // File ID on filesystem
+    std::uint64_t id() const;
+    std::uint64_t last_modification_time() const;
 
     /*
      * File Mapping

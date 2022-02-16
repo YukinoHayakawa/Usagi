@@ -54,6 +54,16 @@ std::size_t RegularFile::size() const
     return platform::file::size(mFileHandle);
 }
 
+std::uint64_t RegularFile::id() const
+{
+    return platform::file::id(mFileHandle);
+}
+
+std::uint64_t RegularFile::last_modification_time() const
+{
+    return platform::file::last_modification_time(mFileHandle);
+}
+
 MappedFileView RegularFile::create_view(
     std::uint64_t offset,
     std::uint64_t length,

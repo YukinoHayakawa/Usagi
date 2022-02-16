@@ -4,12 +4,17 @@
 #include <vector>
 #include <optional>
 
+#include <Usagi/Library/Memory/Noncopyable.hpp>
+
 namespace usagi
 {
 class Task;
 
-class TaskExecutor
+class TaskExecutor : Noncopyable
 {
+protected:
+    static void run_task(Task &task);
+
 public:
     virtual ~TaskExecutor() = default;
 

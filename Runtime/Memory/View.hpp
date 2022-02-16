@@ -27,6 +27,9 @@ class MemoryViewBase
         return Mutability == MemoryViewMutability::READONLY;
     }
 
+    template <MemoryViewMutability OtherMutability>
+    friend class MemoryViewBase;
+
 public:
     MemoryViewBase() = default;
 
