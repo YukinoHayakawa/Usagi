@@ -7,7 +7,7 @@
 
 namespace usagi
 {
-template <std::size_t MaxSize = 64>
+template <std::size_t MaxSize = 128>
 class MemoryArenaBase
 {
 	std::array<char, MaxSize> mMemory { };
@@ -17,7 +17,7 @@ public:
 	void * allocate(std::size_t size)
 	{
 	    if(mCursor + size > mMemory.size())
-			return nullptr; // or throw bad_alloc?
+			throw std::bad_alloc();
 		const auto mem = &mMemory[mCursor];
 		mCursor += size;
         return mem;
@@ -31,7 +31,7 @@ public:
         const auto cursor_aligned = align_up(mCursor, alignment);
         const auto cursor_next = cursor_aligned + sizeof(T);
 		if(cursor_next > mMemory.size())
-			return nullptr; // or throw bad_alloc?
+			throw std::bad_alloc();
 		const auto mem = reinterpret_cast<T *>(&mMemory[cursor_aligned]);
 		std::construct_at(mem, std::forward<Args>(args)...);
 		mCursor = cursor_next;
@@ -39,5 +39,6 @@ public:
 	}
 };
 
+// todo: introduce a base to allow other sizes
 using MemoryArena = MemoryArenaBase<>;
 }

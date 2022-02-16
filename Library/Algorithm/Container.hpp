@@ -22,6 +22,21 @@ void resize_generate(SeqContainer &container, std::size_t size, Generator gen)
     }
 }
 
+template <typename Container, typename Key, typename CreateFunc>
+auto & find_or_emplace(Container &container, Key key, CreateFunc func)
+{
+    const auto find_it = container.lower_bound(key);
+    if(find_it == container.end() || find_it->first != key)
+    {
+        const auto [emplace_it, inserted] = container.try_emplace(
+            key, func()
+        );
+        assert(inserted);
+        return emplace_it->second;
+    }
+    return find_it->second;
+}
+
 // Find a value in the container. Call the creation function for it if it is
 // not found. Useful for implementing cache.
 template <typename Container, typename Key, typename CreateFunc>

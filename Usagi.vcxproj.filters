@@ -42,9 +42,6 @@
     <ClInclude Include="Runtime\Memory\View.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Memory\ReferenceCounted.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Library\Meta\CompileTimeError.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -4,8 +4,8 @@
 #include <memory>
 #include <utility>
 
-#include <Usagi/Concept/Allocator/ReallocatableAllocator.hpp>
-#include <Usagi/Concept/Type/Memcpyable.hpp>
+#include <Usagi/Concepts/Allocator/ReallocatableAllocator.hpp>
+#include <Usagi/Concepts/Type/Memcpyable.hpp>
 #include <Usagi/Library/Memory/Alignment.hpp>
 #include <Usagi/Runtime/ErrorHandling.hpp>
 #include <Usagi/Runtime/ExceptionHeaderCorruption.hpp>

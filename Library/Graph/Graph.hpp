@@ -3,7 +3,7 @@
 #include <concepts>
 #include <ranges>
 
-#include <Usagi/Concept/Type/Range.hpp>
+#include <Usagi/Concepts/Type/Range.hpp>
 
 namespace usagi::graph
 {

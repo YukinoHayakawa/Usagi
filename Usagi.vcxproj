@@ -160,7 +160,6 @@
     <ClInclude Include="Library\Graph\TopologicalSort.hpp" />
     <ClInclude Include="Library\Memory\Alignment.hpp" />
     <ClInclude Include="Library\Memory\PoolAllocator.hpp" />
-    <ClInclude Include="Library\Memory\ReferenceCounted.hpp" />
     <ClInclude Include="Library\Meta\CompileTimeError.hpp" />
     <ClInclude Include="Library\Graph\AdjacencyMatrixFixed.hpp" />
     <ClInclude Include="Library\Meta\Stack.hpp" />

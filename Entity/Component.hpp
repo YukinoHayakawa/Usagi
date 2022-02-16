@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Concept/Type/Memcpyable.hpp>
+#include <Usagi/Concepts/Type/Memcpyable.hpp>
 
 namespace usagi
 {

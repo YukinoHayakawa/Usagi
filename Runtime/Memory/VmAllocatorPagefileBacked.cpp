@@ -82,8 +82,8 @@ void VmAllocatorPagefileBacked::reserve(const std::size_t size_bytes)
         USAGI_THROW(std::runtime_error("Double initialization"));
 
     const auto allocation = memory::allocate(size_bytes, false);
-    mBaseAddress = static_cast<char *>(allocation.base_address);
-    mReservedBytes = allocation.length;
+    mBaseAddress = static_cast<char *>(allocation.mutable_base_address());
+    mReservedBytes = allocation.size();
 }
 
 // Strong exception guarantee

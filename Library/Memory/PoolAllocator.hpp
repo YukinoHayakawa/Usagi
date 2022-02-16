@@ -2,9 +2,7 @@
 
 #include <cassert>
 #include <cstddef>
-
-#include "SpinLock.hpp"
-#include "LockGuard.hpp"
+#include <mutex>
 
 namespace usagi
 {
@@ -67,7 +65,7 @@ protected:
     } mMeta;
 
     // todo lock free algorithm?
-    SpinLock mLock;
+    std::mutex mMutex;
 
     auto & free_list_head() { return mMeta.free_list_head; };
 
@@ -98,7 +96,7 @@ public:
     PoolAllocator(PoolAllocator &&other) noexcept
         : StorageT { std::move(other) }
         , mMeta { other.mMeta }
-        , mLock { std::move(other.mLock) }
+        , mMutex { std::move(other.mMutex) }
     {
         other.release();
     }
@@ -111,7 +109,7 @@ public:
             return *this;
         StorageT::operator=(std::move(other));
         free_list_head() = other.mFreeListHead;
-        mLock = std::move(other.mLock);
+        mMutex = std::move(other.mMutex);
         other.release();
         return *this;
     }
@@ -130,7 +128,7 @@ public:
     {
         std::size_t idx;
 
-        LockGuard lock(mLock);
+        std::unique_lock lock(mMutex);
 
         // Free block available -> use it
         if(free_list_head() != INVALID_BLOCK)
@@ -154,7 +152,7 @@ public:
         // which should be properly handled elsewhere.
         auto &fp = block(index);
 
-        LockGuard lock(mLock);
+        std::unique_lock lock(mMutex);
 
         // Link the released block to the free list
         fp.next = free_list_head();
