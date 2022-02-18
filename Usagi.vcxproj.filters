@@ -123,13 +123,13 @@
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Concept\Container\Stack.hpp">
+    <ClInclude Include="Concepts\Container\Stack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Concept\Allocator\ReallocatableAllocator.hpp">
+    <ClInclude Include="Concepts\Allocator\ReallocatableAllocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Concept\Type\Rebindable.hpp">
+    <ClInclude Include="Concepts\Type\Rebindable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Graph\AdjacencyList.hpp">
@@ -156,7 +156,7 @@
     <ClInclude Include="Library\Graph\Degree.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Concept\Type\Range.hpp">
+    <ClInclude Include="Concepts\Type\Range.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Graph\Level.hpp">
@@ -210,7 +210,7 @@
     <ClInclude Include="Runtime\Memory\VmAllocatorPagefileBacked.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Concept\Type\Memcpyable.hpp">
+    <ClInclude Include="Concepts\Type\Memcpyable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Container\DynamicArray.hpp">
@@ -240,7 +240,7 @@
     <ClInclude Include="Library\Sampling\NBestSampler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\ExceptionHeaderCorruption.hpp">
+    <ClInclude Include="Runtime\Exceptions\ExceptionHeaderCorruption.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Math\Quadratic.hpp">
@@ -249,22 +249,22 @@
     <ClInclude Include="Library\Container\FixedCapacityString.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\WeakSingleton.hpp">
+    <ClInclude Include="Runtime\Memory\WeakSingleton.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Memory\Noncopyable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Utility\EnumTranslation.hpp">
+    <ClInclude Include="Library\Utilities\EnumTranslation.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Utility\String.hpp">
+    <ClInclude Include="Library\Utilities\String.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Utility\BitMask.hpp">
+    <ClInclude Include="Library\Utilities\BitMask.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Utility\Pointer.hpp">
+    <ClInclude Include="Library\Utilities\Pointer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Algorithm\Container.hpp">
@@ -285,19 +285,19 @@
     <ClInclude Include="Library\Memory\Nonmovable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Task.hpp">
+    <ClInclude Include="Runtime\Task\Task.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\TaskExecutor.hpp">
+    <ClInclude Include="Runtime\Task\TaskExecutor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Service\SimpleService.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Utility\Variant.hpp">
+    <ClInclude Include="Library\Utilities\Variant.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Memory\RefCounted.hpp">
+    <ClInclude Include="Runtime\Memory\RefCounter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\File\FilesystemWatcher.hpp">
@@ -315,6 +315,21 @@
     <ClInclude Include="Runtime\Encoding\Unicode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Runtime\ReturnValue.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Concepts\Type\Types.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Utilities\StringView.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Utilities\ArgumentStorage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Utilities\Functional.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\File\RegularFile.cpp">
@@ -330,6 +345,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Encoding\Unicode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Task\TaskExecutor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

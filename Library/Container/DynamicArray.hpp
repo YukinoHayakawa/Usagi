@@ -8,7 +8,7 @@
 #include <Usagi/Concepts/Type/Memcpyable.hpp>
 #include <Usagi/Library/Memory/Alignment.hpp>
 #include <Usagi/Runtime/ErrorHandling.hpp>
-#include <Usagi/Runtime/ExceptionHeaderCorruption.hpp>
+#include <Usagi/Runtime/Exceptions/ExceptionHeaderCorruption.hpp>
 
 namespace usagi
 {
