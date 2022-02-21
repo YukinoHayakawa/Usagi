@@ -13,4 +13,10 @@ struct BoolTag
 {
     bool val;
 };
+
+template <typename T>
+struct Wrapped
+{
+    T val;
+};
 }
