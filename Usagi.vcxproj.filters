@@ -228,7 +228,7 @@
     <ClInclude Include="Library\Meta\Deduplicate.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Type.hpp">
+    <ClInclude Include="Library\Meta\Template.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Entity\EntityDatabase.hpp">
@@ -297,7 +297,7 @@
     <ClInclude Include="Library\Utilities\Variant.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Memory\RefCounter.hpp">
+    <ClInclude Include="Runtime\Memory\RefCount.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\File\FilesystemWatcher.hpp">

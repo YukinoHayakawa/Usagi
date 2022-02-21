@@ -12,9 +12,6 @@ class Task;
 
 class TaskExecutor : Noncopyable
 {
-protected:
-    static void run_task(Task &task);
-
 public:
     virtual ~TaskExecutor() = default;
 
@@ -24,5 +21,7 @@ public:
     virtual std::uint64_t submit(
         std::unique_ptr<Task> task,
         std::optional<std::vector<std::uint64_t>> wait_on = { }) = 0;
+
+    static void run_task(Task &task);
 };
 }

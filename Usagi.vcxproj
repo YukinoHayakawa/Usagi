@@ -96,7 +96,7 @@
     <ClInclude Include="Library\Meta\List.hpp" />
     <ClInclude Include="Library\Meta\Set.hpp" />
     <ClInclude Include="Library\Meta\Deduplicate.hpp" />
-    <ClInclude Include="Library\Meta\Type.hpp" />
+    <ClInclude Include="Library\Meta\Template.hpp" />
     <ClInclude Include="Library\Utilities\Functional.hpp" />
     <ClInclude Include="Library\Utilities\Pointer.hpp" />
     <ClInclude Include="Library\Utilities\String.hpp" />
@@ -127,7 +127,7 @@
     <ClInclude Include="Library\Graph\Traversal.hpp" />
     <ClInclude Include="Library\Meta\Op.hpp" />
     <ClInclude Include="Runtime\IO\Unicode.hpp" />
-    <ClInclude Include="Runtime\Memory\RefCounter.hpp" />
+    <ClInclude Include="Runtime\Memory\RefCount.hpp" />
     <ClInclude Include="Runtime\Memory\TypedAllocator.hpp" />
     <ClInclude Include="Runtime\Encoding\Unicode.hpp" />
     <ClInclude Include="Runtime\Memory\VmAllocatorFileBacked.hpp" />
