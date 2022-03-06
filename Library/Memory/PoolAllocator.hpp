@@ -41,7 +41,7 @@ union Block
  */
 template <
     typename T,
-    template <typename Elem> typename Container
+    template <typename Elem, typename...> typename Container
 >
 class PoolAllocator
     : protected Container<detail::pool_alloc::Block<T>>
@@ -61,13 +61,14 @@ protected:
     // extra header space. So the metadata has to be explicitly synced.
     struct Meta
     {
+        // A list that reuses the memory of the block to store link information.
         std::uint64_t free_list_head = INVALID_BLOCK;
     } mMeta;
 
     // todo lock free algorithm?
     std::mutex mMutex;
 
-    auto & free_list_head() { return mMeta.free_list_head; };
+    auto & free_list_head() { return mMeta.free_list_head; }
 
     Block & block(const std::size_t index)
     {

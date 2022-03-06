@@ -11,6 +11,12 @@ struct SimpleService : Noncopyable
 
     ServiceT & get_service() { return mService; }
 
+    template <typename... Args>
+    explicit SimpleService(Args &&... args)
+        : mService(std::forward<Args>(args)...)
+    {
+    }
+
 private:
     T mService;
 };

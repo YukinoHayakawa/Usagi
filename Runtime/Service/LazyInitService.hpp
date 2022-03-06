@@ -17,7 +17,7 @@ struct LazyInitService : Noncopyable
         {
             mServiceImpl = std::make_unique<ServiceT>();
         }
-        return *mServiceImpl.get();
+        return *mServiceImpl;
     }
 
 private:

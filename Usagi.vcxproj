@@ -98,9 +98,12 @@
     <ClInclude Include="Library\Meta\Deduplicate.hpp" />
     <ClInclude Include="Library\Meta\Template.hpp" />
     <ClInclude Include="Library\Utilities\Functional.hpp" />
+    <ClInclude Include="Library\Meta\NamedArgument.hpp" />
     <ClInclude Include="Library\Utilities\Pointer.hpp" />
+    <ClInclude Include="Library\Meta\StringLiteral.hpp" />
     <ClInclude Include="Library\Utilities\String.hpp" />
     <ClInclude Include="Library\Utilities\StringView.hpp" />
+    <ClInclude Include="Library\Utilities\TransparentlyComparable.hpp" />
     <ClInclude Include="Library\Utilities\Variant.hpp" />
     <ClInclude Include="Runtime\Exceptions\ExceptionHeaderCorruption.hpp" />
     <ClInclude Include="Runtime\File\FilesystemWatcher.hpp" />
@@ -133,6 +136,7 @@
     <ClInclude Include="Runtime\Memory\VmAllocatorFileBacked.hpp" />
     <ClInclude Include="Runtime\ReturnValue.hpp" />
     <ClInclude Include="Runtime\Service\LazyInitService.hpp" />
+    <ClInclude Include="Runtime\Service\ServiceAccess.hpp" />
     <ClInclude Include="Runtime\Service\SimpleCacheService.hpp" />
     <ClInclude Include="Runtime\Service\SimplePlatformService.hpp" />
     <ClInclude Include="Runtime\Service\SimpleService.hpp" />

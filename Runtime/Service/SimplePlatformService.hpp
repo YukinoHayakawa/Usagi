@@ -26,7 +26,7 @@ struct SimplePlatformService : Noncopyable
         std::is_base_of_v<ServiceBaseT, ServiceImplT>
         : mServiceImpl(std::make_unique<ServiceImplT>(
             std::forward<Args>(args)...
-            ))
+        ))
     {
     }
 
