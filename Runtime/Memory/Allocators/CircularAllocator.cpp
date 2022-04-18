@@ -1,11 +1,48 @@
 ﻿#include "CircularAllocator.hpp"
 
 #include <cassert>
+#include <iostream>
 
 #include <Usagi/Runtime/ErrorHandling.hpp>
 
 namespace usagi
 {
+void * CircularAllocator::Segment::payload()
+{
+    // payload is right after the header
+    return raw_advance(this, sizeof(Segment));
+}
+
+bool CircularAllocator::Segment::can_allocate(const std::size_t size) const
+{
+    if(!freed) return false;
+    // don't have to leave the space for extra segment header
+    return length >= sizeof(Segment) + size;
+}
+
+std::size_t CircularAllocator::Segment::do_allocate(const std::size_t size)
+{
+    assert(can_allocate(size));
+
+    // space usable for current allocation
+    const std::size_t available = length - sizeof(Segment);
+    // space left for next allocation
+    std::size_t leftover = available - size;
+    // check for underflow
+    assert(leftover < length);
+
+    // if no more space is enough for next alloc, eat it all
+    if(leftover < 1 + sizeof(Segment))
+        leftover = 0;
+
+    freed = 0;
+    length -= leftover;
+
+    assert(length > 0);
+
+    return leftover;
+}
+
 CircularAllocator::SegmentIterator::SegmentIterator(
     CircularAllocator *allocator,
     Segment *segment)
@@ -15,14 +52,27 @@ CircularAllocator::SegmentIterator::SegmentIterator(
     assert(mSegment <= mAllocator->mMemory.end());
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
-bool CircularAllocator::SegmentIterator::try_merge_next()
+CircularAllocator::SegmentIterator
+CircularAllocator::SegmentIterator::seq_next() const
 {
-    auto it = next();
-    if(it == mAllocator->end()) return false;
-    if(!it->freed) return false;
-    mSegment->length += it->length;
-    return true;
+    return SegmentIterator(
+        mAllocator,
+        raw_advance(mSegment, mSegment->length)
+    );
+}
+
+CircularAllocator::SegmentIterator
+CircularAllocator::SegmentIterator::linked_next() const
+{
+    auto next = seq_next();
+    if(next == mAllocator->end()) next = mAllocator->begin();
+    return next;
+}
+
+void CircularAllocator::SegmentIterator::commit_possible_head_advance() const
+{
+    if(*this == mAllocator->head() && mSegment->freed)
+        mAllocator->head_increment(mSegment->length);
 }
 
 bool CircularAllocator::SegmentIterator::can_allocate(
@@ -42,67 +92,46 @@ CircularAllocator::Segment * CircularAllocator::from_payload(void *ptr)
 
 CircularAllocator::SegmentIterator CircularAllocator::head()
 {
-    return { this, as_segment(mHead) };
+    return at(mHead);
+}
+
+CircularAllocator::SegmentIterator CircularAllocator::tail()
+{
+    return at(mTail);
+}
+
+CircularAllocator::SegmentIterator CircularAllocator::begin()
+{
+    return at(0);
 }
 
 CircularAllocator::SegmentIterator CircularAllocator::end()
 {
-    return { this, as_segment(mMemory.size()) };
+    return at(mMemory.size());
 }
 
-bool CircularAllocator::can_tail_allocate(const size_t size) const
+CircularAllocator::SegmentIterator CircularAllocator::at(
+    const std::size_t offset)
 {
-    const auto end_point = mTail >= mHead ? mMemory.size() : mHead;
-    return mTail + Segment::make_segment_size(size) <= end_point;
+    return { this, as_segment(offset) };
 }
 
-void * CircularAllocator::commit_tail_allocate(const size_t size)
+CircularAllocator::Segment * CircularAllocator::init_free_segment(
+    const std::size_t offset,
+    const std::size_t length)
 {
-    Segment *segment = as_segment(mTail);
-
-    segment->freed = false;
-    segment->length = Segment::make_segment_size(size);
-
-    mTail += segment->length;
-
-    // free space won't allow another allocation, include these bytes in this
-    // allocation.
-    if(mTail + sizeof(Segment) >= mMemory.size())
-    {
-        segment->length += mMemory.size() - mTail;
-        mTail = 0;
-    }
-
-    return segment->payload();
+    assert(length >= sizeof(Segment));
+    Segment * segment = as_segment(offset);
+    segment->freed = 1;
+    segment->length = length;
+    return segment;
 }
 
-// todo initial state?
-void CircularAllocator::merge_head_segments()
+// implements invariant 2.
+void CircularAllocator::init()
 {
-    SegmentIterator it = head();
-    while(it.try_merge_next()) { }
-    if(it->freed)
-        mHead += it->length;
-    // todo: some space may be left at the end. in that case head won't wrap
-    if(mHead == mMemory.size())
-        mHead = 0;
-}
-
-void CircularAllocator::init_segment()
-{
-    assert(!mHead && !mTail);
-    mHead = init_free_segment(0, mMemory.size());
-}
-
-// bug
-bool CircularAllocator::can_head_allocate(const size_t size)
-{
-    return head()->length >= size;
-}
-
-void CircularAllocator::wrap_back()
-{
-    mTail = 0;
+    mHead = mTail = 0;
+    init_free_segment(0, mMemory.size());
 }
 
 bool CircularAllocator::allocated_by_us(void *ptr) const
@@ -111,39 +140,166 @@ bool CircularAllocator::allocated_by_us(void *ptr) const
     return mMemory.contains(ptr);
 }
 
-void CircularAllocator::free_segment(void *ptr)
-{
-    Segment *segment = from_payload(ptr);
-    assert(segment->freed == false);
-    segment->freed = true;
-}
-
 CircularAllocator::CircularAllocator(const MemoryView memory)
     : mMemory(memory)
 {
+    USAGI_ASSERT_THROW(
+        memory.size() > sizeof(Segment),
+        std::runtime_error("Insufficient space.")
+    );
+    init();
+}
+
+void CircularAllocator::head_increment(const std::size_t offset)
+{
+    mHead += offset;
+    mHead %= mMemory.size();
+}
+
+void CircularAllocator::tail_increment(const std::size_t offset)
+{
+    mTail += offset;
+    mTail %= mMemory.size();
 }
 
 void * CircularAllocator::allocate(const std::size_t size)
 {
     USAGI_ASSERT_THROW(size, std::bad_alloc());
 
-    merge_head_segments();
-    if(can_tail_allocate(size))
+    // Case 1: ... head ... tail ...
+    // [A. check the free space after tail.] because the tail will wrap back
+    // when it reaches the end, there is always free space at the tail if
+    // tail > head. if the space is enough, allocate there. otherwise, [B. check
+    // if the space before head is large enough.] if so, allocate there.
+    // otherwise fail the allocation.
+    //
+    // Case 2: ... tail ... head ...
+    // [A. check is there free space between the tail and the head. if so,
+    // allocate there.] [C. otherwise fail the allocation.]
+    //
+    // Case 3: head == tail
+    // the memory is either fully freed or fully allocated. if it's fully free,
+    // it is already handled by [A] so [C. if that failed, there wasn't enough
+    // space and the allocation should fail.] if the memory is fully allocated,
+    // [A] also fails it because there wasn't enough free space on the tail.
+    // so this case does not need special handling.
+
+    // A. first try to allocate from the tail free segment. the end of that
+    // segment may be the end of managed memory or head. if head == tail and
+    // the buffer is full, this automatically fails because the tail segment
+    // overlapping with the head is marked used.
+    if(Segment *tail = as_segment(mTail); tail->can_allocate(size))
     {
-        return commit_tail_allocate(size);
+        // calculate the free space left in the tail segment after allocation.
+        const std::size_t leftover = tail->do_allocate(size);
+        // move the tail. it may wrap to the beginning. if that happens,
+        // doesn't matter whether head == 0 or not, there is always a segment
+        // at the beginning, so no segment init is needed.
+        tail_increment(tail->length);
+        // if there is space left, create a free segment there to maintain
+        // the linked list.
+        if(mTail != 0 && mTail != mHead) init_free_segment(mTail, leftover);
+        return tail->payload();
     }
-    if(can_head_allocate(size))
+    // if tail < head, the allocation fails because the previous attempt shows
+    // no space left. if head == tail and there was enough space, the tail
+    // allocation should have succeeded. so it's only possible to continue
+    // with head < tail. if there is no space before head, also fail.
+    USAGI_ASSERT_THROW(mHead < mTail && mHead > 0, std::bad_alloc());
+    Segment *front = as_segment(0);
+    // if there is space before head, there must be a free segment.
+    assert(front->freed);
+    // there should only be at most one free segment before the head.
+    assert(front->length == mHead);
+    if(front->can_allocate(size))
     {
-        wrap_back();
-        return commit_tail_allocate(size);
+        const std::size_t leftover = front->do_allocate(size);
+        mTail = front->length;
+        if(leftover) init_free_segment(mTail, leftover);
+        return front->payload();
     }
     USAGI_THROW(std::bad_alloc());
+
+    // bug is it possible that head == tail and head is free but there is still allocation left?
 }
 
 void CircularAllocator::deallocate(void *ptr)
 {
-    if(!allocated_by_us(ptr))
-        USAGI_THROW(std::bad_alloc());
-    free_segment(ptr);
+    USAGI_ASSERT_THROW(allocated_by_us(ptr), std::bad_alloc());
+
+    // ... tail ... head ... begin ...
+    // 
+    // scan to merge subsequent free segments
+    // 
+    // merge free segments starting from begin, stop if [A. the end of memory]
+    // or [B. the tail], or [C. an allocated segment] is met.
+    // if begin == head, increment head.
+    // if the stop was due to A., wrap back to the beginning of the memory,
+    // merge free segments until tail is met.
+    // if the stop was due to C., return,
+
+    SegmentIterator it(this, from_payload(ptr));
+    assert(it != end());
+    // free the requested segment.
+    assert(it->freed == false);
+    it->freed = true;
+
+    // loop to merge subsequent free segments.
+    while(true)
+    {
+        SegmentIterator next = it.linked_next();
+        // [B.]/[C.] we are done merging the segments.
+        if(!next->freed || next == tail())
+        {
+            // we can't merge the next segment. if the current segment is
+            // not head, leave it alone. it might be merged from ahead later.
+            // otherwise, remove this segment by advancing the head.
+            // fragmentation is possible because we can't merge with segments
+            // before the current one. but when the head segment is freed,
+            // this segment will be eventually merged.
+            it.commit_possible_head_advance();
+            break;
+        }
+        // if the next wraps back to the beginning, we are done with the
+        // back part of the segments. commit the changes and merge from the
+        // beginning. the case where the beginning is the tail is handled
+        // above.
+        if(next == begin())
+        {
+            it.commit_possible_head_advance();
+            it = begin();
+            continue;
+        }
+        assert(next->freed);
+        // merge next segment. 
+        it->length += next->length;
+    }
+
+    // because we are releasing the segments, if the head meets the tail it
+    // must be the case that all the segments are freed. reset the allocator
+    // then.
+    if(head() == tail()) init();
+}
+
+bool CircularAllocator::check_integrity()
+{
+    std::size_t total_bytes = 0;
+    for(auto it = begin(); it != end(); it = it.seq_next())
+        total_bytes += it->length;
+    return total_bytes == mMemory.size();
+}
+
+void CircularAllocator::print(std::ostream &os)
+{
+    os << "[Segments]\n";
+    for(auto it = begin(); it != end(); it = it.seq_next())
+    {
+        if(it->freed) os << "free ";
+        else os << "used ";
+        os << it->length << " bytes ";
+        if(it == head()) os << "(head) ";
+        if(it == tail()) os << "(tail) ";
+        os << "\n";
+    }
 }
 }
