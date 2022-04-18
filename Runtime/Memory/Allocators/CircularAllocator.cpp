@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <Usagi/Runtime/ErrorHandling.hpp>
+#include <Usagi/Library/Memory/Arithmetic.hpp>
 
 namespace usagi
 {
@@ -81,8 +82,15 @@ bool CircularAllocator::SegmentIterator::can_allocate(
     return mSegment->freed && mSegment->length >= size + sizeof(Segment);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
+CircularAllocator::Segment * CircularAllocator::as_segment(
+    const std::size_t offset)
+{
+    return raw_advance(mMemory.as_mutable<Segment>(), offset);
+}
+
 // ReSharper disable once CppMemberFunctionMayBeStatic
-CircularAllocator::Segment * CircularAllocator::from_payload(void *ptr)
+CircularAllocator::Segment * CircularAllocator::segment_from_payload(void *ptr)
 {
     return static_cast<Segment *>(raw_advance(
         ptr,
@@ -90,24 +98,10 @@ CircularAllocator::Segment * CircularAllocator::from_payload(void *ptr)
     ));
 }
 
-CircularAllocator::SegmentIterator CircularAllocator::head()
+std::size_t CircularAllocator::offset_from_segment(const Segment *segment) const
 {
-    return at(mHead);
-}
-
-CircularAllocator::SegmentIterator CircularAllocator::tail()
-{
-    return at(mTail);
-}
-
-CircularAllocator::SegmentIterator CircularAllocator::begin()
-{
-    return at(0);
-}
-
-CircularAllocator::SegmentIterator CircularAllocator::end()
-{
-    return at(mMemory.size());
+    return reinterpret_cast<std::size_t>(segment) -
+        reinterpret_cast<std::size_t>(mMemory.base_address());
 }
 
 CircularAllocator::SegmentIterator CircularAllocator::at(
@@ -156,9 +150,9 @@ void CircularAllocator::head_increment(const std::size_t offset)
     mHead %= mMemory.size();
 }
 
-void CircularAllocator::tail_increment(const std::size_t offset)
+void CircularAllocator::set_tail(const std::size_t offset)
 {
-    mTail += offset;
+    mTail = offset;
     mTail %= mMemory.size();
 }
 
@@ -188,39 +182,30 @@ void * CircularAllocator::allocate(const std::size_t size)
     // segment may be the end of managed memory or head. if head == tail and
     // the buffer is full, this automatically fails because the tail segment
     // overlapping with the head is marked used.
-    if(Segment *tail = as_segment(mTail); tail->can_allocate(size))
+    Segment *tail = as_segment(mTail);
+    if(!tail->can_allocate(size))
     {
-        // calculate the free space left in the tail segment after allocation.
-        const std::size_t leftover = tail->do_allocate(size);
-        // move the tail. it may wrap to the beginning. if that happens,
-        // doesn't matter whether head == 0 or not, there is always a segment
-        // at the beginning, so no segment init is needed.
-        tail_increment(tail->length);
-        // if there is space left, create a free segment there to maintain
-        // the linked list.
-        if(mTail != 0 && mTail != mHead) init_free_segment(mTail, leftover);
-        return tail->payload();
+        // if tail < head, the allocation fails because the previous attempt
+        // shows no space left. if head == tail and there was enough space, the
+        // tail allocation should have succeeded. so it's only possible to
+        // continue with head < tail. if there is no space before head, also
+        // fail.
+        if(mTail <= mHead) USAGI_THROW(std::bad_alloc());
+        // B.
+        tail = as_segment(0);
+        // if there is space before head, there must be a free segment.
+        assert(tail->freed);
+        // there should only be at most one free segment before the head.
+        assert(tail->length == mHead);
+        if(!tail->can_allocate(size)) USAGI_THROW(std::bad_alloc());
     }
-    // if tail < head, the allocation fails because the previous attempt shows
-    // no space left. if head == tail and there was enough space, the tail
-    // allocation should have succeeded. so it's only possible to continue
-    // with head < tail. if there is no space before head, also fail.
-    USAGI_ASSERT_THROW(mHead < mTail && mHead > 0, std::bad_alloc());
-    Segment *front = as_segment(0);
-    // if there is space before head, there must be a free segment.
-    assert(front->freed);
-    // there should only be at most one free segment before the head.
-    assert(front->length == mHead);
-    if(front->can_allocate(size))
-    {
-        const std::size_t leftover = front->do_allocate(size);
-        mTail = front->length;
-        if(leftover) init_free_segment(mTail, leftover);
-        return front->payload();
-    }
-    USAGI_THROW(std::bad_alloc());
-
-    // bug is it possible that head == tail and head is free but there is still allocation left?
+    // calculate the free space left in the tail segment after allocation.
+    const std::size_t leftover = tail->do_allocate(size);
+    set_tail(offset_from_segment(tail) + tail->length);
+    // if there is space left, create a free segment there to maintain
+    // the linked list.
+    if(leftover) init_free_segment(mTail, leftover);
+    return tail->payload();
 }
 
 void CircularAllocator::deallocate(void *ptr)
@@ -238,7 +223,7 @@ void CircularAllocator::deallocate(void *ptr)
     // merge free segments until tail is met.
     // if the stop was due to C., return,
 
-    SegmentIterator it(this, from_payload(ptr));
+    SegmentIterator it(this, segment_from_payload(ptr));
     assert(it != end());
     // free the requested segment.
     assert(it->freed == false);

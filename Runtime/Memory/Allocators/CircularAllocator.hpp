@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <Usagi/Library/Memory/Arithmetic.hpp>
 #include <Usagi/Library/Memory/Noncopyable.hpp>
 #include <Usagi/Runtime/Memory/View.hpp>
 
@@ -30,12 +29,11 @@ protected:
         // length of current segment. the size of allocatable memory is 8 bytes
         // less (due to overhead of this header).
         std::size_t length : 63 = 0;
-
-        void * payload();
-
+        
         bool can_allocate(std::size_t size) const;
         // return the free space of next segment
         std::size_t do_allocate(std::size_t size);
+        void * payload();
     };
 
     class SegmentIterator
@@ -63,22 +61,20 @@ protected:
     std::size_t mHead = 0;
     std::size_t mTail = 0;
 
-    // ReSharper disable once CppMemberFunctionMayBeConst
-    Segment * as_segment(const std::size_t offset)
-    {
-        return raw_advance(mMemory.as_mutable<Segment>(), offset);
-    }
+    Segment * as_segment(std::size_t offset);
+    Segment * segment_from_payload(void *ptr);
+    std::size_t offset_from_segment(const Segment *segment) const;
 
-    Segment * from_payload(void *ptr);
-
-    SegmentIterator head(); // head segment
-    SegmentIterator tail(); // tail segment
-    SegmentIterator begin(); // first segment (sequentially in the memory)
-    SegmentIterator end(); // last segment
+    SegmentIterator head() { return at(mHead); }
+    SegmentIterator tail() { return at(mTail); }
+    // first segment (sequentially in the memory)
+    SegmentIterator begin() { return at(0); }
+    // last segment
+    SegmentIterator end() { return at(mMemory.size()); }
     SegmentIterator at(std::size_t offset);
 
     void head_increment(std::size_t offset);
-    void tail_increment(std::size_t offset);
+    void set_tail(std::size_t offset);
 
     bool allocated_by_us(void *ptr) const;
 
@@ -93,6 +89,7 @@ public:
     void * allocate(std::size_t size);
     void deallocate(void *ptr);
 
+protected:
     // validate that the segments can be traversed as a linked list that
     // covers all the managed memory.
     bool check_integrity();
