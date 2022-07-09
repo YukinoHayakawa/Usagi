@@ -7,14 +7,20 @@
 
 namespace usagi
 {
+namespace details
+{
+template <typename T>
+concept StringViewConvertible = requires(T t)
+{
+    { to_string_view(t) } -> std::same_as<std::string_view>;
+};
+}
+
 /**
  * \brief Obtain a string view to the underlying memory of the specified value.
  */
 template <typename T>
-std::string_view to_byte_view(T &&val)
-{
-    return to_string_view(val);
-}
+std::string_view to_byte_view(T val);
 
 template <Arithmetic T>
 std::string_view to_byte_view(T &&val)
@@ -29,6 +35,12 @@ template <StringView T>
 std::string_view to_byte_view(T &&val)
 {
     return std::string_view(val);
+}
+
+template <details::StringViewConvertible T>
+std::string_view to_byte_view(T &&val)
+{
+    return to_string_view(val);
 }
 
 template <Enum T>
