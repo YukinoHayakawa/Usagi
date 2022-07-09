@@ -52,20 +52,20 @@ using ApplyIfNotVoidT = typename ConditionalApply<
 >::type;
 
 template <typename T>
-struct ExtractFirstTemplateParameter;
+struct ExtractFirstTemplateArgument;
 
 template <
     template <typename...> typename T,
     typename First,
     typename... Args
 >
-struct ExtractFirstTemplateParameter<T<First, Args...>>
+struct ExtractFirstTemplateArgument<T<First, Args...>>
 {
     using type = First;
 };
 
 template <typename T>
-struct ExtractSecondTemplateParameter;
+struct ExtractSecondTemplateArgument;
 
 template <
     template <typename...> typename T,
@@ -73,8 +73,23 @@ template <
     typename Second,
     typename... Args
 >
-struct ExtractSecondTemplateParameter<T<First, Second, Args...>>
+struct ExtractSecondTemplateArgument<T<First, Second, Args...>>
 {
     using type = Second;
 };
 }
+
+
+/*
+#define USAGI_TARG_EXPAND_TO_TYPES(...) __VA_ARGS__
+#define USAGI_TARG_EXPAND_TO_TYPENAMES(...) __VA_ARGS__
+
+#define USAGI_APPEND_CONSTRAINTS(base_type, member_func, constraints, ...) \
+    template <typename... Args, __VA_ARGS__> \
+    decltype(auto) member_func(Args &&... args) requires (constraints) \
+    { \
+        return base_type::member_func<__VA_ARGS__>( \
+            std::forward<Args>(args)... \
+        ); \
+    } \
+/*#1#*/

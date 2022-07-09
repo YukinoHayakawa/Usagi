@@ -99,6 +99,26 @@ public:
     {
         return static_cast<const char *>(mBaseAddress);
     }
+
+    template <typename ElemT>
+    const ElemT * as() const
+    {
+        return static_cast<const ElemT *>(mBaseAddress);
+    }
+
+    template <typename ElemT>
+    ElemT * as_mutable() const requires (IsMutable())
+    {
+        return static_cast<ElemT *>(mutable_base_address());
+    }
+
+    bool contains(void *ptr) const
+    {
+        return ptr >= begin() && ptr < end();
+    }
+
+    const void * begin() const { return base_address(); }
+    const void * end() const { return as_chars() + size(); }
 };
 
 using MemoryView = MemoryViewBase<MemoryViewMutability::MUTABLE>;

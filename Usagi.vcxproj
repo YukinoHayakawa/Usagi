@@ -82,6 +82,7 @@
     <ClInclude Include="Library\Algorithm\Container.hpp" />
     <ClInclude Include="Library\Container\FixedCapacityString.hpp" />
     <ClInclude Include="Library\Graph\HeterogeneousGraph.hpp" />
+    <ClInclude Include="Library\Memory\Arithmetic.hpp" />
     <ClInclude Include="Library\Memory\Nonmovable.hpp" />
     <ClInclude Include="Library\Memory\Size.hpp" />
     <ClInclude Include="Library\Memory\MemoryArena.hpp" />
@@ -102,11 +103,13 @@
     <ClInclude Include="Library\Utilities\Pointer.hpp" />
     <ClInclude Include="Library\Meta\StringLiteral.hpp" />
     <ClInclude Include="Library\Utilities\String.hpp" />
-    <ClInclude Include="Library\Utilities\StringView.hpp" />
+    <ClInclude Include="Library\Utilities\ByteView.hpp" />
     <ClInclude Include="Library\Utilities\TransparentlyComparable.hpp" />
     <ClInclude Include="Library\Utilities\Variant.hpp" />
     <ClInclude Include="Runtime\Exceptions\ExceptionHeaderCorruption.hpp" />
     <ClInclude Include="Runtime\File\FilesystemWatcher.hpp" />
+    <ClInclude Include="Runtime\Memory\Allocators\BitmapAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\Allocators\CircularAllocator.hpp" />
     <ClInclude Include="Runtime\Memory\PagedStorage.hpp" />
     <ClInclude Include="Executor\detail\SystemAccessTraits.hpp" />
     <ClInclude Include="Concepts\Container\Stack.hpp" />
@@ -188,6 +191,8 @@
     <ClCompile Include="Runtime\Encoding\Unicode.cpp" />
     <ClCompile Include="Runtime\File\MappedFileView.cpp" />
     <ClCompile Include="Runtime\File\RegularFile.cpp" />
+    <ClCompile Include="Runtime\Memory\Allocators\BitmapAllocator.cpp" />
+    <ClCompile Include="Runtime\Memory\Allocators\CircularAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp" />
     <ClCompile Include="Runtime\Memory\VmAllocatorFileBacked.cpp" />
     <ClCompile Include="Runtime\Task\TaskExecutor.cpp" />

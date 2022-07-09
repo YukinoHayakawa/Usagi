@@ -10,10 +10,11 @@ class ReturnValue
 {
 protected:
     ErrorCodeT mCode;
+    // use std::optional to wrap the value when necessary as in usual cases.
     ValueT mValue;
 
 public:
-    ReturnValue(ErrorCodeT code, ValueT value)
+    ReturnValue(ErrorCodeT code, ValueT value = { })
         : mCode(std::move(code))
         , mValue(std::move(value))
     {
@@ -31,7 +32,7 @@ public:
     }
 
     ErrorCodeT code() const { return mCode; }
-    ValueT & value() { return mValue; }
+    const ValueT & value() { return mValue; }
 };
 }
 
