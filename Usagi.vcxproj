@@ -100,6 +100,7 @@
     <ClInclude Include="Library\Meta\Template.hpp" />
     <ClInclude Include="Library\Utilities\Functional.hpp" />
     <ClInclude Include="Library\Meta\NamedArgument.hpp" />
+    <ClInclude Include="Library\Utilities\MaybeOwnedString.hpp" />
     <ClInclude Include="Library\Utilities\Pointer.hpp" />
     <ClInclude Include="Library\Meta\StringLiteral.hpp" />
     <ClInclude Include="Library\Utilities\String.hpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="Runtime\Service\Service.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Library\Utilities\MaybeOwnedString.cpp" />
     <ClCompile Include="Runtime\Encoding\Unicode.cpp" />
     <ClCompile Include="Runtime\File\MappedFileView.cpp" />
     <ClCompile Include="Runtime\File\RegularFile.cpp" />

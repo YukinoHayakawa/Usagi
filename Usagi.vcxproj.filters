@@ -351,6 +351,9 @@
     <ClInclude Include="Library\Memory\Arithmetic.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Library\Utilities\MaybeOwnedString.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\File\RegularFile.cpp">
@@ -375,6 +378,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Memory\Allocators\CircularAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Utilities\MaybeOwnedString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
