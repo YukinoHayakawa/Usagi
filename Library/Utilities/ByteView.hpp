@@ -23,7 +23,7 @@ template <typename T>
 std::string_view to_byte_view(T val);
 
 template <Arithmetic T>
-std::string_view to_byte_view(T &&val)
+std::string_view to_byte_view(const T &val)
 {
     return {
         reinterpret_cast<const char *>(&val),
@@ -32,19 +32,19 @@ std::string_view to_byte_view(T &&val)
 }
 
 template <StringView T>
-std::string_view to_byte_view(T &&val)
+std::string_view to_byte_view(const T &val)
 {
     return std::string_view(val);
 }
 
 template <details::StringViewConvertible T>
-std::string_view to_byte_view(T &&val)
+std::string_view to_byte_view(const T &val)
 {
     return to_string_view(val);
 }
 
 template <Enum T>
-std::string_view to_byte_view(T &&val)
+std::string_view to_byte_view(const T &val)
 {
     using UnderlyingT = std::underlying_type_t<std::remove_cvref_t<T>>;
     return to_byte_view(static_cast<UnderlyingT>(val));
