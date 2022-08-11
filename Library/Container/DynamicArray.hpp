@@ -7,18 +7,21 @@
 #include <Usagi/Concepts/Allocator/ReallocatableAllocator.hpp>
 #include <Usagi/Concepts/Type/Memcpyable.hpp>
 #include <Usagi/Library/Memory/Alignment.hpp>
+#include <Usagi/Library/Memory/Arithmetic.hpp>
 #include <Usagi/Runtime/ErrorHandling.hpp>
 #include <Usagi/Runtime/Exceptions/ExceptionHeaderCorruption.hpp>
 
 namespace usagi
 {
 /**
- * \brief  A dynamic array that grows proportionally to system page size. It is
- * supposed to be used with memcpyable objects that are far smaller than
+ * \brief A dynamic array that allocates by a multiple of system page size.
+ * It is supposed to be used with memcpy-able objects that are far smaller than
  * the page size. Metadata of the allocator is stored in the first page
- * of the allocation. Reallocation may change the base address.
+ * of the allocation. Reallocation may result in base address changes. 
+ * A stack of headers is maintained to record the structure of internally
+ * stored data. Derived classes can use it to store additional data.
  * \tparam T The element type.
- * \tparam Allocator
+ * \tparam Allocator Allocator type.
  */
 template <
     Memcpyable T,
@@ -27,7 +30,7 @@ template <
 class DynamicArray
 {
 public:
-    // types
+    // traits
 
     using value_type = T;
     using allocator_type = Allocator;
@@ -38,29 +41,36 @@ public:
 protected:
     Allocator mAllocator;
 
-    // dynamic array
-    constexpr static std::uint16_t MAGIC_CHECK = 0xDA01;
-    constexpr static std::uint16_t MAX_HEADER_DEPTH = 4;
+    using HeaderMagicT = std::uint64_t;
+
+    // rabbit (usagi) engine .... dynamic array version 1
+    constexpr static HeaderMagicT MAGIC_CHECK = 0xABBE'F5A9B8FF'DA01;
+    constexpr static std::uint64_t MAX_HEADER_SIZE = 256; // 256 bytes
+    constexpr static std::uint64_t ALLOCATION_SIZE = 0x10000; // 64 KiB
 
     // the rest space in the header could be used by derived classes
     // to store associated info.
-    struct Meta
+    struct Header
     {
-        // this can be used by derived classes to insert more header checks
-        std::uint16_t header_check[MAX_HEADER_DEPTH] = { };
-        std::uint64_t size = 0;
+        std::uint64_t storage_offset = 0;
         std::uint64_t capacity = 0;
+        std::uint64_t size = 0;
     };
-    static_assert(sizeof(Meta) == 24);
+    static_assert(sizeof(Header) < MAX_HEADER_SIZE);
 
-    Meta *mBase = nullptr;
-    T *mStorage = nullptr;
+    // Metadata and storage are stored in same chunk of allocation.
+    void *mStorage = nullptr;
+    // Cached for faster access. value may change after reallocation.
+    T *mElements = nullptr;
 
     // assert(mBase + page_size() == mStorage);
 
-    constexpr static std::uint64_t MAX_HEADER_SIZE = 64; // 64 bytes
-    constexpr static std::uint64_t ALLOCATION_SIZE = 0x10000; // 64 KiB
-    constexpr static std::uint64_t EXTRA_HEADER_BEGIN = 0;
+    template <typename HeaderT = Header>
+    HeaderT * header(std::size_t offset = sizeof(HeaderMagicT)) const
+    {
+        assert(storage_initialized());
+        return raw_advance_cast<HeaderT>(mStorage, offset);
+    }
 
     void check_boundary_access(size_type n) const
     {
@@ -69,46 +79,58 @@ protected:
 
     bool storage_initialized() const
     {
-        return mBase != nullptr;
+        return mStorage != nullptr;
     }
 
-    std::uint8_t mHeaderIndex = 0;
-    std::uint8_t mHeaderOffset = 0;
+    // std::uint8_t mHeaderDepth = 0;
+    std::uint8_t mCommittedHeaderOffset = 0;
 
-    // push header stack and restore existing data from mapped memory
-    template <std::uint16_t Magic, typename Header>
-    void push_header(Header &header, const bool restore)
+    /**
+     * \brief Initialize or restore header from allocated storage.
+     * \tparam Magic Magic number.
+     * \tparam Header Header type.
+     * \return <offset to header, initialized>
+     */
+    template <HeaderMagicT Magic, typename Header>
+    std::pair<std::size_t, bool> init_or_restore_header()
     {
-        assert(mHeaderIndex < MAX_HEADER_DEPTH);
-        assert(mHeaderOffset + sizeof(Header) <= MAX_HEADER_SIZE);
-        if(restore)
-        {
-            assert(storage_initialized());
-            if(mBase->header_check[mHeaderIndex] != Magic)
-                USAGI_THROW(ExceptionHeaderCorruption("Corrupted header."));
-            header = *reinterpret_cast<Header*>(
-                reinterpret_cast<char*>(mBase) + mHeaderOffset
-            );
-        }
-        ++mHeaderIndex;
-        mHeaderOffset += sizeof(Header);
-    }
+        constexpr auto header_size_with_magic =
+            sizeof(HeaderMagicT) + sizeof(Header);
 
-    // pop header stack and store data to mapped memory
-    template <std::uint16_t Magic, typename Header>
-    void pop_header(Header &header, const bool save)
-    {
-        assert(mHeaderIndex > 0);
-        assert(mHeaderOffset >= sizeof(Header));
-        --mHeaderIndex;
-        mHeaderOffset -= sizeof(Header);
-        if(save && storage_initialized())
+        // make sure not overwriting element payload
+        assert(mCommittedHeaderOffset + header_size_with_magic <= MAX_HEADER_SIZE);
+
+        HeaderMagicT *magic_probe = raw_advance_cast<HeaderMagicT>(
+            mStorage,
+            mCommittedHeaderOffset
+        );
+        const auto header_payload_offset =
+            mCommittedHeaderOffset + sizeof(HeaderMagicT);
+        Header *header_probe = raw_advance_cast<Header>(
+            mStorage,
+            header_payload_offset
+        );
+
+        bool initialized;
+        // header magic matches, return the header
+        if(*magic_probe == Magic)
         {
-            mBase->header_check[mHeaderIndex] = Magic;
-            *reinterpret_cast<Header*>(
-                reinterpret_cast<char*>(mBase) + mHeaderOffset
-            ) = header;
+            initialized = false;
         }
+        // zeroed storage, init header
+        else if(*magic_probe == 0)
+        {
+            *magic_probe = Magic;
+            *header_probe = Header { };
+            initialized = true;
+        }
+        // magic unmatch, throw.
+        else
+        {
+            USAGI_THROW(ExceptionHeaderCorruption("Corrupted header."));
+        }
+        mCommittedHeaderOffset += header_size_with_magic;
+        return { header_payload_offset, initialized };
     }
 
 public:
@@ -120,8 +142,8 @@ public:
 
     DynamicArray(DynamicArray &&other) noexcept
         : mAllocator { std::move(other.mAllocator) }
-        , mBase { other.mBase }
         , mStorage { other.mStorage }
+        , mElements { other.mElements }
     {
         other.release();
     }
@@ -133,36 +155,35 @@ public:
         if(this == &other)
             return *this;
         mAllocator = std::move(other.mAllocator);
-        mBase = other.mBase;
         mStorage = other.mStorage;
+        mElements = other.mElements;
         other.release();
         return *this;
     }
 
-    explicit DynamicArray(Allocator allocator) noexcept
+    explicit DynamicArray(Allocator allocator)
         : mAllocator(std::move(allocator))
     {
+        // allocate header
+        const auto alloc_size = calc_allocation_size(0);
+        mStorage = mAllocator.reallocate(nullptr, calc_allocation_size(0));
+        // if this is a newly created container, initialize the header
+        if(auto [header_offset, newly_initialized] =
+            init_or_restore_header<MAGIC_CHECK, Header>(); newly_initialized)
+        {
+            header()->storage_offset = MAX_HEADER_SIZE;
+            update_capacity(alloc_size);
+        }
+        update_elem_array_ptr();
     }
 
     // Move assignment & copy operations implicitly deleted.
 
     ~DynamicArray()
     {
-        if(mBase) pop_header<MAGIC_CHECK>(*mBase, false);
-        // unlink the metadata so it doesn't get cleared by clear()
-        mBase = nullptr;
-        if(mStorage) clear();
-        mStorage = nullptr;
+        release();
     }
 
-    /*
-    Allocator & allocator()
-    {
-        return mAllocator;
-    }
-    */
-
-    // capacity
     [[nodiscard]] bool empty() const noexcept
     {
         return size() == 0;
@@ -170,8 +191,7 @@ public:
 
     size_type size() const noexcept
     {
-        if(!mBase) return 0;
-        return mBase->size;
+        return header()->size;
     }
 
     size_type max_size() const noexcept
@@ -181,8 +201,7 @@ public:
 
     size_type capacity() const noexcept
     {
-        if(!mBase) return 0;
-        return mBase->capacity;
+        return header()->capacity;
     }
 
     void shrink_to_fit()
@@ -194,25 +213,25 @@ public:
     reference operator[](size_type n)
     {
         check_boundary_access(n);
-        return mStorage[n];
+        return mElements[n];
     }
 
     const_reference operator[](size_type n) const
     {
         check_boundary_access(n);
-        return mStorage[n];
+        return mElements[n];
     }
 
     const_reference at(size_type n) const
     {
         check_boundary_access(n);
-        return mStorage[n];
+        return mElements[n];
     }
 
     reference at(size_type n)
     {
         check_boundary_access(n);
-        return mStorage[n];
+        return mElements[n];
     }
 
     reference front()
@@ -240,12 +259,12 @@ public:
     // data access
     T * data() noexcept
     {
-        return mStorage;
+        return mElements;
     }
 
     const T * data() const noexcept
     {
-        return mStorage;
+        return mElements;
     }
 
     // modifiers
@@ -269,7 +288,7 @@ public:
     void pop_back()
     {
         std::allocator_traits<Allocator>::destroy(mAllocator, &back());
-        --mBase->size;
+        --header()->size;
     }
 
     void clear() noexcept
@@ -277,67 +296,69 @@ public:
         // if the storage is not initialized, size() would equal 0 and this
         // loop won't run anyway
         for(std::size_t i = 0; i < size(); ++i)
-            std::allocator_traits<Allocator>::destroy(mAllocator, &mStorage[i]);
-        if(mBase) mBase->size = 0;
+            std::allocator_traits<Allocator>::destroy(mAllocator, &mElements[i]);
+        header()->size = 0;
     }
 
 private:
     template <class... Args>
     reference emplace_back_reallocate(Args &&... args)
     {
-        // strong exception guarantee (hopefully)
-
         const auto new_size = size() + 1;
         if(capacity() < new_size)
             reallocate_storage(new_size); // potentially throws
 
-        T *storage = &mStorage[size()];
+        T *storage = &mElements[size()];
         std::allocator_traits<Allocator>::construct(
             mAllocator, storage, std::forward<Args>(args)...
         );
 
         // work is done. update bookkeeping data
-        ++mBase->size;
+        ++header()->size;
 
         return *storage;
     }
 
     void reallocate_storage(const std::size_t size)
     {
-        // strong exception guarantee
-
-        const auto storage_size = sizeof(T) * size;
-        const auto alloc_size = align_up(
-            MAX_HEADER_SIZE + storage_size, ALLOCATION_SIZE
-        );
-
+        const std::size_t alloc_size = calc_allocation_size(size);
         // If the new capacity is smaller than the size, it is assumed that
         // the objects on the freed region are already correctly destructed.
-        const auto new_storage = mAllocator.reallocate(mBase, alloc_size);
-        rebase(new_storage, !storage_initialized());
-        // the reminder part not making up an object is dropped
-        mBase->capacity = (alloc_size - MAX_HEADER_SIZE) / sizeof(T);
+        mStorage = mAllocator.reallocate(mStorage, alloc_size);
+        update_capacity(alloc_size);
+        update_elem_array_ptr();
     }
 
     void release()
     {
         mStorage = nullptr;
-        mBase = nullptr;
+        mElements = nullptr;
     }
 
 protected:
-    void rebase(void *base_address, const bool init_meta)
+    static std::size_t calc_allocation_size(const std::size_t num_elems)
     {
-        const bool first_alloc = !storage_initialized();
-
-        mBase = static_cast<Meta*>(base_address);
-        mStorage = reinterpret_cast<T*>(
-            static_cast<char*>(base_address) + MAX_HEADER_SIZE
+        const auto storage_size = sizeof(T) * num_elems;
+        const auto alloc_size = align_up(
+            MAX_HEADER_SIZE + storage_size,
+            ALLOCATION_SIZE
         );
+        return alloc_size;
+    }
 
-        if(init_meta) *mBase = Meta { };
-        // if this is first allocation, initialize the header
-        if(first_alloc) push_header<MAGIC_CHECK>(*mBase, false);
+    void update_capacity(const std::size_t alloc_size)
+    {
+        assert(storage_initialized());
+        // the reminder part not making up an object is dropped
+        header()->capacity = (alloc_size - MAX_HEADER_SIZE) / sizeof(T);
+    }
+
+    void update_elem_array_ptr()
+    {
+        assert(storage_initialized());
+        // read offset from header to be compatible with configurable header
+        // sizes.
+        mElements = raw_advance_cast<T>(mStorage, header()->storage_offset);
     }
 };
 }

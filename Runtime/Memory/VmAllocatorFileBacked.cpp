@@ -66,6 +66,9 @@ void * VmAllocatorFileBacked::allocate(std::size_t size)
         FileOpenMode(OPEN_READ | OPEN_WRITE),
         FileOpenOptions(OPTION_CREATE_IF_MISSING)
     };
+    // if the file already exist, always use the full file.
+    // todo: is this necessary?
+    if(file.size() > 0) size = MappedFileView::USE_FILE_SIZE;
 
     mMapping = file.create_view(0, size, 0);
 
