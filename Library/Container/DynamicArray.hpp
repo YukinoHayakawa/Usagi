@@ -38,6 +38,8 @@ public:
     using const_reference = const value_type &;
     using size_type = std::size_t;
 
+    using AllocatorT = Allocator;
+
 protected:
     Allocator mAllocator;
 
@@ -162,8 +164,14 @@ public:
     }
 
     explicit DynamicArray(Allocator allocator)
-        : mAllocator(std::move(allocator))
     {
+        init(std::move(allocator));
+    }
+
+    void init(Allocator allocator)
+    {
+        assert(!storage_initialized());
+        mAllocator = std::move(allocator);
         // allocate header
         const auto alloc_size = calc_allocation_size(0);
         mStorage = mAllocator.reallocate(nullptr, calc_allocation_size(0));

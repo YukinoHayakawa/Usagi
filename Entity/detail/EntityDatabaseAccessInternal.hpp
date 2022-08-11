@@ -22,7 +22,7 @@ protected:
 
     auto entity_page_begin() const
     {
-        return entity_page_at_index(mDatabase->mMeta.first_entity_page_idx);
+        return entity_page_at_index(mDatabase->header().first_entity_page_idx);
     }
 
     auto entity_page_end() const

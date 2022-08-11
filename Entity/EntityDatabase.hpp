@@ -115,6 +115,7 @@ public:
     constexpr static std::size_t ENTITY_PAGE_SIZE = EntityPageT::PAGE_SIZE;
 
 protected:
+    // default metadata storage. may be overriden.
     struct Meta
     {
         // Count the allocation of Entity Pages
@@ -122,7 +123,16 @@ protected:
         // A linked list of entities is maintained in the order of allocation
         std::uint64_t first_entity_page_idx = EntityPageT::INVALID_PAGE;
         std::uint64_t last_entity_page_idx = EntityPageT::INVALID_PAGE;
-    } mMeta;
+    } mDefaultMeta;
+
+    // todo perf. better solution? use traits?
+    // enable the metadata to be stored in memory mapped area so it doesn't
+    // have to be manually saved
+    virtual Meta & header()
+    {
+        return mDefaultMeta;
+    }
+
     std::mutex mEntityPageAllocationLock;
 
     EntityPageStorageT & entity_pages()
@@ -154,30 +164,30 @@ protected:
 
         std::unique_lock lock(mEntityPageAllocationLock);
 
-        page.page_seq_id = mMeta.entity_seq_id;
+        page.page_seq_id = header().entity_seq_id;
 
         // Insert the new page at the end of linked list so that the
         // entities are accessed in the incremental order of entity id
         // when being iterated
 
         // The linked list is empty and we are inserting the first page
-        if(mMeta.first_entity_page_idx == EntityPageT::INVALID_PAGE)
+        if(header().first_entity_page_idx == EntityPageT::INVALID_PAGE)
         {
-            assert(mMeta.last_entity_page_idx == EntityPageT::INVALID_PAGE);
-            mMeta.first_entity_page_idx = page_idx;
-            mMeta.last_entity_page_idx = page_idx;
+            assert(header().last_entity_page_idx == EntityPageT::INVALID_PAGE);
+            header().first_entity_page_idx = page_idx;
+            header().last_entity_page_idx = page_idx;
         }
         // The linked list has at least one page
         else
         {
-            assert(mMeta.last_entity_page_idx != EntityPageT::INVALID_PAGE);
-            auto &last = entity_pages().at(mMeta.last_entity_page_idx);
+            assert(header().last_entity_page_idx != EntityPageT::INVALID_PAGE);
+            auto &last = entity_pages().at(header().last_entity_page_idx);
             assert(last.next_page == EntityPageT::INVALID_PAGE);
             last.next_page = page_idx;
-            mMeta.last_entity_page_idx = page_idx;
+            header().last_entity_page_idx = page_idx;
         }
 
-        ++mMeta.entity_seq_id;
+        ++header().entity_seq_id;
 
         return EntityPageInfo {
             .index = page_idx,
@@ -270,6 +280,7 @@ protected:
 
 public:
     EntityDatabase() = default;
+    virtual ~EntityDatabase() = default;
 
     template <typename ComponentAccess>
     auto create_access()
@@ -363,8 +374,8 @@ public:
      */
     void reclaim_pages()
     {
-        std::size_t cur = mMeta.first_entity_page_idx;
-        std::size_t *prev_next_ptr = &mMeta.first_entity_page_idx;
+        std::size_t cur = header().first_entity_page_idx;
+        std::size_t *prev_next_ptr = &header().first_entity_page_idx;
         std::size_t prev = EntityPageT::INVALID_PAGE;
 
         while(cur != EntityPageT::INVALID_PAGE)
@@ -383,11 +394,11 @@ public:
                 // because page.next_page would have that value.
                 *prev_next_ptr = page.next_page;
                 // this is the last page
-                if(cur == mMeta.last_entity_page_idx)
+                if(cur == header().last_entity_page_idx)
                 {
                     assert(page.next_page == EntityPageT::INVALID_PAGE);
                     // if this was the only page, the list becomes empty
-                    mMeta.last_entity_page_idx = prev;
+                    header().last_entity_page_idx = prev;
                 }
                 // clear the id range so it doesn't get accidentally
                 // recognized as a valid page

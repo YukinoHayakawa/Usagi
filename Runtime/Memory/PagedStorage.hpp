@@ -9,7 +9,7 @@
 
 namespace usagi
 {
-namespace detail::paged_storage
+namespace details::paged_storage
 {
 template <typename T>
 using PagefileBackedArray = DynamicArray<
@@ -28,13 +28,13 @@ using FileBackedArray = DynamicArray<
  * \brief Storage for Entity Pages and Components that only to be preserved
  * during runtime. Memory space is allocated via reserving and committing
  * virtual memory.
- * \tparam T
+ * \tparam T Element type.
  */
 template <Memcpyable T>
 class PagedStorageInMemory
-    : public PoolAllocator<T, detail::paged_storage::PagefileBackedArray>
+    : public PoolAllocator<T, details::paged_storage::PagefileBackedArray>
 {
-    using PoolT = PoolAllocator<T, detail::paged_storage::PagefileBackedArray>;
+    using PoolT = PoolAllocator<T, details::paged_storage::PagefileBackedArray>;
     using StorageT = typename PoolT::StorageT;
 
 public:
@@ -45,19 +45,31 @@ public:
 
 /**
  * \brief File-backed storage for Entity Pages and Components.
- * \tparam T
+ * \tparam T Element type.
  */
 template <Memcpyable T>
 class PagedStorageFileBacked
-    : public PoolAllocator<T, detail::paged_storage::FileBackedArray>
+    : public PoolAllocator<T, details::paged_storage::FileBackedArray>
 {
 protected:
-    using PoolT = PoolAllocator<T, detail::paged_storage::FileBackedArray>;
+    using PoolT = PoolAllocator<T, details::paged_storage::FileBackedArray>;
     using StorageT = typename PoolT::StorageT;
+    using AllocatorT = typename StorageT::AllocatorT;
 
     // file-backed allocator
-    constexpr static std::uint16_t MAGIC_CHECK = 0xFA01;
-    bool mHeaderInitialized = false;
+    constexpr static std::uint64_t MAGIC_CHECK = 0xABBE'5BCEFAFF'FA01;
+
+    std::uint64_t mHeaderOffset = -1;
+
+    struct Header
+    {
+        std::uint64_t head = details::pool::INVALID_BLOCK;
+    };
+
+    std::uint64_t & free_list_head() override
+    {
+        return StorageT::template header<Header>(mHeaderOffset)->head;
+    }
 
 public:
     PagedStorageFileBacked() = default;
@@ -69,37 +81,15 @@ public:
 
     // todo automatically save database header when an operation is committed
     // return true if it is restoring from existing file
-    bool init(std::filesystem::path mapped_file)
+    void init(std::filesystem::path mapped_file)
     {
         // prepare memory-mapped allocator.
-        StorageT::mAllocator.set_backing_file(std::move(mapped_file));
-
-        // if there is already a file, restore metadata
-        const bool file_exists = exists(StorageT::mAllocator.path());
-        if(file_exists)
-        {
-            // hopefully the file is not 0-sized or mapping may fail.
-            StorageT::rebase(
-                StorageT::mAllocator.allocate(MappedFileView::USE_FILE_SIZE),
-                false
-            );
-        }
-        StorageT::template push_header<MAGIC_CHECK>(PoolT::mMeta, file_exists);
-        mHeaderInitialized = true;
-
-        // otherwise it's a new file. initialization will be handled by the
-        // dynamic array. no extra action is needed.
-        return file_exists;
-    }
-
-    ~PagedStorageFileBacked()
-    {
-        // save metadata to the header
-        if(mHeaderInitialized)
-        {
-            StorageT::template pop_header<MAGIC_CHECK>(PoolT::mMeta, true);
-        }
-        // file mapping automatically flushed by base destructor
+        AllocatorT alloc;
+        alloc.set_backing_file(std::move(mapped_file));
+        StorageT::init(std::move(alloc));
+        std::tie(mHeaderOffset, std::ignore) =
+            StorageT::template init_or_restore_header<
+                MAGIC_CHECK, Header>();
     }
 };
 }

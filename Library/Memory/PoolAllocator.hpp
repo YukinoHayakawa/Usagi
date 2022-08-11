@@ -6,7 +6,7 @@
 
 namespace usagi
 {
-namespace detail::pool_alloc
+namespace details::pool
 {
 constexpr static std::size_t INVALID_BLOCK = -1;
 
@@ -34,41 +34,37 @@ union Block
  * memory.
  *
  * TODO: lock-free
- * todo: dump & load from file
- * todo: allow using memory-mapped file in place of the vector storage
- * \tparam T
- * \tparam Container
+ * \tparam T Element type.
+ * \tparam Container Underlying container.
  */
 template <
     typename T,
     template <typename Elem, typename...> typename Container
 >
-class PoolAllocator
-    : protected Container<detail::pool_alloc::Block<T>>
+class PoolAllocator : protected Container<details::pool::Block<T>>
 {
+    // A list that reuses the memory of the block to store link information.
+    std::uint64_t mFreeListHead = INVALID_BLOCK;
 
 protected:
-    constexpr static std::size_t INVALID_BLOCK =
-        detail::pool_alloc::INVALID_BLOCK;
+    constexpr static std::size_t INVALID_BLOCK = details::pool::INVALID_BLOCK;
 
-    using Block = detail::pool_alloc::Block<T>;
+    using Block = details::pool::Block<T>;
 
 public:
     using StorageT = Container<Block>;
 
 protected:
-    // Pool allocator cannot rely on that the underlying container provides
-    // extra header space. So the metadata has to be explicitly synced.
-    struct Meta
-    {
-        // A list that reuses the memory of the block to store link information.
-        std::uint64_t free_list_head = INVALID_BLOCK;
-    } mMeta;
 
     // todo lock free algorithm?
+    // todo use lock state to detect data inconsistency caused by crash etc.
     std::mutex mMutex;
 
-    auto & free_list_head() { return mMeta.free_list_head; }
+    // override if the value should be stored somewhere else
+    virtual std::uint64_t & free_list_head()
+    {
+        return mFreeListHead;
+    }
 
     Block & block(const std::size_t index)
     {
@@ -96,7 +92,7 @@ public:
 
     PoolAllocator(PoolAllocator &&other) noexcept
         : StorageT { std::move(other) }
-        , mMeta { other.mMeta }
+        , mFreeListHead { other.mFreeListHead }
         , mMutex { std::move(other.mMutex) }
     {
         other.release();
@@ -109,11 +105,14 @@ public:
         if(this == &other)
             return *this;
         StorageT::operator=(std::move(other));
-        free_list_head() = other.mFreeListHead;
+        mFreeListHead = std::move(other.mFreeListHead);
         mMutex = std::move(other.mMutex);
         other.release();
         return *this;
     }
+
+    // todo: traverse and destroy elements
+    virtual ~PoolAllocator() = default;
 
     template <typename R>
     using rebind = PoolAllocator<R, Container>;
