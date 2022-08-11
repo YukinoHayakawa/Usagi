@@ -56,6 +56,7 @@ struct ComponentFilter : Tag<Components>...
     }
 };
 
+// todo: this is a temporary solution to destroying entities & scripting
 struct AllComponents
 {
     template <Component C>

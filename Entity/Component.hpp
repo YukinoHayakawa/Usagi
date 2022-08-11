@@ -60,6 +60,7 @@ concept Component =
     !IsComponentFilter<T>
 ;
 
+// todo: is it better to use sizeof(C) != 0 && std::is_empty_v<C>? (complete empty type)
 template <typename C>
 concept TagComponent = Component<C> && requires
 {
