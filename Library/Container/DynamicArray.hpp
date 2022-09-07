@@ -87,6 +87,7 @@ protected:
     // std::uint8_t mHeaderDepth = 0;
     std::uint8_t mCommittedHeaderOffset = 0;
 
+    // todo the responsibility of keeping headers should not be taken by a dynamic array
     /**
      * \brief Initialize or restore header from allocated storage.
      * \tparam Magic Magic number.
@@ -172,17 +173,7 @@ public:
     {
         assert(!storage_initialized());
         mAllocator = std::move(allocator);
-        // allocate header
-        const auto alloc_size = calc_allocation_size(0);
-        mStorage = mAllocator.reallocate(nullptr, calc_allocation_size(0));
-        // if this is a newly created container, initialize the header
-        if(auto [header_offset, newly_initialized] =
-            init_or_restore_header<MAGIC_CHECK, Header>(); newly_initialized)
-        {
-            header()->storage_offset = MAX_HEADER_SIZE;
-            update_capacity(alloc_size);
-        }
-        update_elem_array_ptr();
+        init_storage();
     }
 
     // Move assignment & copy operations implicitly deleted.
@@ -199,7 +190,7 @@ public:
 
     size_type size() const noexcept
     {
-        return header()->size;
+        return storage_initialized() ? header()->size : 0;
     }
 
     size_type max_size() const noexcept
@@ -209,7 +200,7 @@ public:
 
     size_type capacity() const noexcept
     {
-        return header()->capacity;
+        return storage_initialized() ? header()->capacity : 0;
     }
 
     void shrink_to_fit()
@@ -309,9 +300,29 @@ public:
     }
 
 private:
+    void init_storage()
+    {
+        assert(!storage_initialized());
+
+        // allocate header
+        const auto alloc_size = calc_allocation_size(0);
+        mStorage = mAllocator.reallocate(nullptr, calc_allocation_size(0));
+        // if this is a newly created container, initialize the header
+        if(auto [header_offset, newly_initialized] =
+            init_or_restore_header<MAGIC_CHECK, Header>(); newly_initialized)
+        {
+            header()->storage_offset = MAX_HEADER_SIZE;
+            update_capacity(alloc_size);
+        }
+        update_elem_array_ptr();
+    }
+
     template <class... Args>
     reference emplace_back_reallocate(Args &&... args)
     {
+        if(!storage_initialized()) 
+            init_storage();
+
         const auto new_size = size() + 1;
         if(capacity() < new_size)
             reallocate_storage(new_size); // potentially throws
@@ -329,6 +340,8 @@ private:
 
     void reallocate_storage(const std::size_t size)
     {
+        assert(storage_initialized());
+
         const std::size_t alloc_size = calc_allocation_size(size);
         // If the new capacity is smaller than the size, it is assumed that
         // the objects on the freed region are already correctly destructed.
