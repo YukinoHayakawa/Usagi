@@ -73,12 +73,15 @@
     <ClInclude Include="Concepts\Type\Memcpyable.hpp" />
     <ClInclude Include="Concepts\Type\Range.hpp" />
     <ClInclude Include="Concepts\Type\Types.hpp" />
+    <ClInclude Include="Entity\ComponentQueryFilter.hpp" />
     <ClInclude Include="Entity\ComponentReflection.hpp">
       <FileType>CppHeader</FileType>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
     </ClInclude>
+    <ClInclude Include="Entity\detail\Declarations.hpp" />
     <ClInclude Include="Entity\EntityDatabase.hpp" />
+    <ClInclude Include="Entity\Utilities.hpp" />
     <ClInclude Include="Library\Algorithm\Container.hpp" />
     <ClInclude Include="Library\Container\FixedCapacityString.hpp" />
     <ClInclude Include="Library\Graph\HeterogeneousGraph.hpp" />
@@ -87,6 +90,8 @@
     <ClInclude Include="Library\Memory\Size.hpp" />
     <ClInclude Include="Library\Memory\MemoryArena.hpp" />
     <ClInclude Include="Library\Memory\RawResource.hpp" />
+    <ClInclude Include="Library\Meta\ParameterPack\CollectInnerLists.hpp" />
+    <ClInclude Include="Library\Meta\TypeContainers\TypeList.hpp" />
     <ClInclude Include="Library\Utilities\ArgumentStorage.hpp" />
     <ClInclude Include="Library\Utilities\BitMask.hpp" />
     <ClInclude Include="Library\Utilities\EnumTranslation.hpp" />
@@ -94,9 +99,9 @@
     <ClInclude Include="Library\Memory\Noncopyable.hpp" />
     <ClInclude Include="Library\Sampling\NBestSampler.hpp" />
     <ClInclude Include="Library\Sampling\ReservoirSampler.hpp" />
-    <ClInclude Include="Library\Meta\List.hpp" />
-    <ClInclude Include="Library\Meta\Set.hpp" />
-    <ClInclude Include="Library\Meta\Deduplicate.hpp" />
+    <ClInclude Include="Library\Meta\ParameterPack\Concatenate.hpp" />
+    <ClInclude Include="Library\Meta\TypeContainers\TypeSet.hpp" />
+    <ClInclude Include="Library\Meta\ParameterPack\Deduplicate.hpp" />
     <ClInclude Include="Library\Meta\Template.hpp" />
     <ClInclude Include="Library\Utilities\Functional.hpp" />
     <ClInclude Include="Library\Meta\NamedArgument.hpp" />
@@ -135,6 +140,7 @@
     <ClInclude Include="Library\Meta\Op.hpp" />
     <ClInclude Include="Runtime\IO\Unicode.hpp" />
     <ClInclude Include="Runtime\Memory\RefCount.hpp" />
+    <ClInclude Include="Runtime\Memory\StructuredStorage.hpp" />
     <ClInclude Include="Runtime\Memory\TypedAllocator.hpp" />
     <ClInclude Include="Runtime\Encoding\Unicode.hpp" />
     <ClInclude Include="Runtime\Memory\VmAllocatorFileBacked.hpp" />
@@ -175,9 +181,9 @@
     <ClInclude Include="Library\Memory\PoolAllocator.hpp" />
     <ClInclude Include="Library\Meta\CompileTimeError.hpp" />
     <ClInclude Include="Library\Graph\AdjacencyMatrixFixed.hpp" />
-    <ClInclude Include="Library\Meta\Stack.hpp" />
-    <ClInclude Include="Library\Meta\Queue.hpp" />
-    <ClInclude Include="Library\Meta\Tag.hpp" />
+    <ClInclude Include="Library\Meta\Containers\Stack.hpp" />
+    <ClInclude Include="Library\Meta\Containers\Queue.hpp" />
+    <ClInclude Include="Library\Meta\TypeContainers\TypeTag.hpp" />
     <ClInclude Include="Library\Meta\Tuple.hpp" />
     <ClInclude Include="Runtime\ErrorHandling.hpp" />
     <ClInclude Include="Runtime\File\MappedFileView.hpp" />

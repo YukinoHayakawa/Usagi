@@ -18,7 +18,7 @@
     <ClInclude Include="Library\Memory\PoolAllocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Tag.hpp">
+    <ClInclude Include="Library\Meta\TypeContainers\TypeTag.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\ErrorHandling.hpp">
@@ -57,10 +57,10 @@
     <ClInclude Include="Executor\TaskGraph.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Queue.hpp">
+    <ClInclude Include="Library\Meta\Containers\Queue.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Stack.hpp">
+    <ClInclude Include="Library\Meta\Containers\Stack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Graph\TopologicalSort.hpp">
@@ -219,13 +219,13 @@
     <ClInclude Include="Runtime\Memory\PagedStorage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\List.hpp">
+    <ClInclude Include="Library\Meta\ParameterPack\Concatenate.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Set.hpp">
+    <ClInclude Include="Library\Meta\TypeContainers\TypeSet.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Deduplicate.hpp">
+    <ClInclude Include="Library\Meta\ParameterPack\Deduplicate.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\Template.hpp">
@@ -352,6 +352,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Utilities\MaybeOwnedString.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Memory\StructuredStorage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\ComponentQueryFilter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\ParameterPack\CollectInnerLists.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\TypeContainers\TypeList.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\Utilities.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\detail\Declarations.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
