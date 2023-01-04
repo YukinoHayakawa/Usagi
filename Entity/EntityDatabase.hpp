@@ -76,6 +76,8 @@ using ComponentStorageT = std::conditional_t<
  *
  * \tparam EnabledComponents List of allowed component types. There shall not
  * be two identical types in the list.
+ *
+ * todo implement interfaces & implementations using mixins
  */
 template <
     typename Config,

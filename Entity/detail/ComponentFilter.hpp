@@ -3,8 +3,9 @@
 #include <type_traits>
 
 #include <Usagi/Entity/Component.hpp>
-#include <Usagi/Library/Meta/Deduplicate.hpp>
-#include <Usagi/Library/Meta/List.hpp>
+#include <Usagi/Library/Meta/ParameterPack/Concatenate.hpp>
+#include <Usagi/Library/Meta/ParameterPack/Deduplicate.hpp>
+#include <Usagi/Library/Meta/TypeContainers/TypeList.hpp>
 
 namespace usagi
 {
@@ -16,7 +17,7 @@ namespace usagi
  * \tparam Components A sequence of component types.
  */
 template <Component... Components>
-struct ComponentFilter : Tag<Components>...
+struct ComponentFilter : TypeTag<Components>...
 {
     using IsComponentFilter = void;
 
@@ -24,7 +25,7 @@ struct ComponentFilter : Tag<Components>...
 
     template <Component C>
     static constexpr bool HAS_COMPONENT = std::is_base_of_v<
-        Tag<C>,
+        TypeTag<C>,
         ComponentFilter
     >;
 
@@ -90,4 +91,17 @@ using CatComponentsUnique =
         Filter,
         ComponentFilter<Cs...>
     >>;
+
+// todo: generalize to N filters
+template <
+    SimpleComponentFilter First,
+    SimpleComponentFilter Second
+>
+using CatComponentFiltersUnique =
+    FilterDeduplicatedT<
+        FilterConcatenatedT<
+            First,
+            Second
+        >
+    >;
 }

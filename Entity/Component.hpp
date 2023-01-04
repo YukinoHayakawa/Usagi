@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <concepts>
+
 #include <Usagi/Concepts/Type/Memcpyable.hpp>
 
 namespace usagi
@@ -48,7 +50,7 @@ namespace usagi
  * https://docs.microsoft.com/en-us/cpp/cpp/trivial-standard-layout-and-pod-types
  */
 template <typename T>
-concept IsComponentFilter = requires
+concept SimpleComponentFilter = requires
 {
     typename T::IsComponentFilter;
 };
@@ -57,7 +59,7 @@ template <typename T>
 concept Component =
     Memcpyable<T> &&
     // prevent accidentally using the component filter as a component
-    !IsComponentFilter<T>
+    !SimpleComponentFilter<T>
 ;
 
 // todo: is it better to use sizeof(C) != 0 && std::is_empty_v<C>? (complete empty type)
@@ -65,6 +67,25 @@ template <typename C>
 concept TagComponent = Component<C> && requires
 {
     typename C::TagComponent;
+};
+
+template <typename Func, typename C>
+concept ComponentProjection =
+    std::invocable<Func, C &>;
+
+template <typename Func, typename C>
+concept WritableComponentProjection =
+    ComponentProjection<Func, C> &&
+    std::is_lvalue_reference_v<std::invoke_result_t<Func, C &>>
+;
+
+template <Component Comp>
+struct GetComponent
+{
+    auto & operator()(auto &&entity_view)
+    {
+        return entity_view.template component<Comp>();
+    }
 };
 }
 

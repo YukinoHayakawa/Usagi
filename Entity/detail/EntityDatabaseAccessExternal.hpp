@@ -4,6 +4,7 @@
 #include <random>
 
 #include <Usagi/Entity/Archetype.hpp>
+#include <Usagi/Entity/ComponentQueryFilter.hpp>
 
 #include "ComponentAccessReadOnly.hpp"
 #include "EntityDatabaseViewFiltered.hpp"
@@ -90,6 +91,19 @@ public:
             decltype(include),
             decltype(exclude)
         >(this->mDatabase);
+    }
+
+    template <SimpleComponentQuery Q>
+    decltype(auto) view(Q query)
+    {
+        return view(typename Q::IncludeFilter(), typename Q::ExcludeFilter());
+    }
+
+    // todo parallel evaluation?
+    template <SimpleComponentQuery Q>
+    std::size_t count(Q query) const
+    {
+        return std::ranges::distance(view(std::move(query)));
     }
 
     // This can be used with begin(), end() to implement parallelization

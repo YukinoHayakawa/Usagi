@@ -15,6 +15,7 @@ class Archetype : InitialComponents...
     >
     friend class EntityDatabase;
 
+    // todo thread safety
     // These two fields combinedly determine that whether the last used page
     // can be reused. Beware that the the page index must refer to the same
     // entity database.
@@ -69,4 +70,12 @@ public:
         return *this;
     }
 };
+
+template <typename ArchetypeT, typename Comp>
+concept ArchetypeHasComponent =
+    Component<Comp> &&
+    ArchetypeT::ComponentFilterT::template HAS_COMPONENT<Comp>;
+
+template <typename ArchetypeT>
+using ArchetypeComponentFilter = typename ArchetypeT::ComponentFilterT;
 }

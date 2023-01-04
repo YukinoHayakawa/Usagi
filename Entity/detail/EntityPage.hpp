@@ -89,6 +89,13 @@ struct EntityPage : EntityPageMeta
         return first_free;
     }
 
+    /* todo: the returned value is only to be trusted after dirty bit is cleared
+    constexpr bool is_entity_empty(const EntityIndexT index)
+    {
+        return free_mask & (1u << index) != 0;
+    }
+    */
+
     template <Component C>
     constexpr static std::uint64_t component_index()
         requires FilterT::template HAS_COMPONENT<C>

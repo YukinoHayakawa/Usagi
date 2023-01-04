@@ -105,7 +105,7 @@ struct ExplicitSystemComponentAccessTraitRead<GameSystem, true>
 {
     using type = typename GameSystem::ReadAccess;
 
-    static_assert(IsComponentFilter<type>,
+    static_assert(SimpleComponentFilter<type>,
         "ReadAccess is not a component filter.");
 };
 
@@ -128,7 +128,7 @@ struct ExplicitSystemComponentAccessTraitWrite<GameSystem, true>
 {
     using type = typename GameSystem::WriteAccess;
 
-    static_assert(IsComponentFilter<type>,
+    static_assert(SimpleComponentFilter<type>,
         "WriteAccess is not a component filter.");
 };
 
