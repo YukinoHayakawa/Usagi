@@ -98,7 +98,7 @@ struct EntityPage : EntityPageMeta
 
     template <Component C>
     constexpr static std::uint64_t component_index()
-        requires FilterT::template HAS_COMPONENT<C>
+        requires FilterT::template HasComponent<C>
     {
         return Index<C, std::tuple<EnabledComponents...>>::value;
     }

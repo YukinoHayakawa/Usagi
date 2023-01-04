@@ -58,7 +58,7 @@ template <
 >
 using ComponentStorageT = std::conditional_t<
     TagComponent<C>,
-    Tag<C>, // an empty struct for dispatching purpose only
+    TypeTag<C>, // an empty struct for dispatching purpose only
     Storage<std::array<C, EntityPageMeta::PAGE_SIZE>>
 >;
 }

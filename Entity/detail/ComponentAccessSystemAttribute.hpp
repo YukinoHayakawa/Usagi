@@ -19,7 +19,7 @@ struct ComponentReadMaskBitPresent : std::false_type {};
 template <System GameSystem, Component C>
     requires SystemDeclaresReadAccess<GameSystem>
 struct ComponentReadMaskBitPresent<GameSystem, C>
-    : std::bool_constant<GameSystem::ReadAccess::template HAS_COMPONENT<C>> {};
+    : std::bool_constant<HasComponent<typename GameSystem::ReadAccess, C>> {};
 
 // ============================================================================
 // WriteMaskBit
@@ -31,7 +31,7 @@ struct ComponentWriteMaskBitPresent : std::false_type {};
 template <System GameSystem, Component C>
     requires SystemDeclaresWriteAccess<GameSystem>
 struct ComponentWriteMaskBitPresent<GameSystem, C>
-    : std::bool_constant<GameSystem::WriteAccess::template HAS_COMPONENT<C>> {};
+    : std::bool_constant<HasComponent<typename GameSystem::WriteAccess, C>> {};
 }
 
 // ============================================================================
@@ -141,9 +141,9 @@ concept SystemExplicitComponentAccess =
     System<GameSystem>
     && Component<Comp>
     && (ExplicitSystemComponentAccessRead<GameSystem>::
-        template HAS_COMPONENT<Comp> ||
+        template HasComponent<Comp> ||
         ExplicitSystemComponentAccessWrite<GameSystem>::
-        template HAS_COMPONENT<Comp>)
+        template HasComponent<Comp>)
 ;
 
 template <System GameSystem>

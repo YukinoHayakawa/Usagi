@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "detail/Declarations.hpp"
 #include "detail/ComponentFilter.hpp"
 
 namespace usagi
@@ -73,11 +74,11 @@ concept System = requires(T t)
 
 template <typename T>
 concept SystemDeclaresReadAccess =
-    System<T> && requires { typename T::ReadAccess; };
+    System<T> && StructDeclaresReadAccess<T>;
 
 template <typename T>
 concept SystemDeclaresWriteAccess =
-    System<T> && requires { typename T::WriteAccess; };
+    System<T> && StructDeclaresWriteAccess<T>;
 
 // todo: maybe T::ReadAllAccess should be retained because sometimes you will have to access certain components and it's more neat to make them accessible by declaring in component access
 template <typename T>

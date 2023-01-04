@@ -25,7 +25,7 @@ class Archetype : InitialComponents...
 public:
     Archetype() = default;
 
-    using ComponentFilterT = ComponentFilter<InitialComponents...>;
+    using WriteAccess = ComponentFilter<InitialComponents...>;
 
     template <Component... Cs>
     using Derived = Archetype<InitialComponents..., Cs...>;
@@ -71,11 +71,10 @@ public:
     }
 };
 
-template <typename ArchetypeT, typename Comp>
-concept ArchetypeHasComponent =
-    Component<Comp> &&
-    ArchetypeT::ComponentFilterT::template HAS_COMPONENT<Comp>;
+template <typename ArchetypeT, Component Comp>
+constexpr bool ArchetypeHasComponent =
+    ArchetypeT::WriteAccess::template HasComponent<Comp>;
 
 template <typename ArchetypeT>
-using ArchetypeComponentFilter = typename ArchetypeT::ComponentFilterT;
+using ArchetypeComponentFilter = typename ArchetypeT::WriteAccess;
 }

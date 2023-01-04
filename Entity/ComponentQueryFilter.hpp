@@ -38,10 +38,10 @@ template<SimpleComponentQuery Query>
 using QueryReadAccess = typename Query::ReadAccess;
 
 template <SimpleComponentQuery Query, Component... Comp>
-concept QueryIncludesComponent =
-    (Query::IncludeFilter::template HAS_COMPONENT<Comp> && ...);
+constexpr bool QueryIncludesComponent =
+    (Query::IncludeFilter::template HasComponent<Comp> && ...);
 
 template <SimpleComponentQuery Query, Component... Comp>
-concept QueryExcludesComponent =
-    (Query::ExcludeFilter::template HAS_COMPONENT<Comp> && ...);
+constexpr bool QueryExcludesComponent =
+    (Query::ExcludeFilter::template HasComponent<Comp> && ...);
 }

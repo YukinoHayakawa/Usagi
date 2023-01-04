@@ -8,11 +8,23 @@ namespace usagi
 template <typename T>
 struct DeclaredComponentReadAccess
 {
+    using InnerListT = C<>;
+};
+
+template <StructDeclaresReadAccess T>
+struct DeclaredComponentReadAccess<T>
+{
     using InnerListT = typename T::ReadAccess;
 };
 
 template <typename T>
 struct DeclaredComponentWriteAccess
+{
+    using InnerListT = C<>;
+};
+
+template <StructDeclaresWriteAccess T>
+struct DeclaredComponentWriteAccess<T>
 {
     using InnerListT = typename T::WriteAccess;
 };
@@ -48,9 +60,14 @@ struct B
     using ReadAccess = C<bool, double>;
 };
 
+struct D
+{
+};
+
 static_assert(std::is_same_v<
-    CollectReadAccessUnique<A, B>,
+    CollectReadAccessUnique<A, B, D>,
     C<int, bool, double>
 >);
 */
+
 }

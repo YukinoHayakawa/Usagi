@@ -24,7 +24,7 @@ struct ComponentFilter : TypeTag<Components>...
     static constexpr std::size_t NUM_COMPONENTS = sizeof...(Components);
 
     template <Component C>
-    static constexpr bool HAS_COMPONENT = std::is_base_of_v<
+    static constexpr bool HasComponent = std::is_base_of_v<
         TypeTag<C>,
         ComponentFilter
     >;
@@ -61,8 +61,11 @@ struct ComponentFilter : TypeTag<Components>...
 struct AllComponents
 {
     template <Component C>
-    static constexpr bool HAS_COMPONENT = true;
+    static constexpr bool HasComponent = true;
 };
+
+template <typename Filter, Component C>
+constexpr bool HasComponent = Filter::template HasComponent<C>;
 
 // Shortcut name
 // bug: waiting for P1814R0 to be implemented

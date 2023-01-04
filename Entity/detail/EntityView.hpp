@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <Usagi/Entity/Component.hpp>
-#include <Usagi/Library/Meta/Tag.hpp>
+#include <Usagi/Library/Meta/TypeContainers/TypeTag.hpp>
 
 #include "ComponentAccess.hpp"
 #include "ComponentFilter.hpp"
