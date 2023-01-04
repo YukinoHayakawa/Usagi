@@ -5,13 +5,13 @@
 namespace usagi
 {
 template <
-    SimpleComponentFilter IncludeFilter,
-    SimpleComponentFilter ExcludeFilter = C<>
+    SimpleComponentFilter IncludeFilter_,
+    SimpleComponentFilter ExcludeFilter_ = C<>
 >
 struct ComponentQueryFilter
 {
-    using IncludeFilter = IncludeFilter;
-    using ExcludeFilter = ExcludeFilter;
+    using IncludeFilter = IncludeFilter_;
+    using ExcludeFilter = ExcludeFilter_;
 
     using ReadAccess = CatComponentFiltersUnique<IncludeFilter, ExcludeFilter>;
 };

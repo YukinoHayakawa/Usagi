@@ -26,7 +26,6 @@ struct ServiceTest
     // ServiceTest & test_manager(); no not here
 };
 
-
 template <>
 class ServiceAlias<ServiceTest>
 {
@@ -79,7 +78,16 @@ inline void test(ServiceAccess<ServiceTest> rt)
 }
 
 template <typename T>
+concept StructDeclaresServiceAccess = requires { typename T::ServiceAccessT; };
+
+template <typename T>
 struct DeclaredServiceAccess
+{
+    using InnerListT = ServiceAccess<>;
+};
+
+template <StructDeclaresServiceAccess T>
+struct DeclaredServiceAccess<T>
 {
     using InnerListT = typename T::ServiceAccessT;
 };

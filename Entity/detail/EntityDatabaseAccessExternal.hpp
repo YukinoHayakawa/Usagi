@@ -101,9 +101,10 @@ public:
 
     // todo parallel evaluation?
     template <SimpleComponentQuery Q>
-    std::size_t count(Q query) const
+    std::size_t count(Q query) /*const*/
     {
-        return std::ranges::distance(view(std::move(query)));
+        auto range = view(std::move(query));
+        return std::distance(range.begin(), range.end());
     }
 
     // This can be used with begin(), end() to implement parallelization
