@@ -3,7 +3,7 @@
 #include <memory>
 #include <type_traits>
 
-#include <Usagi/Library/Meta/Tag.hpp>
+#include <Usagi/Library/Meta/TypeContainers/TypeTag.hpp>
 #include <Usagi/Library/Memory/Noncopyable.hpp>
 
 namespace usagi
@@ -22,7 +22,7 @@ struct SimplePlatformService : Noncopyable
     // cannot be specified explicitly.
     // See: https://stackoverflow.com/questions/26553803/derive-from-template-constructor-of-template-base-class
     template <typename ServiceImplT, typename... Args>
-    explicit SimplePlatformService(Tag<ServiceImplT>, Args &&... args) requires
+    explicit SimplePlatformService(TypeTag<ServiceImplT>, Args &&... args) requires
         std::is_base_of_v<ServiceBaseT, ServiceImplT>
         : mServiceImpl(std::make_unique<ServiceImplT>(
             std::forward<Args>(args)...

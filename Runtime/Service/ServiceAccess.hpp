@@ -2,6 +2,9 @@
 
 #include <type_traits>
 
+#include <Usagi/Library/Meta/ParameterPack/CollectInnerLists.hpp>
+#include <Usagi/Library/Meta/ParameterPack/Deduplicate.hpp>
+
 namespace usagi
 {
 template <typename Service>
@@ -60,12 +63,32 @@ public:
         : ServiceAlias<Services>(rt)...
     {
     }
+
+    // Intentionally non-explicit: initialize from a superset
+    template <typename... OtherServices>
+    // ReSharper disable once CppNonExplicitConvertingConstructor
+    ServiceAccess(ServiceAccess<OtherServices...> &&other_access)
+        : ServiceAlias<Services>(std::forward<OtherServices>(other_access))...
+    {
+    }
 };
 
 inline void test(ServiceAccess<ServiceTest> rt)
 {
     rt.test_manager();
 }
+
+template <typename T>
+struct DeclaredServiceAccess
+{
+    using InnerListT = typename T::ServiceAccessT;
+};
+
+template <typename... Ts>
+using CollectServiceAccessUnique = 
+    meta::Deduplicated<
+        meta::CollectedInnerList<DeclaredServiceAccess, Ts...>
+    >;
 }
 
 /**
@@ -76,7 +99,7 @@ inline void test(ServiceAccess<ServiceTest> rt)
  * \param accessor_name 
  */
 #define USAGI_DECL_SERVICE_ALIAS(service_type, accessor_name) \
-template <> class ServiceAlias<service_type> \
+template <> class ::usagi::ServiceAlias<service_type> \
 { \
     using ServiceT = service_type; \
     ServiceT *mService = nullptr; \
@@ -84,6 +107,8 @@ public: \
     template <typename Runtime> \
     explicit ServiceAlias(Runtime &runtime) \
         : mService(static_cast<ServiceT *>(&runtime)) {} \
+    ServiceAlias(const ServiceAlias &another) \
+        : mService(another.mService) {} \
     /* todo remove get_service() */ \
     ServiceT::ServiceT & accessor_name() const \
         { return mService->get_service(); } \
