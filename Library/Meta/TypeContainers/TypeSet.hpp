@@ -2,18 +2,18 @@
 
 #include <type_traits>
 
-#include "Tag.hpp"
+#include "TypeTag.hpp"
 
 namespace usagi::meta
 {
 template <typename... Ts>
-struct Set : Tag<Ts>...
+struct TypeSet : TypeTag<Ts>...
 {
     template <typename T>
     using insert = std::conditional_t<
-        std::is_base_of_v<Tag<T>, Set>,
-        Set<Ts...>,
-        Set<Ts..., T>
+        std::is_base_of_v<TypeTag<T>, TypeSet>,
+        TypeSet<Ts...>,
+        TypeSet<Ts..., T>
     >;
 
     template <template <typename...> typename T>

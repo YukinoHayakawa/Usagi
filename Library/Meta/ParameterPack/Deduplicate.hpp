@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Set.hpp"
+#include <Usagi/Library/Meta/TypeContainers/TypeSet.hpp>
 
 namespace usagi::meta
 {
@@ -8,17 +8,17 @@ template <typename Lhs, typename Rhs>
 struct DeduplicateHelper;
 
 template<typename... Lhs>
-struct DeduplicateHelper<Set<Lhs...>, Set<>>
+struct DeduplicateHelper<TypeSet<Lhs...>, TypeSet<>>
 {
-    using type = Set<Lhs...>;
+    using type = TypeSet<Lhs...>;
 };
 
 template<typename... Lhs, typename R, typename... Rhs>
-struct DeduplicateHelper<Set<Lhs...>, Set<R, Rhs...>>
+struct DeduplicateHelper<TypeSet<Lhs...>, TypeSet<R, Rhs...>>
 {
     using type = typename DeduplicateHelper<
-        typename Set<Lhs...>::template insert<R>,
-        Set<Rhs...>
+        typename TypeSet<Lhs...>::template insert<R>,
+        TypeSet<Rhs...>
     >::type;
 };
 
@@ -32,10 +32,10 @@ template <
 struct Deduplicate<Tuple<Ts...>>
 {
     using type = typename DeduplicateHelper<
-        Set<>, Set<Ts...>
+        TypeSet<>, TypeSet<Ts...>
     >::type::template apply<Tuple>;
 };
 
-template <typename... Ts>
-using Deduplicated = typename Deduplicate<Set<Ts...>>::type;
+template <typename TypeListT>
+using Deduplicated = typename Deduplicate<TypeListT>::type;
 }

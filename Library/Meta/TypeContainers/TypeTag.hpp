@@ -4,7 +4,7 @@ namespace usagi
 {
 // Type tag. Used for dispatching.
 template <typename T>
-struct Tag
+struct TypeTag
 {
 };
 
@@ -15,7 +15,7 @@ struct BoolTag
 };
 
 template <typename T>
-struct Wrapped
+struct WrappedValue
 {
     T val;
 };
