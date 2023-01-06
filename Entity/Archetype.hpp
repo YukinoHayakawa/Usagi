@@ -71,6 +71,19 @@ public:
     }
 };
 
+template <typename T>
+struct ArchetypeFromComponentFilter;
+
+template <Component...Cs>
+struct ArchetypeFromComponentFilter<ComponentFilter<Cs...>>
+{
+    using type = Archetype<Cs...>;
+};
+
+template <SimpleComponentFilter Filter>
+using ArchetypeFromComponentFilterT = 
+    typename ArchetypeFromComponentFilter<Filter>::type;
+
 template <typename ArchetypeT, Component Comp>
 constexpr bool ArchetypeHasComponent =
     ArchetypeT::WriteAccess::template HasComponent<Comp>;

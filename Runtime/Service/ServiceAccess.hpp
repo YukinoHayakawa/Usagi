@@ -70,6 +70,8 @@ public:
         : ServiceAlias<Services>(std::forward<OtherServices>(other_access))...
     {
     }
+
+    struct InstantiatedRuntime : Services... { };
 };
 
 inline void test(ServiceAccess<ServiceTest> rt)

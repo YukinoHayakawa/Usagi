@@ -245,6 +245,13 @@ public:
         }
     }
 
+    template <Component... Cs>
+    void add_components(ComponentFilter<Cs...>) requires
+        CanWriteComponents<ComponentAccess, Cs...>
+    {
+        (add_component<Cs>(), ...);
+    }
+
     template <Component C>
     void remove_component(ComponentFilter<C> = {}) requires
         CanWriteComponent<ComponentAccess, C>
