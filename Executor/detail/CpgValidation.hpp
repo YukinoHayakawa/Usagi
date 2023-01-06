@@ -2,7 +2,7 @@
 
 #include <Usagi/Executor/TaskGraph.hpp>
 #include <Usagi/Library/Meta/CompileTimeError.hpp>
-#include <Usagi/Library/Meta/Stack.hpp>
+#include <Usagi/Library/Meta/Containers/Stack.hpp>
 #include <Usagi/Library/Graph/TopologicalSort.hpp>
 
 namespace usagi

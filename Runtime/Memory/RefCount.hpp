@@ -7,7 +7,7 @@
 #include <variant>
 
 #include <Usagi/Library/Memory/Noncopyable.hpp>
-#include <Usagi/Library/Meta/Tag.hpp>
+#include <Usagi/Library/Meta/TypeContainers/TypeTag.hpp>
 
 namespace usagi
 {
@@ -90,7 +90,7 @@ struct PointerWrapper
 // possible that two trackers referencing the same counter can have different
 // values.
 template <typename T>
-struct InPlace : Wrapped<T>
+struct InPlace : WrappedValue<T>
 {
 };
 
