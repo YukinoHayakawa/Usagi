@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+#include <exception>
 
 #include "Alignment.hpp"
 

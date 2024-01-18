@@ -21,7 +21,7 @@ concept Graph = requires(
     typename Traits::GraphT;
     typename Traits::VertexIndexT;
     { Traits::INVALID_VERTEX_ID } ->
-        std::same_as<const typename Traits::VertexIndexT>;
+        std::convertible_to<const typename Traits::VertexIndexT>;
     { t.adjacent_vertices(g, v) } -> concepts::SizedRange;
     { t.num_vertices(g) } -> std::convertible_to<std::size_t>;
     { t.has_edge(g, v, u) };
@@ -49,8 +49,8 @@ concept WeightedGraph = requires(
 {
     typename Traits::WeightT;
     requires std::is_arithmetic_v<typename Traits::WeightT>;
-    { t.vertex_weight(g, u) } -> std::same_as<typename Traits::WeightT>;
-    { t.edge_weight(g, u, v) } -> std::same_as<typename Traits::WeightT>;
+    { t.vertex_weight(g, u) } -> std::convertible_to<typename Traits::WeightT>;
+    { t.edge_weight(g, u, v) } -> std::convertible_to<typename Traits::WeightT>;
 };
 
 template <typename T, typename Traits>

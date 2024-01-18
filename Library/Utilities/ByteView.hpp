@@ -20,7 +20,7 @@ concept StringViewConvertible = requires(T t)
  * \brief Obtain a string view to the underlying memory of the specified value.
  */
 template <typename T>
-std::string_view to_byte_view(T val);
+std::string_view to_byte_view(const T &val);
 
 template <Arithmetic T>
 std::string_view to_byte_view(const T &val)

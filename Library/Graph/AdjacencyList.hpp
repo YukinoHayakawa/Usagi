@@ -16,7 +16,8 @@ public:
     using VertexT = Vertex;
     using EdgeT = Edge;
 
-    using VertexIndexT = std::uint64_t;
+    // bug some problem here
+    using VertexIndexT = int;
     constexpr static VertexIndexT INVALID_VERTEX_ID = -1;
     using WeightT = decltype(
         // Deduce the larger type to accomodate the values.
@@ -39,7 +40,7 @@ protected:
 public:
     AdjacencyList() = default;
 
-    explicit AdjacencyList(VertexIndexT num_vertices)
+    explicit AdjacencyList(std::size_t num_vertices)
         : mVertices(num_vertices)
     {
     }
@@ -99,6 +100,7 @@ public:
         }
     };
 
+    // todo: this really should be outgoing edges
     auto adjacent_vertices(const VertexIndexT v) const
     {
         return AdjacentVertexRange { this, v };
