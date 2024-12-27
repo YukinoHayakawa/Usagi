@@ -20,6 +20,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>ClangCL</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -91,7 +92,9 @@
     <ClInclude Include="Library\Memory\MemoryArena.hpp" />
     <ClInclude Include="Library\Memory\RawResource.hpp" />
     <ClInclude Include="Library\Meta\ParameterPack\CollectInnerLists.hpp" />
+    <ClInclude Include="Library\Meta\Types\Deduplicate.hpp" />
     <ClInclude Include="Library\Meta\TypeContainers\TypeList.hpp" />
+    <ClInclude Include="Library\Meta\Types\Containers\List\TypeList.hpp" />
     <ClInclude Include="Library\Utilities\ArgumentStorage.hpp" />
     <ClInclude Include="Library\Utilities\BitMask.hpp" />
     <ClInclude Include="Library\Utilities\EnumTranslation.hpp" />
