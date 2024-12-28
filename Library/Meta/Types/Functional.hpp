@@ -32,10 +32,4 @@ consteval void map(auto &&op)
      */
     do_map(std::make_index_sequence<sizeof...(Ts)>());
 }
-
-template <typename T, typename... Ts>
-consteval auto reduce(auto &&op)
-{
-    return op.template operator()<T, Ts...>();
-}
 }

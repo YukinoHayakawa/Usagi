@@ -83,13 +83,17 @@ consteval auto calc_unique_type_array()
 /*
  * Static Tests.
  */
+
+// Handling of empty pack.
+static_assert(calc_unique_type_array<>().empty());
+// Common case.
 static_assert(calc_unique_type_array<int, int, double, char>() == "1011");
 
 /**
  * Remove duplicated types from Ts... and wrap the result in List.
  * @tparam List A template accepting variadic types.
  * @tparam Ts A list of types.
- * @return List<Us...> where Us... are unique types from Ts...
+ * @return List<Us...>() where Us... are unique types from Ts...
  */
 template <
     template <typename...> typename List,
@@ -97,60 +101,64 @@ template <
 >
 consteval auto deduplicate_type_list()
 {
+    // handle base case. avoid getting into Ts...[N] when Ts... is empty.
     if constexpr(sizeof...(Ts) == 0)
     {
         return List<>();
     }
+    // sizeof...(Ts) > 0
     else
     {
-        // static constexpr auto unique_flags = calc_unique_type_array<Ts...>() + std::string("0");
-        // auto test = [&]<typename> { 
-        //     static_assert(unique_flags.size() == sizeof...(Ts));
-        // };
-        // test.template operator()<int>();
-        // process types after U. remove front type one-by-one
-        // tail_unique_flags does not include value for U
-        // <U, Us...> == <Ts...> during the first call
-        // I is the index of U in Ts...
-        // constexpr std::size_t num_types = sizeof...(Ts);
-        // note that unique_flags MUST be part of the template argument,
-        // otherwise type deduction may result in inconsistent outcomes.
-        auto op_reduce = [&]<
-            std::size_t I,
-            typename U,
-            typename... Us,
-            bool KeepCurT = (calc_unique_type_array<Ts...>() + std::string("0"))[I + 1] == '1'
+        /*
+         * todo: bug somehow clang 20.0.0 has some problems regarding
+         *   variables initialized with calc_unique_type_array<Ts...>().
+         *   the problem seems to root from how MSVC's stdlib handle
+         *   std::string's internal memory allocation in constexpr contexts.
+         *   so we have to use them as some template argument to avoid
+         *   memory allocation.
+         */
+
+        // even this doesn't work - kinda ridiculous - even though msvc claims
+        // operator new is constexpr...
+        // static constexpr auto unique_flags = [] consteval {
+            // return calc_unique_type_array<Ts...>() + "0";
+        // }();
+
+        /*
+         * recursively remove duplicated types. Ts... is always read from the
+         * outer template. CurTIndex is recursively incremented. each invocation
+         * pops one type from the front and shifts the front of OtherTs... to
+         * CurT, until there is nothing left.
+         * IsCurTDuplicated exists as a workaround to the problem mentioned
+         * above.
+         */
+        constexpr auto op_reduce = [&]<
+            std::size_t CurTIndex,
+            typename CurT,
+            typename... OtherTs,
+            bool IsCurTDuplicated =
+                // the + "0" part is for easier handling for the last element
+                (calc_unique_type_array<Ts...>() + "0")[CurTIndex + 1] == '1'
         >(auto &&self)
-            // requires (unique_flags.size() == sizeof...(Ts))
         {
-            // return List<>();
-            // static_assert(unique_flags.size() == sizeof...(Ts));
             // base case. nothing left.
-            if constexpr(I + 1 >= sizeof...(Ts))
+            if constexpr(sizeof...(OtherTs) == 0)
             {
                 return List<>();
             }
-            // else
-            // {
-                // return List<>();
-            // }
-            // decide whether to keep Us...[0]
-            // keep Us...[0]
-            if constexpr(KeepCurT)
+            // decide whether to keep OtherTs...[0]
+            // keep OtherTs...[0]
+            else if constexpr(IsCurTDuplicated)
             {
                 return concatenate_lists(
-                    List<Us...[0]>(),
-                    self.template operator()<I + 1, Us...>(self)
+                    List<OtherTs...[0]>(),
+                    self.template operator()<CurTIndex + 1, OtherTs...>(self)
                 );
             }
-            // drop Us...[0]
-            else if constexpr(sizeof...(Us) > 0)
-            {
-                return self.template operator()<I + 1, Us...>(self);
-            }
+            // drop OtherTs...[0]
             else
             {
-                return List<>();
+                return self.template operator()<CurTIndex + 1, OtherTs...>(self);
             }
         };
         return concatenate_lists(
@@ -159,6 +167,10 @@ consteval auto deduplicate_type_list()
         );
     }
 }
+
+/*
+ * Static Tests
+ */
 
 static_assert(std::is_same_v<
     decltype(deduplicate_type_list<containers::TypeList>()),
@@ -175,5 +187,40 @@ static_assert(std::is_same_v<
 static_assert(std::is_same_v<
     decltype(deduplicate_type_list<containers::TypeList, int, char, int, bool>()),
     containers::TypeList<int, char, bool>
+>);
+
+template <typename... Lists>
+consteval auto deduplicate_merge_lists(Lists...lists)
+    requires (sizeof...(lists) > 1)
+{
+    constexpr auto full_list = concatenate_lists(lists...);
+    constexpr auto op = []<
+        template <typename...> typename List,
+        typename... Ts
+    >(List<Ts...>)
+    {
+        return deduplicate_type_list<List, Ts...>();
+    };
+    return op(full_list);
+}
+
+/*
+ * Static Tests
+ */
+
+static_assert(std::is_same_v<
+    decltype(deduplicate_merge_lists(
+        containers::TypeList<int, char, bool>(),
+        containers::TypeList<bool, char, float>()
+    )),
+    containers::TypeList<int, char, bool, float>
+>);
+static_assert(std::is_same_v<
+    decltype(deduplicate_merge_lists(
+        containers::TypeList<int, char, bool>(),
+        containers::TypeList<bool, double, int>(),
+        containers::TypeList<>()
+    )),
+    containers::TypeList<int, char, bool, double>
 >);
 }
