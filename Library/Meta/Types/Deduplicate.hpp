@@ -3,59 +3,94 @@
 #include <type_traits>
 #include <utility>
 #include <bitset>
+#include <algorithm>
 
 #include <Usagi/Library/Meta/Types/Containers/List/TypeList.hpp>
+#include <Usagi/Library/Meta/Types/Containers/List/Concatenate.hpp>
 
-namespace usagi::meta
+#include "Functional.hpp"
+
+namespace usagi::meta::types
 {
+namespace details
+{
+/*
+ * Computes whether the current type has already appeared in the previous
+ * part of the type list.
+ * T is the current type. PrecedingIndices... should be [0, index), where
+ * index is the index of T in Ts...
+ * So basically this function checks whether T is present in
+ * Ts...[PrecedingIndices]..., which are the type before T.
+ * std::make_index_sequence<N>() gives std::integer_sequence<
+ * [...], { 0, ..., N-1 }>. Therefore, it automatically excludes the current
+ * type being tested. i.e. When N == 0, it gives <[...], {}>, automatically
+ * marks the current type as unique.
+ * I hope the compiler does some internal caching. Otherwise, the algorithm
+ * might be O(num_types^2).
+ */
+template <typename T, typename... Ts, typename Int, Int... PrecedingIndices>
+consteval bool is_type_duplicated(
+    std::integer_sequence<Int, PrecedingIndices...>)
+{
+    return std::disjunction_v<std::is_same<T, Ts...[PrecedingIndices]>...>;
+}
+
+/*
+ * Static Tests
+ */
+
+// unique type.
+static_assert(is_type_duplicated<int, int>(
+    std::make_index_sequence<0>()) == false);
+// the second type is not reached.
+static_assert(is_type_duplicated<bool, int, bool>(
+    std::make_index_sequence<0>()) == false);
+// still, only checked against int.
+static_assert(is_type_duplicated<bool, int, bool, bool>(
+    std::make_index_sequence<1>()) == false);
+// duplicate found on index 1. 
+static_assert(is_type_duplicated<bool, int, bool, bool>(
+    std::make_index_sequence<2>()) == true);
+}
+
 /**
  * Calculate the uniqueness of provided type list. The first appearance of a
  * type in the list is regarded as unique and the bit with the same index in
- * the returned bitset is set to 1.
- * todo: return an actual bitset. ullong only supports 64 types.
+ * the returned string is set to '1'.
  * @tparam Ts List of types.
- * @return a bitset where each bit corresponds the uniqueness of a type.
+ * @return a std::string where each char corresponds the uniqueness of a type,
+ * where '0' means the type is duplicated in the list, and '1' means it is
+ * unique.
  */
 template <typename... Ts>
-consteval auto tag_unique_types()
+consteval auto calc_unique_type_array()
 {
     constexpr std::size_t num_types = sizeof...(Ts);
-    constexpr auto index_seq = std::make_index_sequence<num_types> { };
-    std::bitset<num_types> unique_types;
-    // std::uint64_t unique_types = 0;
-    // PrevIndices... should be [0, index)
-    auto op_is_duplicated =
-        []<typename CurT, typename Int, Int... PrevIndices>(
-            // const std::size_t index,
-            std::integer_sequence<Int, PrevIndices...> idx_seq) -> bool
-    {
-        // static_assert(sizeof...(PrevIndices) < index);
-        return std::disjunction_v<std::is_same<CurT, Ts...[PrevIndices]>...>;
-    };
-    auto op_visit_types = [&]<typename Int, Int... AllIndices>(
-        std::integer_sequence<Int, AllIndices...> idx_seq) -> void
-    {
-        ((unique_types[AllIndices] = !op_is_duplicated
-            .template operator()<Ts...[AllIndices]>(
-                // make_index_sequence automatically creates a
-                // sequence ending with AllIndices - 1.
-                std::make_index_sequence<AllIndices>()
-            )
-        ), ...);
-    };
-    op_visit_types(index_seq);
-    return unique_types.to_ullong();
+    std::bitset<num_types> is_type_unique;
+    // check whether each type is duplicated starting from the first one.
+    map<Ts...>([&]<std::size_t CurIndex, typename CurT> {
+        is_type_unique[CurIndex] = !details::is_type_duplicated<CurT, Ts...>(
+            // make_index_sequence automatically creates a
+            // sequence ending with I - 1.
+            std::make_index_sequence<CurIndex>()
+        );
+    });
+    auto uniqueness_array = is_type_unique.to_string();
+    std::ranges::reverse(uniqueness_array);
+    return uniqueness_array;
 }
 
-static_assert(tag_unique_types<int, int, double, char>() == 0b1101);
-    // std::bitset<4>{ "1101" });
+/*
+ * Static Tests.
+ */
+static_assert(calc_unique_type_array<int, int, double, char>() == "1011");
 
-template <template <typename...> typename List, typename... Ts, typename... Us>
-consteval auto concatenate_list(List<Ts...>, List<Us...>)
-{
-    return List<Ts..., Us...>();
-}
-
+/**
+ * Remove duplicated types from Ts... and wrap the result in List.
+ * @tparam List A template accepting variadic types.
+ * @tparam Ts A list of types.
+ * @return List<Us...> where Us... are unique types from Ts...
+ */
 template <
     template <typename...> typename List,
     typename... Ts
@@ -64,57 +99,81 @@ consteval auto deduplicate_type_list()
 {
     if constexpr(sizeof...(Ts) == 0)
     {
-        return []<typename T = void>() { return List<>(); };
+        return List<>();
     }
     else
     {
-        auto op = []<std::uint64_t UniqueFlags = tag_unique_types<Ts...>()>()
+        // static constexpr auto unique_flags = calc_unique_type_array<Ts...>() + std::string("0");
+        // auto test = [&]<typename> { 
+        //     static_assert(unique_flags.size() == sizeof...(Ts));
+        // };
+        // test.template operator()<int>();
+        // process types after U. remove front type one-by-one
+        // tail_unique_flags does not include value for U
+        // <U, Us...> == <Ts...> during the first call
+        // I is the index of U in Ts...
+        // constexpr std::size_t num_types = sizeof...(Ts);
+        // note that unique_flags MUST be part of the template argument,
+        // otherwise type deduction may result in inconsistent outcomes.
+        auto op_reduce = [&]<
+            std::size_t I,
+            typename U,
+            typename... Us,
+            bool KeepCurT = (calc_unique_type_array<Ts...>() + std::string("0"))[I + 1] == '1'
+        >(auto &&self)
+            // requires (unique_flags.size() == sizeof...(Ts))
         {
-            if constexpr(sizeof...(Ts) == 0)
+            // return List<>();
+            // static_assert(unique_flags.size() == sizeof...(Ts));
+            // base case. nothing left.
+            if constexpr(I + 1 >= sizeof...(Ts))
             {
                 return List<>();
             }
+            // else
+            // {
+                // return List<>();
+            // }
+            // decide whether to keep Us...[0]
+            // keep Us...[0]
+            if constexpr(KeepCurT)
+            {
+                return concatenate_lists(
+                    List<Us...[0]>(),
+                    self.template operator()<I + 1, Us...>(self)
+                );
+            }
+            // drop Us...[0]
+            else if constexpr(sizeof...(Us) > 0)
+            {
+                return self.template operator()<I + 1, Us...>(self);
+            }
             else
             {
-                auto op_reduce = []<typename U, typename... Us>()
-                {
-                    // constexpr std::bitset<sizeof...(Us)> flags {
-                        // unique_flags.to_ullong() >> 1
-                        // UniqueFlags >> 1
-                    // };
-                    // drop the prev type
-                    if constexpr(sizeof...(Us) == 0)
-                    {
-                        return List<>();
-                    }
-                    else
-                    {
-                        return deduplicate_type_list<List, Us...>()
-                            .template operator()<(UniqueFlags >> 1)>();
-                    }
-                };
-                if constexpr((UniqueFlags & 0b1) == true)
-                {
-                    return concatenate_list(
-                        List<Ts...[0]>(), op_reduce.template operator()<Ts...>()
-                    );
-                }
-                else
-                {
-                    return op_reduce.template operator()<Ts...>();
-                }
+                return List<>();
             }
         };
-        return op;
+        return concatenate_lists(
+            List<Ts...[0]>(),
+            op_reduce.template operator()<0, Ts...>(op_reduce)
+        );
     }
 }
 
-static_assert(deduplicate_type_list<TypeList>()() ==
-    TypeList<>());
-static_assert(deduplicate_type_list<TypeList, int>()() ==
-    TypeList<int>());
-static_assert(deduplicate_type_list<TypeList, int, int, bool>()() ==
-    TypeList<int, bool>());
-static_assert(deduplicate_type_list<TypeList, int, char, int, bool>()() ==
-    TypeList<int, char, bool>());
+static_assert(std::is_same_v<
+    decltype(deduplicate_type_list<containers::TypeList>()),
+    containers::TypeList<>
+>);
+static_assert(std::is_same_v<
+    decltype(deduplicate_type_list<containers::TypeList, int>()),
+    containers::TypeList<int>
+>);
+static_assert(std::is_same_v<
+    decltype(deduplicate_type_list<containers::TypeList, int, int, bool>()),
+    containers::TypeList<int, bool>
+>);
+static_assert(std::is_same_v<
+    decltype(deduplicate_type_list<containers::TypeList, int, char, int, bool>()),
+    containers::TypeList<int, char, bool>
+>);
 }

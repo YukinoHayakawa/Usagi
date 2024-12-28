@@ -1,18 +1,11 @@
 ﻿#pragma once
 
-namespace usagi::meta
+namespace usagi::meta::containers
 {
 template <typename... Ts>
 struct TypeList
 {
-    friend constexpr bool operator==(const TypeList &lhs, const TypeList &rhs)
-    {
-        return true;
-    }
-
-    friend constexpr bool operator!=(const TypeList &lhs, const TypeList &rhs)
-    {
-        return !(lhs == rhs);
-    }
+    template <template <typename...> typename T>
+    using rebind = T<Ts...>;
 };
 }
