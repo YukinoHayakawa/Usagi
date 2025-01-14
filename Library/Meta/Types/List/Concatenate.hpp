@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include <Usagi/Library/Meta/Types/Containers/List/TypeList.hpp>
+#include <Usagi/Library/Meta/Types/List/TypeList.hpp>
 
-namespace usagi::meta
+namespace usagi::meta::types
 {
 consteval auto concatenate_lists(auto &&list, auto &&...lists)
     requires (sizeof...(lists) > 0)
@@ -31,24 +31,24 @@ consteval auto concatenate_lists(auto &&list, auto &&...lists)
 
 static_assert(std::is_same_v<
     decltype(concatenate_lists(
-        containers::TypeList<int>(),
-        containers::TypeList<char>()
+        TypeList<int>(),
+        TypeList<char>()
     )),
-    containers::TypeList<int, char>
+    TypeList<int, char>
 >);
 static_assert(std::is_same_v<
     decltype(concatenate_lists(
-        containers::TypeList<int>(),
-        containers::TypeList<>()
+        TypeList<int>(),
+        TypeList<>()
     )),
-    containers::TypeList<int>
+    TypeList<int>
 >);
 static_assert(std::is_same_v<
     decltype(concatenate_lists(
-        containers::TypeList<int>(),
-        containers::TypeList<char>(),
-        containers::TypeList<bool>()
+        TypeList<int>(),
+        TypeList<char>(),
+        TypeList<bool>()
     )),
-    containers::TypeList<int, char, bool>
+    TypeList<int, char, bool>
 >);
 }

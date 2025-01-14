@@ -2,15 +2,20 @@
 
 #include <utility>
 
+#include <Usagi/Library/Meta/Functional.hpp>
+#include <Usagi/Library/Meta/Concepts/Functional.hpp>
+
 namespace usagi::meta::types
 {
 /**
- * Map given operator to every type in Ts...
- * @tparam Ts List of types.
- * @param op Operator to apply.
+ * Invoke the provided operator with each type in Ts... together with indices.
+ * Nop if `sizeof(Ts...) == 0`.
+ * @tparam Ts Parameter pack of types.
+ * @param op A generic invocable that accepts `<Index, Type>`.
  */
 template <typename... Ts>
-consteval void map(auto &&op)
+consteval void map(auto &&op) requires
+    (concepts::GenericIndexedTypenameOperator<decltype(op), Ts> && ...)
 {
     auto do_map = [&]<typename Int, Int... Indices>(
         std::integer_sequence<Int, Indices...>)
@@ -19,6 +24,7 @@ consteval void map(auto &&op)
         // indexed, right?
         if constexpr(sizeof...(Ts) > 0)
         {
+            // both the
             ((op.template operator()<Indices, Ts...[Indices]>()), ...);
         }
     };
@@ -35,13 +41,13 @@ consteval void map(auto &&op)
 
 /**
  * Process a list of types with certain constexpr conditions to decide which
- * types to save.
+ * types to keep.
  * @tparam Ts List of types.
- * @param tail An empty list.
- * @param op_accumulate An invocable constexpr object that handles types to be
- * saved.
+ * @param tail An empty type list when there is nothing left to deal with.
+ * @param op_accumulate An invocable constexpr object that concatenates the head
+ * with the tail list when the head is to be kept.
  * @param op_cond_keep_cur_t An invocable constexpr object deciding which type
- * should be kept.
+ * should be kept by index.
  * @return A type list with only elements decided to be kept by
  * op_cond_keep_cur_t.
  */
@@ -49,14 +55,8 @@ template <typename... Ts>
 consteval auto reduce(
     auto &&tail,
     auto &&op_accumulate,
-    auto &&op_cond_keep_cur_t) requires requires
-{
-    // the op must evaluate to bool
-    std::is_same_v<
-        decltype(op_cond_keep_cur_t.template operator()<sizeof...(Ts)>()),
-        bool
-    > == true;
-}
+    auto &&op_cond_keep_cur_t) requires
+    concepts::IndexedBooleanOperator<decltype(op_cond_keep_cur_t)>
 {
     /*
      * sort of the base case
@@ -90,11 +90,14 @@ consteval auto reduce(
             // this must be constexpr because it is used for determining
             // the control path.
             bool KeepCurT =
-                // this doesn't work. op_cond_keep_cur_t is not constexpr:
-                // op_cond_keep_cur_t.template operator()<CurTIndex>()
-                // so we have to use something like this to put it in an
-                // unevaluated context.
-                std::remove_cvref_t<decltype(op_cond_keep_cur_t)>()
+                /*
+                 * Lambdas are constexpr by default whenever possible (see
+                 * https://en.cppreference.com/w/cpp/language/lambda#:~:text=a%20constexpr%20function.-,If%20operator()%20satisfy%20all,(since%20C%2B%2B20),-Specifies%20that%20operator).
+                 * However, op_cond_keep_cur_t is not because it is a parameter.
+                 * But since we can know its unique type, a constexpr instance
+                 * can be created for compile time evaluation.
+                 */
+                construct_constexpr_invocable<decltype(op_cond_keep_cur_t)>()
                     .template operator()<CurTIndex>() == true
         >(auto &&self) consteval
         {
