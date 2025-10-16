@@ -11,77 +11,49 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{f9061c06-bce6-416b-9aeb-31351810b7ba}</ProjectGuid>
     <RootNamespace>Usagi</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>ClangCL</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>ClangCL</PlatformToolset>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>$(Dir_IncludePath);$(IncludePath)</IncludePath>
-    <LibraryPath>$(Dir_LibraryPath);$(LibraryPath)</LibraryPath>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <IncludePath>$(Usagi_IncludePaths);$(IncludePath)</IncludePath>
+    <LibraryPath>$(Usagi_LibraryPaths);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
+  <ItemDefinitionGroup>
     <Link>
-      <SubSystem>Console</SubSystem>
       <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
     </Link>
-    <Lib />
-    <Lib />
-    <Lib />
-    <Lib />
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
-    </Link>
-    <Lib />
-    <Lib />
-    <Lib />
-    <Lib />
-    <Lib />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Concepts\Type\Memcpyable.hpp" />
+    <ClInclude Include="Runtime\Files\concepts.hpp" />
+    <ClInclude Include="Runtime\Memory\Allocators\AbstractAllocator.hpp" />
+    <ClInclude Include="v2\Database\Entities\EntityId.hpp" />
+    <ClInclude Include="v2\Database\Entities\EntityInsertionPolicies.hpp" />
+    <ClInclude Include="Concepts\Memory\PoolableComponent.hpp" />
     <ClInclude Include="Concepts\Type\Range.hpp" />
     <ClInclude Include="Concepts\Type\Types.hpp" />
+    <ClInclude Include=".stash\ComponentAccess.hpp" />
     <ClInclude Include="Entity\ComponentQueryFilter.hpp" />
     <ClInclude Include="Entity\ComponentReflection.hpp">
       <FileType>CppHeader</FileType>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
     </ClInclude>
+    <ClInclude Include="Entity\Components\ComponentList.hpp" />
+    <ClInclude Include="Database\Components\ComponentMemoryAccessType.hpp" />
+    <ClInclude Include="Database\Components\ComponentPresence.hpp" />
+    <ClInclude Include="Database\Components\ComponentAccessDeduction.hpp" />
+    <ClInclude Include="Database\Components\ComponentQueryArgument.hpp" />
     <ClInclude Include="Entity\detail\Declarations.hpp" />
+    <ClInclude Include="Entity\Entities\Queries\EntityQuery.hpp" />
+    <ClInclude Include=".stash\ComponentList.hpp" />
     <ClInclude Include="Entity\EntityDatabase.hpp" />
+    <ClInclude Include="Database\Components\ComponentAccessLevel.hpp" />
+    <ClInclude Include="Entity\Systems\SystemComponentAccessDeduction.hpp" />
     <ClInclude Include="Entity\Utilities.hpp" />
     <ClInclude Include="Library\Algorithm\Container.hpp" />
     <ClInclude Include="Library\Container\FixedCapacityString.hpp" />
@@ -91,10 +63,17 @@
     <ClInclude Include="Library\Memory\Size.hpp" />
     <ClInclude Include="Library\Memory\MemoryArena.hpp" />
     <ClInclude Include="Library\Memory\RawResource.hpp" />
+    <ClInclude Include="Library\Meta\Functional.hpp" />
     <ClInclude Include="Library\Meta\ParameterPack\CollectInnerLists.hpp" />
+    <ClInclude Include="Library\Meta\ParameterPack\Deduplicate2.hpp" />
+    <ClInclude Include="Library\Meta\Concepts\Functional.hpp" />
+    <ClInclude Include="Library\Meta\Strings\Misc.hpp" />
+    <ClInclude Include="Library\Meta\Types\List\Concatenate.hpp" />
     <ClInclude Include="Library\Meta\Types\Deduplicate.hpp" />
     <ClInclude Include="Library\Meta\TypeContainers\TypeList.hpp" />
-    <ClInclude Include="Library\Meta\Types\Containers\List\TypeList.hpp" />
+    <ClInclude Include="Library\Meta\Types\List\TypeList.hpp" />
+    <ClInclude Include="Library\Meta\Types\Functional.hpp" />
+    <ClInclude Include="Library\Meta\Types\TypeTag.hpp" />
     <ClInclude Include="Library\Utilities\ArgumentStorage.hpp" />
     <ClInclude Include="Library\Utilities\BitMask.hpp" />
     <ClInclude Include="Library\Utilities\EnumTranslation.hpp" />
@@ -114,9 +93,11 @@
     <ClInclude Include="Library\Utilities\String.hpp" />
     <ClInclude Include="Library\Utilities\ByteView.hpp" />
     <ClInclude Include="Library\Utilities\TransparentlyComparable.hpp" />
+    <ClInclude Include="Library\Utilities\Tuple.hpp" />
+    <ClInclude Include="Library\Utilities\Types.hpp" />
     <ClInclude Include="Library\Utilities\Variant.hpp" />
     <ClInclude Include="Runtime\Exceptions\ExceptionHeaderCorruption.hpp" />
-    <ClInclude Include="Runtime\File\FilesystemWatcher.hpp" />
+    <ClInclude Include="Runtime\Files\FilesystemWatcher.hpp" />
     <ClInclude Include="Runtime\Memory\Allocators\BitmapAllocator.hpp" />
     <ClInclude Include="Runtime\Memory\Allocators\CircularAllocator.hpp" />
     <ClInclude Include="Runtime\Memory\PagedStorage.hpp" />
@@ -158,7 +139,7 @@
     <ClInclude Include="Runtime\Memory\WeakSingleton.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />
     <ClInclude Include="Entity\Archetype.hpp" />
-    <ClInclude Include="Entity\Component.hpp" />
+    <ClInclude Include="Database\Component.hpp" />
     <ClInclude Include="Entity\System.hpp" />
     <ClInclude Include="Entity\detail\ComponentAccess.hpp" />
     <ClInclude Include="Entity\detail\ComponentAccessAllowAll.hpp" />
@@ -189,30 +170,34 @@
     <ClInclude Include="Library\Meta\TypeContainers\TypeTag.hpp" />
     <ClInclude Include="Library\Meta\Tuple.hpp" />
     <ClInclude Include="Runtime\ErrorHandling.hpp" />
-    <ClInclude Include="Runtime\File\MappedFileView.hpp" />
-    <ClInclude Include="Runtime\File\RegularFile.hpp" />
+    <ClInclude Include="Runtime\Files\MappedFileView.hpp" />
+    <ClInclude Include="Runtime\Files\RegularFile.hpp" />
     <ClInclude Include="Runtime\Memory\View.hpp" />
     <ClInclude Include="Runtime\Memory\VmAllocatorPagefileBacked.hpp" />
     <ClInclude Include="Runtime\Platform\File.hpp" />
     <ClInclude Include="Runtime\Platform\Memory.hpp" />
     <ClInclude Include="Runtime\Service\Service.hpp" />
+    <ClInclude Include="v2\Database\Entities\PagedAllocator.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Library\Meta\test.cpp" />
     <ClCompile Include="Library\Utilities\MaybeOwnedString.cpp" />
     <ClCompile Include="Runtime\Encoding\Unicode.cpp" />
-    <ClCompile Include="Runtime\File\MappedFileView.cpp" />
-    <ClCompile Include="Runtime\File\RegularFile.cpp" />
+    <ClCompile Include="Runtime\Files\MappedFileView.cpp" />
+    <ClCompile Include="Runtime\Files\RegularFile.cpp" />
     <ClCompile Include="Runtime\Memory\Allocators\BitmapAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\Allocators\CircularAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp" />
     <ClCompile Include="Runtime\Memory\VmAllocatorFileBacked.cpp" />
     <ClCompile Include="Runtime\Task\TaskExecutor.cpp" />
+    <ClCompile Include="test_.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Usagi.natvis" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Export.def" />
+    <None Include="vcpkg.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

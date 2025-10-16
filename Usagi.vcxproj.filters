@@ -33,7 +33,7 @@
     <ClInclude Include="Runtime\Platform\Memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\File\RegularFile.hpp">
+    <ClInclude Include="Runtime\Files\RegularFile.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Platform\File.hpp">
@@ -48,7 +48,7 @@
     <ClInclude Include="Entity\Archetype.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Entity\Component.hpp">
+    <ClInclude Include="Database\Component.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Entity\System.hpp">
@@ -195,7 +195,7 @@
     <ClInclude Include="Entity\ComponentReflection.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\File\MappedFileView.hpp">
+    <ClInclude Include="Runtime\Files\MappedFileView.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\IO\Unicode.hpp">
@@ -210,7 +210,7 @@
     <ClInclude Include="Runtime\Memory\VmAllocatorPagefileBacked.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Concepts\Type\Memcpyable.hpp">
+    <ClInclude Include="Concepts\Memory\PoolableComponent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Container\DynamicArray.hpp">
@@ -300,7 +300,7 @@
     <ClInclude Include="Runtime\Memory\RefCount.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\File\FilesystemWatcher.hpp">
+    <ClInclude Include="Runtime\Files\FilesystemWatcher.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Graph\HeterogeneousGraph.hpp">
@@ -372,18 +372,90 @@
     <ClInclude Include="Entity\detail\Declarations.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include=".stash\ComponentAccess.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\Systems\SystemComponentAccessDeduction.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Components\ComponentAccessLevel.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Components\ComponentAccessDeduction.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Components\ComponentQueryArgument.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Components\ComponentPresence.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Utilities\Tuple.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Components\ComponentMemoryAccessType.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".stash\ComponentList.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\Entities\Queries\EntityQuery.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Utilities\Types.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\ParameterPack\Deduplicate2.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Library\Meta\Types\Deduplicate.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Types\Containers\List\TypeList.hpp">
+    <ClInclude Include="Library\Meta\Types\List\TypeList.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Types\List\Concatenate.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Types\Functional.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Strings\Misc.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\Components\ComponentList.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Concepts\Functional.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Functional.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Types\TypeTag.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="v2\Database\Entities\EntityInsertionPolicies.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="v2\Database\Entities\EntityId.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="v2\Database\Entities\PagedAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Memory\Allocators\AbstractAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Files\concepts.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Runtime\File\RegularFile.cpp">
+    <ClCompile Include="Runtime\Files\RegularFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\File\MappedFileView.cpp">
+    <ClCompile Include="Runtime\Files\MappedFileView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Memory\VmAllocatorFileBacked.cpp">
@@ -407,6 +479,12 @@
     <ClCompile Include="Library\Utilities\MaybeOwnedString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Library\Meta\test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Usagi.natvis" />
@@ -415,5 +493,6 @@
     <None Include="Export.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="vcpkg.json" />
   </ItemGroup>
 </Project>
