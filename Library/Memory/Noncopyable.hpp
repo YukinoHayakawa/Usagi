@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace usagi::v2
+namespace usagi
 {
 /**
  * \brief Inheriting from this class makes a class non-copyable.
@@ -47,4 +47,4 @@ static_assert(
     "A class inheriting Noncopyable should remain move assignable.");
 } // namespace details::static_tests
 
-} // namespace usagi::v2
+} // namespace usagi
