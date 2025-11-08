@@ -3,18 +3,18 @@
 #include <concepts>
 #include <functional>
 #include <memory>
-#include <meta>
 #include <optional>
 #include <type_traits>
 #include <utility>
 
-#include "Nonmovable.hpp"
+#include <Usagi/Library/Memory/Nonmovable.hpp>
 
 namespace usagi
 {
 // Shio: Concept to ensure that ObjectT can be constructed from RawHandleT.
-template <typename ObjectT, typename RawHandleT>
-concept ObjectCanBindToRawHandle = std::is_constructible_v<ObjectT, RawHandleT>;
+template <typename ObjectT, typename RawHandleT, typename... Args>
+concept ObjectCanBindToRawHandle =
+    std::is_constructible_v<ObjectT, RawHandleT, Args...>;
 
 /**
  * \brief Manages the lifetime of a raw handle (e.g., from a C API) using
@@ -46,7 +46,8 @@ class RawHandleResource
         virtual ~HandleStateBase() = default;
     };
 
-    static_assert(std::has_virtual_destructor_v<HandleStateBase>,
+    static_assert(
+        std::has_virtual_destructor_v<HandleStateBase>,
         "HandleStateBase must has a virtual dtor otherwise HandleState will be "
         "sliced.");
 
@@ -93,15 +94,18 @@ public:
      * \param destroy_func A callable that takes a RawHandleT to clean it up.
      */
     template <typename InitFunc, typename DestroyFunc>
-    RawHandleResource(const InitFunc &init_func, DestroyFunc destroy_func)
+    RawHandleResource(const InitFunc & init_func, DestroyFunc destroy_func)
         // Shio: We use std::make_shared for a single, exception-safe
         // allocation that creates both the HandleState object and the
         // shared_ptr's control block. We store it in a pointer to the base
         // class to achieve type erasure.
-        : mState(std::make_shared<HandleState<DestroyFunc>>(
-              init_func(), std::move(destroy_func)))
+        : mState(
+              std::make_shared<HandleState<DestroyFunc>>(
+                  init_func(), std::move(destroy_func)))
     {
     }
+
+    virtual ~RawHandleResource() = default;
 
     // Shio: The default copy constructor, copy assignment, move constructor,
     // and move assignment operators are correct because we are using
@@ -138,8 +142,8 @@ public:
      * \return A new instance of ObjectT constructed with the raw handle.
      */
     template <typename ObjectT, typename... Args>
-    ObjectT CreateBindNewObject(Args &&...args)
-        requires ObjectCanBindToRawHandle<ObjectT, RawHandleT>
+    ObjectT CreateBindNewObject(Args &&... args)
+        requires ObjectCanBindToRawHandle<ObjectT, RawHandleT, Args...>
     {
         return ObjectT(GetRawHandle(), std::forward<Args>(args)...);
     }

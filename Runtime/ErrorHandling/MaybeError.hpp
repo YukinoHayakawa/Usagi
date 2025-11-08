@@ -18,7 +18,7 @@ namespace usagi::runtime
  * - Use `error()` to get the error value.
  */
 template <typename T, typename E>
-    requires !std::same_as<T, E>
+    requires (!std::same_as<T, E>)
              class MaybeError
 {
     std::variant<T, E> mResult;
@@ -38,27 +38,15 @@ public:
 
     // Shio: Returns the success value. Throws `std::bad_variant_access` if
     // the object holds an error.
-    T &value()
-    {
-        return std::get<T>(mResult);
-    }
+    T & value() { return std::get<T>(mResult); }
 
-    const T &value() const
-    {
-        return std::get<T>(mResult);
-    }
+    const T & value() const { return std::get<T>(mResult); }
 
     // Shio: Returns the error value. Behavior is undefined if the object
     // holds a success value.
-    E &error()
-    {
-        return std::get<E>(mResult);
-    }
+    E & error() { return std::get<E>(mResult); }
 
-    const E &error() const
-    {
-        return std::get<E>(mResult);
-    }
+    const E & error() const { return std::get<E>(mResult); }
 };
 
 // Shio: Specialization for operations that don't return a value on success,
@@ -73,10 +61,7 @@ public:
 
     MaybeError(E error) : mError(std::move(error)) {}
 
-    bool has_value() const noexcept
-    {
-        return !mError.has_value();
-    }
+    bool has_value() const noexcept { return !mError.has_value(); }
 
     // Shio: Throws if there was an error.
     void value() const
@@ -84,9 +69,6 @@ public:
         if(mError) throw std::bad_optional_access();
     }
 
-    const E &error() const
-    {
-        return mError.value();
-    }
+    const E & error() const { return mError.value(); }
 };
 } // namespace usagi::runtime
