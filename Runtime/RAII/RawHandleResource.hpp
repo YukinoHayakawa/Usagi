@@ -41,7 +41,9 @@ class RawHandleResource
         // or nullptr).
         std::optional<RawHandleT> mHandle;
 
-        explicit HandleStateBase(RawHandleT handle) : mHandle(handle) {}
+        explicit HandleStateBase(RawHandleT handle) : mHandle(std::move(handle))
+        {
+        }
 
         virtual ~HandleStateBase() = default;
     };
@@ -57,7 +59,7 @@ class RawHandleResource
         DestroyFunc mDestroyer;
 
         HandleState(RawHandleT handle, DestroyFunc destroyer)
-            : HandleStateBase(handle)
+            : HandleStateBase(std::move(handle))
             , mDestroyer(std::move(destroyer))
         {
         }
@@ -68,9 +70,9 @@ class RawHandleResource
         ~HandleState() override
         {
             // Shio: The check on std::optional is robust.
-            if(this->mHandle)
+            if(this->mHandle.has_value())
             {
-                mDestroyer(*this->mHandle);
+                mDestroyer(this->mHandle.value());
                 // Always reset destructed members to avoid unintentional
                 // memory misuse.
                 this->mHandle.reset();
@@ -86,6 +88,8 @@ protected:
     RawHandleResource() = default;
 
 public:
+    using RawHandleT = RawHandleT;
+
     /**
      * \brief Initializes the resource handle using the provided init function.
      * \tparam InitFunc A callable type for resource initialization.
@@ -120,7 +124,7 @@ public:
      * and undefined behavior when the last RawHandleResource is destroyed.
      * \return The raw handle, or a null/default value if not present.
      */
-    RawHandleT GetRawHandle() const
+    std::optional<std::reference_wrapper<RawHandleT>> TryGetRawHandle() const
     {
         // Shio: Return the handle's value if it exists, otherwise return a
         // value that indicates an invalid handle (e.g., nullptr for pointer
@@ -131,6 +135,15 @@ public:
         }
         // Shio: Assuming RawHandleT is pointer-like or has a default state
         // that represents an invalid handle.
+        return {};
+    }
+
+    RawHandleT GetRawHandle() const
+    {
+        if(const auto Ret = TryGetRawHandle())
+        {
+            return Ret.value().get();
+        }
         return {};
     }
 
