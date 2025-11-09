@@ -49,6 +49,7 @@
     <ClInclude Include="Runtime\Platform\PermissionErrorCodes.hpp" />
     <ClInclude Include="Runtime\Platform\SecurityError.hpp" />
     <ClInclude Include="Runtime\Platform\SecurityErrorCodes.hpp" />
+    <ClInclude Include="Runtime\RAII\Exceptions.hpp" />
     <ClInclude Include="Runtime\RAII\RawHandleResource.hpp" />
     <ClInclude Include="Runtime\RAII\ScopeExitGuard.hpp" />
     <ClInclude Include="Runtime\RAII\UnmanagedResource.hpp" />

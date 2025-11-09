@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <concepts>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -8,6 +7,9 @@
 #include <utility>
 
 #include <Usagi/Library/Memory/Nonmovable.hpp>
+#include <Usagi/Library/Values/MaybeError.hpp>
+
+#include "Exceptions.hpp"
 
 namespace usagi
 {
@@ -18,15 +20,29 @@ concept ObjectCanBindToRawHandle =
 
 /**
  * \brief Manages the lifetime of a raw handle (e.g., from a C API) using
- * reference counting, allowing it to be safely copied and shared.
+ *        RAII, allowing it to be safely copied and shared via reference
+ *        counting.
  * \details This class is a lightweight, copyable wrapper around a shared
- * handle. All copies of a RawHandleResource share ownership of the same
- * underlying handle. The handle is created via an init function and is
- * automatically destroyed when the last copy of the RawHandleResource is
- * destroyed.
+ *          handle. All copies of a RawHandleResource share ownership of the
+ *          same underlying handle. The handle is created via an init function
+ *          and is automatically destroyed when the last copy of the
+ *          RawHandleResource is destroyed.
+ *
+ *          Shio: A key design consideration is how the raw handle is returned.
+ *          For small, pointer-like handles, returning by copy is cheap and
+ *          simple. However, for larger handle structures, copying can be a
+ *          performance bottleneck. This class uses a size threshold to decide
+ *          whether to return the handle by value or by const reference,
+ *          optimizing for both performance and safety.
  * \tparam RawHandleT The type of the raw handle.
+ * \tparam ReturnHandleByCopyThresholdSize The size in bytes at which the class
+ *         will switch from returning handles by value to returning by const
+ *         reference.
  */
-template <typename RawHandleT>
+template <
+    typename RawHandleT,
+    std::size_t ReturnHandleByCopyThresholdSize = sizeof(std::size_t) * 2
+>
 class RawHandleResource
 {
     // Shio: We use a private polymorphic struct to bundle the handle and its
@@ -88,7 +104,20 @@ protected:
     RawHandleResource() = default;
 
 public:
-    using RawHandleT = RawHandleT;
+    using raw_handle_t = RawHandleT;
+
+    // Shio: Statically decide whether to return the handle by copy or by
+    // reference. If the handle's size is smaller than the threshold, we copy.
+    // Otherwise, we return by const reference to avoid expensive copies.
+    static constexpr bool return_handle_by_copy_v =
+        sizeof(RawHandleT) < ReturnHandleByCopyThresholdSize;
+
+    // Shio: The type used for accessing the handle, determined at compile time.
+    using handle_access_t = std::conditional_t<
+        return_handle_by_copy_v,
+        raw_handle_t,
+        const raw_handle_t &
+    >;
 
     /**
      * \brief Initializes the resource handle using the provided init function.
@@ -117,34 +146,23 @@ public:
     // ownership.
 
     /**
-     * \brief Retrieves the underlying raw handle.
+     * \brief Retrieves the underlying raw handle, throwing if not present.
      * \warning This provides direct access to the raw handle. The handle's
-     * lifetime is managed by the RawHandleResource. Do not manually delete,
-     * free, or close the handle, as doing so will result in a double-free
-     * and undefined behavior when the last RawHandleResource is destroyed.
-     * \return The raw handle, or a null/default value if not present.
+     *          lifetime is managed by the RawHandleResource. Do not manually
+     *          delete, free, or close the handle, as doing so will result in a
+     *          double-free and undefined behavior when the last
+     *          RawHandleResource is destroyed.
+     * \return The raw handle, either by value or const reference depending on
+     *         its size.
+     * \throws MissingManagedResource if the handle is not available.
      */
-    std::optional<std::reference_wrapper<RawHandleT>> TryGetRawHandle() const
+    handle_access_t GetRawHandle(this auto && self)
     {
-        // Shio: Return the handle's value if it exists, otherwise return a
-        // value that indicates an invalid handle (e.g., nullptr for pointer
-        // types).
-        if(mState && mState->mHandle)
-        {
-            return *mState->mHandle;
-        }
-        // Shio: Assuming RawHandleT is pointer-like or has a default state
-        // that represents an invalid handle.
-        return {};
-    }
-
-    RawHandleT GetRawHandle() const
-    {
-        if(const auto Ret = TryGetRawHandle())
-        {
-            return Ret.value().get();
-        }
-        return {};
+        // Shio: We call the throwing version of our internal helper and unwrap
+        // the result. The reference wrapper's `.get()` returns the raw
+        // reference, which is then either copied or used as a reference,
+        // depending on `handle_access_t`.
+        return self.template _TryGetRawHandleRef<false>().value().get();
     }
 
     /**
@@ -159,6 +177,43 @@ public:
         requires ObjectCanBindToRawHandle<ObjectT, RawHandleT, Args...>
     {
         return ObjectT(GetRawHandle(), std::forward<Args>(args)...);
+    }
+
+protected:
+    /**
+     * \brief Internal helper to safely access the raw handle.
+     * \details Shio: This function provides unified access to the underlying
+     *          handle. The template parameter controls the behavior when the
+     *          handle is missing. It always returns a const-reference because
+     *          the public API never exposes a non-const one.
+     * \tparam NoExcept If true, returns an empty result on failure. If false,
+     *         throws `MissingManagedResource`.
+     * \return A `MaybeError` containing a `std::reference_wrapper` to the
+     *         const handle if present, or an error state otherwise.
+     */
+    template <bool NoExcept>
+    auto _TryGetRawHandleRef(this auto && self)
+        -> runtime::MaybeError<std::reference_wrapper<const RawHandleT>, void>
+    {
+        if(self.mState && self.mState->mHandle.has_value())
+        {
+            // Shio: If the handle exists, wrap it in a const reference.
+            // std::cref ensures we get a reference-to-const.
+            return std::cref(self.mState->mHandle.value());
+        }
+
+        // Shio: If the handle does not exist...
+        if constexpr(NoExcept)
+        {
+            // Shio: ...return an empty/error state.
+            return std::nullopt;
+        }
+        else
+        {
+            // Shio: ...or throw an exception if requested.
+            throw MissingManagedResource(
+                "The managed resource is not available.");
+        }
     }
 };
 

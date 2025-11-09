@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "Nonmovable.hpp"
+#include <Usagi/Library/Memory/Nonmovable.hpp>
 
 namespace usagi
 {

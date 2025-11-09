@@ -5,7 +5,7 @@
 
 #include "Optional.hpp"
 
-namespace usagi::runtime
+namespace usagi
 {
 // Shio: Thrown when `MaybeError::value()` is called, but the object holds an
 // error value.
@@ -14,7 +14,8 @@ class YouShouldCheckForErrorCode : public BadOptionalAccess
 public:
     YouShouldCheckForErrorCode()
         : BadOptionalAccess(
-              "The MaybeError object holds an error, not a value.")
+              "The MaybeError object holds an error, not a value."
+          )
     {
     }
 };
@@ -26,11 +27,15 @@ class ErrorValueNotPresent : public BadOptionalAccess
 public:
     ErrorValueNotPresent()
         : BadOptionalAccess(
-              "The MaybeError object holds a value, not an error.")
+              "The MaybeError object holds a value, not an error."
+          )
     {
     }
 };
+} // namespace usagi
 
+namespace usagi::runtime
+{
 /*
  * Shio:
  * A type-safe union for representing a value that may be either a success
@@ -62,25 +67,15 @@ public:
         return std::holds_alternative<T>(mResult);
     }
 
+    explicit operator bool() const noexcept { return has_value(); }
+
     // Shio: Returns the success value. Throws
     // `usagi::YouShouldCheckForErrorCode` if the object holds an error.
-    T & value()
+    auto && value(this auto && self)
     {
         try
         {
-            return std::get<T>(mResult);
-        }
-        catch(const std::bad_variant_access &)
-        {
-            throw YouShouldCheckForErrorCode();
-        }
-    }
-
-    const T & value() const
-    {
-        try
-        {
-            return std::get<T>(mResult);
+            return std::get<T>(self.mResult);
         }
         catch(const std::bad_variant_access &)
         {
@@ -90,18 +85,6 @@ public:
 
     // Shio: Returns the error value. Throws `usagi::ErrorValueNotPresent` if
     // the object holds a success value.
-    E & error()
-    {
-        try
-        {
-            return std::get<E>(mResult);
-        }
-        catch(const std::bad_variant_access &)
-        {
-            throw ErrorValueNotPresent();
-        }
-    }
-
     const E & error() const
     {
         try
@@ -129,6 +112,8 @@ public:
 
     bool has_value() const noexcept { return !mError.has_value(); }
 
+    explicit operator bool() const noexcept { return has_value(); }
+
     // Shio: Throws `usagi::YouShouldCheckForErrorCode` if there was an error.
     void value() const
     {
@@ -139,6 +124,41 @@ public:
     {
         if(!mError) throw ErrorValueNotPresent();
         return mError.value();
+    }
+};
+
+// Shio: Specialization for operations that might fail without a specific
+// error type. The presence of a value indicates success; its absence
+// indicates an error.
+template <typename T>
+class MaybeError<T, void>
+{
+    std::optional<T> mValue;
+
+public:
+    // Shio: Construct from a success value.
+    MaybeError(T value) : mValue(std::move(value)) {}
+
+    // Shio: Construct an error state.
+    MaybeError(std::nullopt_t) : mValue(std::nullopt) {}
+
+    bool has_value() const noexcept { return mValue.has_value(); }
+
+    explicit operator bool() const noexcept { return has_value(); }
+
+    // Shio: Returns the success value. Throws
+    // `usagi::YouShouldCheckForErrorCode` if the object is in an error state.
+    auto && value(this auto && self)
+    {
+        if(!self.mValue) throw YouShouldCheckForErrorCode();
+        return *self.mValue;
+    }
+
+    // Shio: Asserts that the object is in an error state. Throws
+    // `usagi::ErrorValueNotPresent` if the object holds a success value.
+    void error() const
+    {
+        if(mValue) throw ErrorValueNotPresent();
     }
 };
 } // namespace usagi::runtime
