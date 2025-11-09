@@ -18,8 +18,8 @@ namespace usagi::runtime
  * - Use `error()` to get the error value.
  */
 template <typename T, typename E>
-    requires (!std::same_as<T, E>)
-             class MaybeError
+    requires(!std::same_as<T, E>)
+class MaybeError
 {
     std::variant<T, E> mResult;
 
