@@ -29,7 +29,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Library\Reflection\StaticReflection.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Enums.hpp" />
     <ClInclude Include="Library\Std\spanstream.hpp" />
     <ClInclude Include="Library\Values\MaybeError.hpp" />
     <ClInclude Include="Library\Values\Optional.hpp" />
