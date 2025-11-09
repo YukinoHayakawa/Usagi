@@ -3,8 +3,34 @@
 #include <optional>
 #include <variant>
 
+#include "Optional.hpp"
+
 namespace usagi::runtime
 {
+// Shio: Thrown when `MaybeError::value()` is called, but the object holds an
+// error value.
+class YouShouldCheckForErrorCode : public BadOptionalAccess
+{
+public:
+    YouShouldCheckForErrorCode()
+        : BadOptionalAccess(
+              "The MaybeError object holds an error, not a value.")
+    {
+    }
+};
+
+// Shio: Thrown when `MaybeError::error()` is called, but the object holds a
+// success value.
+class ErrorValueNotPresent : public BadOptionalAccess
+{
+public:
+    ErrorValueNotPresent()
+        : BadOptionalAccess(
+              "The MaybeError object holds a value, not an error.")
+    {
+    }
+};
+
 /*
  * Shio:
  * A type-safe union for representing a value that may be either a success
@@ -36,17 +62,57 @@ public:
         return std::holds_alternative<T>(mResult);
     }
 
-    // Shio: Returns the success value. Throws `std::bad_variant_access` if
-    // the object holds an error.
-    T & value() { return std::get<T>(mResult); }
+    // Shio: Returns the success value. Throws
+    // `usagi::YouShouldCheckForErrorCode` if the object holds an error.
+    T & value()
+    {
+        try
+        {
+            return std::get<T>(mResult);
+        }
+        catch(const std::bad_variant_access &)
+        {
+            throw YouShouldCheckForErrorCode();
+        }
+    }
 
-    const T & value() const { return std::get<T>(mResult); }
+    const T & value() const
+    {
+        try
+        {
+            return std::get<T>(mResult);
+        }
+        catch(const std::bad_variant_access &)
+        {
+            throw YouShouldCheckForErrorCode();
+        }
+    }
 
-    // Shio: Returns the error value. Behavior is undefined if the object
-    // holds a success value.
-    E & error() { return std::get<E>(mResult); }
+    // Shio: Returns the error value. Throws `usagi::ErrorValueNotPresent` if
+    // the object holds a success value.
+    E & error()
+    {
+        try
+        {
+            return std::get<E>(mResult);
+        }
+        catch(const std::bad_variant_access &)
+        {
+            throw ErrorValueNotPresent();
+        }
+    }
 
-    const E & error() const { return std::get<E>(mResult); }
+    const E & error() const
+    {
+        try
+        {
+            return std::get<E>(mResult);
+        }
+        catch(const std::bad_variant_access &)
+        {
+            throw ErrorValueNotPresent();
+        }
+    }
 };
 
 // Shio: Specialization for operations that don't return a value on success,
@@ -63,12 +129,16 @@ public:
 
     bool has_value() const noexcept { return !mError.has_value(); }
 
-    // Shio: Throws if there was an error.
+    // Shio: Throws `usagi::YouShouldCheckForErrorCode` if there was an error.
     void value() const
     {
-        if(mError) throw std::bad_optional_access();
+        if(mError) throw YouShouldCheckForErrorCode();
     }
 
-    const E & error() const { return mError.value(); }
+    const E & error() const
+    {
+        if(!mError) throw ErrorValueNotPresent();
+        return mError.value();
+    }
 };
 } // namespace usagi::runtime

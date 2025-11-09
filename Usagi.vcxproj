@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>17.0</VCProjectVersion>
+    <VCProjectVersion>18.0</VCProjectVersion>
     <ProjectGuid>{f9061c06-bce6-416b-9aeb-31351810b7ba}</ProjectGuid>
     <RootNamespace>Usagi</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
@@ -29,8 +29,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Library\Reflection\StaticReflection.hpp" />
+    <ClInclude Include="Library\Std\spanstream.hpp" />
+    <ClInclude Include="Library\Values\MaybeError.hpp" />
+    <ClInclude Include="Library\Values\Optional.hpp" />
+    <ClInclude Include="Runtime\Exceptions\Exceptions.hpp" />
     <ClInclude Include="Runtime\Files\concepts.hpp" />
     <ClInclude Include="Runtime\Memory\Allocators\AbstractAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\Backends\MemoryMappedStorage.hpp" />
+    <ClInclude Include="Runtime\Memory\Backends\MemoryMappingResult.hpp" />
+    <ClInclude Include="Runtime\Memory\Backends\PersistableStorage.hpp" />
+    <ClInclude Include="Runtime\Memory\Backends\PersistableStorageType.hpp" />
+    <ClInclude Include="Runtime\Memory\Backends\PersistableStorageTypes.hpp" />
+    <ClInclude Include="Runtime\Memory\Objects\WeakSingleton.hpp" />
+    <ClInclude Include="Runtime\Platform\FileError.hpp" />
+    <ClInclude Include="Runtime\Platform\FileErrorCodes.hpp" />
+    <ClInclude Include="Runtime\Platform\MemoryError.hpp" />
+    <ClInclude Include="Runtime\Platform\MemoryErrorCodes.hpp" />
+    <ClInclude Include="Runtime\Platform\PermissionErrorCodes.hpp" />
+    <ClInclude Include="Runtime\Platform\SecurityError.hpp" />
+    <ClInclude Include="Runtime\Platform\SecurityErrorCodes.hpp" />
+    <ClInclude Include="Runtime\RAII\RawHandleResource.hpp" />
+    <ClInclude Include="Runtime\RAII\ScopeExitGuard.hpp" />
+    <ClInclude Include="Runtime\RAII\UnmanagedResource.hpp" />
+    <ClInclude Include="Runtime\Services\MissingRequiredRuntimeService.hpp" />
+    <ClInclude Include="Runtime\Services\ServiceProvider.hpp" />
+    <ClInclude Include="Runtime\Services\ServiceProviderErrorCodes.hpp" />
+    <ClInclude Include="Runtime\Services\SimpleRuntimeServiceProvider.hpp" />
     <ClInclude Include="v2\Database\Entities\EntityId.hpp" />
     <ClInclude Include="v2\Database\Entities\EntityInsertionPolicies.hpp" />
     <ClInclude Include="Concepts\Memory\PoolableComponent.hpp" />
@@ -62,7 +87,6 @@
     <ClInclude Include="Library\Memory\Nonmovable.hpp" />
     <ClInclude Include="Library\Memory\Size.hpp" />
     <ClInclude Include="Library\Memory\MemoryArena.hpp" />
-    <ClInclude Include="Library\Memory\RawResource.hpp" />
     <ClInclude Include="Library\Meta\Functional.hpp" />
     <ClInclude Include="Library\Meta\ParameterPack\CollectInnerLists.hpp" />
     <ClInclude Include="Library\Meta\ParameterPack\Deduplicate2.hpp" />
@@ -136,7 +160,6 @@
     <ClInclude Include="Runtime\Service\SimpleService.hpp" />
     <ClInclude Include="Runtime\Task\Task.hpp" />
     <ClInclude Include="Runtime\Task\TaskExecutor.hpp" />
-    <ClInclude Include="Runtime\Memory\WeakSingleton.hpp" />
     <ClInclude Include="Executor\TaskGraph.hpp" />
     <ClInclude Include="Entity\Archetype.hpp" />
     <ClInclude Include="Database\Component.hpp" />
@@ -187,6 +210,7 @@
     <ClCompile Include="Runtime\Files\RegularFile.cpp" />
     <ClCompile Include="Runtime\Memory\Allocators\BitmapAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\Allocators\CircularAllocator.cpp" />
+    <ClCompile Include="Runtime\Memory\Policies\DisableDefaultDynamicAllocation.cpp" />
     <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp" />
     <ClCompile Include="Runtime\Memory\VmAllocatorFileBacked.cpp" />
     <ClCompile Include="Runtime\Task\TaskExecutor.cpp" />
@@ -198,6 +222,9 @@
   <ItemGroup>
     <None Include="Export.def" />
     <None Include="vcpkg.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Library\StateMachines\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

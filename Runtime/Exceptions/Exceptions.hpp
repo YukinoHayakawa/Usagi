@@ -18,7 +18,7 @@ public:
     using std::runtime_error::runtime_error;
 
     template <typename... Args>
-    explicit RuntimeError(std::format_string<Args...> fmt, Args &&...args)
+    explicit RuntimeError(std::format_string<Args...> fmt, Args &&... args)
         : std::runtime_error(std::format(fmt, std::forward<Args>(args)...))
     {
     }
@@ -36,7 +36,7 @@ public:
     using std::logic_error::logic_error;
 
     template <typename... Args>
-    explicit LogicError(std::format_string<Args...> fmt, Args &&...args)
+    explicit LogicError(std::format_string<Args...> fmt, Args &&... args)
         : std::logic_error(std::format(fmt, std::forward<Args>(args)...))
     {
     }
