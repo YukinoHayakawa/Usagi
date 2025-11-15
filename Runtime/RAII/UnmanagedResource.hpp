@@ -4,7 +4,7 @@
 
 #include <Usagi/Library/Memory/Nonmovable.hpp>
 
-namespace usagi
+namespace usagi::runtime
 {
 /**
  * \brief Provides RAII semantics for a resource that is managed via
@@ -16,6 +16,11 @@ namespace usagi
  * It is both non-copyable and non-movable to prevent accidental misuse, such
  * as creating a dangling resource handle in a derived class. Its identity and
  * lifetime are meant to be tied to a specific scope or a singleton manager.
+ *
+ * todo: maybe UnmanagedResource should be relaxed to Noncopyable? Or maybe not?
+ *   Because even for giant resource objects like LLVM, it is highly likely that
+ *   we will use a `ServiceProvider` to hold the instances, so that the resource
+ *   will never be copied nor moved.
  *
  * \tparam InitFunc A callable type for resource initialization.
  * \tparam DestroyFunc A callable type for resource destruction.
@@ -55,4 +60,4 @@ public:
 template <typename InitFunc, typename DestroyFunc>
 UnmanagedResource(InitFunc, DestroyFunc)
     -> UnmanagedResource<InitFunc, DestroyFunc>;
-} // namespace usagi
+} // namespace usagi::runtime
