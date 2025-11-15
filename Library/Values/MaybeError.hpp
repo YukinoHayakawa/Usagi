@@ -50,7 +50,7 @@ namespace usagi::runtime
  */
 template <typename T, typename E>
     requires(!std::same_as<T, E>)
-class MaybeError
+[[deprecated("Use std::excepected instead.")]] class MaybeError
 {
     std::variant<T, E> mResult;
 
