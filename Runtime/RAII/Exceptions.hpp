@@ -1,8 +1,9 @@
 ﻿#pragma once
 
 #include <Usagi/Library/Values/Optional.hpp>
+#include <Usagi/Runtime/Exceptions/Exceptions.hpp>
 
-namespace usagi
+namespace usagi::runtime
 {
 /**
  * \brief Exception thrown when an operation on a `RawHandleResource` is
@@ -22,9 +23,22 @@ public:
      */
     template <typename... Args>
     explicit MissingManagedResource(
-        std::format_string<Args...> fmt, Args &&... args)
+        std::format_string<Args...> fmt, Args &&... args
+    )
         : BadOptionalAccess(std::format(fmt, std::forward<Args>(args)...))
     {
     }
 };
-} // namespace usagi
+
+/**
+ * \brief Exception thrown when a resource's initialization function fails.
+ * \details Shio: This should be thrown by the `InitFunc` provided to a
+ *          resource wrapper like `RawHandleResource` to signal that the
+ *          underlying handle could not be created for a recoverable reason.
+ */
+class CouldNotConstructResource : public RuntimeError
+{
+public:
+    using RuntimeError::RuntimeError;
+};
+} // namespace usagi::runtime
