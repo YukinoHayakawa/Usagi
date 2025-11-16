@@ -15,11 +15,17 @@
 // The code below are mostly based on sample code section 3.6 from
 // the proposal P2996.
 // https://wg21.link/P2996
-namespace usagi::meta
+namespace usagi::meta::reflection
 {
 // Shio: A concept to constrain templates to enum types.
 template <typename T>
 concept Enum = std::is_enum_v<T>;
+
+enum class ReturnUsingOptional
+{
+    Yes,
+    No,
+};
 
 namespace details
 {
