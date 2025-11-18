@@ -88,7 +88,7 @@ concept NamelessServiceProviderRequirements =
         >>;
         {
             provider.template generate_service_name<ServiceT>()
-        } -> std::same_as<std::string>;
+        } -> std::convertible_to<std::string_view>;
     };
 } // namespace details
 

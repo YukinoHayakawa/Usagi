@@ -22,7 +22,8 @@ namespace usagi::runtime
  *
  * Shio: This class uses a `std::unordered_map` with `std::any` to store
  * service instances. This implementation takes ownership of the services
- * passed to it by storing them as `std::unique_ptr` inside `std::any`.
+ * passed to it by storing them as `std::shared_ptr` inside `std::any`.
+ * Because `std::any` requires the payload to be copy-constructible.
  */
 class SimpleServiceProvider
     : public RawHandleResource<std::shared_mutex *>
@@ -48,7 +49,7 @@ public:
         operator=(SimpleServiceProvider && other) noexcept = default;
 
     template <typename ServiceT>
-    static std::string generate_service_name()
+    static std::string_view generate_service_name()
     {
         return typeid(ServiceT).name();
     }
@@ -67,11 +68,11 @@ public:
             return std::unexpected(ServiceProviderErrorCodes::ServiceNotFound);
         }
 
-        // Shio: The `any` stores a `std::unique_ptr<ServiceT>`. We need to
-        // get a pointer to the stored unique_ptr to avoid moving it, and
+        // Shio: The `any` stores a `std::shared_ptr<ServiceT>`. We need to
+        // get a pointer to the stored shared_ptr to avoid moving it, and
         // then get the raw pointer from it.
         if(auto * service_ptr_ptr =
-               std::any_cast<std::unique_ptr<ServiceT>>(service_any))
+               std::any_cast<std::shared_ptr<ServiceT>>(service_any))
         {
             auto * raw_ptr = service_ptr_ptr->get();
             // Shio: The raw pointer to the service is stable even if the map
@@ -138,7 +139,9 @@ public:
 
         auto * const service_ptr = instance.get();
 
-        if(!create_service_impl(service_name, std::move(instance)))
+        if(!create_service_impl(
+               service_name, std::shared_ptr<ServiceT>(std::move(instance))
+           ))
         {
             return std::unexpected(ServiceProviderErrorCodes::ServiceNameInUse);
         }
