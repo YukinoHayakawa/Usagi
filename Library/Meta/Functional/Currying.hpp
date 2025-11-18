@@ -100,7 +100,8 @@ static_assert(
 // Fully specializing the template in two passes and instantiate it.
 static_assert(
     typename[:partially_apply<CurryingTest, TestValue>().apply<char>():]().a.c
-    == 31'415);
+    == 31'415
+);
 
 // Fully specializing the template in one pass and instantiate it.
 static_assert(
