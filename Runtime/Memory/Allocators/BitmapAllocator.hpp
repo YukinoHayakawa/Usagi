@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <mutex>
+#include <string>
 
 #include <Usagi/Library/Memory/Noncopyable.hpp>
 

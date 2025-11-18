@@ -9,6 +9,10 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="UnitTest|x64">
+      <Configuration>UnitTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
@@ -17,9 +21,14 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <PropertyGroup>
     <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='UnitTest'">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
     <IncludePath>$(Usagi_IncludePaths);$(IncludePath)</IncludePath>
     <LibraryPath>$(Usagi_LibraryPaths);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -29,7 +38,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Library\Meta\Functional\Callables.hpp" />
+    <ClInclude Include="Library\Meta\Functional\Currying.hpp" />
+    <ClInclude Include="Library\Meta\Functional\Transform.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Callables.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Classes.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Closures.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\details\Predicates.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\details\PredicateEvaluation.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Enums.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Flags.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Members.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\details\UnaryPredicates.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Traits.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\StaticReflection.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Values.hpp" />
+    <ClInclude Include="Library\Meta\Self.hpp" />
+    <ClInclude Include="Library\Meta\Types\Traits.hpp" />
+    <ClInclude Include="Library\Meta\Values\Constness.hpp" />
     <ClInclude Include="Library\Std\spanstream.hpp" />
     <ClInclude Include="Library\Values\MaybeError.hpp" />
     <ClInclude Include="Library\Values\Optional.hpp" />
@@ -51,12 +77,13 @@
     <ClInclude Include="Runtime\Platform\SecurityErrorCodes.hpp" />
     <ClInclude Include="Runtime\RAII\Exceptions.hpp" />
     <ClInclude Include="Runtime\RAII\RawHandleResource.hpp" />
+    <ClInclude Include="Runtime\RAII\ResourceErrorCodes.hpp" />
     <ClInclude Include="Runtime\RAII\ScopeExitGuard.hpp" />
     <ClInclude Include="Runtime\RAII\UnmanagedResource.hpp" />
-    <ClInclude Include="Runtime\Services\MissingRequiredRuntimeService.hpp" />
+    <ClInclude Include="Runtime\Services\Exceptions.hpp" />
     <ClInclude Include="Runtime\Services\ServiceProvider.hpp" />
     <ClInclude Include="Runtime\Services\ServiceProviderErrorCodes.hpp" />
-    <ClInclude Include="Runtime\Services\SimpleRuntimeServiceProvider.hpp" />
+    <ClInclude Include="Runtime\Services\SimpleServiceProvider.hpp" />
     <ClInclude Include="v2\Database\Entities\EntityId.hpp" />
     <ClInclude Include="v2\Database\Entities\EntityInsertionPolicies.hpp" />
     <ClInclude Include="Concepts\Memory\PoolableComponent.hpp" />
@@ -64,11 +91,7 @@
     <ClInclude Include="Concepts\Type\Types.hpp" />
     <ClInclude Include=".stash\ComponentAccess.hpp" />
     <ClInclude Include="Entity\ComponentQueryFilter.hpp" />
-    <ClInclude Include="Entity\ComponentReflection.hpp">
-      <FileType>CppHeader</FileType>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">-Xclang -freflection %(AdditionalOptions)</AdditionalOptions>
-    </ClInclude>
+    <ClInclude Include="Entity\ComponentReflection.hpp" />
     <ClInclude Include="Entity\Components\ComponentList.hpp" />
     <ClInclude Include="Database\Components\ComponentMemoryAccessType.hpp" />
     <ClInclude Include="Database\Components\ComponentPresence.hpp" />
@@ -211,9 +234,7 @@
     <ClCompile Include="Runtime\Files\RegularFile.cpp" />
     <ClCompile Include="Runtime\Memory\Allocators\BitmapAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\Allocators\CircularAllocator.cpp" />
-    <ClCompile Include="Runtime\Memory\Policies\DisableDefaultDynamicAllocation.cpp" />
-    <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp" />
-    <ClCompile Include="Runtime\Memory\VmAllocatorFileBacked.cpp" />
+    <ClCompile Include="Runtime\Services\SimpleServiceProvider.cpp" />
     <ClCompile Include="Runtime\Task\TaskExecutor.cpp" />
     <ClCompile Include="test_.cpp" />
   </ItemGroup>
