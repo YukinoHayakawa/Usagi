@@ -64,7 +64,7 @@ public:
 
         if(!service_any)
         {
-            return ServiceProviderErrorCodes::ServiceNotFound;
+            return std::unexpected(ServiceProviderErrorCodes::ServiceNotFound);
         }
 
         // Shio: The `any` stores a `std::unique_ptr<ServiceT>`. We need to
@@ -82,7 +82,9 @@ public:
 
         // Shio: If we are here, it means the service name exists, but the
         // type is not what we are looking for.
-        return ServiceProviderErrorCodes::MismatchedServiceType;
+        return std::unexpected(
+            ServiceProviderErrorCodes::MismatchedServiceType
+        );
     }
 
     template <typename ServiceT>
@@ -91,7 +93,7 @@ public:
     )
     {
         auto result = try_get_service<ServiceT>(service_name);
-        if(result.has_error())
+        if(!result)
         {
             // Shio: Consider logging the error code here for debugging.
             throw MissingRequiredRuntimeService(std::string(service_name));
@@ -129,14 +131,16 @@ public:
     {
         if(!instance)
         {
-            return ServiceProviderErrorCodes::NullServiceInstance;
+            return std::unexpected(
+                ServiceProviderErrorCodes::NullServiceInstance
+            );
         }
 
         auto * const service_ptr = instance.get();
 
         if(!create_service_impl(service_name, std::move(instance)))
         {
-            return ServiceProviderErrorCodes::ServiceNameInUse;
+            return std::unexpected(ServiceProviderErrorCodes::ServiceNameInUse);
         }
 
         return std::ref(*service_ptr);
