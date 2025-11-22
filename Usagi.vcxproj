@@ -67,6 +67,9 @@
     <ClInclude Include="Runtime\Memory\Backends\PersistableStorage.hpp" />
     <ClInclude Include="Runtime\Memory\Backends\PersistableStorageType.hpp" />
     <ClInclude Include="Runtime\Memory\Backends\PersistableStorageTypes.hpp" />
+    <ClInclude Include="Runtime\Memory\Safety\MemoryAccessErrorCodes.hpp" />
+    <ClInclude Include="Runtime\Memory\Safety\MemorySafety.hpp" />
+    <ClInclude Include="Runtime\Serialization\ErrorCodes.hpp" />
     <ClInclude Include="Runtime\Memory\Objects\WeakSingleton.hpp" />
     <ClInclude Include="Runtime\Platform\FileError.hpp" />
     <ClInclude Include="Runtime\Platform\FileErrorCodes.hpp" />
@@ -234,6 +237,7 @@
     <ClCompile Include="Runtime\Files\RegularFile.cpp" />
     <ClCompile Include="Runtime\Memory\Allocators\BitmapAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\Allocators\CircularAllocator.cpp" />
+    <ClCompile Include="Runtime\Memory\Safety\MemorySafety.cpp" />
     <ClCompile Include="Runtime\Services\SimpleServiceProvider.cpp" />
     <ClCompile Include="Runtime\Task\TaskExecutor.cpp" />
     <ClCompile Include="test_.cpp" />
