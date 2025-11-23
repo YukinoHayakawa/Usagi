@@ -585,6 +585,9 @@
     <ClInclude Include="Runtime\Memory\Safety\MemoryAccessErrorCodes.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Runtime\Strings\VariadicFormat.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\Files\RegularFile.cpp">
@@ -618,6 +621,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Memory\Safety\MemorySafety.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Strings\VariadicFormat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

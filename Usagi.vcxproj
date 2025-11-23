@@ -87,6 +87,7 @@
     <ClInclude Include="Runtime\Services\ServiceProvider.hpp" />
     <ClInclude Include="Runtime\Services\ServiceProviderErrorCodes.hpp" />
     <ClInclude Include="Runtime\Services\SimpleServiceProvider.hpp" />
+    <ClInclude Include="Runtime\Strings\VariadicFormat.hpp" />
     <ClInclude Include="v2\Database\Entities\EntityId.hpp" />
     <ClInclude Include="v2\Database\Entities\EntityInsertionPolicies.hpp" />
     <ClInclude Include="Concepts\Memory\PoolableComponent.hpp" />
@@ -239,6 +240,7 @@
     <ClCompile Include="Runtime\Memory\Allocators\CircularAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\Safety\MemorySafety.cpp" />
     <ClCompile Include="Runtime\Services\SimpleServiceProvider.cpp" />
+    <ClCompile Include="Runtime\Strings\VariadicFormat.cpp" />
     <ClCompile Include="Runtime\Task\TaskExecutor.cpp" />
     <ClCompile Include="test_.cpp" />
   </ItemGroup>
