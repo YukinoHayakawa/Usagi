@@ -6,17 +6,16 @@
 namespace usagi::runtime
 {
 SimpleServiceProvider::SimpleServiceProvider()
-    : RawHandleResource<std::shared_mutex *>(
-        []() { return new std::shared_mutex(); },
-        [](auto * m) { delete m; }
-    )
+    : RawHandleResource(
+          []() { return new std::shared_mutex(); }, [](auto * m) { delete m; }
+      )
 {
 }
 
 SimpleServiceProvider::AnyAndSharedLock
-SimpleServiceProvider::try_get_service_impl_locked(
-    const std::string_view service_name
-)
+    SimpleServiceProvider::try_get_service_impl_locked(
+        const std::string_view service_name
+    )
 {
     std::shared_lock lock(*GetRawHandle());
     const auto       it = mServices.find(std::string(service_name));

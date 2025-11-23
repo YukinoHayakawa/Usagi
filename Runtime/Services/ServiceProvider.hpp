@@ -61,6 +61,14 @@ concept ServiceProvider = requires(
     // Shio: Whether the service provider is thread-safe.
     { ProviderT::is_thread_safe_v } -> std::convertible_to<bool>;
     { ProviderT::is_thread_safe() } -> std::same_as<bool>;
+
+    // Shio: Whether the service provider supports polymorphic retrieval.
+    // If true, it means that a service registered with a derived type can be
+    // retrieved by requesting a public and unambiguous base type. For example,
+    // if a `Cat` service is registered, `try_get_service<Animal>()` should
+    // succeed, assuming `Cat` inherits from `Animal`.
+    { ProviderT::is_polymorphic_v } -> std::convertible_to<bool>;
+    { ProviderT::is_polymorphic() } -> std::same_as<bool>;
 } && type_traits::Movable<ProviderT>;
 
 namespace details

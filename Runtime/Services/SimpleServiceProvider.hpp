@@ -41,6 +41,10 @@ public:
 
     static constexpr bool is_thread_safe() { return is_thread_safe_v; }
 
+    static constexpr bool is_polymorphic_v = true;
+
+    static constexpr bool is_polymorphic() { return is_polymorphic_v; }
+
     SimpleServiceProvider();
     virtual ~SimpleServiceProvider() = default;
 
@@ -68,9 +72,10 @@ public:
             return std::unexpected(ServiceProviderErrorCodes::ServiceNotFound);
         }
 
-        // Shio: The `any` stores a `std::shared_ptr<ServiceT>`. We need to
-        // get a pointer to the stored shared_ptr to avoid moving it, and
-        // then get the raw pointer from it.
+        // Shio: The `any` stores a `std::shared_ptr` to a service instance.
+        // `std::any_cast` is used to retrieve it. So long as the requested
+        // `ServiceT` is a type that the stored `std::shared_ptr` can be
+        // converted to, this operation will succeed.
         if(auto * service_ptr_ptr =
                std::any_cast<std::shared_ptr<ServiceT>>(service_any))
         {
