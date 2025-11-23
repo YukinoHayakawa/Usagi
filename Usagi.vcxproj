@@ -43,6 +43,7 @@
     <ClInclude Include="Library\Meta\Functional\Transform.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Callables.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Classes.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Classes_.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Closures.hpp" />
     <ClInclude Include="Library\Meta\Reflection\details\Predicates.hpp" />
     <ClInclude Include="Library\Meta\Reflection\details\PredicateEvaluation.hpp" />
@@ -67,6 +68,7 @@
     <ClInclude Include="Runtime\Memory\Backends\PersistableStorage.hpp" />
     <ClInclude Include="Runtime\Memory\Backends\PersistableStorageType.hpp" />
     <ClInclude Include="Runtime\Memory\Backends\PersistableStorageTypes.hpp" />
+    <ClInclude Include="Runtime\Memory\Safety\MagicNumberMixin.hpp" />
     <ClInclude Include="Runtime\Memory\Safety\MemoryAccessErrorCodes.hpp" />
     <ClInclude Include="Runtime\Memory\Safety\MemorySafety.hpp" />
     <ClInclude Include="Runtime\Serialization\ErrorCodes.hpp" />

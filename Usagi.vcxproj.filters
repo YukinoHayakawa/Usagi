@@ -534,7 +534,7 @@
     <ClInclude Include="Library\Meta\Reflection\Callables.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Classes.hpp">
+    <ClInclude Include="Library\Meta\Reflection\Classes_.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\Reflection\Closures.hpp">
@@ -586,6 +586,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Strings\VariadicFormat.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Classes.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Memory\Safety\MagicNumberMixin.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
