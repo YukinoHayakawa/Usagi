@@ -162,23 +162,24 @@ public:
 
     template <typename ServiceT, typename... Args>
     auto create_service(
-        std::in_place_t,
+        construct_in_place_t,
         const optional_service_name_t & service_name,
-        auto &&                         args
+        Args &&... args
     ) -> maybe_service_t<ServiceT>
     {
         return create_service<ServiceT>(
-            service_name,
-            std::make_unique<ServiceT>(std::forward<Args>(args)...)
+            std::make_unique<ServiceT>(std::forward<Args>(args)...),
+            service_name
         );
     }
 
     template <typename ServiceT, typename... Args>
-    auto create_service(std::in_place_t, auto && args)
+    auto create_service(construct_default_name_t, Args &&... args)
         -> maybe_service_t<ServiceT>
     {
         return create_service<ServiceT>(
-            std::in_place, default_service_name, std::forward<Args>(args)...
+            construct_in_place, default_service_name,
+            std::forward<Args>(args)...
         );
     }
 };

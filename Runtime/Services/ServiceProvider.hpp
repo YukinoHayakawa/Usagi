@@ -7,6 +7,7 @@
 #include <string_view>
 #include <variant>
 
+#include <Usagi/Library/Memory/Construction.hpp>
 #include <Usagi/Library/Meta/Types/Traits.hpp>
 
 #include "ServiceProviderErrorCodes.hpp"
@@ -39,7 +40,6 @@ using maybe_service_t =
 template <typename ProviderT, typename ServiceT = int>
 concept ServiceProvider = requires(
                               ProviderT                 provider,
-                              std::in_place_t           in_place,
                               std::string_view          name,
                               std::unique_ptr<ServiceT> instance
                           ) {
@@ -69,7 +69,7 @@ concept ServiceProvider = requires(
     // The ServiceProvider calls `std::make_unique` to create the service.
     // todo: support checking construction with actual ctor args
     {
-        provider.template create_service<ServiceT>(std::in_place, name, 0)
+        provider.template create_service<ServiceT>(construct_in_place, name, 0)
     } -> std::convertible_to<maybe_service_t<ServiceT>>;
 
     // Shio: Whether the service provider is thread-safe.
@@ -90,7 +90,6 @@ namespace details
 template <typename ProviderT, typename ServiceT = int>
 concept NamelessServiceProviderRequirements = requires(
     ProviderT                 provider,
-    std::in_place_t           in_place,
     optional_service_name_t   name,
     std::unique_ptr<ServiceT> instance
 ) {
@@ -111,7 +110,7 @@ concept NamelessServiceProviderRequirements = requires(
     } -> std::convertible_to<std::string_view>;
     // todo: support checking construction with actual ctor args
     {
-        provider.template create_service<ServiceT>(std::in_place, 0)
+        provider.template create_service<ServiceT>(construct_default_name, 0)
     } -> std::convertible_to<maybe_service_t<ServiceT>>;
 };
 } // namespace details
