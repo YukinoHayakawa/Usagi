@@ -10,6 +10,7 @@
 #include <utility>
 
 #include <Usagi/Library/Memory/Noncopyable.hpp>
+#include <Usagi/Library/Meta/Reflection/StaticReflection.hpp>
 #include <Usagi/Runtime/RAII/RawHandleResource.hpp>
 
 #include "Exceptions.hpp"
@@ -116,7 +117,7 @@ public:
         {
             // Shio: Consider logging the error code here for debugging.
             throw MissingRequiredRuntimeService(
-                std::string(actual_service_name)
+                std::meta::display_string_of(^^ServiceT), actual_service_name
             );
         }
         return result.value().get();

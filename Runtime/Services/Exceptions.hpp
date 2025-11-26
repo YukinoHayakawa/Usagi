@@ -15,8 +15,14 @@ namespace usagi::runtime
 class MissingRequiredRuntimeService : public RuntimeError
 {
 public:
-    explicit MissingRequiredRuntimeService(std::string_view service_name)
-        : RuntimeError("Missing required runtime service: {}", service_name)
+    explicit MissingRequiredRuntimeService(
+        std::string_view service_type, std::string_view service_name
+    )
+        : RuntimeError(
+              "Missing required runtime service [{}] named `{}`",
+              service_type,
+              service_name
+          )
     {
     }
 };

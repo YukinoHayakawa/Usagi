@@ -29,16 +29,15 @@ namespace usagi::runtime
 template <typename... Ts>
 struct ServiceAccess
 {
-    ServiceAccess(SimpleServiceProvider & services)
-        : services_(services)
-    {
-    }
+    ServiceAccess(SimpleServiceProvider & services) : services_(services) {}
 
     template <typename T>
 #ifndef __RESHARPER__
         requires(meta::reflection::is_type_in_list<T, Ts...>())
 #endif
-    auto & require(const std::string_view service_name = {}) const
+    auto & require(
+        const optional_service_name_t & service_name = default_service_name
+    ) const
     {
         return services_.ensure_service<T>(service_name);
     }
@@ -47,7 +46,9 @@ struct ServiceAccess
 #ifndef __RESHARPER__
         requires(meta::reflection::is_type_in_list<T, Ts...>())
 #endif
-    auto optional(const std::string_view service_name = {}) const
+    auto optional(
+        const optional_service_name_t & service_name = default_service_name
+    ) const
     {
         return services_.try_get_service<T>(service_name);
     }
