@@ -161,8 +161,10 @@ public:
     }
 
     template <typename ServiceT, typename... Args>
-    auto create_service_inplace(
-        const optional_service_name_t & service_name, auto && args
+    auto create_service(
+        std::in_place_t,
+        const optional_service_name_t & service_name,
+        auto &&                         args
     ) -> maybe_service_t<ServiceT>
     {
         return create_service<ServiceT>(
@@ -172,10 +174,11 @@ public:
     }
 
     template <typename ServiceT, typename... Args>
-    auto create_service_inplace(auto && args) -> maybe_service_t<ServiceT>
+    auto create_service(std::in_place_t, auto && args)
+        -> maybe_service_t<ServiceT>
     {
-        return create_service_inplace<ServiceT>(
-            default_service_name, std::forward<Args>(args)...
+        return create_service<ServiceT>(
+            std::in_place, default_service_name, std::forward<Args>(args)...
         );
     }
 };
