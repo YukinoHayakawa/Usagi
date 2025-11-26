@@ -20,6 +20,11 @@ namespace usagi::runtime
  * todo: we also need some way for adding services via this interface.
  * todo: `ServiceAccess` should only provide access to Services declared in
  *   `Ts...`.
+ * todo: Executive should collect all Services required by Systems and validate
+ *   that the application has actually created them before running the task
+ *   graph.
+ * todo: use reflection & codegen to manually build vtables for `ServiceAccess`
+ *   so that it can work independent of `SimpleServiceProvider`.
  */
 template <typename... Ts>
 struct ServiceAccess

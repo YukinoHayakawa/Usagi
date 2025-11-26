@@ -38,6 +38,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Library\Memory\Construction.hpp" />
     <ClInclude Include="Library\Meta\Functional\Callables.hpp" />
     <ClInclude Include="Library\Meta\Functional\Currying.hpp" />
     <ClInclude Include="Library\Meta\Functional\Transform.hpp" />
