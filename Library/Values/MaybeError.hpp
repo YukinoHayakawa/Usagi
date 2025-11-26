@@ -50,7 +50,10 @@ namespace usagi::runtime
  */
 template <typename T, typename E>
     requires(!std::same_as<T, E>)
-[[deprecated("Use std::excepected instead.")]] class MaybeError
+//todo libc++'s `std::expected` cannot be put into `std::vector` or other
+//   containers due to some issues with its deallocator.
+// [[deprecated("Use `std::expected` instead.")]]
+class MaybeError
 {
     std::variant<T, E> mResult;
 
