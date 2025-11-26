@@ -55,6 +55,7 @@ struct partially_applied_template
 
 // This function must be able to handle the case where no `PartialArgs` are
 // provided.
+// todo: support any kind of templates including variables/concepts.
 template <template <typename...> typename Template, typename... PartialArgs>
 consteval auto partially_apply()
 {

@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <string_view>
+#include <variant>
 
 #include <Usagi/Library/Meta/Types/Traits.hpp>
 
@@ -12,6 +13,18 @@
 
 namespace usagi::runtime
 {
+struct UseDefaultServiceNameTag
+{
+};
+
+constexpr inline UseDefaultServiceNameTag default_service_name;
+using optional_service_name_t =
+    std::variant<UseDefaultServiceNameTag, std::string_view>;
+
+template <typename ServiceT>
+using maybe_service_t =
+    std::expected<std::reference_wrapper<ServiceT>, ServiceProviderErrorCodes>;
+
 /**
  * \brief A concept for a runtime service provider.
  *
@@ -26,7 +39,7 @@ namespace usagi::runtime
 template <typename ProviderT, typename ServiceT = int>
 concept ServiceProvider = requires(
                               ProviderT                 provider,
-                              const std::string_view    name,
+                              std::string_view          name,
                               std::unique_ptr<ServiceT> instance
                           ) {
     // Shio: Attempts to retrieve a service. This version does not throw on
@@ -34,9 +47,7 @@ concept ServiceProvider = requires(
     // registered under different names.
     {
         provider.template try_get_service<ServiceT>(name)
-    } -> std::convertible_to<std::expected<
-        std::reference_wrapper<ServiceT>, ServiceProviderErrorCodes
-    >>;
+    } -> std::convertible_to<maybe_service_t<ServiceT>>;
 
     // Shio: Ensures a service is available and returns it. Throws
     // `MissingRequiredRuntimeService` if the service cannot be found.
@@ -47,16 +58,18 @@ concept ServiceProvider = requires(
     // Shio: Creates a default-constructed service instance.
     {
         provider.template create_default_service<ServiceT>(name)
-    } -> std::convertible_to<std::expected<
-        std::reference_wrapper<ServiceT>, ServiceProviderErrorCodes
-    >>;
+    } -> std::convertible_to<maybe_service_t<ServiceT>>;
 
     // Shio: Takes ownership of a pre-made service instance.
     {
-        provider.template create_service<ServiceT>(name, std::move(instance))
-    } -> std::convertible_to<std::expected<
-        std::reference_wrapper<ServiceT>, ServiceProviderErrorCodes
-    >>;
+        provider.template create_service<ServiceT>(std::move(instance), name)
+    } -> std::convertible_to<maybe_service_t<ServiceT>>;
+
+    // The ServiceProvider calls `std::make_unique` to create the service.
+    // todo: support checking construction with actual ctor args
+    {
+        provider.template create_service_inplace<ServiceT>(name, 0)
+    } -> std::convertible_to<maybe_service_t<ServiceT>>;
 
     // Shio: Whether the service provider is thread-safe.
     { ProviderT::is_thread_safe_v } -> std::convertible_to<bool>;
@@ -74,30 +87,31 @@ concept ServiceProvider = requires(
 namespace details
 {
 template <typename ProviderT, typename ServiceT = int>
-concept NamelessServiceProviderRequirements =
-    requires(ProviderT provider, std::unique_ptr<ServiceT> instance) {
-        {
-            provider.template try_get_service<ServiceT>()
-        } -> std::convertible_to<std::expected<
-            std::reference_wrapper<ServiceT>, ServiceProviderErrorCodes
-        >>;
-        {
-            provider.template ensure_service<ServiceT>()
-        } -> std::same_as<ServiceT &>;
-        {
-            provider.template create_default_service<ServiceT>()
-        } -> std::convertible_to<std::expected<
-            std::reference_wrapper<ServiceT>, ServiceProviderErrorCodes
-        >>;
-        {
-            provider.template create_service<ServiceT>(std::move(instance))
-        } -> std::convertible_to<std::expected<
-            std::reference_wrapper<ServiceT>, ServiceProviderErrorCodes
-        >>;
-        {
-            provider.template generate_service_name<ServiceT>()
-        } -> std::convertible_to<std::string_view>;
-    };
+concept NamelessServiceProviderRequirements = requires(
+    ProviderT                 provider,
+    optional_service_name_t   name,
+    std::unique_ptr<ServiceT> instance
+) {
+    {
+        provider.template try_get_service<ServiceT>()
+    } -> std::convertible_to<maybe_service_t<ServiceT>>;
+    {
+        provider.template ensure_service<ServiceT>()
+    } -> std::same_as<ServiceT &>;
+    {
+        provider.template create_default_service<ServiceT>()
+    } -> std::convertible_to<maybe_service_t<ServiceT>>;
+    {
+        provider.template create_service<ServiceT>(std::move(instance))
+    } -> std::convertible_to<maybe_service_t<ServiceT>>;
+    {
+        provider.template generate_service_name<ServiceT>()
+    } -> std::convertible_to<std::string_view>;
+    // todo: support checking construction with actual ctor args
+    {
+        provider.template create_service_inplace<ServiceT>(0)
+    } -> std::convertible_to<maybe_service_t<ServiceT>>;
+};
 } // namespace details
 
 template <typename ProviderT, typename ServiceT = int>

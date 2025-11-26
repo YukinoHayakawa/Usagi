@@ -29,12 +29,21 @@ class SimpleServiceProvider
     : public RawHandleResource<std::shared_mutex *>
     , Noncopyable
 {
+protected:
     std::unordered_map<std::string, std::any> mServices;
 
     using AnyAndSharedLock =
         std::pair<std::any *, std::shared_lock<std::shared_mutex>>;
     AnyAndSharedLock try_get_service_impl_locked(std::string_view service_name);
     bool create_service_impl(std::string_view service_name, std::any instance);
+
+    template <typename ServiceT>
+    static std::string_view
+        get_actual_service_name(const optional_service_name_t & service_name)
+    {
+        return service_name.index() == 0 ? generate_service_name<ServiceT>()
+                                         : std::get<1>(service_name);
+    }
 
 public:
     static constexpr bool is_thread_safe_v = true;
@@ -59,13 +68,15 @@ public:
     }
 
     template <typename ServiceT>
-    std::expected<std::reference_wrapper<ServiceT>, ServiceProviderErrorCodes>
-        try_get_service(
-            const std::string_view service_name =
-                generate_service_name<ServiceT>()
-        )
+    auto try_get_service(
+        const optional_service_name_t & service_name = default_service_name
+    ) -> maybe_service_t<ServiceT>
     {
-        auto [service_any, lock] = try_get_service_impl_locked(service_name);
+        const auto actual_service_name =
+            get_actual_service_name<ServiceT>(service_name);
+
+        auto [service_any, lock] =
+            try_get_service_impl_locked(actual_service_name);
 
         if(!service_any)
         {
@@ -95,24 +106,26 @@ public:
 
     template <typename ServiceT>
     ServiceT & ensure_service(
-        const std::string_view service_name = generate_service_name<ServiceT>()
+        const optional_service_name_t & service_name = default_service_name
     )
     {
-        auto result = try_get_service<ServiceT>(service_name);
+        const auto actual_service_name =
+            get_actual_service_name<ServiceT>(service_name);
+        auto result = try_get_service<ServiceT>(actual_service_name);
         if(!result)
         {
             // Shio: Consider logging the error code here for debugging.
-            throw MissingRequiredRuntimeService(std::string(service_name));
+            throw MissingRequiredRuntimeService(
+                std::string(actual_service_name)
+            );
         }
         return result.value().get();
     }
 
     template <typename ServiceT>
-    std::expected<std::reference_wrapper<ServiceT>, ServiceProviderErrorCodes>
-        create_default_service(
-            const std::string_view service_name =
-                generate_service_name<ServiceT>()
-        )
+    auto create_default_service(
+        const optional_service_name_t & service_name = default_service_name
+    ) -> maybe_service_t<ServiceT>
     {
         return create_service<ServiceT>(
             service_name, std::make_unique<ServiceT>()
@@ -120,20 +133,10 @@ public:
     }
 
     template <typename ServiceT>
-    std::expected<std::reference_wrapper<ServiceT>, ServiceProviderErrorCodes>
-        create_service(std::unique_ptr<ServiceT> instance)
-    {
-        return create_service<ServiceT>(
-            generate_service_name<ServiceT>(), std::move(instance)
-        );
-    }
-
-    template <typename ServiceT>
-    std::expected<std::reference_wrapper<ServiceT>, ServiceProviderErrorCodes>
-        create_service(
-            const std::string_view    service_name,
-            std::unique_ptr<ServiceT> instance
-        )
+    auto create_service(
+        std::unique_ptr<ServiceT>       instance,
+        const optional_service_name_t & service_name = default_service_name
+    ) -> maybe_service_t<ServiceT>
     {
         if(!instance)
         {
@@ -143,15 +146,37 @@ public:
         }
 
         auto * const service_ptr = instance.get();
+        const auto   actual_service_name =
+            get_actual_service_name<ServiceT>(service_name);
 
         if(!create_service_impl(
-               service_name, std::shared_ptr<ServiceT>(std::move(instance))
+               actual_service_name,
+               std::shared_ptr<ServiceT>(std::move(instance))
            ))
         {
             return std::unexpected(ServiceProviderErrorCodes::ServiceNameInUse);
         }
 
         return std::ref(*service_ptr);
+    }
+
+    template <typename ServiceT, typename... Args>
+    auto create_service_inplace(
+        const optional_service_name_t & service_name, auto && args
+    ) -> maybe_service_t<ServiceT>
+    {
+        return create_service<ServiceT>(
+            service_name,
+            std::make_unique<ServiceT>(std::forward<Args>(args)...)
+        );
+    }
+
+    template <typename ServiceT, typename... Args>
+    auto create_service_inplace(auto && args) -> maybe_service_t<ServiceT>
+    {
+        return create_service_inplace<ServiceT>(
+            default_service_name, std::forward<Args>(args)...
+        );
     }
 };
 
