@@ -51,8 +51,10 @@
     <ClInclude Include="Library\Meta\Reflection\Flags.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Members.hpp" />
     <ClInclude Include="Library\Meta\Reflection\details\UnaryPredicates.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Statics.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Traits.hpp" />
     <ClInclude Include="Library\Meta\Reflection\StaticReflection.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Types.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Values.hpp" />
     <ClInclude Include="Library\Meta\Self.hpp" />
     <ClInclude Include="Library\Meta\Types\Traits.hpp" />
@@ -88,6 +90,7 @@
     <ClInclude Include="Runtime\Services\Exceptions.hpp" />
     <ClInclude Include="Runtime\Services\ServiceProvider.hpp" />
     <ClInclude Include="Runtime\Services\ServiceProviderErrorCodes.hpp" />
+    <ClInclude Include="Runtime\Services\Services.hpp" />
     <ClInclude Include="Runtime\Services\SimpleServiceProvider.hpp" />
     <ClInclude Include="Runtime\Strings\VariadicFormat.hpp" />
     <ClInclude Include="v2\Database\Entities\EntityId.hpp" />
