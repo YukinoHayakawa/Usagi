@@ -128,7 +128,7 @@ public:
     ) -> maybe_service_t<ServiceT>
     {
         return create_service<ServiceT>(
-            service_name, std::make_unique<ServiceT>()
+            std::make_unique<ServiceT>(), service_name
         );
     }
 
