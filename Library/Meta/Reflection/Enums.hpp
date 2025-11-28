@@ -41,7 +41,8 @@ constexpr E do_enum_class_arithmetic(
 
 // Shio: Returns a `std::views::transform` that converts a range of enumerator
 // reflections into a range of `std::pair<Enum, std::string_view>`.
-template <Enum E> constexpr auto zip_enum_values_with_names()
+template <Enum E>
+constexpr auto zip_enum_values_with_names()
 {
     return std::views::transform([](std::meta::info e) {
         return std::pair<E, std::string_view>(
@@ -57,20 +58,28 @@ template <Enum E> constexpr auto zip_enum_values_with_names()
 
 // Shio: Reflects on an enum `E` and returns a range of pairs, with each pair
 // containing an enumerator's value and its string identifier.
-template <Enum E> constexpr auto get_enum_value_name_pairs()
+template <Enum E>
+constexpr auto get_enum_value_name_pairs()
 {
     // Shio: `std::meta::enumerators_of(^^E)` gets reflections of all
     // enumerators.
     return std::meta::enumerators_of(^^E) | zip_enum_values_with_names<E>();
 };
 
-template <Enum E> constexpr std::meta::info find_enum_refl__naive_loop(E value)
+// todo: if we return a meta::info this function to be forced to be consteval
+//   and cannot be used in runtime contexts. so instead, we simply passes the
+//   value back if it was found. and returning `std::optional<std::meta::info>`
+//   would crash the compiler.
+template <Enum E>
+constexpr auto find_enum_value__naive_loop(E value) -> std::optional<E>
 {
+    // this template for works because it is bound by `enumerators_of` so
+    // it generates a definitive series of comparisons and `e` is constexpr.
     template for(constexpr auto e :
-        std::define_static_array(std::meta::enumerators_of(^^E)))
+                 std::define_static_array(std::meta::enumerators_of(^^E)))
         // Shio: The splicer `[:e:]` converts the reflection `e` to a value.
-        if(value == [:e:]) return e;
-    return {};
+        if(value == [:e:]) return value;
+    return std::nullopt;
 }
 
 // Shio: An O(n) `enum_to_string` implementation using a `template for` loop.
@@ -79,9 +88,19 @@ template <Enum E>
 constexpr auto enum_to_string__naive_loop(E value)
     -> std::optional<std::string_view>
 {
-    const auto opt_val = find_enum_refl__naive_loop(value);
-    if(opt_val == std::meta::info()) return std::nullopt;
-    return std::meta::identifier_of(opt_val);
+    /* this won't work because `find_enum_value__naive_loop` depends on a
+     * runtime value `value` so code generation would fail.
+    return find_enum_value__naive_loop<E>(value)
+        .transform([](E val) {
+            return std::meta::identifier_of(^^val);
+        });
+    */
+    // So we can still only write the loop again :)
+    template for(constexpr auto e :
+                 std::define_static_array(std::meta::enumerators_of(^^E)))
+        // Shio: The splicer `[:e:]` converts the reflection `e` to a value.
+        if(value == [:e:]) return std::meta::identifier_of(e);
+    return std::nullopt;
 }
 
 #ifdef __cpp_lib_constexpr_vector
@@ -183,11 +202,11 @@ constexpr auto enum_to_string(Enum auto value) -> std::conditional_t<
 }
 
 // todo impl more efficient method when `__cpp_lib_constexpr_map` is available
-template <Enum E> constexpr bool is_valid_enum_value(E value)
+template <Enum E>
+constexpr bool is_valid_enum_value(E value)
 {
-    const auto refl = details::find_enum_refl__naive_loop(value);
-    if(refl == std::meta::info()) return false;
-    return true;
+    const auto refl = details::find_enum_value__naive_loop<E>(value);
+    return refl.has_value();
 }
 
 // Shio: Converts a string representation to an enum value using a compile-time
