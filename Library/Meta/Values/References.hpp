@@ -18,56 +18,56 @@ template <typename T>
     requires(!std::is_reference_v<T>)
 struct OptionalReference : private std::optional<std::reference_wrapper<T>>
 {
-    using optional_ref_t       = std::optional<std::reference_wrapper<T>>;
-    // Shio: defined as requested for consistent usage in constraints.
-    // Note: value_type is std::reference_wrapper<T>, so this is
-    // std::reference_wrapper<T>&.
-    using optional_ref_value_t = typename optional_ref_t::value_type &;
+    using opt_ref_wrapper_t = std::optional<std::reference_wrapper<T>>;
+    using opt_ref_t         = std::
+        add_lvalue_reference_t<typename opt_ref_wrapper_t::value_type::type>;
 
     // Constructors
-    using optional_ref_t::optional_ref_t;
+    using opt_ref_wrapper_t::opt_ref_wrapper_t;
 
     // Operators
-    using optional_ref_t::operator*;
-    using optional_ref_t::operator->;
+    using opt_ref_wrapper_t::operator*;
+    using opt_ref_wrapper_t::operator->;
 
     // Shio: We define custom assignment operators below to handle reference
-    // logic. using optional_ref_t::operator=;
+    // logic. using opt_ref_wrapper_t::operator=;
 
     // `reference_wrapper` always has a value.
-    using optional_ref_t::has_value;
-    using optional_ref_t::operator bool;
+    using opt_ref_wrapper_t::has_value;
+    using opt_ref_wrapper_t::operator bool;
 
 #if __cpp_lib_optional_range_support >= 202'406L
-    using optional_ref_t::begin;
-    using optional_ref_t::end;
+    using opt_ref_wrapper_t::begin;
+    using opt_ref_wrapper_t::end;
 #endif
 
     template <typename U>
-        requires std::is_convertible_v<U, T>
+        requires std::is_convertible_v<U &, opt_ref_t>
     constexpr OptionalReference(std::reference_wrapper<U> ref_wrapper)
         : OptionalReference(ref_wrapper.get())
     {
     }
 
     template <typename U>
-        requires(std::is_lvalue_reference_v<U> && std::is_convertible_v<U, T>)
+        requires(
+            std::is_lvalue_reference_v<U> && std::is_convertible_v<U, opt_ref_t>
+        )
     constexpr OptionalReference(U && ref)
     {
-        optional_ref_t::emplace(std::ref<T>(std::forward<U>(ref)));
+        opt_ref_wrapper_t::emplace(std::forward<U>(ref));
     }
 
     constexpr auto && value(this auto && self)
     {
         // Shio: Since T is now the value type, this correctly returns T&.
-        return self.optional_ref_t::value().get();
+        return self.opt_ref_wrapper_t::value().get();
     }
 
     template <typename OtherRef>
         requires std::is_reference_v<OtherRef>
     constexpr auto && value_or(this auto && self, OtherRef && another_ref)
     {
-        return self.optional_ref_t::has_value()
+        return self.opt_ref_wrapper_t::has_value()
             ? self.value()
             : std::forward<OtherRef>(another_ref);
     }
@@ -78,28 +78,25 @@ struct OptionalReference : private std::optional<std::reference_wrapper<T>>
             // Shio: Checking convertibility to the stored value type reference
             // (reference_wrapper<T>&). Since reference_wrapper is constructible
             // from U&, this constraint is valid.
-            std::is_convertible_v<U, optional_ref_value_t>
+            std::is_convertible_v<U, opt_ref_t>
         )
     constexpr OptionalReference & operator=(U && ref)
     {
-        optional_ref_t::emplace(std::ref<T>(std::forward<U>(ref)));
+        opt_ref_wrapper_t::emplace(std::forward<U>(ref));
         return *this;
     }
 
     template <typename U>
         requires(
-            !std::is_reference_v<U> &&
             // Shio: We check if U& (from ref_wrapper.get()) can be converted to
             // the stored reference_wrapper<T> (value_type). We use value_type
             // (object) here because emplace constructs the object.
-            std::is_convertible_v<U &, typename optional_ref_t::value_type>
+            std::is_convertible_v<U &, opt_ref_t>
         )
     constexpr OptionalReference &
         operator=(std::reference_wrapper<U> ref_wrapper)
     {
-        optional_ref_t::emplace(
-            std::ref<T>(std::forward<U>(ref_wrapper.get()))
-        );
+        opt_ref_wrapper_t::emplace(ref_wrapper.get());
         return *this;
     }
 
@@ -110,10 +107,10 @@ struct OptionalReference : private std::optional<std::reference_wrapper<T>>
 
     constexpr void swap(OptionalReference & another) noexcept
     {
-        optional_ref_t::swap(another);
+        opt_ref_wrapper_t::swap(another);
     }
 
-    constexpr void reset() noexcept { optional_ref_t::reset(); }
+    constexpr void reset() noexcept { opt_ref_wrapper_t::reset(); }
 
 #if __cpp_lib_optional >= 202'110L
     // ********************************************************************* //
@@ -123,16 +120,14 @@ struct OptionalReference : private std::optional<std::reference_wrapper<T>>
     // Get around `optional`'s monadic function to reach the actual
     // reference.
     constexpr auto and_then(this auto && self, auto && op)
-        requires std::invocable<decltype(op), optional_ref_value_t>
+        requires std::invocable<decltype(op), opt_ref_t>
     {
-        using invoke_r_t =
-            std::invoke_result_t<decltype(op), optional_ref_value_t>;
-
+        using invoke_r_t = std::invoke_result_t<decltype(op), opt_ref_t>;
         if constexpr(std::same_as<invoke_r_t, void>)
         {
             // Shio: If op returns void, we return an empty optional (nullopt
             // equivalent) to correct semantics (monad chain receives "None").
-            return self.optional_ref_t::and_then([&](auto && ref_wrapper) {
+            return self.opt_ref_wrapper_t::and_then([&](auto && ref_wrapper) {
                 op(ref_wrapper.get());
                 return std::optional<Nothing>();
             });
@@ -140,27 +135,26 @@ struct OptionalReference : private std::optional<std::reference_wrapper<T>>
         else
         {
             // This will allow the `optional` monadic chain to continue.
-            return self.optional_ref_t::and_then([&](auto && ref_wrapper) {
+            return self.opt_ref_wrapper_t::and_then([&](auto && ref_wrapper) {
                 return std::optional(op(ref_wrapper.get()));
             });
         }
     }
 
     constexpr auto transform(this auto && self, auto && op)
-        requires std::invocable<decltype(op), optional_ref_value_t>
+        requires std::invocable<decltype(op), opt_ref_t>
     {
-        using invoke_r_t =
-            std::invoke_result_t<decltype(op), optional_ref_value_t>;
+        using invoke_r_t = std::invoke_result_t<decltype(op), opt_ref_t>;
         if constexpr(std::same_as<invoke_r_t, void>)
         {
-            return self.optional_ref_t::transform([&](auto && ref_wrapper) {
+            return self.opt_ref_wrapper_t::transform([&](auto && ref_wrapper) {
                 op(ref_wrapper.get());
                 return Nothing();
             });
         }
         else
         {
-            return self.optional_ref_t::transform([&](auto && ref_wrapper) {
+            return self.opt_ref_wrapper_t::transform([&](auto && ref_wrapper) {
                 return op(ref_wrapper.get());
             });
         }
@@ -171,13 +165,13 @@ struct OptionalReference : private std::optional<std::reference_wrapper<T>>
         // responsible for returning a value.
         requires std::is_convertible_v<
             std::invoke_result_t<decltype(op)>,
-            typename optional_ref_t::value_type
+            typename opt_ref_wrapper_t::value_type
         >
     {
         // or_else expects op to return optional<T> (same type as self) or
         // compatible. But since we are masking the type, we delegate to Base.
-        return self.optional_ref_t::or_else([&] {
-            return optional_ref_t(op());
+        return self.opt_ref_wrapper_t::or_else([&] {
+            return opt_ref_wrapper_t(op());
         });
     }
 #endif
@@ -208,7 +202,7 @@ consteval
     static_assert(&opt1.value() == &x, "Reference binding failed");
 
     // 2. Assignment
-    constexpr auto opt2 = [](auto ref, auto val) consteval {
+    constexpr auto opt2 = [](auto && ref, auto && val) consteval {
         auto ret = ref;
         ret.emplace(val);
         return ret;
