@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "StaticReflection.hpp"
-#include "Values.hpp"
 
 // The code below are mostly based on sample code section 3.6 from
 // the proposal P2996.
@@ -48,8 +47,7 @@ constexpr E do_enum_class_arithmetic(
 
 // Shio: Returns a `std::views::transform` that converts a range of enumerator
 // reflections into a range of `std::pair<Enum, std::string_view>`.
-template <Enum E>
-constexpr auto zip_enum_values_with_names()
+template <Enum E> constexpr auto zip_enum_values_with_names()
 {
     return std::views::transform([](std::meta::info e) {
         return std::pair<E, std::string_view>(
@@ -65,13 +63,21 @@ constexpr auto zip_enum_values_with_names()
 
 // Shio: Reflects on an enum `E` and returns a range of pairs, with each pair
 // containing an enumerator's value and its string identifier.
-template <Enum E>
-constexpr auto get_enum_value_name_pairs()
+template <Enum E> constexpr auto get_enum_value_name_pairs()
 {
     // Shio: `std::meta::enumerators_of(^^E)` gets reflections of all
     // enumerators.
     return std::meta::enumerators_of(^^E) | zip_enum_values_with_names<E>();
 };
+
+template <Enum E> constexpr std::meta::info find_enum_refl__naive_loop(E value)
+{
+    template for(constexpr auto e :
+        std::define_static_array(std::meta::enumerators_of(^^E)))
+        // Shio: The splicer `[:e:]` converts the reflection `e` to a value.
+        if(value == [:e:]) return e;
+    return {};
+}
 
 // Shio: An O(n) `enum_to_string` implementation using a `template for` loop.
 // This is suitable for enums with a small number of enumerators.
@@ -79,13 +85,12 @@ template <Enum E>
 constexpr auto enum_to_string__naive_loop(E value)
     -> std::optional<std::string_view>
 {
-    template for(constexpr auto e :
-                 std::define_static_array(std::meta::enumerators_of(^^E)))
-        // Shio: The splicer `[:e:]` converts the reflection `e` to a value.
-        if(value == [:e:]) return std::meta::identifier_of(e);
-    return std::nullopt;
+    const auto opt_val = find_enum_refl__naive_loop(value);
+    if(opt_val == std::meta::info()) return std::nullopt;
+    return std::meta::identifier_of(opt_val);
 }
 
+#ifdef __cpp_lib_constexpr_vector
 /*
  * This code sample is also from P2996 to demonstrate how to use algorithms
  * to convert enum value to string. However, I don't think this is very
@@ -98,7 +103,7 @@ constexpr auto enum_to_string__find_in_vector(E value)
 {
     auto enumerators =
         get_enum_value_name_pairs<E>() | std::ranges::to<std::vector>();
-    auto it = std::ranges::find_if(enumerators, [value](auto const & pr) {
+    auto it = std::ranges::find_if(enumerators, [value](const auto & pr) {
         return pr.first == value;
     });
     if(it == enumerators.end())
@@ -107,6 +112,7 @@ constexpr auto enum_to_string__find_in_vector(E value)
     }
     return it->second;
 }
+#endif
 
 #ifdef __cpp_lib_constexpr_map
 /*
@@ -170,8 +176,9 @@ constexpr auto enum_to_string(Enum auto value) -> std::conditional_t<
     // Shio: At compile time, select the most efficient lookup strategy.
 #ifdef __cpp_lib_constexpr_map
     // Shio: If `std::map` is constexpr-capable, use it for large enums.
-    if constexpr(std::meta::enumerators_of(std::meta::dealias(^^EnumT))
-                     .size() <= details::large_enum_numbers_threshold)
+    if constexpr(
+        std::meta::enumerators_of(std::meta::dealias(^^EnumT)).size() <=
+        details::large_enum_numbers_threshold)
         return return_val(details::enum_to_string__naive_loop(value));
     else
         return return_val(details::enum_to_string__find_in_map(value));
@@ -179,6 +186,14 @@ constexpr auto enum_to_string(Enum auto value) -> std::conditional_t<
     // Shio: Otherwise, fall back to the naive loop for all enums.
     return return_val(details::enum_to_string__naive_loop(value));
 #endif
+}
+
+// todo impl more efficient method when `__cpp_lib_constexpr_map` is available
+template <Enum E> constexpr bool is_valid_enum_value(E value)
+{
+    const auto refl = details::find_enum_refl__naive_loop(value);
+    if(refl == std::meta::info()) return false;
+    return true;
 }
 
 // Shio: Converts a string representation to an enum value using a compile-time
@@ -193,7 +208,8 @@ constexpr auto string_to_enum(std::string_view name) -> std::optional<E>
         // Shio: `enumerators_of` returns a `std::vector`, which is not a
         // constant expression. `define_static_array` (P3491) converts it to
         // a `std::span` that is a constant expression.
-        std::meta::enumerators_of(^^E));
+        std::meta::enumerators_of(^^E)
+    );
     template for(constexpr auto e : enums)
     {
         // Shio: Compare the input string with the identifier of the
@@ -232,6 +248,9 @@ enum class EnumReflectionTestLarge
     I,
     J,
 };
+
+static_assert(is_valid_enum_value(EnumReflectionTestSmall::A));
+static_assert(!is_valid_enum_value(static_cast<EnumReflectionTestSmall>(-1)));
 
 // Shio: Verify that the test enums are correctly categorized as small/large.
 static_assert(
@@ -313,4 +332,4 @@ static_assert(
     EnumReflectionTestSmall::B
 );
 } // namespace static_tests
-} // namespace usagi::meta
+} // namespace usagi::meta::reflection
