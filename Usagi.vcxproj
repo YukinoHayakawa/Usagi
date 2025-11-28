@@ -60,6 +60,8 @@
     <ClInclude Include="Library\Meta\Self.hpp" />
     <ClInclude Include="Library\Meta\Types\Traits.hpp" />
     <ClInclude Include="Library\Meta\Values\Constness.hpp" />
+    <ClInclude Include="Library\Meta\Values\Nothing.hpp" />
+    <ClInclude Include="Library\Meta\Values\References.hpp" />
     <ClInclude Include="Library\Std\spanstream.hpp" />
     <ClInclude Include="Library\Values\MaybeError.hpp" />
     <ClInclude Include="Library\Values\Optional.hpp" />
