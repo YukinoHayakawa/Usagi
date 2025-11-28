@@ -20,12 +20,6 @@ namespace usagi::meta::reflection
 template <typename T>
 concept Enum = std::is_enum_v<T>;
 
-enum class ReturnUsingOptional
-{
-    Yes,
-    No,
-};
-
 namespace details
 {
 // Shio: The default string to return for an unknown enum value.
@@ -155,9 +149,9 @@ constexpr auto enum_to_string__find_in_map(E value)
 //   unknown value, returns `details::unknown_enum_value_name`.
 // - `ReturnUsingOptional::Yes`: Returns `std::optional<std::string_view>`. For
 //   an unknown value, returns `std::nullopt`.
-template <ReturnUsingOptional ReturnUsingOpt = ReturnUsingOptional::No>
+template <bool ReturnUsingOptional = false>
 constexpr auto enum_to_string(Enum auto value) -> std::conditional_t<
-    ReturnUsingOpt == ReturnUsingOptional::Yes,
+    ReturnUsingOptional,
     std::optional<std::string_view>,
     std::string_view
 >
@@ -167,7 +161,7 @@ constexpr auto enum_to_string(Enum auto value) -> std::conditional_t<
     // Shio: A helper lambda to conditionally wrap the result in an optional or
     // provide a default value.
     auto return_val = [](auto && val) {
-        if constexpr(ReturnUsingOpt == ReturnUsingOptional::Yes)
+        if constexpr(ReturnUsingOptional)
             return val;
         else
             return val.value_or(details::unknown_enum_value_name);
@@ -307,13 +301,12 @@ static_assert(
     details::unknown_enum_value_name
 );
 static_assert(
-    enum_to_string<ReturnUsingOptional::Yes>(EnumReflectionTestLarge::A) ==
+    enum_to_string<true>(EnumReflectionTestLarge::A) ==
     std::meta::identifier_of(^^EnumReflectionTestLarge::A)
 );
 static_assert(
-    enum_to_string<ReturnUsingOptional::Yes>(
-        static_cast<EnumReflectionTestLarge>(-1)
-    ) == std::nullopt
+    enum_to_string<true>(static_cast<EnumReflectionTestLarge>(-1)) ==
+    std::nullopt
 );
 
 // Shio: Test the public `string_to_enum` API.
