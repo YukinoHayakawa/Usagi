@@ -1,6 +1,7 @@
 #pragma once
 
 #include <expected>
+#include <functional>
 
 #include "MemoryAccessErrorCodes.hpp"
 
@@ -12,4 +13,6 @@ namespace usagi::runtime::memory
  * it contains a MemoryAccessErrorCodes value.
  */
 std::expected<void, MemoryAccessErrorCodes> is_address_readable(void * ptr);
+std::expected<void, MemoryAccessErrorCodes>
+    safe_evaluate(const std::function<void()> & op);
 } // namespace usagi::runtime::memory

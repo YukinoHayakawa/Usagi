@@ -19,7 +19,7 @@
 
 #if defined(_WIN32)
 #include <windows.h>
-#if defined(_MSC_VER) && !defined(USAGI_USE_VIRTUALQUERY_MEMORY_CHECK)
+#if defined(_MSC_VER)
 #include <excpt.h>
 #endif
 #elif defined(__linux__)
@@ -32,7 +32,63 @@
 
 namespace usagi::runtime::memory
 {
+namespace
+{
+#if defined(_WIN32) && defined(_MSC_VER)
+// Shio: Helper to translate SEH exception codes to our error codes.
+// This avoids duplicating logic between is_address_readable and safe_evaluate.
+MemoryAccessErrorCodes translate_seh_code(const DWORD code)
+{
+    // todo: maybe we'd have this code from ntos.h?
+    constexpr auto EXCEPTION_GUARD_PAGE_VIOLATION_ = 0x8000'0001;
+
+    if(code == EXCEPTION_GUARD_PAGE_VIOLATION_)
+    {
+        return MemoryAccessErrorCodes::AccessingPageGuard;
+    }
+    // EXCEPTION_ACCESS_VIOLATION is raised for reads/writes to
+    // inaccessible memory, which includes pages that are not committed
+    // (MEM_RESERVE/MEM_FREE) or pages with PAGE_NOACCESS. SEH alone
+    // cannot distinguish these cases.
+    if(code == EXCEPTION_ACCESS_VIOLATION)
+    {
+        return MemoryAccessErrorCodes::GeneralAccessViolation;
+    }
+    // Other exceptions can also occur.
+    return MemoryAccessErrorCodes::GeneralAccessViolation;
+}
+#endif
+} // namespace
+
 #if defined(_WIN32)
+
+#if defined(_MSC_VER)
+// Shio: SEH-based safe evaluation implementation.
+// This catches access violations and other SEH exceptions during execution.
+std::expected<void, MemoryAccessErrorCodes>
+    safe_evaluate(const std::function<void()> & op)
+{
+    __try
+    {
+        op();
+        return {};
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER)
+    {
+        return std::unexpected(translate_seh_code(GetExceptionCode()));
+    }
+}
+#else
+// Shio: Fallback for non-MSVC Windows compilers (e.g. MinGW without SEH
+// support).
+std::expected<void, MemoryAccessErrorCodes>
+    safe_evaluate(const std::function<void()> & op)
+{
+    op();
+    return {};
+}
+#endif
+
 #if defined(_MSC_VER) && !defined(USAGI_USE_VIRTUALQUERY_MEMORY_CHECK)
 // SEH implementation (MSVC specific)
 std::expected<void, MemoryAccessErrorCodes> is_address_readable(void * ptr)
@@ -44,25 +100,7 @@ std::expected<void, MemoryAccessErrorCodes> is_address_readable(void * ptr)
     }
     __except(EXCEPTION_EXECUTE_HANDLER)
     {
-        const DWORD    code                           = GetExceptionCode();
-        // todo: maybe we'd have this code from ntos.h?
-        constexpr auto EXCEPTION_GUARD_PAGE_VIOLATION = 0x8000'0001;
-        if(code == EXCEPTION_GUARD_PAGE_VIOLATION)
-        {
-            return std::unexpected(MemoryAccessErrorCodes::AccessingPageGuard);
-        }
-        // EXCEPTION_ACCESS_VIOLATION is raised for reads/writes to
-        // inaccessible memory, which includes pages that are not committed
-        // (MEM_RESERVE/MEM_FREE) or pages with PAGE_NOACCESS. SEH alone
-        // cannot distinguish these cases.
-        if(code == EXCEPTION_ACCESS_VIOLATION)
-        {
-            return std::unexpected(
-                MemoryAccessErrorCodes::GeneralAccessViolation
-            );
-        }
-        // Other exceptions can also occur.
-        return std::unexpected(MemoryAccessErrorCodes::GeneralAccessViolation);
+        return std::unexpected(translate_seh_code(GetExceptionCode()));
     }
 }
 #else
@@ -100,6 +138,7 @@ std::expected<void, MemoryAccessErrorCodes> is_address_readable(void * ptr)
     return {};
 }
 #endif
+
 #elif defined(__linux__)
 // Linux implementation using a pipe
 std::expected<void, MemoryAccessErrorCodes> is_address_readable(void * ptr)
@@ -128,12 +167,29 @@ std::expected<void, MemoryAccessErrorCodes> is_address_readable(void * ptr)
 
     return {};
 }
+
+std::expected<void, MemoryAccessErrorCodes>
+    safe_evaluate(const std::function<void()> & op)
+{
+    // Shio: Signal handling implementation is required for safe execution on
+    // Linux.
+    op();
+    return {};
+}
+
 #else
 // Fallback for unsupported platforms
 std::expected<void, MemoryAccessErrorCodes> is_address_readable(void * ptr)
 {
     (void)ptr;
     return std.unexpected(MemoryAccessErrorCodes::PlatformOperationFailed);
+}
+
+std::expected<void, MemoryAccessErrorCodes>
+    safe_evaluate(const std::function<void()> & op)
+{
+    op();
+    return {};
 }
 #endif
 } // namespace usagi::runtime::memory
