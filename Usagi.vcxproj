@@ -38,6 +38,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Library\Memory\Casting.hpp" />
     <ClInclude Include="Library\Memory\Construction.hpp" />
     <ClInclude Include="Library\Meta\Functional\Callables.hpp" />
     <ClInclude Include="Library\Meta\Functional\Currying.hpp" />
@@ -52,8 +53,12 @@
     <ClInclude Include="Library\Meta\Reflection\Flags.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Members.hpp" />
     <ClInclude Include="Library\Meta\Reflection\details\UnaryPredicates.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Operators.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Overloads.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\ReflectionLists.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Statics.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Traits.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Traits_.hpp" />
     <ClInclude Include="Library\Meta\Reflection\StaticReflection.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Types.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Values.hpp" />
@@ -62,6 +67,7 @@
     <ClInclude Include="Library\Meta\Values\Constness.hpp" />
     <ClInclude Include="Library\Meta\Values\Nothing.hpp" />
     <ClInclude Include="Library\Meta\Values\References.hpp" />
+    <ClInclude Include="Library\Meta\Templates\SFINAE.hpp" />
     <ClInclude Include="Library\Std\spanstream.hpp" />
     <ClInclude Include="Library\Values\MaybeError.hpp" />
     <ClInclude Include="Library\Values\Optional.hpp" />
@@ -239,6 +245,7 @@
     <ClInclude Include="v2\Database\Entities\PagedAllocator.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Library\Meta\Reflection\StaticTests.cpp" />
     <ClCompile Include="Library\Meta\test.cpp" />
     <ClCompile Include="Library\Utilities\MaybeOwnedString.cpp" />
     <ClCompile Include="Runtime\Encoding\Unicode.cpp" />

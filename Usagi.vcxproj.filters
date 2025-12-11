@@ -546,7 +546,7 @@
     <ClInclude Include="Library\Meta\Reflection\Members.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Traits.hpp">
+    <ClInclude Include="Library\Meta\Reflection\Traits_.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\Self.hpp">
@@ -610,6 +610,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\Values\Nothing.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Traits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Operators.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Overloads.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Templates\SFINAE.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\ReflectionLists.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Memory\Casting.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
