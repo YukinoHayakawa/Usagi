@@ -12,7 +12,7 @@ namespace usagi::meta::reflection
 // It doesn't matter whether it's from a namespace or as a class member.
 // todo: support constructors, conversion operators, different parameters.
 template <std::meta::info Refl>
-    requires(
+    requires (
         std::meta::is_function(Refl) && !std::meta::is_destructor(Refl) &&
         std::meta::has_template_arguments(Refl)
     )
@@ -122,7 +122,7 @@ struct overload_selector
                 }
             }
         }
-        return {};
+        return { };
     }
 };
 
@@ -225,7 +225,7 @@ struct __overload_selection_test
     template <typename T>
     operator T()
     {
-        return T {};
+        return T { };
     }
 };
 
