@@ -83,7 +83,7 @@ namespace static_tests
 {
 consteval
 {
-    constexpr static auto a_lambda = [](int) { };
+    constexpr static auto a_lambda = [&](int) { };
 
     struct a_class
     {
