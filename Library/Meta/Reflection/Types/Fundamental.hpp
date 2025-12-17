@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#include <Usagi/Library/Meta/Reflection/StaticReflection.hpp>
+#include "TypeLists.hpp"
 
 // todo: bug [libc++] can't reflect std::intN_t and alike
 //   https://github.com/bloomberg/clang-p2996/issues/230
@@ -15,32 +15,31 @@ consteval auto & get_fundamental_types()
 
     // Using fixed widths to ensure we are getting the correct ints
     // https://en.cppreference.com/w/cpp/language/types.html
-    static constexpr std::initializer_list<std::meta::info> type_list {
-        ^^void,
-        ^^std::nullptr_t,
+    return static_type_list<
+        void,
+        std::nullptr_t,
         // Standard integer types
-        dealias(^^int16_t),
-        dealias(^^uint16_t),
-        dealias(^^int32_t),
-        dealias(^^uint32_t),
-        dealias(^^int64_t),
-        dealias(^^uint64_t),
+        std::int16_t,
+        std::uint16_t,
+        std::int32_t,
+        std::uint32_t,
+        std::int64_t,
+        std::uint64_t,
         // Boolean type
-        ^^bool,
+        bool,
         // Character types
-        ^^char,
-        dealias(^^int8_t),
-        dealias(^^uint8_t),
-        ^^wchar_t,
-        ^^char8_t,
-        ^^char16_t,
-        ^^char32_t,
+        char,
+        std::int8_t,
+        std::uint8_t,
+        wchar_t,
+        char8_t,
+        char16_t,
+        char32_t,
         // Standard floating-point types
-        ^^float,
-        ^^double,
-        ^^long double,
-    };
-    return type_list;
+        float,
+        double,
+        long double
+    >();
 }
 
 template <std::meta::info Refl>
@@ -51,7 +50,7 @@ consteval std::string_view get_fundamental_type_camel_case_name()
 
     if constexpr(Refl == ^^void)
         return "Void";
-    else if constexpr(Refl == ^^std::nullptr_t)
+    else if constexpr(Refl == dealias(^^std::nullptr_t))
         return "Nullptr";
     // Standard integer types
     else if constexpr(Refl == dealias(^^int16_t))

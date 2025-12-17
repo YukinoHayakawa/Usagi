@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Library/Meta/Reflection/StaticReflection.hpp>
-#include <Usagi/Library/Meta/Reflection/Types.hpp>
+#include <Usagi/Library/Meta/Reflection/Types/TypeLists.hpp>
 
 #include "SimpleServiceProvider.hpp"
 
