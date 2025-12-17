@@ -45,7 +45,7 @@ consteval auto & get_fundamental_types()
 
 template <std::meta::info Refl>
     requires (std::meta::is_type(Refl))
-consteval auto get_fundamental_type_camel_case_name()
+consteval std::string_view get_fundamental_type_camel_case_name()
 {
     using namespace std::meta;
 
@@ -76,6 +76,14 @@ consteval auto get_fundamental_type_camel_case_name()
         return "Integer8";
     else if constexpr(Refl == dealias(^^uint8_t))
         return "UnsignedInteger8";
+    else if constexpr(Refl == ^^wchar_t)
+        return "WideChar";
+    else if constexpr(Refl == ^^char8_t)
+        return "Char8";
+    else if constexpr(Refl == ^^char16_t)
+        return "Char16";
+    else if constexpr(Refl == ^^char32_t)
+        return "Char32";
     // Standard floating-point types
     else if constexpr(Refl == ^^float)
         return "Float";
@@ -84,7 +92,7 @@ consteval auto get_fundamental_type_camel_case_name()
     else if constexpr(Refl == ^^long double)
         return "LongDouble";
     else
-        std::unreachable();
+        static_assert(false, std::meta::display_string_of(Refl));
 }
 
 namespace static_tests

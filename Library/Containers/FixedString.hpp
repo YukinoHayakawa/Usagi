@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <algorithm>
+#include <string>
 #include <string_view>
 
 namespace usagi
@@ -57,6 +58,8 @@ public:
     {
         return std::string_view(buf, m_length);
     }
+
+    constexpr std::string to_string() const { return std::string { view() }; }
 
     // -------------------------------------------------------------------------
     // Comparison Operators (Handling different N)
