@@ -16,7 +16,7 @@ template <std::meta::info TemplateRefl, std::meta::info... PartialArgs>
 struct template_partial_apply
 {
     template <std::meta::info... RemainingArgs>
-    consteval static auto apply()
+    consteval static auto apply(/*Lifted<RemainingArgs>...*/)
     {
         // For some reason, I cannot write a vector like this here. Clang will
         // complain about "heap allocation".
@@ -70,7 +70,7 @@ consteval auto operator<<(
     template_partial_apply<TemplateRefl, PartialArgs...> p,
     // NextArg must be lifted to a constant expression by making it into a
     // template argument.
-    IntegralConstant<std::meta::info, NextArg>
+    Lifted<NextArg>
 )
 {
     return decltype(p)::template apply<NextArg>();
@@ -80,7 +80,10 @@ consteval auto operator<<(
 // provided.
 template <std::meta::info TemplateRefl, std::meta::info... PartialArgs>
     requires (std::meta::is_template(TemplateRefl))
-consteval auto partial_apply()
+// Unfortunately we can only have one `Lifted` parameter here, because if we
+// have multiple of them, more than one implicit conversions are required and
+// this function won't be viable.
+consteval auto partial_apply(/*Lifted<TemplateRefl>*/)
 {
     using partial_t = template_partial_apply<TemplateRefl, PartialArgs...>;
     // If the template is already fully specialized, return it.
@@ -93,6 +96,20 @@ consteval auto partial_apply()
         return partial_t { };
     }
 }
+
+/*
+consteval auto partial_apply(
+    std::meta::info template_refl, std::meta::info... partial_args
+)
+{
+    // can't lift arguments because they are not constant expressions
+    constexpr auto lifter = []<std::meta::info I>(Lifted<I> l) { return l; };
+    return partial_apply(
+        lifter(std::meta::reflect_constant(template_refl)),
+        lifter(partial_args)...
+    );
+}
+*/
 
 namespace static_tests
 {
