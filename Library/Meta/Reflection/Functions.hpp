@@ -43,6 +43,20 @@ consteval
         get_function_param_counts<^^decltype(test_func)::operator()>();
     static_assert(num_params.num_total_parameters == 3);
     static_assert(num_params.num_required_parameters == 2);
+
+    struct __s
+    {
+        void func(this __s &, int, ...);
+    };
+
+    constexpr auto f2_refl     = ^^__s::func;
+    constexpr auto num_params2 = get_function_param_counts<f2_refl>();
+    static_assert(num_params2.num_total_parameters == 2);
+    static_assert(num_params2.num_required_parameters == 2);
+    static_assert(std::meta::has_ellipsis_parameter(f2_refl));
+    static_assert(std::meta::is_explicit_object_parameter(
+        std::meta::parameters_of(f2_refl)[0]
+    ));
 }
 } // namespace static_tests
 } // namespace usagi::meta::reflection
