@@ -77,6 +77,12 @@ consteval bool is_type_in_list()
     return std::ranges::find(types, ^^T) != types.end();
 }
 
+template <typename T, typename... Ts>
+consteval bool is_none_of()
+{
+    return !is_type_in_list<T, Ts...>();
+}
+
 namespace static_tests
 {
 consteval
