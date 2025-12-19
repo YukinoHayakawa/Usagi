@@ -16,17 +16,19 @@ concept OperatorFunctionOrTemplateOf = requires {
     typename sfinae_probe_value<std::meta::operator_of(Refl)>;
 } && std::meta::operator_of(Refl) == Op;
 
-// todo: there are issues suggesting that `members_of` sometimes cannot return
-//   the complete set of members of a class, including the `operator()` of a
-//   lambda type that is not a template. It seems the problem is that
-//   `isReflectableDecl` cannot deduce the return type of the closure type's
-//   `operator()` return type because the return type deduction is performed
-//   during much later stages. a workaround would be simply... write all lambdas
-//   as generic ones.
+// todo: there are some issues regarding `members_of` which won't return
+//   functions whose declared type involves `auto` placeholder. this involves
+//   a non-generic lambda's `operator()` and functions like `auto func() {}`
+//   (note that no trailing return type is written here.)
+//   `auto func() -> void { }` works fine though.
+//   It seems the reason is `Sema::isReflectableDecl` is using a function's
+//   declared type to decide whether a function should appear in the results of
+//   `members_of`.
+//   https://github.com/bloomberg/clang-p2996/issues/218
+//   https://github.com/bloomberg/clang-p2996/issues/219
+//   https://github.com/bloomberg/clang-p2996/issues/171
+//   https://github.com/bloomberg/clang-p2996/issues/179
 // todo: allow picking overloads by parameter types.
-// https://github.com/bloomberg/clang-p2996/issues/218
-// https://github.com/bloomberg/clang-p2996/issues/171
-// https://github.com/bloomberg/clang-p2996/issues/179
 template <
     std::meta::info      Refl,
     std::meta::operators Op,
@@ -105,11 +107,12 @@ consteval
     //   lambda return type not deduced causing `operator()` not included in
     //   the results of `members_of`.
     constexpr static int i   = 1;
-    // constexpr auto l   = [] -> void { };
+    constexpr auto l   = [] -> void { };
+    constexpr auto l   = [] { };
     constexpr auto       l   = []<typename...> -> void { };
-    // constexpr auto l2  = [](int) { };
+    constexpr auto l2  = [](int) { };
     constexpr auto       l2  = []<typename...>(int) { };
-    // constexpr auto lc  = [&] { return i; };
+    constexpr auto lc  = [&] { return i; };
     constexpr auto       lc  = [&]<typename...> { return i; };
     constexpr auto       lt  = []<typename, typename...> { };
     constexpr auto       lt2 = []<typename...> { };

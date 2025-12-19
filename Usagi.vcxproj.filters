@@ -525,10 +525,10 @@
     <ClInclude Include="Library\Meta\Functional\Callables.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Functional\Currying.hpp">
+    <ClInclude Include="Library\Meta\Templates\Currying.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Functional\Transform.hpp">
+    <ClInclude Include="Library\Meta\Classes\Transform.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\Reflection\Callables.hpp">
@@ -594,13 +594,10 @@
     <ClInclude Include="Runtime\Memory\Safety\MagicNumberMixin.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Types.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Services\Services.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Statics.hpp">
+    <ClInclude Include="Library\Meta\Reflection\Utilities\MakeStatics.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Memory\Construction.hpp">
@@ -615,10 +612,10 @@
     <ClInclude Include="Library\Meta\Reflection\Traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Operators.hpp">
+    <ClInclude Include="Library\Meta\Reflection\Functions\Operators.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Overloads.hpp">
+    <ClInclude Include="Library\Meta\Reflection\Functions\Overloads.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\Templates\SFINAE.hpp">
@@ -628,6 +625,54 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Memory\Casting.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Container\BinaryHeap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Services\ServiceRequirementCollector.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Services\ServiceProviderCallingTable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Closures.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Types\Polymorphism\ProxyCallTable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Manifold\Components\Component.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Packs\Expansion.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Functions\Functions.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Splicing.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Containers\FixedString.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Types\Fundamental.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Types\TypeLists.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Algorithms\Ranges.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Constexpr\IntegralConstant.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Values\Constexpr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Types\Types.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -653,10 +698,7 @@
     <ClCompile Include="Library\Utilities\MaybeOwnedString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Library\Meta\test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test_.cpp">
+    <ClCompile Include="Library\test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Services\SimpleServiceProvider.cpp">
@@ -666,6 +708,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\Strings\VariadicFormat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Meta\Reflection\StaticTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Services\ServiceRequirementCollector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Services\ServiceProviderCallingTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Types\Polymorphism\ProxyCallTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

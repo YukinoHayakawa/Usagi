@@ -50,7 +50,7 @@ consteval auto extract_closure_type_refl()
     return std::meta::remove_reference(std::meta::type_of(Refl));
 }
 
-// todo: there is a bug in the current clang causing it impossible to get
+// todo: there is a bug in the current clang fork causing it impossible to get
 //   the invoke operator of a non-generic lambda using `find_operator_in_class`
 //   https://github.com/bloomberg/clang-p2996/issues/219
 template <std::meta::info Refl>
@@ -61,22 +61,9 @@ consteval auto extract_closure_invoke_operator_refl()
     // one `operator()`.
     constexpr auto closure_type_refl = extract_closure_type_refl<Refl>();
     using closure_t                  = typename[:closure_type_refl:];
+    // this might be a function or function template, but a closure type can
+    // only have exactly one of it so it must be callable.
     return ^^closure_t::operator();
-    /*
-    constexpr auto ctx = std::meta::access_context::current().via(closure_type);
-    template for(constexpr auto m :
-        std::define_static_array(std::meta::members_of(closure_type, ctx)))
-    {
-        if(OperatorFunctionOrTemplateOf<
-               m,
-               std::meta::operators::op_parentheses
-           >)
-        {
-            return m;
-        }
-    }
-    return std::meta::info { };
-    */
 }
 
 namespace static_tests

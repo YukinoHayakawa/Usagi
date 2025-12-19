@@ -38,11 +38,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Library\Containers\FixedString.hpp" />
     <ClInclude Include="Library\Memory\Casting.hpp" />
     <ClInclude Include="Library\Memory\Construction.hpp" />
     <ClInclude Include="Library\Meta\Functional\Callables.hpp" />
-    <ClInclude Include="Library\Meta\Functional\Currying.hpp" />
-    <ClInclude Include="Library\Meta\Functional\Transform.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Types\Types.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Values\Constexpr.hpp" />
+    <ClInclude Include="Library\Meta\Templates\Currying.hpp" />
+    <ClInclude Include="Library\Meta\Classes\Transform.hpp" />
+    <ClInclude Include="Library\Meta\Packs\Expansion.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Callables.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Classes.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Classes_.hpp" />
@@ -51,26 +55,33 @@
     <ClInclude Include="Library\Meta\Reflection\details\PredicateEvaluation.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Enums.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Flags.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Functions\Functions.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Types\Fundamental.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Members.hpp" />
     <ClInclude Include="Library\Meta\Reflection\details\UnaryPredicates.hpp" />
-    <ClInclude Include="Library\Meta\Reflection\Operators.hpp" />
-    <ClInclude Include="Library\Meta\Reflection\Overloads.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Functions\Operators.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Functions\Overloads.hpp" />
     <ClInclude Include="Library\Meta\Reflection\ReflectionLists.hpp" />
-    <ClInclude Include="Library\Meta\Reflection\Statics.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Splicing.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Utilities\MakeStatics.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Traits.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Traits_.hpp" />
     <ClInclude Include="Library\Meta\Reflection\StaticReflection.hpp" />
-    <ClInclude Include="Library\Meta\Reflection\Types.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Types\TypeLists.hpp" />
+    <ClInclude Include="Library\Algorithms\Ranges.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Values.hpp" />
     <ClInclude Include="Library\Meta\Self.hpp" />
+    <ClInclude Include="Library\Meta\Constexpr\IntegralConstant.hpp" />
     <ClInclude Include="Library\Meta\Types\Traits.hpp" />
     <ClInclude Include="Library\Meta\Values\Constness.hpp" />
     <ClInclude Include="Library\Meta\Values\Nothing.hpp" />
     <ClInclude Include="Library\Meta\Values\References.hpp" />
     <ClInclude Include="Library\Meta\Templates\SFINAE.hpp" />
     <ClInclude Include="Library\Std\spanstream.hpp" />
+    <ClInclude Include="Library\Types\Polymorphism\ProxyCallTable.hpp" />
     <ClInclude Include="Library\Values\MaybeError.hpp" />
     <ClInclude Include="Library\Values\Optional.hpp" />
+    <ClInclude Include="Manifold\Components\Component.hpp" />
     <ClInclude Include="Runtime\Exceptions\Exceptions.hpp" />
     <ClInclude Include="Runtime\Files\concepts.hpp" />
     <ClInclude Include="Runtime\Memory\Allocators\AbstractAllocator.hpp" />
@@ -98,7 +109,9 @@
     <ClInclude Include="Runtime\RAII\UnmanagedResource.hpp" />
     <ClInclude Include="Runtime\Services\Exceptions.hpp" />
     <ClInclude Include="Runtime\Services\ServiceProvider.hpp" />
+    <ClInclude Include="Runtime\Services\ServiceProviderCallingTable.hpp" />
     <ClInclude Include="Runtime\Services\ServiceProviderErrorCodes.hpp" />
+    <ClInclude Include="Runtime\Services\ServiceRequirementCollector.hpp" />
     <ClInclude Include="Runtime\Services\Services.hpp" />
     <ClInclude Include="Runtime\Services\SimpleServiceProvider.hpp" />
     <ClInclude Include="Runtime\Strings\VariadicFormat.hpp" />
@@ -246,7 +259,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Library\Meta\Reflection\StaticTests.cpp" />
-    <ClCompile Include="Library\Meta\test.cpp" />
+    <ClCompile Include="Library\test.cpp" />
+    <ClCompile Include="Library\Types\Polymorphism\ProxyCallTable.cpp" />
     <ClCompile Include="Library\Utilities\MaybeOwnedString.cpp" />
     <ClCompile Include="Runtime\Encoding\Unicode.cpp" />
     <ClCompile Include="Runtime\Files\MappedFileView.cpp" />
@@ -254,10 +268,11 @@
     <ClCompile Include="Runtime\Memory\Allocators\BitmapAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\Allocators\CircularAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\Safety\MemorySafety.cpp" />
+    <ClCompile Include="Runtime\Services\ServiceProviderCallingTable.cpp" />
+    <ClCompile Include="Runtime\Services\ServiceRequirementCollector.cpp" />
     <ClCompile Include="Runtime\Services\SimpleServiceProvider.cpp" />
     <ClCompile Include="Runtime\Strings\VariadicFormat.cpp" />
     <ClCompile Include="Runtime\Task\TaskExecutor.cpp" />
-    <ClCompile Include="test_.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Usagi.natvis" />
