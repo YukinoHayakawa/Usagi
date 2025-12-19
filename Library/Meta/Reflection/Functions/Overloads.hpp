@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <ranges>
 
-#include "StaticReflection.hpp"
+#include <Usagi/Library/Meta/Reflection/StaticReflection.hpp>
 
 namespace usagi::meta::reflection
 {

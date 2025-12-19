@@ -42,6 +42,7 @@
     <ClInclude Include="Library\Memory\Casting.hpp" />
     <ClInclude Include="Library\Memory\Construction.hpp" />
     <ClInclude Include="Library\Meta\Functional\Callables.hpp" />
+    <ClInclude Include="Library\Meta\Reflection\Concepts.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Types\Types.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Values\Constexpr.hpp" />
     <ClInclude Include="Library\Meta\Templates\Currying.hpp" />

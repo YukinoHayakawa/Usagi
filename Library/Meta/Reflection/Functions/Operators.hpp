@@ -1,21 +1,9 @@
 ﻿#pragma once
 
-#include <Usagi/Library/Meta/Templates/SFINAE.hpp>
-
-#include "StaticReflection.hpp"
+#include <Usagi/Library/Meta/Reflection/Concepts.hpp>
 
 namespace usagi::meta::reflection
 {
-template <std::meta::info Refl>
-concept OperatorFunctionOrTemplate =
-    std::meta::is_operator_function_template(Refl) ||
-    std::meta::is_operator_function(Refl);
-
-template <std::meta::info Refl, std::meta::operators Op>
-concept OperatorFunctionOrTemplateOf = requires {
-    typename sfinae_probe_value<std::meta::operator_of(Refl)>;
-} && std::meta::operator_of(Refl) == Op;
-
 // todo: there are some issues regarding `members_of` which won't return
 //   functions whose declared type involves `auto` placeholder. this involves
 //   a non-generic lambda's `operator()` and functions like `auto func() {}`
@@ -107,12 +95,12 @@ consteval
     //   lambda return type not deduced causing `operator()` not included in
     //   the results of `members_of`.
     constexpr static int i   = 1;
-    constexpr auto l   = [] -> void { };
-    constexpr auto l   = [] { };
-    constexpr auto       l   = []<typename...> -> void { };
-    constexpr auto l2  = [](int) { };
-    constexpr auto       l2  = []<typename...>(int) { };
-    constexpr auto lc  = [&] { return i; };
+    // constexpr auto l   = [] -> void { };
+    constexpr auto       l   = [] { };
+    // constexpr auto       l   = []<typename...> -> void { };
+    constexpr auto       l2  = [](int) { };
+    // constexpr auto       l2  = []<typename...>(int) { };
+    constexpr auto       lc  = [&] { return i; };
     constexpr auto       lc  = [&]<typename...> { return i; };
     constexpr auto       lt  = []<typename, typename...> { };
     constexpr auto       lt2 = []<typename...> { };

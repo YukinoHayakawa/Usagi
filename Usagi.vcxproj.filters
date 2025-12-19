@@ -675,6 +675,9 @@
     <ClInclude Include="Library\Meta\Reflection\Types\Types.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Concepts.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime\Files\RegularFile.cpp">
