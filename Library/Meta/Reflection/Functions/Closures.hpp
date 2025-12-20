@@ -2,7 +2,7 @@
 
 #include <ranges>
 
-#include "Concepts.hpp"
+#include <Usagi/Library/Meta/Reflection/Concepts.hpp>
 
 namespace usagi::meta::reflection
 {
@@ -89,6 +89,9 @@ concept IsConstevalBlockCallOperator = std::meta::is_class_member(Func) &&
     } &&
     extract_closure_invoke_operator_refl<std::meta::parent_of(Func)>() != Func;
 
+// todo https://github.com/bloomberg/clang-p2996/issues/239
+//   ^^decltype([](this auto &&) { })::operator() causes SFINAE to fail #239
+//   so we may need some workaround for lambda types with `(this auto)`
 template <std::meta::info Func>
 concept IsClosureTypeCallOperator = std::meta::is_class_member(Func) &&
     OperatorFunctionOrTemplateOf<Func, std::meta::op_parentheses> &&
@@ -166,9 +169,14 @@ consteval
     constexpr auto refl_type    = ^^decltype(a_lambda);
     constexpr auto refl_call_op = ^^decltype(a_lambda)::operator();
     constexpr auto refl_class   = ^^a_class;
+    [[maybe_unused]]
+    constexpr auto refl_l_d_auto = ^^decltype([](this auto &&) { })::operator();
 
     static_assert(IsClosureTypeCallOperator<refl_call_op>);
     static_assert(!IsClosureTypeCallOperator<^^a_class::operator()>);
+    // todo bug SFINAE failure
+    //   https://github.com/bloomberg/clang-p2996/issues/239
+    // static_assert(IsClosureTypeCallOperator<refl_l_d_auto>);
 
     static_assert(
         get_closure_type_from_call_operator<refl_call_op>() ==

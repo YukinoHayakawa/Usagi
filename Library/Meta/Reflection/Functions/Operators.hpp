@@ -60,8 +60,7 @@ constexpr auto operator""_optest2()
 
 struct __operators_test_1
 {
-    // todo bug must write trailing type
-    auto operator()() -> void { }
+    auto operator()() { }
 
     template <typename...>
     void operator()()
@@ -101,7 +100,7 @@ consteval
     constexpr auto       l2  = [](int) { };
     // constexpr auto       l2  = []<typename...>(int) { };
     constexpr auto       lc  = [&] { return i; };
-    constexpr auto       lc  = [&]<typename...> { return i; };
+    // constexpr auto       lc  = [&]<typename...> { return i; };
     constexpr auto       lt  = []<typename, typename...> { };
     constexpr auto       lt2 = []<typename...> { };
     constexpr auto       lt3 = [](auto...) { };
@@ -110,8 +109,7 @@ consteval
         ^^decltype(l)::operator(),
         std::meta::operators::op_parentheses,
         std::meta::operators::op_caret,
-        // false
-        true
+        false
     >());
     static_assert(test.operator()<
         ^^decltype(lt)::operator(),
@@ -156,7 +154,6 @@ consteval
             true
         >() == ^^__operators_test_2::operator()
     );
-    /*
     static_assert(
         find_operator_in_class<
             ^^decltype(l),
@@ -178,30 +175,6 @@ consteval
             false
         >() == ^^decltype(lc)::operator()
     );
-    */
-    // todo begin
-    static_assert(
-        find_operator_in_class<
-            ^^decltype(l),
-            std::meta::operators::op_parentheses,
-            true
-        >() == ^^decltype(l)::operator()
-    );
-    static_assert(
-        find_operator_in_class<
-            ^^decltype(l2),
-            std::meta::operators::op_parentheses,
-            true
-        >() == ^^decltype(l2)::operator()
-    );
-    static_assert(
-        find_operator_in_class<
-            ^^decltype(lc),
-            std::meta::operators::op_parentheses,
-            true
-        >() == ^^decltype(lc)::operator()
-    );
-    // todo end
     static_assert(
         find_operator_in_class<
             ^^decltype(lt),

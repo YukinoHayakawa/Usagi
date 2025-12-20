@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Usagi/Library/Meta/Reflection/Closures.hpp>
+#include "Closures.hpp"
 
 namespace usagi::meta::reflection
 {
@@ -38,8 +38,7 @@ struct function_meta_info
 };
 
 template <std::meta::info Func>
-// The reflected entity must be a function. Otherwise, it would be almost
-// useless in game engine contexts.
+// The reflected entity must be a function rather than a function template.
     requires (std::meta::is_function(Func))
 consteval function_meta_info reflect_function()
 {

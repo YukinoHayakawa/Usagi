@@ -8,8 +8,17 @@
 namespace usagi::meta::reflection
 {
 template <std::meta::info Refl>
+concept Function = std::meta::is_function(Refl);
+
+template <std::meta::info Refl>
 concept FunctionOrFunctionType =
     std::meta::is_function(Refl) || std::meta::is_function_type(Refl);
+
+template <std::meta::info Refl>
+concept FunctionTemplate = std::meta::is_function_template(Refl);
+
+template <std::meta::info Refl>
+concept TemplateSpecialization = std::meta::has_template_arguments(Refl);
 
 template <std::meta::info Refl>
 concept OperatorFunctionOrTemplate =

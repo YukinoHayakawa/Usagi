@@ -537,7 +537,7 @@
     <ClInclude Include="Library\Meta\Reflection\Classes_.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Closures.hpp">
+    <ClInclude Include="Library\Meta\Reflection\Functions\Closures.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\Reflection\Flags.hpp">
@@ -676,6 +676,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\Reflection\Concepts.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Functions\Invoke.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Functions\Templates.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Functions\Parameters.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
