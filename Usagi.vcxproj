@@ -42,6 +42,7 @@
     <ClInclude Include="Library\Memory\Casting.hpp" />
     <ClInclude Include="Library\Memory\Construction.hpp" />
     <ClInclude Include="Library\Meta\Functional\Callables.hpp" />
+    <ClInclude Include="Library\Meta\Platforms\TypeTraits.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Concepts.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Functions\Invoke.hpp" />
     <ClInclude Include="Library\Meta\Reflection\Functions\Parameters.hpp" />
@@ -76,6 +77,8 @@
     <ClInclude Include="Library\Meta\Reflection\Values.hpp" />
     <ClInclude Include="Library\Meta\Self.hpp" />
     <ClInclude Include="Library\Meta\Constexpr\IntegralConstant.hpp" />
+    <ClInclude Include="Library\Meta\ThunkGen\ThunkGen.hpp" />
+    <ClInclude Include="Library\Meta\ThunkGen\ThunkGenTraits.hpp" />
     <ClInclude Include="Library\Meta\Types\Traits.hpp" />
     <ClInclude Include="Library\Meta\Values\Constness.hpp" />
     <ClInclude Include="Library\Meta\Values\Nothing.hpp" />
@@ -85,15 +88,33 @@
     <ClInclude Include="Library\Types\Polymorphism\ProxyCallTable.hpp" />
     <ClInclude Include="Library\Values\MaybeError.hpp" />
     <ClInclude Include="Library\Values\Optional.hpp" />
+    <ClInclude Include="Manifold\ComponentGroup.hpp" />
+    <ClInclude Include="Manifold\ComponentGroupLayout.hpp" />
     <ClInclude Include="Manifold\Components\Component.hpp" />
+    <ClInclude Include="Manifold\EntityDatabase.hpp" />
+    <ClInclude Include="Manifold\Scheduler\DependencyGraphAnalyzer.hpp" />
+    <ClInclude Include="Manifold\Scheduler\PipelinedExecutionHost.hpp" />
+    <ClInclude Include="Manifold\Staging\CommandMerger.hpp" />
+    <ClInclude Include="Manifold\Staging\EntityCommandList.hpp" />
+    <ClInclude Include="Manifold\Entities\EntityId.hpp" />
+    <ClInclude Include="Manifold\Systems\System.hpp" />
+    <ClInclude Include="Manifold\Systems\SystemTraits.hpp" />
+    <ClInclude Include="Runtime\Invocations\CallTable_.hpp" />
     <ClInclude Include="Runtime\Exceptions\Exceptions.hpp" />
     <ClInclude Include="Runtime\Files\concepts.hpp" />
+    <ClInclude Include="Runtime\Invocations\OpaqueCallTable.hpp" />
     <ClInclude Include="Runtime\Memory\Allocators\AbstractAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\Allocators\MemoryHandle.hpp" />
+    <ClInclude Include="Runtime\Memory\Allocators\OffsetBuddyAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\Allocators\OffsetPageAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\Allocators\OffsetTLSFAllocator.hpp" />
+    <ClInclude Include="Runtime\Memory\Allocators\StagingBumpAllocator.hpp" />
     <ClInclude Include="Runtime\Memory\Backends\MemoryMappedStorage.hpp" />
     <ClInclude Include="Runtime\Memory\Backends\MemoryMappingResult.hpp" />
     <ClInclude Include="Runtime\Memory\Backends\PersistableStorage.hpp" />
     <ClInclude Include="Runtime\Memory\Backends\PersistableStorageType.hpp" />
     <ClInclude Include="Runtime\Memory\Backends\PersistableStorageTypes.hpp" />
+    <ClInclude Include="Runtime\Memory\Containers\VirtualArray.hpp" />
     <ClInclude Include="Runtime\Memory\Safety\MagicNumberMixin.hpp" />
     <ClInclude Include="Runtime\Memory\Safety\MemoryAccessErrorCodes.hpp" />
     <ClInclude Include="Runtime\Memory\Safety\MemorySafety.hpp" />
@@ -113,7 +134,7 @@
     <ClInclude Include="Runtime\RAII\UnmanagedResource.hpp" />
     <ClInclude Include="Runtime\Services\Exceptions.hpp" />
     <ClInclude Include="Runtime\Services\ServiceProvider.hpp" />
-    <ClInclude Include="Runtime\Services\ServiceProviderCallingTable.hpp" />
+    <ClInclude Include="Runtime\Injection\ServiceProviderCallingTable.hpp" />
     <ClInclude Include="Runtime\Services\ServiceProviderErrorCodes.hpp" />
     <ClInclude Include="Runtime\Services\ServiceRequirementCollector.hpp" />
     <ClInclude Include="Runtime\Services\Services.hpp" />
@@ -262,17 +283,22 @@
     <ClInclude Include="v2\Database\Entities\PagedAllocator.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Library\Memory\tests.cpp" />
     <ClCompile Include="Library\Meta\Reflection\StaticTests.cpp" />
     <ClCompile Include="Library\test.cpp" />
     <ClCompile Include="Library\Types\Polymorphism\ProxyCallTable.cpp" />
     <ClCompile Include="Library\Utilities\MaybeOwnedString.cpp" />
+    <ClCompile Include="Runtime\Invocations\CallTable_.cpp" />
     <ClCompile Include="Runtime\Encoding\Unicode.cpp" />
     <ClCompile Include="Runtime\Files\MappedFileView.cpp" />
     <ClCompile Include="Runtime\Files\RegularFile.cpp" />
+    <ClCompile Include="Runtime\Invocations\OpaqueCallTable.cpp" />
     <ClCompile Include="Runtime\Memory\Allocators\BitmapAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\Allocators\CircularAllocator.cpp" />
     <ClCompile Include="Runtime\Memory\Safety\MemorySafety.cpp" />
-    <ClCompile Include="Runtime\Services\ServiceProviderCallingTable.cpp" />
+    <ClCompile Include="Runtime\Memory\VmAllocatorFileBacked.cpp" />
+    <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp" />
+    <ClCompile Include="Runtime\Injection\ServiceProviderCallingTable.cpp" />
     <ClCompile Include="Runtime\Services\ServiceRequirementCollector.cpp" />
     <ClCompile Include="Runtime\Services\SimpleServiceProvider.cpp" />
     <ClCompile Include="Runtime\Strings\VariadicFormat.cpp" />
@@ -283,6 +309,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Export.def" />
+    <None Include="LICENSE.md" />
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
