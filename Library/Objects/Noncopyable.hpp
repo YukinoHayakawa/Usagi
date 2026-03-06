@@ -33,18 +33,13 @@ struct NoncopyableTest : Noncopyable
 {
 };
 
-static_assert(
-    !std::is_copy_constructible_v<NoncopyableTest>,
+static_assert(!std::is_copy_constructible_v<NoncopyableTest>,
     "A class inheriting Noncopyable should not be copy constructible.");
-static_assert(
-    !std::is_copy_assignable_v<NoncopyableTest>,
+static_assert(!std::is_copy_assignable_v<NoncopyableTest>,
     "A class inheriting Noncopyable should not be copy assignable.");
-static_assert(
-    std::is_move_constructible_v<NoncopyableTest>,
+static_assert(std::is_move_constructible_v<NoncopyableTest>,
     "A class inheriting Noncopyable should remain move constructible.");
-static_assert(
-    std::is_move_assignable_v<NoncopyableTest>,
+static_assert(std::is_move_assignable_v<NoncopyableTest>,
     "A class inheriting Noncopyable should remain move assignable.");
 } // namespace details::static_tests
-
 } // namespace usagi
