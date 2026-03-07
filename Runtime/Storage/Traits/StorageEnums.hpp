@@ -113,27 +113,29 @@ enum class StorageLatencyFlags : std::uint8_t
 enum class StorageDeviceFlags : std::uint16_t
 {
     None       = 0,
-    Silicon    = 1 << 0, // Solid-state (RAM / Optane / NAND)
-    Magnetic   = 1 << 1, // Spinning or Tape media (HDD / LTO)
-    Optical    = 1 << 2, // Laser-read media (CD / DVD / Blu-ray)
-    Volatile   = 1 << 3, // Data lost on power cycle (Standard RAM)
-    Persistent = 1 << 4, // Data survives power cycle (Disk / NVDIMM)
-    Coherent   = 1 << 5, // Hardware cache coherency (CPU-visible)
-    Atomic     = 1 << 6, // Supports hardware-level atomic operations
-    Integrated = 1 << 7, // On-die or SoC internal (Integrated GPU)
-    Discrete   = 1 << 8, // External bus device (Discrete GPU / PCIe Card)
-    Remote     = 1 << 9, // Network-attached device
+    Silicon    = 1 << 0,  // Solid-state (RAM / Optane / NAND)
+    Magnetic   = 1 << 1,  // Spinning or Tape media (HDD / LTO)
+    Optical    = 1 << 2,  // Laser-read media (CD / DVD / Blu-ray)
+    Volatile   = 1 << 3,  // Data lost on power cycle (Standard RAM)
+    Persistent = 1 << 4,  // Data survives power cycle (Disk / NVDIMM)
+    Coherent   = 1 << 5,  // Hardware cache coherency (CPU-visible)
+    Atomic     = 1 << 6,  // Supports hardware-level atomic operations
+    Integrated = 1 << 7,  // On-die or SoC internal (Integrated GPU)
+    Discrete   = 1 << 8,  // External bus device (Discrete GPU / PCIe Card)
+    Remote     = 1 << 9,  // Network-attached device
+    Pinned     = 1 << 10, // Locked in physical memory, immune to OS paging
 
     // Shio: Common shorthands to keep trait definitions clean.
-    CpuInternal   = Silicon | Volatile | Coherent | Atomic | Integrated,
-    SystemRam     = Silicon | Volatile | Coherent | Atomic | Integrated,
-    PersistentRam = Silicon | Persistent | Coherent | Atomic | Integrated,
-    GpuVRam       = Silicon | Volatile | Atomic | Discrete,
-    NvmeStorage   = Silicon | Persistent | Discrete,
-    SataStorage   = Silicon | Persistent | Discrete,
-    MagneticDisk  = Magnetic | Persistent | Discrete,
-    TapeArchival  = Magnetic | Persistent | Remote,
-    NetworkNode   = Remote,
+    CpuInternal     = Silicon | Volatile | Coherent | Atomic | Integrated,
+    SystemRam       = Silicon | Volatile | Coherent | Atomic | Integrated,
+    SystemRamLocked = SystemRam | Pinned,
+    PersistentRam   = Silicon | Persistent | Coherent | Atomic | Integrated,
+    GpuVRam         = Silicon | Volatile | Atomic | Discrete,
+    NvmeStorage     = Silicon | Persistent | Discrete,
+    SataStorage     = Silicon | Persistent | Discrete,
+    MagneticDisk    = Magnetic | Persistent | Discrete,
+    TapeArchival    = Magnetic | Persistent | Remote,
+    NetworkNode     = Remote,
 };
 
 /**
