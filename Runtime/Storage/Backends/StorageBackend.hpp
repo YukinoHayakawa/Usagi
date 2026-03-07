@@ -5,8 +5,8 @@
 
 #include <Usagi/Library/Meta/TypeTraits.hpp>
 #include <Usagi/Platforms/Syscalls/VirtualMemory.hpp>
-#include <Usagi/Runtime/Storage/MemoryView.hpp>
 #include <Usagi/Runtime/Storage/Traits/StorageTraits.hpp>
+#include <Usagi/Runtime/Storage/Views/MemoryView.hpp>
 
 namespace usagi::runtime::storage
 {

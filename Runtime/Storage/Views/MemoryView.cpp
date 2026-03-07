@@ -2,13 +2,13 @@
 
 #include <cassert>
 
-namespace usagi::runtime::storage
+namespace usagi::runtime
 {
 void MemoryView::reset() noexcept
 {
-    mBackendHandle = INVALID_FILE_HANDLE;
+    mBackendHandle = storage::INVALID_FILE_HANDLE;
     mMaxSizeAndMode.set_int(0);
-    mMaxSizeAndMode.set_enum(FileOpenMode::None);
+    mMaxSizeAndMode.set_enum(storage::FileOpenMode::None);
     mVirtualBase = nullptr;
     mFuncTable   = nullptr;
 }
@@ -35,14 +35,14 @@ void MemoryView::check_page_aligned(
 
 void MemoryView::check_write_access() const
 {
-    assert(has_flag(mode(), FileOpenMode::Write));
+    assert(has_flag(mode(), storage::FileOpenMode::Write));
 }
 
-MemoryView::MemoryView(const MemoryFunctionTable *vtable,
-    const NativeFileHandle                        handle,
-    const FileOpenMode                            mode,
-    const std::size_t                             reserved_size,
-    void                                         *virtual_base) noexcept
+MemoryView::MemoryView(const storage::MemoryFunctionTable *vtable,
+    const storage::NativeFileHandle                        handle,
+    const storage::FileOpenMode                            mode,
+    const std::size_t                                      reserved_size,
+    void *virtual_base) noexcept
     : mBackendHandle(handle)
     , mVirtualBase(static_cast<std::byte *>(virtual_base))
     , mMaxSizeAndMode(reserved_size, mode)
@@ -51,13 +51,13 @@ MemoryView::MemoryView(const MemoryFunctionTable *vtable,
 }
 
 std::expected<MemoryView, platforms::memory::VirtualMemoryError>
-    MemoryView::create(const MemoryFunctionTable *vtable,
-        const NativeFileHandle                    handle,
-        const FileOpenMode                        mode,
-        const std::uint64_t                       offset,
-        const std::uint64_t                       size,
-        const std::uint64_t                       commit,
-        void                                     *base_address_hint) noexcept
+    MemoryView::create(const storage::MemoryFunctionTable *vtable,
+        const storage::NativeFileHandle                    handle,
+        const storage::FileOpenMode                        mode,
+        const std::uint64_t                                offset,
+        const std::uint64_t                                size,
+        const std::uint64_t                                commit,
+        void *base_address_hint) noexcept
 {
     // Shio: If size is 0 and we are backed by the pagefile, this is invalid.
     // Real physical backends will substitute USE_BACKEND_CAPACITY before
@@ -81,7 +81,7 @@ MemoryView::~MemoryView()
 {
     if(mVirtualBase)
     {
-        if(has_flag(mode(), FileOpenMode::Write))
+        if(has_flag(mode(), storage::FileOpenMode::Write))
         {
             flush(0, max_size());
         }
@@ -105,7 +105,7 @@ MemoryView &MemoryView::operator=(MemoryView &&other) noexcept
 
     if(mVirtualBase)
     {
-        if(has_flag(mode(), FileOpenMode::Write))
+        if(has_flag(mode(), storage::FileOpenMode::Write))
         {
             flush(0, max_size());
         }
@@ -197,4 +197,4 @@ void MemoryView::flush(const std::uint64_t offset, std::uint64_t size)
     check_write_access();
     mFuncTable->flush(mVirtualBase + offset, size);
 }
-} // namespace usagi::runtime::storage
+} // namespace usagi::runtime

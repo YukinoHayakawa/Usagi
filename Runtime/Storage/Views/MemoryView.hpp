@@ -1,16 +1,11 @@
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <string_view>
-
 #include <Usagi/Library/Containers/PackedIntEnumPair.hpp>
 #include <Usagi/Library/Objects/Noncopyable.hpp>
 #include <Usagi/Platforms/Syscalls/VirtualMemory.hpp> // Keep for error enum
+#include <Usagi/Runtime/Storage/Backends/MemoryFunctionTable.hpp>
 
-#include "../Backends/MemoryFunctionTable.hpp"
-
-namespace usagi::runtime::storage
+namespace usagi::runtime
 {
 /**
  * Shio:
@@ -25,14 +20,14 @@ namespace usagi::runtime::storage
  */
 class MemoryView final : Noncopyable
 {
-    NativeFileHandle mBackendHandle = INVALID_FILE_HANDLE;
-    std::byte       *mVirtualBase   = nullptr;
+    storage::NativeFileHandle mBackendHandle = storage::INVALID_FILE_HANDLE;
+    std::byte                *mVirtualBase   = nullptr;
 
     // Shio: Pack the 3-bit mode flag into the upper bits of the 64-bit size
     // to tightly pack the class and improve cache efficiency.
-    PackedIntEnumPair<std::size_t, FileOpenMode, 3> mMaxSizeAndMode;
+    PackedIntEnumPair<std::size_t, storage::FileOpenMode, 3> mMaxSizeAndMode;
 
-    const MemoryFunctionTable *mFuncTable = nullptr;
+    const storage::MemoryFunctionTable *mFuncTable = nullptr;
 
     void reset() noexcept;
 
@@ -42,11 +37,11 @@ class MemoryView final : Noncopyable
     void check_write_access() const;
 
     // Private constructor. Use create() factory method.
-    MemoryView(const MemoryFunctionTable *vtable,
-        NativeFileHandle                  handle,
-        FileOpenMode                      mode,
-        std::size_t                       reserved_size,
-        void                             *virtual_base) noexcept;
+    MemoryView(const storage::MemoryFunctionTable *vtable,
+        storage::NativeFileHandle                  handle,
+        storage::FileOpenMode                      mode,
+        std::size_t                                reserved_size,
+        void                                      *virtual_base) noexcept;
 
 public:
     constexpr static std::uint64_t USE_BACKEND_CAPACITY = 0;
@@ -67,13 +62,13 @@ public:
      */
     [[nodiscard]]
     static std::expected<MemoryView, platforms::memory::VirtualMemoryError>
-        create(const MemoryFunctionTable *vtable,
-            NativeFileHandle              handle,
-            FileOpenMode                  mode,
-            std::uint64_t                 offset = 0,
-            std::uint64_t                 size   = USE_BACKEND_CAPACITY,
-            std::uint64_t                 commit = 0,
-            void                         *base_address_hint = nullptr) noexcept;
+        create(const storage::MemoryFunctionTable *vtable,
+            storage::NativeFileHandle              handle,
+            storage::FileOpenMode                  mode,
+            std::uint64_t                          offset = 0,
+            std::uint64_t                          size = USE_BACKEND_CAPACITY,
+            std::uint64_t                          commit = 0,
+            void *base_address_hint                       = nullptr) noexcept;
 
     ~MemoryView();
 
@@ -81,7 +76,7 @@ public:
     MemoryView &operator=(MemoryView &&other) noexcept;
 
     [[nodiscard]]
-    FileOpenMode mode() const noexcept
+    storage::FileOpenMode mode() const noexcept
     {
         return mMaxSizeAndMode.get_enum();
     }
@@ -149,4 +144,4 @@ public:
     // If `size == 0` the operation is performed on [offset, max_size - offset).
     void flush(std::uint64_t offset = 0, std::uint64_t size = 0);
 };
-} // namespace usagi::runtime::storage
+} // namespace usagi::runtime
