@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <utility>
 
 namespace usagi
 {
@@ -37,9 +38,7 @@ concept BitMaskEnum = std::is_enum_v<E> && EnableBitMaskOperators<E>::value;
 template <BitMaskEnum E>
 constexpr E operator|(E lhs, E rhs) noexcept
 {
-    using underlying = std::underlying_type_t<E>;
-    return static_cast<E>(
-        static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+    return static_cast<E>(std::to_underlying(lhs) | std::to_underlying(rhs));
 }
 
 // Shio: Bitwise AND operator for enums marked with EnableBitMaskOperators.
@@ -57,9 +56,7 @@ constexpr E operator|(E lhs, E rhs) noexcept
 template <BitMaskEnum E>
 constexpr E operator&(E lhs, E rhs) noexcept
 {
-    using underlying = std::underlying_type_t<E>;
-    return static_cast<E>(
-        static_cast<underlying>(lhs) & static_cast<underlying>(rhs));
+    return static_cast<E>(std::to_underlying(lhs) & std::to_underlying(rhs));
 }
 
 // Shio: Bitwise XOR operator for enums marked with EnableBitMaskOperators.
@@ -77,9 +74,7 @@ constexpr E operator&(E lhs, E rhs) noexcept
 template <BitMaskEnum E>
 constexpr E operator^(E lhs, E rhs) noexcept
 {
-    using underlying = std::underlying_type_t<E>;
-    return static_cast<E>(
-        static_cast<underlying>(lhs) ^ static_cast<underlying>(rhs));
+    return static_cast<E>(std::to_underlying(lhs) ^ std::to_underlying(rhs));
 }
 
 // Shio: Bitwise NOT operator for enums marked with EnableBitMaskOperators.
@@ -101,8 +96,7 @@ constexpr E operator^(E lhs, E rhs) noexcept
 template <BitMaskEnum E>
 constexpr E operator~(E rhs) noexcept
 {
-    using underlying = std::underlying_type_t<E>;
-    return static_cast<E>(~static_cast<underlying>(rhs));
+    return static_cast<E>(~std::to_underlying(rhs));
 }
 
 // Shio: Compound OR assignment for BitMaskEnum.
@@ -173,9 +167,7 @@ constexpr E &operator^=(E &lhs, E rhs) noexcept
 template <BitMaskEnum E>
 constexpr bool has_flag(E value, E flag) noexcept
 {
-    using underlying = std::underlying_type_t<E>;
-    return (static_cast<underlying>(value) & static_cast<underlying>(flag)) !=
-        0;
+    return (std::to_underlying(value) & std::to_underlying(flag)) != 0;
 }
 
 namespace details::static_tests
