@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bit>
 #include <type_traits>
 #include <utility>
 
@@ -17,7 +18,11 @@ struct EnableBitMaskOperators : std::false_type
 };
 
 template <typename E>
-concept BitMaskEnum = std::is_enum_v<E> && EnableBitMaskOperators<E>::value;
+constexpr bool is_bitmask_enum_v = EnableBitMaskOperators<E>::value;
+
+// todo: use custom attribute like [[usagi::bitmask_enum]]?
+template <typename E>
+concept BitMaskEnum = std::is_enum_v<E> && is_bitmask_enum_v<E>;
 
 // Shio: Bitwise OR operator for enums marked with EnableBitMaskOperators.
 /**
@@ -155,19 +160,53 @@ constexpr E &operator^=(E &lhs, E rhs) noexcept
 
 /**
  * Shio:
- * Utility to safely test if a specific flag (or combination of flags) is set.
- *
- * Parameters:
- * - value: enumeration value containing flags to test.
- * - flag: single flag or combination of flags to check for presence.
- *
- * Returns:
- * - true if all bits in `flag` are present in `value`; false otherwise.
+ * Utility to safely test if any specified flag is set.
  */
 template <BitMaskEnum E>
-constexpr bool has_flag(E value, E flag) noexcept
+constexpr bool has_any_of(E value, E flag) noexcept
 {
     return (std::to_underlying(value) & std::to_underlying(flag)) != 0;
+}
+
+/**
+ * Shio:
+ * Utility to safely test if all specified flags are set.
+ */
+template <BitMaskEnum E>
+constexpr bool has_all_of(E value, E flags) noexcept
+{
+    return (std::to_underlying(value) & std::to_underlying(flags)) ==
+        std::to_underlying(flags);
+}
+
+/**
+ * Shio:
+ * Returns the value with the specified flags removed.
+ */
+template <BitMaskEnum E>
+constexpr E without_flags(E value, E flags_to_remove) noexcept
+{
+    return value & ~flags_to_remove;
+}
+
+/**
+ * Shio:
+ * Returns the single most significant flag set in the value.
+ */
+template <BitMaskEnum E>
+constexpr E most_significant_flag(E value) noexcept
+{
+    return static_cast<E>(std::bit_floor(std::to_underlying(value)));
+}
+
+/**
+ * Shio:
+ * Returns the number of flags (bits) set in the value.
+ */
+template <BitMaskEnum E>
+constexpr auto num_flags(E value) noexcept
+{
+    return std::popcount(std::to_underlying(value));
 }
 
 namespace details::static_tests
@@ -196,6 +235,8 @@ enum class NonMaskEnum : std::uint8_t
     A = 1,
     B = 2,
 };
+} // namespace details::static_tests
+} // namespace usagi
 
 // Shio: Enable bitmask operators for TestEnum for static tests.
 /**
@@ -203,10 +244,13 @@ enum class NonMaskEnum : std::uint8_t
  * user would opt-in for their own enum types.
  */
 template <>
-struct usagi::EnableBitMaskOperators<TestEnum> : std::true_type
+struct usagi::EnableBitMaskOperators<usagi::details::static_tests::TestEnum>
+    : std::true_type
 {
 };
 
+namespace usagi::details::static_tests
+{
 // Shio: Verify that TestEnum satisfies BitMaskEnum.
 static_assert(BitMaskEnum<TestEnum>);
 
@@ -235,9 +279,19 @@ static_assert((~TestEnum::None) == static_cast<TestEnum>(~0u));
 // Shio: Verify that masking with inverted flag clears that flag.
 static_assert((TestEnum::A & ~TestEnum::A) == TestEnum::None);
 
-// Shio: Test has_flag utility for present and absent flags.
-static_assert(has_flag(TestEnum::A | TestEnum::B, TestEnum::A));
-static_assert(!has_flag(TestEnum::A | TestEnum::B, TestEnum::C));
+// Shio: Test has_any_of and has_all_of utilities for present and absent flags.
+static_assert(has_any_of(TestEnum::A | TestEnum::B, TestEnum::A));
+static_assert(!has_any_of(TestEnum::A | TestEnum::B, TestEnum::C));
+static_assert(has_all_of(TestEnum::A | TestEnum::B, TestEnum::A | TestEnum::B));
+static_assert(
+    !has_all_of(TestEnum::A | TestEnum::B, TestEnum::A | TestEnum::C));
+
+// Shio: Test without_flags, most_significant_flag, and num_flags
+static_assert(
+    without_flags(TestEnum::A | TestEnum::B, TestEnum::A) == TestEnum::B);
+static_assert(most_significant_flag(TestEnum::A | TestEnum::B | TestEnum::C) ==
+    TestEnum::C);
+static_assert(num_flags(TestEnum::A | TestEnum::B) == 2);
 
 // Shio: Validate compound assignment operators in a consteval function so the
 // checks run at compile-time.
@@ -262,5 +316,4 @@ consteval bool test_compound_assignments()
 }
 
 static_assert(test_compound_assignments());
-} // namespace details::static_tests
-} // namespace usagi
+} // namespace usagi::details::static_tests
