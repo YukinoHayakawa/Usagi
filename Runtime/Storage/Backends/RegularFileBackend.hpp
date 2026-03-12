@@ -1,10 +1,6 @@
 #pragma once
 
-#include <expected>
 #include <filesystem>
-
-#include <Usagi/Runtime/Storage/Traits/StorageTraits.hpp>
-#include <Usagi/Runtime/Storage/Views/MemoryView.hpp>
 
 #include "StorageBackend.hpp"
 
@@ -42,7 +38,7 @@ public:
      * constructors.
      */
     [[nodiscard]]
-    static std::expected<RegularFileBackend, FileError> open(
+    static ExpectedSyscallValue<RegularFileBackend> open(
         std::filesystem::path path,
         FileOpenMode          mode       = FileOpenMode::ReadWrite,
         FileShareMode         share_mode = FileShareMode::ReadWrite,
@@ -58,12 +54,11 @@ public:
     NativeFileHandle native_handle() const;
 
     [[nodiscard]]
-    std::expected<MemoryView, platforms::memory::VirtualMemoryError>
-        create_view(std::uint64_t offset            = 0,
-            std::uint64_t         size              = USE_BACKEND_CAPACITY,
-            std::uint64_t         commit_size       = 0,
-            void                 *base_address_hint = nullptr,
-            FileOpenMode          mode = FileOpenMode::Identical) const;
+    ExpectedSyscallValue<MemoryView> create_view(std::uint64_t offset = 0,
+        std::uint64_t size              = MemoryView::USE_BACKEND_CAPACITY,
+        std::uint64_t commit_size       = 0,
+        void         *base_address_hint = nullptr,
+        FileOpenMode  mode              = FileOpenMode::Identical) const;
 
     [[nodiscard]]
     const std::filesystem::path &path() const;

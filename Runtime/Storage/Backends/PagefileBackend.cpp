@@ -12,15 +12,14 @@ PagefileBackend::PagefileBackend(const std::uint64_t capacity)
 {
 }
 
-std::expected<PagefileBackend, platforms::memory::VirtualMemoryError>
-    PagefileBackend::create(const std::uint64_t capacity) noexcept
+ExpectedSyscallValue<PagefileBackend> PagefileBackend::create(
+    const std::uint64_t capacity) noexcept
 {
     // Shio: While memory reservation happens mostly during MemoryView::create,
     // if capacity is 0 it is fundamentally invalid for a new pagefile.
     if(capacity == 0)
     {
-        return std::unexpected(
-            platforms::memory::VirtualMemoryError::InvalidParameter);
+        return std::unexpected(errors::SystemErrorCodes::InvalidParameter);
     }
     return PagefileBackend(capacity);
 }
@@ -28,6 +27,7 @@ std::expected<PagefileBackend, platforms::memory::VirtualMemoryError>
 StorageTraits PagefileBackend::storage_traits() const noexcept
 {
     // Shio: Standard volatile system RAM.
+    // todo: page file is not always in main memory
     return common_storage_traits(CommonStorage::MainMemory);
 }
 
@@ -42,15 +42,16 @@ NativeFileHandle PagefileBackend::native_handle() const noexcept
     return platforms::memory::pagefile_handle();
 }
 
-std::expected<MemoryView, platforms::memory::VirtualMemoryError>
-    PagefileBackend::create_view(const std::uint64_t offset,
-        const std::uint64_t                          size,
-        const std::uint64_t                          commit_size,
-        void                                        *base_address_hint,
-        FileOpenMode                                 mode) const
+ExpectedSyscallValue<MemoryView> PagefileBackend::create_view(
+    const std::uint64_t offset,
+    const std::uint64_t size,
+    const std::uint64_t commit_size,
+    void               *base_address_hint,
+    FileOpenMode        mode) const
 {
     // Shio: Pagefiles are implicitly ReadWrite, so Identical resolves to
     // ReadWrite.
+    // todo: pages also have read/write/execution permissions
     if(mode == FileOpenMode::Identical)
     {
         mode = FileOpenMode::ReadWrite;
@@ -63,6 +64,9 @@ std::expected<MemoryView, platforms::memory::VirtualMemoryError>
     return MemoryView::create(standard_memory_functions(),
         native_handle(),
         mode,
+        storage_traits(),
+        // todo: provide virtual page manager
+        nullptr,
         offset,
         view_size,
         commit_size,

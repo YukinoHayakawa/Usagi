@@ -1,8 +1,5 @@
 #pragma once
 
-#include <Usagi/Runtime/Storage/Views/MemoryView.hpp>
-
-#include "Files.hpp"
 #include "StorageBackend.hpp"
 
 namespace usagi::runtime::storage
@@ -15,6 +12,8 @@ namespace usagi::runtime::storage
  */
 class PagefileBackend : Noncopyable
 {
+    // todo: should have alignment, etc. Or maybe get from StorageTraits?
+
     std::uint64_t mCapacity = 0;
 
     // Private constructor. Use create() factory method.
@@ -33,8 +32,8 @@ public:
      * identical to RegularFileBackend simplifies template interfaces.
      */
     [[nodiscard]]
-    static std::expected<PagefileBackend, platforms::memory::VirtualMemoryError>
-        create(std::uint64_t capacity) noexcept;
+    static ExpectedSyscallValue<PagefileBackend> create(
+        std::uint64_t capacity) noexcept;
 
     // --- StorageBackend Concept Requirement ---
 
@@ -46,12 +45,11 @@ public:
     NativeFileHandle native_handle() const noexcept;
 
     [[nodiscard]]
-    std::expected<MemoryView, platforms::memory::VirtualMemoryError>
-        create_view(std::uint64_t offset            = 0,
-            std::uint64_t         size              = USE_BACKEND_CAPACITY,
-            std::uint64_t         commit_size       = 0,
-            void                 *base_address_hint = nullptr,
-            FileOpenMode          mode = FileOpenMode::Identical) const;
+    ExpectedSyscallValue<MemoryView> create_view(std::uint64_t offset = 0,
+        std::uint64_t size              = MemoryView::USE_BACKEND_CAPACITY,
+        std::uint64_t commit_size       = 0,
+        void         *base_address_hint = nullptr,
+        FileOpenMode  mode              = FileOpenMode::Identical) const;
 };
 
 static_assert(StorageBackend<PagefileBackend>);

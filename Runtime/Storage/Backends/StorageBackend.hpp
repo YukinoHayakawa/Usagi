@@ -4,14 +4,11 @@
 #include <expected>
 
 #include <Usagi/Library/Meta/TypeTraits.hpp>
-#include <Usagi/Platforms/Syscalls/VirtualMemory.hpp>
 #include <Usagi/Runtime/Storage/Traits/StorageTraits.hpp>
 #include <Usagi/Runtime/Storage/Views/MemoryView.hpp>
 
 namespace usagi::runtime::storage
 {
-constexpr std::uint64_t USE_BACKEND_CAPACITY = 0;
-
 /**
  * Shio:
  * Compile-time concept for Layer 1 Storage Backends.
@@ -27,11 +24,13 @@ concept StorageBackend = requires(const T &a) {
      * @brief Queries the hardware and logical traits of the backend.
      * Used by the Task Graph to schedule migrations and verify constraints.
      */
+    // todo: error handling
     { a.storage_traits() } -> std::convertible_to<StorageTraits>;
 
     /**
      * @brief Returns the total logical capacity of the storage medium in bytes.
      */
+    // todo: error handling
     { a.capacity() } -> std::convertible_to<std::uint64_t>;
 
     /**
@@ -39,6 +38,7 @@ concept StorageBackend = requires(const T &a) {
      * For backends that do not support direct OS mapping (e.g. Network),
      * this should return INVALID_FILE_HANDLE.
      */
+    // todo: error handling
     { a.native_handle() } -> std::convertible_to<NativeFileHandle>;
 
     /**
@@ -51,8 +51,7 @@ concept StorageBackend = requires(const T &a) {
             std::uint64_t { },
             static_cast<void *>(nullptr),
             FileOpenMode::Identical)
-    } -> std::same_as<std::expected<MemoryView,
-        platforms::memory::VirtualMemoryError>>;
+    } -> std::same_as<ExpectedSyscallValue<MemoryView>>;
 } && meta::NotCopyable<T>;
 
 /**
@@ -72,12 +71,12 @@ struct StorageBackendInterface : Noncopyable
     virtual NativeFileHandle native_handle() const noexcept = 0;
 
     [[nodiscard]]
-    virtual std::expected<MemoryView, platforms::memory::VirtualMemoryError>
-        create_view(std::uint64_t offset            = 0,
-            std::uint64_t         size              = USE_BACKEND_CAPACITY,
-            std::uint64_t         commit_size       = 0,
-            void                 *base_address_hint = nullptr,
-            FileOpenMode          mode = FileOpenMode::Identical) const = 0;
+    virtual ExpectedSyscallValue<MemoryView> create_view(
+        std::uint64_t offset            = 0,
+        std::uint64_t size              = MemoryView::USE_BACKEND_CAPACITY,
+        std::uint64_t commit_size       = 0,
+        void         *base_address_hint = nullptr,
+        FileOpenMode  mode              = FileOpenMode::Identical) const = 0;
 };
 
 static_assert(StorageBackend<StorageBackendInterface>);

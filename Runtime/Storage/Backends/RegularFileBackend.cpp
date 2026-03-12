@@ -45,7 +45,7 @@ RegularFileBackend &RegularFileBackend::operator=(
     return *this;
 }
 
-std::expected<RegularFileBackend, FileError> RegularFileBackend::open(
+ExpectedSyscallValue<RegularFileBackend> RegularFileBackend::open(
     std::filesystem::path path, // NOLINT(performance-unnecessary-value-param)
     const FileOpenMode    mode,
     const FileShareMode   share_mode,
@@ -64,15 +64,17 @@ std::expected<RegularFileBackend, FileError> RegularFileBackend::open(
 StorageTraits RegularFileBackend::storage_traits() const
 {
     // Shio: Query the actual physical traits from the OS/Hardware
-    StorageTraits t =
+    const auto t_expected =
         platforms::storage::query_file_storage_traits(mFileHandle);
-    t.is_read_only = has_flag(mMode, FileOpenMode::Write) ? 0 : 1;
+    StorageTraits t = t_expected.value_or(StorageTraits { });
+    t.is_read_only  = has_all_of(mMode, FileOpenMode::Write) ? 0 : 1;
     return t;
 }
 
 std::uint64_t RegularFileBackend::capacity() const
 {
-    return platforms::storage::file_size(mFileHandle);
+    const auto size_expected = platforms::storage::file_size(mFileHandle);
+    return size_expected.value_or(0);
 }
 
 NativeFileHandle RegularFileBackend::native_handle() const
@@ -80,12 +82,12 @@ NativeFileHandle RegularFileBackend::native_handle() const
     return mFileHandle;
 }
 
-std::expected<MemoryView, platforms::memory::VirtualMemoryError>
-    RegularFileBackend::create_view(const std::uint64_t offset,
-        const std::uint64_t                             size,
-        const std::uint64_t                             commit_size,
-        void                                           *base_address_hint,
-        FileOpenMode                                    mode) const
+ExpectedSyscallValue<MemoryView> RegularFileBackend::create_view(
+    const std::uint64_t offset,
+    const std::uint64_t size,
+    const std::uint64_t commit_size,
+    void               *base_address_hint,
+    FileOpenMode        mode) const
 {
     // Resolve "Identical" request to the exact mode the backend was opened
     // with.
@@ -100,13 +102,15 @@ std::expected<MemoryView, platforms::memory::VirtualMemoryError>
     if((static_cast<std::uint8_t>(mode) & static_cast<std::uint8_t>(mMode)) !=
         static_cast<std::uint8_t>(mode))
     {
-        return std::unexpected(
-            platforms::memory::VirtualMemoryError::AccessDenied);
+        return std::unexpected(errors::SystemErrorCodes::AccessDenied);
     }
 
     return MemoryView::create(standard_memory_functions(),
         mFileHandle,
         mode,
+        storage_traits(),
+        // todo: provide virtual page manager
+        nullptr,
         offset,
         size,
         commit_size,
@@ -125,11 +129,11 @@ FileOpenMode RegularFileBackend::mode() const
 
 std::uint64_t RegularFileBackend::id() const
 {
-    return platforms::storage::file_id(mFileHandle);
+    return platforms::storage::file_id(mFileHandle).value();
 }
 
 std::uint64_t RegularFileBackend::last_modification_time() const
 {
-    return platforms::storage::file_last_modification_time(mFileHandle);
+    return platforms::storage::file_last_modification_time(mFileHandle).value();
 }
 } // namespace usagi::runtime::storage
