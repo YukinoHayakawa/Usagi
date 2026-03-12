@@ -1,5 +1,7 @@
 ﻿#include "Exceptions.hpp"
 
+#include <format>
+
 namespace usagi
 {
 Exception::Exception(const runtime::errors::SystemErrorCodes code,
@@ -12,11 +14,12 @@ Exception::Exception(const runtime::errors::SystemErrorCodes code,
         .instruction_pointer = nullptr,
     }
 {
-    // Shio: Format a readable string for the std::exception::what()
-    // override. In a full implementation, we might use std::format here.
-    mFormattedMessage = std::string(loc.file_name()) + ":" +
-        std::to_string(loc.line()) + " [" + std::string(loc.function_name()) +
-        "] - " + std::string(message);
+    // Shio: Format a readable string for the std::exception::what() override.
+    mFormattedMessage = std::format("{}:{} [{}] - {}",
+        loc.file_name(),
+        loc.line(),
+        loc.function_name(),
+        message);
 }
 
 const char *Exception::what() const noexcept
@@ -38,29 +41,68 @@ NonEngineException::NonEngineException(
 {
 }
 
+RuntimeException::RuntimeException(const runtime::errors::SystemErrorCodes code,
+    const std::string_view     message,
+    const std::source_location loc)
+    : Exception(code, message, loc)
+{
+}
+
+OperatingSystemException::OperatingSystemException(
+    const runtime::errors::SystemErrorCodes code,
+    const std::string_view                  message,
+    const std::source_location              loc)
+    : RuntimeException(code, message, loc)
+{
+}
+
 LogicException::LogicException(
     const std::string_view message, const std::source_location loc)
-    : Exception(runtime::errors::SystemErrorCodes::InvalidParameter |
+    : Exception(runtime::errors::SystemErrorCodes::UnexpectedCodePath |
               runtime::errors::SystemErrorCodes::SeverityLogicError,
           message,
           loc)
 {
 }
 
+LogicException::LogicException(const runtime::errors::SystemErrorCodes code,
+    const std::string_view                                             message,
+    const std::source_location                                         loc)
+    : Exception(code, message, loc)
+{
+}
+
 BrokenInvariantException::BrokenInvariantException(
     const std::string_view message, const std::source_location loc)
-    : Exception(runtime::errors::SystemErrorCodes::StateError |
+    : LogicException(runtime::errors::SystemErrorCodes::StateError |
               runtime::errors::SystemErrorCodes::SeverityHardFault,
           message,
           loc)
 {
 }
 
+BrokenInvariantException::BrokenInvariantException(
+    const runtime::errors::SystemErrorCodes code,
+    const std::string_view                  message,
+    const std::source_location              loc)
+    : LogicException(code, message, loc)
+{
+}
+
 ResourceExhaustedException::ResourceExhaustedException(
-    const std::string_view message, const std::source_location loc)
-    : Exception(runtime::errors::SystemErrorCodes::OutOfMemory |
-              runtime::errors::SystemErrorCodes::SeverityHardFault,
+    const runtime::errors::SystemErrorCodes code,
+    const std::string_view                  message,
+    const std::source_location              loc)
+    : RuntimeException(
+          code | runtime::errors::SystemErrorCodes::SeverityHardFault,
           message,
+          loc)
+{
+}
+
+OutOfMemoryException::OutOfMemoryException(const std::source_location loc)
+    : ResourceExhaustedException(runtime::errors::SystemErrorCodes::OutOfMemory,
+          "memory allocation failed",
           loc)
 {
 }
@@ -74,12 +116,27 @@ FatalException::FatalException(
 {
 }
 
+FatalException::FatalException(const runtime::errors::SystemErrorCodes code,
+    const std::string_view                                             message,
+    const std::source_location                                         loc)
+    : Exception(code, message, loc)
+{
+}
+
 UnreachableException::UnreachableException(
     const std::string_view message, const std::source_location loc)
-    : Exception(runtime::errors::SystemErrorCodes::StateError |
+    : FatalException(runtime::errors::SystemErrorCodes::UnreachableCode |
               runtime::errors::SystemErrorCodes::SeverityFatal,
           message,
           loc)
+{
+}
+
+UnreachableException::UnreachableException(
+    const runtime::errors::SystemErrorCodes code,
+    const std::string_view                  message,
+    const std::source_location              loc)
+    : FatalException(code, message, loc)
 {
 }
 } // namespace usagi

@@ -46,26 +46,70 @@ public:
         std::source_location loc     = std::source_location::current());
 };
 
-// --- Semantic Domain Exceptions ---
+// --- Core Domains ---
+
+/**
+ * Shio:
+ * The base class for exceptions occurring due to environmental, OS, or
+ * generalized runtime failures rather than pure logical bugs.
+ */
+class RuntimeException : public Exception
+{
+public:
+    RuntimeException(runtime::errors::SystemErrorCodes code,
+        std::string_view                               message,
+        std::source_location loc = std::source_location::current());
+};
+
+/**
+ * Shio:
+ * Represents failures reported directly by the underlying operating system
+ * (e.g. syscall rejections, handle invalidation, transient device states).
+ */
+class OperatingSystemException : public RuntimeException
+{
+public:
+    OperatingSystemException(runtime::errors::SystemErrorCodes code,
+        std::string_view                                       message,
+        std::source_location loc = std::source_location::current());
+};
+
+// --- Semantic Leaf Exceptions ---
 
 class LogicException : public Exception
 {
 public:
     explicit LogicException(std::string_view message,
         std::source_location loc = std::source_location::current());
+
+    LogicException(runtime::errors::SystemErrorCodes code,
+        std::string_view                             message,
+        std::source_location loc = std::source_location::current());
 };
 
-class BrokenInvariantException : public Exception
+class BrokenInvariantException : public LogicException
 {
 public:
     explicit BrokenInvariantException(std::string_view message,
         std::source_location loc = std::source_location::current());
+
+    BrokenInvariantException(runtime::errors::SystemErrorCodes code,
+        std::string_view                                       message,
+        std::source_location loc = std::source_location::current());
 };
 
-class ResourceExhaustedException : public Exception
+class ResourceExhaustedException : public RuntimeException
 {
 public:
-    explicit ResourceExhaustedException(std::string_view message,
+    ResourceExhaustedException(runtime::errors::SystemErrorCodes code,
+        std::string_view                                         message,
+        std::source_location loc = std::source_location::current());
+};
+
+class OutOfMemoryException : public ResourceExhaustedException
+{
+public:
+    explicit OutOfMemoryException(
         std::source_location loc = std::source_location::current());
 };
 
@@ -74,12 +118,20 @@ class FatalException : public Exception
 public:
     explicit FatalException(std::string_view message,
         std::source_location loc = std::source_location::current());
+
+    FatalException(runtime::errors::SystemErrorCodes code,
+        std::string_view                             message,
+        std::source_location loc = std::source_location::current());
 };
 
-class UnreachableException : public Exception
+class UnreachableException : public FatalException
 {
 public:
     explicit UnreachableException(std::string_view message,
+        std::source_location loc = std::source_location::current());
+
+    UnreachableException(runtime::errors::SystemErrorCodes code,
+        std::string_view                                   message,
         std::source_location loc = std::source_location::current());
 };
 } // namespace usagi

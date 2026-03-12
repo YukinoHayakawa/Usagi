@@ -64,45 +64,54 @@ enum class SystemErrorCodes : std::uint32_t
     // Note: Severity flags are deliberately NOT baked into these definitions.
     // They should be bitwise-OR'd dynamically based on the execution context.
 
+    ErrorCodeMask = 0x0000'ffff,
+
+#define _NEXT_OF(prev_error) ((prev_error & ErrorCodeMask) + 1)
+
     // General Fallbacks
     UnknownError             = 1,
     // The OS lacks this feature entirely.
-    NotImplementedByPlatform = StateError | 2,
+    NotImplementedByPlatform = StateError | _NEXT_OF(UnknownError),
     // Usagi hasn't implemented this path yet.
-    NotImplementedByEngine   = StateError | 3,
+    NotImplementedByEngine   = StateError | _NEXT_OF(NotImplementedByPlatform),
 
     // State & Capability
-    NoOp         = StateError | 4,
-    NotSupported = StateError | 5,
+    NoOp               = StateError | _NEXT_OF(NotImplementedByEngine),
+    NotSupported       = StateError | _NEXT_OF(NoOp),
+    UnreachableCode    = StateError | _NEXT_OF(NotSupported),
+    UnexpectedCodePath = StateError | _NEXT_OF(UnreachableCode),
 
     // Memory & Resource
-    OutOfMemory           = ResourceError | 6,
-    AddressSpaceExhausted = ResourceError | 7,
-    QuotaExceeded         = ResourceError | 8,
+    OutOfMemory           = ResourceError | _NEXT_OF(UnexpectedCodePath),
+    AddressSpaceExhausted = ResourceError | _NEXT_OF(OutOfMemory),
+    QuotaExceeded         = ResourceError | _NEXT_OF(AddressSpaceExhausted),
 
     // Security & Access
-    AccessDenied = SecurityError | 9,
-    FileInUse    = SecurityError | StateError | 10,
+    AccessDenied = SecurityError | _NEXT_OF(QuotaExceeded),
+    FileInUse    = SecurityError | StateError | _NEXT_OF(AccessDenied),
 
     // Parameters & Bounds
-    InvalidParameter = ParameterError | 11,
-    AlignmentError   = ParameterError | 12,
-    OutOfBounds      = ParameterError | 13,
-    RegionOverlap    = ParameterError | 14,
+    InvalidParameter = ParameterError | _NEXT_OF(FileInUse),
+    AlignmentError   = ParameterError | _NEXT_OF(InvalidParameter),
+    OutOfBounds      = ParameterError | _NEXT_OF(AlignmentError),
+    RegionOverlap    = ParameterError | _NEXT_OF(OutOfBounds),
 
     // Device I/O & Integrity
-    DeviceDisconnected = DeviceIOError | StateError | 15,
-    FileNotFound       = DeviceIOError | ParameterError | 16,
-    PathTooLong        = DeviceIOError | ParameterError | 17,
-    DiskFull           = DeviceIOError | ResourceError | 18,
-    DataCorruption     = DataIntegrityError | DeviceIOError | 19,
+    DeviceDisconnected = DeviceIOError | StateError | _NEXT_OF(RegionOverlap),
+    FileNotFound =
+        DeviceIOError | ParameterError | _NEXT_OF(DeviceDisconnected),
+    PathTooLong    = DeviceIOError | ParameterError | _NEXT_OF(FileNotFound),
+    DiskFull       = DeviceIOError | ResourceError | _NEXT_OF(PathTooLong),
+    DataCorruption = DataIntegrityError | DeviceIOError | _NEXT_OF(DiskFull),
 };
+
+#undef _NEXT_OF
 } // namespace usagi::runtime::errors
 
 namespace usagi
 {
 template <>
-struct usagi::EnableBitMaskOperators<runtime::errors::SystemErrorCodes>
+struct EnableBitMaskOperators<runtime::errors::SystemErrorCodes>
     : std::true_type
 {
 };
