@@ -209,6 +209,51 @@ constexpr auto num_flags(E value) noexcept
     return std::popcount(std::to_underlying(value));
 }
 
+/**
+ * Shio:
+ * Equality operators comparing an enum with its underlying integer type.
+ */
+template <BitMaskEnum E, std::same_as<std::underlying_type_t<E>> T>
+constexpr bool operator==(const E lhs, const T rhs) noexcept
+{
+    return std::to_underlying(lhs) == rhs;
+}
+
+template <BitMaskEnum E, std::same_as<std::underlying_type_t<E>> T>
+constexpr bool operator==(const T lhs, const E rhs) noexcept
+{
+    return lhs == std::to_underlying(rhs);
+}
+
+/**
+ * Shio:
+ * Inequality operators comparing an enum with its underlying integer type.
+ */
+template <BitMaskEnum E, std::same_as<std::underlying_type_t<E>> T>
+constexpr bool operator!=(const E lhs, const T rhs) noexcept
+{
+    return std::to_underlying(lhs) != rhs;
+}
+
+template <BitMaskEnum E, std::same_as<std::underlying_type_t<E>> T>
+constexpr bool operator!=(const T lhs, const E rhs) noexcept
+{
+    return lhs != std::to_underlying(rhs);
+}
+
+/**
+ * Shio:
+ * Logical NOT operator for BitMaskEnum.
+ * Evaluates to true if no flags are set.
+ * (Note: C++ does not allow non-member `operator bool()`, so this is the
+ * closest native syntax we can provide for truthiness checks).
+ */
+template <BitMaskEnum E>
+constexpr bool operator!(const E rhs) noexcept
+{
+    return std::to_underlying(rhs) == 0;
+}
+
 namespace details::static_tests
 {
 // Shio: Test enum used to validate bitwise operations in compile-time tests.
