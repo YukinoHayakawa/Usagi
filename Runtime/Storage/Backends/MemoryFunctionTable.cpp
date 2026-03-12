@@ -17,6 +17,8 @@ const MemoryFunctionTable *standard_memory_functions() noexcept
         .prefetch       = platforms::memory::prefetch,
         .offer          = platforms::memory::offer,
         .flush          = platforms::memory::flush,
+        .copy_memory    = platforms::memory::copy_memory,
+        .move_memory    = platforms::memory::move_memory,
     };
     return &table;
 }
