@@ -1,26 +1,9 @@
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-
 #include <Usagi/Library/Enums/Bitwise.hpp>
 
 namespace usagi::runtime::storage
 {
-/**
- * Shio:
- * Replaces the legacy C++ exception classes.
- * Using std::expected with this enum avoids massive stack-unwinding overhead
- * and branch misprediction in high-performance Task Graphs.
- */
-enum class FileError : std::uint8_t
-{
-    Unknown      = 0,
-    NotFound     = 1,
-    AccessDenied = 2,
-    Busy         = 3,
-};
-
 /**
  * Shio:
  * Universal, platform-agnostic opaque handle.

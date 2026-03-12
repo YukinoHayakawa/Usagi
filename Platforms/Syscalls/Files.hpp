@@ -1,5 +1,9 @@
 ﻿#pragma once
 
+#include <filesystem>
+
+#include <Usagi/Platforms/Platforms.hpp>
+#include <Usagi/Runtime/Errors/SystemErrorCodes.hpp>
 #include <Usagi/Runtime/Storage/Backends/Files.hpp>
 #include <Usagi/Runtime/Storage/Traits/StorageTraits.hpp>
 
@@ -14,9 +18,9 @@ namespace usagi::platforms::storage
  * platform-specific hardware discovery (e.g. checking if it's on an NVMe vs
  * HDD).
  */
-[[nodiscard, usagi::platform_dependent]]
-runtime::storage::StorageTraits query_file_storage_traits(
-    runtime::storage::NativeFileHandle file) noexcept;
+[[nodiscard]]
+USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<runtime::storage::StorageTraits>
+    query_file_storage_traits(runtime::storage::NativeFileHandle file) noexcept;
 
 /**
  * @brief Opens a physical file on the storage medium and returns an opaque
@@ -34,27 +38,29 @@ runtime::storage::StorageTraits query_file_storage_traits(
  * @param options Bitmask for creation semantics (e.g. CreateIfMissing).
  * @return The OS-specific file handle, or a FileError if the operation fails.
  */
-[[nodiscard, usagi::platform_dependent]]
-std::expected<runtime::storage::NativeFileHandle, runtime::storage::FileError>
-    open_file(const std::filesystem::path &path,
-        runtime::storage::FileOpenMode     mode,
-        runtime::storage::FileShareMode    share_mode,
-        runtime::storage::FileOpenOptions  options) noexcept;
+[[nodiscard]]
+USAGI_PLATFORM_DEPENDENT
+    ExpectedSyscallValue<runtime::storage::NativeFileHandle> open_file(
+        const std::filesystem::path      &path,
+        runtime::storage::FileOpenMode    mode,
+        runtime::storage::FileShareMode   share_mode,
+        runtime::storage::FileOpenOptions options) noexcept;
 
 /**
  * @brief Closes the provided file handle, releasing the OS resource.
  * @param file The opaque handle previously returned by open_file.
  */
-[[usagi::platform_dependent]]
-void close_file(runtime::storage::NativeFileHandle file) noexcept;
+USAGI_PLATFORM_DEPENDENT void close_file(
+    runtime::storage::NativeFileHandle file) noexcept;
 
 /**
  * @brief Retrieves the total size of the file in bytes.
  * @param file The opaque handle of the file.
  * @return The size of the file in bytes.
  */
-[[nodiscard, usagi::platform_dependent]]
-std::size_t file_size(runtime::storage::NativeFileHandle file) noexcept;
+[[nodiscard]]
+USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<std::size_t> file_size(
+    runtime::storage::NativeFileHandle file) noexcept;
 
 /**
  * @brief Retrieves a persistent, unique identifier for the file on the
@@ -71,8 +77,9 @@ std::size_t file_size(runtime::storage::NativeFileHandle file) noexcept;
  * @return A 64-bit unsigned integer representing the file's unique filesystem
  * ID.
  */
-[[nodiscard, usagi::platform_dependent]]
-std::uint64_t file_id(runtime::storage::NativeFileHandle file) noexcept;
+[[nodiscard]]
+USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<std::uint64_t> file_id(
+    runtime::storage::NativeFileHandle file) noexcept;
 
 /**
  * @brief Retrieves the time the file was last modified.
@@ -85,9 +92,10 @@ std::uint64_t file_id(runtime::storage::NativeFileHandle file) noexcept;
  * @param file The opaque handle of the file.
  * @return A 64-bit unsigned integer representing the modification time.
  */
-[[nodiscard, usagi::platform_dependent]]
-std::uint64_t file_last_modification_time(
-    runtime::storage::NativeFileHandle file) noexcept;
+[[nodiscard]]
+USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<std::uint64_t>
+    file_last_modification_time(
+        runtime::storage::NativeFileHandle file) noexcept;
 
 /**
  * @brief Atomically replaces one file with another, optionally preserving the
@@ -101,8 +109,8 @@ std::uint64_t file_last_modification_time(
  * @param backup_name The path to store the backup, if requested.
  * @return Success, or a FileError if the atomic replacement fails.
  */
-[[nodiscard, usagi::platform_dependent]]
-std::expected<void, runtime::storage::FileError> replace_file(
+[[nodiscard]]
+USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> replace_file(
     const std::filesystem::path &replaced_file,
     const std::filesystem::path &replacement_file,
     bool                         backup,

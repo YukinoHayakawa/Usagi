@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 #include "StorageEnums.hpp"
 
 namespace usagi::runtime::storage

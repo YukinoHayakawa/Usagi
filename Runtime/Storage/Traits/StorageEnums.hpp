@@ -1,7 +1,6 @@
 #pragma once
 
 #include <concepts>
-#include <cstdint>
 
 #include <Usagi/Library/Enums/Bitwise.hpp>
 
