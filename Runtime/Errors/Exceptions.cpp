@@ -72,6 +72,15 @@ LogicException::LogicException(const runtime::errors::SystemErrorCodes code,
 {
 }
 
+InvalidParameterException::InvalidParameterException(
+    const std::string_view message, const std::source_location loc)
+    : LogicException(runtime::errors::SystemErrorCodes::InvalidParameter |
+              runtime::errors::SystemErrorCodes::SeverityHardFault,
+          message,
+          loc)
+{
+}
+
 BrokenInvariantException::BrokenInvariantException(
     const std::string_view message, const std::source_location loc)
     : LogicException(runtime::errors::SystemErrorCodes::StateError |
@@ -86,6 +95,24 @@ BrokenInvariantException::BrokenInvariantException(
     const std::string_view                  message,
     const std::source_location              loc)
     : LogicException(code, message, loc)
+{
+}
+
+OutOfBoundException::OutOfBoundException(
+    const std::string_view message, const std::source_location loc)
+    : LogicException(runtime::errors::SystemErrorCodes::OutOfBounds |
+              runtime::errors::SystemErrorCodes::SeverityHardFault,
+          message,
+          loc)
+{
+}
+
+OutOfBoundException::OutOfBoundException(
+    const runtime::errors::SystemErrorCodes code,
+    const std::string_view                  message,
+    const std::source_location              loc)
+    : LogicException(
+          code | runtime::errors::SystemErrorCodes::OutOfBounds, message, loc)
 {
 }
 
@@ -107,8 +134,16 @@ OutOfMemoryException::OutOfMemoryException(const std::source_location loc)
 {
 }
 
+OutOfMemoryException::OutOfMemoryException(
+    const std::string_view message, const std::source_location loc)
+    : ResourceExhaustedException(
+          runtime::errors::SystemErrorCodes::OutOfMemory, message, loc)
+{
+}
+
 FatalException::FatalException(
     const std::string_view message, const std::source_location loc)
+    // todo: needs a proper default flag
     : Exception(runtime::errors::SystemErrorCodes::UnknownError |
               runtime::errors::SystemErrorCodes::SeverityFatal,
           message,

@@ -28,12 +28,13 @@ inline void debug_break() noexcept
  * and throws an UnreachableException to ensure proper stack unwinding and
  * error context propagation to the Orchestrator.
  */
-template <auto Loc = std::source_location::current()>
 [[noreturn]]
-void unreachable(std::string_view message = "Unreachable code executed")
+inline void unreachable(
+    const std::string_view     message = "Unreachable code executed",
+    const std::source_location loc     = std::source_location::current())
 {
     debug_break();
-    throw UnreachableException(message, Loc);
+    throw UnreachableException(message, loc);
 }
 
 /**
@@ -44,10 +45,10 @@ void unreachable(std::string_view message = "Unreachable code executed")
  * immediately and throws it nested inside a usagi::NonEngineException to ensure
  * the EngineOrchestrator always receives an ErrorContext.
  */
-template <typename ExceptionType,
-    auto Loc = std::source_location::current(),
-    typename... Args>
-void check_throw(const bool condition, Args &&...args)
+template <typename ExceptionType, typename... Args>
+void check_throw(const bool condition,
+    std::source_location    loc = std::source_location::current(),
+    Args &&...args)
 {
     if(condition) [[likely]]
     {
@@ -56,7 +57,7 @@ void check_throw(const bool condition, Args &&...args)
     if constexpr(std::is_base_of_v<Exception, ExceptionType>)
     {
         // Shio: It's already our engine type. Throw it directly.
-        throw ExceptionType(std::forward<Args>(args)..., Loc);
+        throw ExceptionType(std::forward<Args>(args)..., loc);
     }
     else
     {
@@ -69,7 +70,7 @@ void check_throw(const bool condition, Args &&...args)
         catch(...)
         {
             std::throw_with_nested(NonEngineException(
-                "Non-engine exception thrown via check_throw.", Loc));
+                "Non-engine exception thrown via check_throw.", loc));
         }
     }
 }
@@ -80,26 +81,18 @@ void check_throw(const bool condition, Args &&...args)
  * debugger and throws a FatalException. Used for logic invariants that must
  * halt execution safely with full context logging.
  */
-template <auto Loc = std::source_location::current()>
-void check_fatal(
-    const bool condition, std::string_view message = "Fatal check failed")
+inline void check_fatal(const bool condition,
+    const std::string_view         message = "Fatal check failed",
+    const std::source_location     loc     = std::source_location::current())
 {
     if(!condition) [[unlikely]]
     {
         debug_break();
-        throw FatalException(message, Loc);
+        throw FatalException(message, loc);
     }
 }
 } // namespace usagi::runtime::errors
 
-// Shio:
-// Legacy compatibility macros. These should be phased out in favor of the
-// direct template functions, but are kept here to not break existing Engine
-// codebase immediately.
-
-#define USAGI_ASSERT_THROW(condition, exception)                \
-    ::usagi::runtime::errors::check_throw<decltype(exception)>( \
-        condition, std::move(exception))
-
-#define USAGI_UNREACHABLE(message)                 \
-    ::usagi::runtime::errors::unreachable(message)
+#define USAGI_CHECK_THROW(exception_type, condition, ...)        \
+    ::usagi::runtime::errors::check_throw<exception_type>(       \
+        condition, std::source_location::current(), __VA_ARGS__)

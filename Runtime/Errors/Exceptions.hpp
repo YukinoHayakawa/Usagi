@@ -87,6 +87,13 @@ public:
         std::source_location loc = std::source_location::current());
 };
 
+class InvalidParameterException : public LogicException
+{
+public:
+    explicit InvalidParameterException(std::string_view message,
+        std::source_location loc = std::source_location::current());
+};
+
 class BrokenInvariantException : public LogicException
 {
 public:
@@ -95,6 +102,17 @@ public:
 
     BrokenInvariantException(runtime::errors::SystemErrorCodes code,
         std::string_view                                       message,
+        std::source_location loc = std::source_location::current());
+};
+
+class OutOfBoundException : public LogicException
+{
+public:
+    explicit OutOfBoundException(std::string_view message,
+        std::source_location loc = std::source_location::current());
+
+    OutOfBoundException(runtime::errors::SystemErrorCodes code,
+        std::string_view                                  message,
         std::source_location loc = std::source_location::current());
 };
 
@@ -110,6 +128,9 @@ class OutOfMemoryException : public ResourceExhaustedException
 {
 public:
     explicit OutOfMemoryException(
+        std::source_location loc = std::source_location::current());
+
+    explicit OutOfMemoryException(std::string_view message,
         std::source_location loc = std::source_location::current());
 };
 
