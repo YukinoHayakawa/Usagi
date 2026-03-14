@@ -91,13 +91,10 @@ inline void check_fatal(
 }
 } // namespace usagi::runtime::errors
 
-#define USAGI_CHECK_THROW(exception_type, condition, ...) \
-    ::usagi::runtime::USAGI_CHECK_THROW(                  \
-        exception_type,                                   \
-        condition,                                        \
-        std::source_location::current(),                  \
-        __VA_ARGS__)
+#define USAGI_CHECK_THROW(exception_type, condition, ...)        \
+    ::usagi::runtime::errors::check_throw<exception_type>(       \
+        condition, std::source_location::current(), __VA_ARGS__)
 
-#define USAGI_CHECK_FATAL(condition, ...)                        \
-    ::usagi::runtime::USAGI_CHECK_FATAL(                         \
-        condition, __VA_ARGS__, std::source_location::current())
+#define USAGI_CHECK_FATAL(condition, message)                \
+    ::usagi::runtime::errors::check_fatal(                   \
+        condition, message, std::source_location::current())
