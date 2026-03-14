@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <utility>
 
@@ -46,9 +46,7 @@ inline void unreachable(
  * the EngineOrchestrator always receives an ErrorContext.
  */
 template <typename ExceptionType, typename... Args>
-void check_throw(const bool condition,
-    std::source_location    loc = std::source_location::current(),
-    Args &&...args)
+void check_throw(const bool condition, std::source_location loc, Args &&...args)
 {
     if(condition) [[likely]]
     {
@@ -81,9 +79,9 @@ void check_throw(const bool condition,
  * debugger and throws a FatalException. Used for logic invariants that must
  * halt execution safely with full context logging.
  */
-inline void check_fatal(const bool condition,
-    const std::string_view         message = "Fatal check failed",
-    const std::source_location     loc     = std::source_location::current())
+inline void check_fatal(
+    const bool condition, const std::string_view message,
+    const std::source_location loc = std::source_location::current())
 {
     if(!condition) [[unlikely]]
     {
@@ -93,6 +91,13 @@ inline void check_fatal(const bool condition,
 }
 } // namespace usagi::runtime::errors
 
-#define USAGI_CHECK_THROW(exception_type, condition, ...)        \
-    ::usagi::runtime::errors::check_throw<exception_type>(       \
-        condition, std::source_location::current(), __VA_ARGS__)
+#define USAGI_CHECK_THROW(exception_type, condition, ...) \
+    ::usagi::runtime::USAGI_CHECK_THROW(                  \
+        exception_type,                                   \
+        condition,                                        \
+        std::source_location::current(),                  \
+        __VA_ARGS__)
+
+#define USAGI_CHECK_FATAL(condition, ...)                        \
+    ::usagi::runtime::USAGI_CHECK_FATAL(                         \
+        condition, __VA_ARGS__, std::source_location::current())

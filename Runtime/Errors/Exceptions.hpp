@@ -18,11 +18,12 @@ class Exception : public std::exception
 {
 protected:
     runtime::errors::ErrorContext mContext;
+    // todo: there shouldn't be dynamically allocated memory
     std::string                   mFormattedMessage;
 
 public:
-    Exception(runtime::errors::SystemErrorCodes code,
-        std::string_view                        message,
+    Exception(
+        runtime::errors::RuntimeErrorCodes code, std::string_view message,
         std::source_location loc = std::source_location::current());
 
     [[nodiscard]]
@@ -56,8 +57,8 @@ public:
 class RuntimeException : public Exception
 {
 public:
-    RuntimeException(runtime::errors::SystemErrorCodes code,
-        std::string_view                               message,
+    RuntimeException(
+        runtime::errors::RuntimeErrorCodes code, std::string_view message,
         std::source_location loc = std::source_location::current());
 };
 
@@ -69,8 +70,8 @@ public:
 class OperatingSystemException : public RuntimeException
 {
 public:
-    OperatingSystemException(runtime::errors::SystemErrorCodes code,
-        std::string_view                                       message,
+    OperatingSystemException(
+        runtime::errors::RuntimeErrorCodes code, std::string_view message,
         std::source_location loc = std::source_location::current());
 };
 
@@ -79,48 +80,52 @@ public:
 class LogicException : public Exception
 {
 public:
-    explicit LogicException(std::string_view message,
+    LogicException(
+        runtime::errors::RuntimeErrorCodes code, std::string_view message,
         std::source_location loc = std::source_location::current());
 
-    LogicException(runtime::errors::SystemErrorCodes code,
-        std::string_view                             message,
+    explicit LogicException(
+        std::string_view     message,
         std::source_location loc = std::source_location::current());
 };
 
 class InvalidParameterException : public LogicException
 {
 public:
-    explicit InvalidParameterException(std::string_view message,
+    explicit InvalidParameterException(
+        std::string_view     message,
         std::source_location loc = std::source_location::current());
 };
 
 class BrokenInvariantException : public LogicException
 {
 public:
-    explicit BrokenInvariantException(std::string_view message,
+    BrokenInvariantException(
+        runtime::errors::RuntimeErrorCodes code, std::string_view message,
         std::source_location loc = std::source_location::current());
 
-    BrokenInvariantException(runtime::errors::SystemErrorCodes code,
-        std::string_view                                       message,
+    explicit BrokenInvariantException(
+        std::string_view     message,
         std::source_location loc = std::source_location::current());
 };
 
 class OutOfBoundException : public LogicException
 {
 public:
-    explicit OutOfBoundException(std::string_view message,
+    OutOfBoundException(
+        runtime::errors::RuntimeErrorCodes code, std::string_view message,
         std::source_location loc = std::source_location::current());
 
-    OutOfBoundException(runtime::errors::SystemErrorCodes code,
-        std::string_view                                  message,
+    explicit OutOfBoundException(
+        std::string_view     message,
         std::source_location loc = std::source_location::current());
 };
 
 class ResourceExhaustedException : public RuntimeException
 {
 public:
-    ResourceExhaustedException(runtime::errors::SystemErrorCodes code,
-        std::string_view                                         message,
+    ResourceExhaustedException(
+        runtime::errors::RuntimeErrorCodes code, std::string_view message,
         std::source_location loc = std::source_location::current());
 };
 
@@ -128,31 +133,34 @@ class OutOfMemoryException : public ResourceExhaustedException
 {
 public:
     explicit OutOfMemoryException(
+        std::string_view     message,
         std::source_location loc = std::source_location::current());
 
-    explicit OutOfMemoryException(std::string_view message,
+    explicit OutOfMemoryException(
         std::source_location loc = std::source_location::current());
 };
 
 class FatalException : public Exception
 {
 public:
-    explicit FatalException(std::string_view message,
+    FatalException(
+        runtime::errors::RuntimeErrorCodes code, std::string_view message,
         std::source_location loc = std::source_location::current());
 
-    FatalException(runtime::errors::SystemErrorCodes code,
-        std::string_view                             message,
+    explicit FatalException(
+        std::string_view     message,
         std::source_location loc = std::source_location::current());
 };
 
 class UnreachableException : public FatalException
 {
 public:
-    explicit UnreachableException(std::string_view message,
+    UnreachableException(
+        runtime::errors::RuntimeErrorCodes code, std::string_view message,
         std::source_location loc = std::source_location::current());
 
-    UnreachableException(runtime::errors::SystemErrorCodes code,
-        std::string_view                                   message,
+    explicit UnreachableException(
+        std::string_view     message,
         std::source_location loc = std::source_location::current());
 };
 } // namespace usagi

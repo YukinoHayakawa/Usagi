@@ -4,18 +4,25 @@
 
 namespace usagi
 {
-Exception::Exception(const runtime::errors::SystemErrorCodes code,
-    const std::string_view                                   message,
-    const std::source_location                               loc)
+namespace
+{
+using enum runtime::errors::RuntimeErrorCodes;
+} // namespace
+
+Exception::Exception(
+    const runtime::errors::RuntimeErrorCodes code,
+    const std::string_view message, const std::source_location loc)
     : mContext {
-        .error_code          = code,
-        .message             = message,
         .source_location     = loc,
         .instruction_pointer = nullptr,
+        .message             = message,
+        .error_code          = code,
     }
 {
     // Shio: Format a readable string for the std::exception::what() override.
-    mFormattedMessage = std::format("{}:{} [{}] - {}",
+    // todo: remove dynamic memory allocation
+    mFormattedMessage = std::format(
+        "{}:{} [{}] - {}",
         loc.file_name(),
         loc.line(),
         loc.function_name(),
@@ -34,144 +41,111 @@ const runtime::errors::ErrorContext &Exception::context() const noexcept
 
 NonEngineException::NonEngineException(
     const std::string_view message, const std::source_location loc)
-    : Exception(runtime::errors::SystemErrorCodes::UnknownError |
-              runtime::errors::SystemErrorCodes::SeverityUndecidable,
-          message,
-          loc)
+    : Exception(UnknownError | SeverityUndecidable, message, loc)
 {
 }
 
-RuntimeException::RuntimeException(const runtime::errors::SystemErrorCodes code,
-    const std::string_view     message,
-    const std::source_location loc)
+RuntimeException::RuntimeException(
+    const runtime::errors::RuntimeErrorCodes code,
+    const std::string_view message, const std::source_location loc)
     : Exception(code, message, loc)
 {
 }
 
 OperatingSystemException::OperatingSystemException(
-    const runtime::errors::SystemErrorCodes code,
-    const std::string_view                  message,
-    const std::source_location              loc)
+    const runtime::errors::RuntimeErrorCodes code,
+    const std::string_view message, const std::source_location loc)
     : RuntimeException(code, message, loc)
 {
 }
 
 LogicException::LogicException(
+    const runtime::errors::RuntimeErrorCodes code,
     const std::string_view message, const std::source_location loc)
-    : Exception(runtime::errors::SystemErrorCodes::UnexpectedCodePath |
-              runtime::errors::SystemErrorCodes::SeverityLogicError,
-          message,
-          loc)
+    : Exception(SeverityHardFault | code, message, loc)
 {
 }
 
-LogicException::LogicException(const runtime::errors::SystemErrorCodes code,
-    const std::string_view                                             message,
-    const std::source_location                                         loc)
-    : Exception(code, message, loc)
+LogicException::LogicException(
+    const std::string_view message, const std::source_location loc)
+    : LogicException(UnexpectedCodePath, message, loc)
 {
 }
 
 InvalidParameterException::InvalidParameterException(
     const std::string_view message, const std::source_location loc)
-    : LogicException(runtime::errors::SystemErrorCodes::InvalidParameter |
-              runtime::errors::SystemErrorCodes::SeverityHardFault,
-          message,
-          loc)
+    : LogicException(InvalidParameter, message, loc)
+{
+}
+
+BrokenInvariantException::BrokenInvariantException(
+    const runtime::errors::RuntimeErrorCodes code,
+    const std::string_view message, const std::source_location loc)
+    : LogicException(StateError | code, message, loc)
 {
 }
 
 BrokenInvariantException::BrokenInvariantException(
     const std::string_view message, const std::source_location loc)
-    : LogicException(runtime::errors::SystemErrorCodes::StateError |
-              runtime::errors::SystemErrorCodes::SeverityHardFault,
-          message,
-          loc)
+    : BrokenInvariantException({ }, message, loc)
 {
 }
 
-BrokenInvariantException::BrokenInvariantException(
-    const runtime::errors::SystemErrorCodes code,
-    const std::string_view                  message,
-    const std::source_location              loc)
-    : LogicException(code, message, loc)
+OutOfBoundException::OutOfBoundException(
+    const runtime::errors::RuntimeErrorCodes code,
+    const std::string_view message, const std::source_location loc)
+    : LogicException(OutOfBounds | code, message, loc)
 {
 }
 
 OutOfBoundException::OutOfBoundException(
     const std::string_view message, const std::source_location loc)
-    : LogicException(runtime::errors::SystemErrorCodes::OutOfBounds |
-              runtime::errors::SystemErrorCodes::SeverityHardFault,
-          message,
-          loc)
-{
-}
-
-OutOfBoundException::OutOfBoundException(
-    const runtime::errors::SystemErrorCodes code,
-    const std::string_view                  message,
-    const std::source_location              loc)
-    : LogicException(
-          code | runtime::errors::SystemErrorCodes::OutOfBounds, message, loc)
+    : OutOfBoundException({ }, message, loc)
 {
 }
 
 ResourceExhaustedException::ResourceExhaustedException(
-    const runtime::errors::SystemErrorCodes code,
-    const std::string_view                  message,
-    const std::source_location              loc)
-    : RuntimeException(
-          code | runtime::errors::SystemErrorCodes::SeverityHardFault,
-          message,
-          loc)
-{
-}
-
-OutOfMemoryException::OutOfMemoryException(const std::source_location loc)
-    : ResourceExhaustedException(runtime::errors::SystemErrorCodes::OutOfMemory,
-          "memory allocation failed",
-          loc)
+    const runtime::errors::RuntimeErrorCodes code,
+    const std::string_view message, const std::source_location loc)
+    : RuntimeException(SeverityHardFault | code, message, loc)
 {
 }
 
 OutOfMemoryException::OutOfMemoryException(
     const std::string_view message, const std::source_location loc)
-    : ResourceExhaustedException(
-          runtime::errors::SystemErrorCodes::OutOfMemory, message, loc)
+    : ResourceExhaustedException(OutOfMemory, message, loc)
+{
+}
+
+OutOfMemoryException::OutOfMemoryException(const std::source_location loc)
+    : OutOfMemoryException("memory allocation failed", loc)
+{
+}
+
+FatalException::FatalException(
+    const runtime::errors::RuntimeErrorCodes code,
+    const std::string_view message, const std::source_location loc)
+    : Exception(SeverityFatal | code, message, loc)
 {
 }
 
 FatalException::FatalException(
     const std::string_view message, const std::source_location loc)
     // todo: needs a proper default flag
-    : Exception(runtime::errors::SystemErrorCodes::UnknownError |
-              runtime::errors::SystemErrorCodes::SeverityFatal,
-          message,
-          loc)
+    : Exception(UnknownError, message, loc)
 {
 }
 
-FatalException::FatalException(const runtime::errors::SystemErrorCodes code,
-    const std::string_view                                             message,
-    const std::source_location                                         loc)
-    : Exception(code, message, loc)
+UnreachableException::UnreachableException(
+    const runtime::errors::RuntimeErrorCodes code,
+    const std::string_view message, const std::source_location loc)
+    : FatalException(UnreachableCode | code, message, loc)
 {
 }
 
 UnreachableException::UnreachableException(
     const std::string_view message, const std::source_location loc)
-    : FatalException(runtime::errors::SystemErrorCodes::UnreachableCode |
-              runtime::errors::SystemErrorCodes::SeverityFatal,
-          message,
-          loc)
-{
-}
-
-UnreachableException::UnreachableException(
-    const runtime::errors::SystemErrorCodes code,
-    const std::string_view                  message,
-    const std::source_location              loc)
-    : FatalException(code, message, loc)
+    : FatalException({ }, message, loc)
 {
 }
 } // namespace usagi

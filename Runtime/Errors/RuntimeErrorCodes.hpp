@@ -8,7 +8,8 @@ namespace usagi::runtime::errors
 {
 // todo: is it possible to implement a safer container to ensure segments don't
 //   accidentally get cross each other?
-enum class SystemErrorCodes : std::uint32_t
+// todo: e.g. CombinedFlags<...>?
+enum class RuntimeErrorCodes : std::uint32_t
 {
     Success = 0,
     NoError = Success,
@@ -64,7 +65,7 @@ enum class SystemErrorCodes : std::uint32_t
     // Note: Severity flags are deliberately NOT baked into these definitions.
     // They should be bitwise-OR'd dynamically based on the execution context.
 
-    ErrorCodeMask = 0x0000'ffff,
+    ErrorCodeMask = 0x0000'FFFFu,
 
 #define _NEXT_OF(prev_error) ((prev_error & ErrorCodeMask) + 1)
 
@@ -104,45 +105,46 @@ enum class SystemErrorCodes : std::uint32_t
     DiskFull       = DeviceIOError | ResourceError | _NEXT_OF(PathTooLong),
     DataCorruption = DataIntegrityError | DeviceIOError | _NEXT_OF(DiskFull),
 };
-
+// todo: bug -  it's weird that if I put `_NEXT_OF` inside RuntimeErrorCodes
+//   clang-format will add a trailing comma for it??
 #undef _NEXT_OF
 } // namespace usagi::runtime::errors
 
 namespace usagi
 {
 template <>
-struct EnableBitMaskOperators<runtime::errors::SystemErrorCodes>
+struct EnableBitMaskOperators<runtime::errors::RuntimeErrorCodes>
     : std::true_type
 {
 };
 
 template <typename T>
-using ExpectedSyscallValue =
-    std::expected<T, runtime::errors::SystemErrorCodes>;
+using ExpectedRuntimeValue =
+    std::expected<T, runtime::errors::RuntimeErrorCodes>;
 } // namespace usagi
 
 namespace usagi::runtime::errors
 {
 // --- Evaluation Helpers ---
 
-constexpr auto domains_of(const SystemErrorCodes code) noexcept
+constexpr auto domains_of(const RuntimeErrorCodes code) noexcept
 {
-    return code & SystemErrorCodes::DomainMask;
+    return code & RuntimeErrorCodes::DomainMask;
 }
 
 constexpr bool has_domain(
-    const SystemErrorCodes code, const SystemErrorCodes domain) noexcept
+    const RuntimeErrorCodes code, const RuntimeErrorCodes domain) noexcept
 {
     return has_any_of(domains_of(code), domain);
 }
 
-constexpr auto severity_flags_of(const SystemErrorCodes code) noexcept
+constexpr auto severity_flags_of(const RuntimeErrorCodes code) noexcept
 {
-    return code & SystemErrorCodes::SeverityMask;
+    return code & RuntimeErrorCodes::SeverityMask;
 }
 
 constexpr bool has_severity_flag(
-    const SystemErrorCodes code, const SystemErrorCodes severity) noexcept
+    const RuntimeErrorCodes code, const RuntimeErrorCodes severity) noexcept
 {
     return has_any_of(severity_flags_of(code), severity);
 }
@@ -153,42 +155,42 @@ constexpr bool has_severity_flag(
 // presence of a flag while ensuring no *higher* threat flag overrides it.
 // Fatal overrides everything.
 
-constexpr auto top_severity_flag_of(const SystemErrorCodes code) noexcept
+constexpr auto top_severity_flag_of(const RuntimeErrorCodes code) noexcept
 {
     return most_significant_flag(severity_flags_of(code));
 }
 
-constexpr bool is_fatal(const SystemErrorCodes code) noexcept
+constexpr bool is_fatal(const RuntimeErrorCodes code) noexcept
 {
-    return top_severity_flag_of(code) == SystemErrorCodes::SeverityFatal;
+    return top_severity_flag_of(code) == RuntimeErrorCodes::SeverityFatal;
 }
 
-constexpr bool is_logic_error(const SystemErrorCodes code) noexcept
+constexpr bool is_logic_error(const RuntimeErrorCodes code) noexcept
 {
-    return top_severity_flag_of(code) == SystemErrorCodes::SeverityLogicError;
+    return top_severity_flag_of(code) == RuntimeErrorCodes::SeverityLogicError;
 }
 
-constexpr bool is_hard_fault(const SystemErrorCodes code) noexcept
+constexpr bool is_hard_fault(const RuntimeErrorCodes code) noexcept
 {
-    return top_severity_flag_of(code) == SystemErrorCodes::SeverityHardFault;
+    return top_severity_flag_of(code) == RuntimeErrorCodes::SeverityHardFault;
 }
 
-constexpr bool is_transient(const SystemErrorCodes code) noexcept
+constexpr bool is_transient(const RuntimeErrorCodes code) noexcept
 {
-    return top_severity_flag_of(code) == SystemErrorCodes::SeverityTransient;
+    return top_severity_flag_of(code) == RuntimeErrorCodes::SeverityTransient;
 }
 
-constexpr bool is_ignorable(const SystemErrorCodes code) noexcept
+constexpr bool is_ignorable(const RuntimeErrorCodes code) noexcept
 {
-    return top_severity_flag_of(code) == SystemErrorCodes::SeverityIgnorable;
+    return top_severity_flag_of(code) == RuntimeErrorCodes::SeverityIgnorable;
 }
 
-constexpr bool is_undecidable(const SystemErrorCodes code) noexcept
+constexpr bool is_undecidable(const RuntimeErrorCodes code) noexcept
 {
-    return top_severity_flag_of(code) == SystemErrorCodes::NoSeverity;
+    return top_severity_flag_of(code) == RuntimeErrorCodes::NoSeverity;
 }
 
-constexpr bool is_elevated(const SystemErrorCodes code) noexcept
+constexpr bool is_elevated(const RuntimeErrorCodes code) noexcept
 {
     return num_flags(severity_flags_of(code)) > 1;
 }
@@ -196,40 +198,42 @@ constexpr bool is_elevated(const SystemErrorCodes code) noexcept
 /**
  * @brief Injects or adds a severity flag to an existing error code.
  */
-constexpr SystemErrorCodes add_severity(
-    const SystemErrorCodes code, const SystemErrorCodes severity) noexcept
+constexpr RuntimeErrorCodes add_severity(
+    const RuntimeErrorCodes code, const RuntimeErrorCodes severity) noexcept
 {
     return code | severity;
 }
 
 namespace details::static_tests
 {
-static_assert(SystemErrorCodes::DomainMask == 0x00ff'0000u);
-static_assert(SystemErrorCodes::SeverityMask == 0xff00'0000u);
-
-static_assert(domains_of(SystemErrorCodes::FileNotFound) ==
-    (SystemErrorCodes::DeviceIOError | SystemErrorCodes::ParameterError));
-static_assert(has_domain(
-    SystemErrorCodes::FileNotFound, SystemErrorCodes::DeviceIOError));
-static_assert(has_domain(
-    SystemErrorCodes::FileNotFound, SystemErrorCodes::ParameterError));
-static_assert(!has_domain(
-    SystemErrorCodes::FileNotFound, SystemErrorCodes::SecurityError));
+static_assert(RuntimeErrorCodes::DomainMask == 0x00FF'0000u);
+static_assert(RuntimeErrorCodes::SeverityMask == 0xFF00'0000u);
 
 static_assert(
-    is_undecidable(SystemErrorCodes::FileNotFound)); // Baseline is undecidable
-static_assert(is_fatal(add_severity(
-    SystemErrorCodes::FileNotFound, SystemErrorCodes::SeverityFatal)));
-static_assert(is_transient(add_severity(
-    SystemErrorCodes::FileNotFound, SystemErrorCodes::SeverityTransient)));
+    domains_of(RuntimeErrorCodes::FileNotFound) ==
+    (RuntimeErrorCodes::DeviceIOError | RuntimeErrorCodes::ParameterError));
+static_assert(has_domain(
+    RuntimeErrorCodes::FileNotFound, RuntimeErrorCodes::DeviceIOError));
+static_assert(has_domain(
+    RuntimeErrorCodes::FileNotFound, RuntimeErrorCodes::ParameterError));
+static_assert(!has_domain(
+    RuntimeErrorCodes::FileNotFound, RuntimeErrorCodes::SecurityError));
 
-constexpr SystemErrorCodes escalated_error =
-    add_severity(add_severity(SystemErrorCodes::FileNotFound,
-                     SystemErrorCodes::SeverityTransient),
-        SystemErrorCodes::SeverityFatal);
+static_assert(
+    is_undecidable(RuntimeErrorCodes::FileNotFound)); // Baseline is undecidable
+static_assert(is_fatal(add_severity(
+    RuntimeErrorCodes::FileNotFound, RuntimeErrorCodes::SeverityFatal)));
+static_assert(is_transient(add_severity(
+    RuntimeErrorCodes::FileNotFound, RuntimeErrorCodes::SeverityTransient)));
+
+constexpr RuntimeErrorCodes escalated_error = add_severity(
+    add_severity(
+        RuntimeErrorCodes::FileNotFound, RuntimeErrorCodes::SeverityTransient),
+    RuntimeErrorCodes::SeverityFatal);
 
 static_assert(is_fatal(escalated_error));
-static_assert(!is_transient(escalated_error)); // Fatal overrides transient
+// Fatal overrides transient
+static_assert(!is_transient(escalated_error));
 static_assert(is_elevated(escalated_error));
 } // namespace details::static_tests
 } // namespace usagi::runtime::errors
