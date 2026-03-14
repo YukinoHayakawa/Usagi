@@ -3,7 +3,7 @@
 #include <filesystem>
 
 #include <Usagi/Platforms/Platforms.hpp>
-#include <Usagi/Runtime/Errors/SystemErrorCodes.hpp>
+#include <Usagi/Runtime/Errors/RuntimeErrorCodes.hpp>
 #include <Usagi/Runtime/Storage/Backends/Files.hpp>
 #include <Usagi/Runtime/Storage/Traits/StorageTraits.hpp>
 
@@ -19,7 +19,7 @@ namespace usagi::platforms::storage
  * HDD).
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<runtime::storage::StorageTraits>
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<runtime::storage::StorageTraits>
     query_file_storage_traits(runtime::storage::NativeFileHandle file) noexcept;
 
 /**
@@ -40,9 +40,8 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<runtime::storage::StorageTraits>
  */
 [[nodiscard]]
 USAGI_PLATFORM_DEPENDENT
-    ExpectedSyscallValue<runtime::storage::NativeFileHandle> open_file(
-        const std::filesystem::path      &path,
-        runtime::storage::FileOpenMode    mode,
+    ExpectedRuntimeValue<runtime::storage::NativeFileHandle> open_file(
+        const std::filesystem::path &path, runtime::storage::FileOpenMode mode,
         runtime::storage::FileShareMode   share_mode,
         runtime::storage::FileOpenOptions options) noexcept;
 
@@ -59,7 +58,7 @@ USAGI_PLATFORM_DEPENDENT void close_file(
  * @return The size of the file in bytes.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<std::size_t> file_size(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<std::size_t> file_size(
     runtime::storage::NativeFileHandle file) noexcept;
 
 /**
@@ -78,7 +77,7 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<std::size_t> file_size(
  * ID.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<std::uint64_t> file_id(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<std::uint64_t> file_id(
     runtime::storage::NativeFileHandle file) noexcept;
 
 /**
@@ -93,7 +92,7 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<std::uint64_t> file_id(
  * @return A 64-bit unsigned integer representing the modification time.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<std::uint64_t>
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<std::uint64_t>
     file_last_modification_time(
         runtime::storage::NativeFileHandle file) noexcept;
 
@@ -110,9 +109,8 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<std::uint64_t>
  * @return Success, or a FileError if the atomic replacement fails.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> replace_file(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> replace_file(
     const std::filesystem::path &replaced_file,
-    const std::filesystem::path &replacement_file,
-    bool                         backup,
+    const std::filesystem::path &replacement_file, bool backup,
     const std::filesystem::path &backup_name) noexcept;
 } // namespace usagi::platforms::storage

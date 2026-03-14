@@ -13,7 +13,7 @@ namespace usagi::runtime
  *
  * If a hardware fault (Access Violation, Division By Zero, etc.) occurs during
  * the execution of 'callable', the OS exception filter intercepts it,
- * translates the hardware error into a SystemErrorCodes, and returns it as a
+ * translates the hardware error into a RuntimeErrorCodes, and returns it as a
  * std::unexpected.
  *
  * This MUST be implemented in a non-inline, OS-specific translation unit.
@@ -21,7 +21,7 @@ namespace usagi::runtime
 template <typename Callable>
 // todo: using && here forces a rvalue. we need a lvalue or ref
 auto protected_invoke(Callable &callable)
-    -> std::expected<decltype(callable()), errors::SystemErrorCodes>
+    -> std::expected<decltype(callable()), errors::RuntimeErrorCodes>
 {
     // todo: can use static reflection here
     using ReturnType = decltype(callable());
@@ -33,9 +33,9 @@ auto protected_invoke(Callable &callable)
             (*typed_callable)();
         };
 
-        errors::SystemErrorCodes result =
+        errors::RuntimeErrorCodes result =
             platforms::runtime::execute_seh_trampoline(invoker, &callable);
-        if(result == errors::SystemErrorCodes::Success) return { };
+        if(result == errors::RuntimeErrorCodes::Success) return { };
         return std::unexpected(result);
     }
     else
@@ -53,9 +53,9 @@ auto protected_invoke(Callable &callable)
             typed_wrapper->result = (*typed_wrapper->callable_ptr)();
         };
 
-        errors::SystemErrorCodes result =
+        errors::RuntimeErrorCodes result =
             platforms::runtime::execute_seh_trampoline(invoker, &wrapper);
-        if(result == errors::SystemErrorCodes::Success)
+        if(result == errors::RuntimeErrorCodes::Success)
             return std::move(wrapper.result);
         return std::unexpected(result);
     }
