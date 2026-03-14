@@ -30,13 +30,17 @@ struct NonmovableTest : Nonmovable
 {
 };
 
-static_assert(!std::is_move_constructible_v<NonmovableTest>,
+static_assert(
+    !std::is_move_constructible_v<NonmovableTest>,
     "A class inheriting Nonmovable should not be move constructible.");
-static_assert(!std::is_move_assignable_v<NonmovableTest>,
+static_assert(
+    !std::is_move_assignable_v<NonmovableTest>,
     "A class inheriting Nonmovable should not be move assignable.");
-static_assert(!std::is_copy_constructible_v<NonmovableTest>,
+static_assert(
+    !std::is_copy_constructible_v<NonmovableTest>,
     "A class inheriting Nonmovable should also not be copy constructible.");
-static_assert(!std::is_copy_assignable_v<NonmovableTest>,
+static_assert(
+    !std::is_copy_assignable_v<NonmovableTest>,
     "A class inheriting Nonmovable should also not be copy assignable.");
 } // namespace details::static_tests
 } // namespace usagi
