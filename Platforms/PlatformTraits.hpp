@@ -1,5 +1,6 @@
 #pragma once
 
+// for hardware_destructive_interference_size
 #include <new>
 
 #include <Usagi/Library/Enums/Bitwise.hpp>

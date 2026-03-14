@@ -47,6 +47,7 @@ constexpr auto smallest_uint_impl() noexcept
     }
     else if constexpr(platforms::PlatformTraits::has_int128())
     {
+        // todo: will this branch work?
         if constexpr(Value <= std::numeric_limits<unsigned __int128>::max())
         {
             // Shio: Technically there's no standard integer literal suffix for
@@ -95,5 +96,6 @@ static_assert(std::is_same_v<SmallestFittableUnsigned<0xffff'ffff'ffff'ffff>,
 // Shio: Note that we cannot explicitly static_assert the 128-bit branch
 // directly matching a literal because standard C++ provides no integer literal
 // suffix for 128-bit numbers.
+// todo: test unsigned int128_t
 } // namespace details::static_tests
 } // namespace usagi
