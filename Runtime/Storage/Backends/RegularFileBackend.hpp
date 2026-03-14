@@ -1,6 +1,9 @@
 #pragma once
 
 #include <filesystem>
+#include <memory>
+
+#include <Usagi/Runtime/Storage/Views/VirtualPageManager.hpp>
 
 #include "StorageBackend.hpp"
 
@@ -15,9 +18,10 @@ namespace usagi::runtime::storage
  */
 class RegularFileBackend : Noncopyable
 {
-    std::filesystem::path mFilePath;
-    NativeFileHandle      mFileHandle = INVALID_FILE_HANDLE;
-    FileOpenMode          mMode;
+    std::filesystem::path               mFilePath;
+    std::unique_ptr<VirtualPageManager> mPageManager;
+    NativeFileHandle                    mFileHandle = INVALID_FILE_HANDLE;
+    FileOpenMode                        mMode;
 
     // Private constructor. Use `open()` factory to instantiate.
     RegularFileBackend(
@@ -38,11 +42,10 @@ public:
      * constructors.
      */
     [[nodiscard]]
-    static ExpectedSyscallValue<RegularFileBackend> open(
-        std::filesystem::path path,
-        FileOpenMode          mode       = FileOpenMode::ReadWrite,
-        FileShareMode         share_mode = FileShareMode::ReadWrite,
-        FileOpenOptions       options    = FileOpenOptions::None);
+    static ExpectedRuntimeValue<RegularFileBackend> open(
+        std::filesystem::path path, FileOpenMode mode = FileOpenMode::ReadWrite,
+        FileShareMode   share_mode = FileShareMode::ReadWrite,
+        FileOpenOptions options    = FileOpenOptions::None);
 
     // --- StorageBackend Concept Requirement ---
 
@@ -54,11 +57,11 @@ public:
     NativeFileHandle native_handle() const;
 
     [[nodiscard]]
-    ExpectedSyscallValue<MemoryView> create_view(std::uint64_t offset = 0,
-        std::uint64_t size              = MemoryView::USE_BACKEND_CAPACITY,
-        std::uint64_t commit_size       = 0,
-        void         *base_address_hint = nullptr,
-        FileOpenMode  mode              = FileOpenMode::Identical) const;
+    ExpectedRuntimeValue<MemoryView> create_view(
+        std::uint64_t offset      = 0,
+        std::uint64_t size        = MemoryView::USE_BACKEND_CAPACITY,
+        std::uint64_t commit_size = 0, void *base_address_hint = nullptr,
+        FileOpenMode mode = FileOpenMode::Identical);
 
     [[nodiscard]]
     const std::filesystem::path &path() const;

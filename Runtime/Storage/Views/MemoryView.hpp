@@ -87,6 +87,12 @@ public:
     MemoryView &operator=(MemoryView &&other) noexcept;
 
     [[nodiscard]]
+    bool is_valid() const noexcept
+    {
+        return mVirtualBase != nullptr;
+    }
+
+    [[nodiscard]]
     FileOpenMode mode() const noexcept
     {
         return mMaxSizeAndMode.get_enum();

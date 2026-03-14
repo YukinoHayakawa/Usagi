@@ -1,14 +1,15 @@
 #include "RegularFileBackend.hpp"
 
 #include <Usagi/Platforms/Syscalls/Files.hpp>
+#include <Usagi/Runtime/Errors/Errors.hpp>
 
 #include "MemoryFunctionTable.hpp"
 
 namespace usagi::runtime::storage
 {
-RegularFileBackend::RegularFileBackend(std::filesystem::path path,
-    const FileOpenMode                                       mode,
-    const NativeFileHandle                                   handle)
+RegularFileBackend::RegularFileBackend(
+    std::filesystem::path path, const FileOpenMode mode,
+    const NativeFileHandle handle)
     : mFilePath(std::move(path)), mFileHandle(handle), mMode(mode)
 {
 }
@@ -45,10 +46,9 @@ RegularFileBackend &RegularFileBackend::operator=(
     return *this;
 }
 
-ExpectedSyscallValue<RegularFileBackend> RegularFileBackend::open(
+ExpectedRuntimeValue<RegularFileBackend> RegularFileBackend::open(
     std::filesystem::path path, // NOLINT(performance-unnecessary-value-param)
-    const FileOpenMode    mode,
-    const FileShareMode   share_mode,
+    const FileOpenMode mode, const FileShareMode share_mode,
     const FileOpenOptions options)
 {
     auto handle_expected =
@@ -82,12 +82,10 @@ NativeFileHandle RegularFileBackend::native_handle() const
     return mFileHandle;
 }
 
-ExpectedSyscallValue<MemoryView> RegularFileBackend::create_view(
-    const std::uint64_t offset,
-    const std::uint64_t size,
-    const std::uint64_t commit_size,
-    void               *base_address_hint,
-    FileOpenMode        mode) const
+// todo merge with PagefileBackend::create_view
+ExpectedRuntimeValue<MemoryView> RegularFileBackend::create_view(
+    const std::uint64_t offset, const std::uint64_t size,
+    const std::uint64_t commit_size, void *base_address_hint, FileOpenMode mode)
 {
     // Resolve "Identical" request to the exact mode the backend was opened
     // with.
@@ -102,15 +100,43 @@ ExpectedSyscallValue<MemoryView> RegularFileBackend::create_view(
     if((static_cast<std::uint8_t>(mode) & static_cast<std::uint8_t>(mMode)) !=
         static_cast<std::uint8_t>(mode))
     {
-        return std::unexpected(errors::SystemErrorCodes::AccessDenied);
+        return std::unexpected(errors::RuntimeErrorCodes::AccessDenied);
     }
 
-    return MemoryView::create(standard_memory_functions(),
+    // todo: move this factory function to VirtualPageManager
+    if(!mPageManager)
+    {
+        // Shio: 1MB bookkeeping view can track ~8 million pages (32GB of
+        // memory)
+        auto bookkeeping_view = MemoryView::create(
+            standard_memory_functions(),
+            // todo: heap management
+            platforms::memory::pagefile_handle(),
+            FileOpenMode::ReadWrite,
+            storage_traits(),
+            // No VPM for the VPM's own bookkeeping view to prevent infinite
+            // recursion
+            nullptr,
+            0,
+            to_bytes(StoragePageSize::Page_1MB),
+            0,
+            nullptr);
+
+        USAGI_CHECK_THROW(
+            OutOfMemoryException,
+            bookkeeping_view.has_value(),
+            "Failed to allocate bookkeeping view for VirtualPageManager");
+
+        mPageManager = std::make_unique<VirtualPageManager>(
+            std::move(bookkeeping_view.value()));
+    }
+
+    return MemoryView::create(
+        standard_memory_functions(),
         mFileHandle,
         mode,
         storage_traits(),
-        // todo: provide virtual page manager
-        nullptr,
+        mPageManager.get(),
         offset,
         size,
         commit_size,

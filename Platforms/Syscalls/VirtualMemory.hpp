@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Usagi/Platforms/Platforms.hpp>
-#include <Usagi/Runtime/Errors/SystemErrorCodes.hpp>
+#include <Usagi/Runtime/Errors/RuntimeErrorCodes.hpp>
 #include <Usagi/Runtime/Storage/Backends/Files.hpp>
 
 namespace usagi::platforms::memory
@@ -21,19 +21,16 @@ namespace usagi::platforms::memory
  * @return The base pointer to the mapped virtual memory, or an error.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void *> map_file_view(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void *> map_file_view(
     runtime::storage::NativeFileHandle file,
-    runtime::storage::FileOpenMode     mode,
-    std::uint64_t                      offset,
-    std::size_t                        size,
-    std::size_t                        commit_size,
-    void                              *base_address_hint = nullptr) noexcept;
+    runtime::storage::FileOpenMode mode, std::uint64_t offset, std::size_t size,
+    std::size_t commit_size, void *base_address_hint = nullptr) noexcept;
 
 /**
  * @brief Unmaps a previously mapped virtual memory view.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> unmap_file_view(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> unmap_file_view(
     void *base_address, std::size_t size) noexcept;
 
 /**
@@ -41,14 +38,14 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> unmap_file_view(
  * OS level).
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void *> remap_view(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void *> remap_view(
     void *base_address, std::size_t old_size, std::size_t new_size) noexcept;
 
 /**
  * @brief Commits physical pages to a reserved virtual address range.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> commit_pages(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> commit_pages(
     void *address, std::size_t size) noexcept;
 
 /**
@@ -56,7 +53,7 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> commit_pages(
  * virtual addresses reserved.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> decommit_pages(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> decommit_pages(
     void *address, std::size_t size) noexcept;
 
 /**
@@ -66,7 +63,7 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> decommit_pages(
  * the page data.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<bool> is_resident(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<bool> is_resident(
     const void *address, std::size_t size) noexcept;
 
 /**
@@ -76,7 +73,7 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<bool> is_resident(
  * write access.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> prefetch(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> prefetch(
     const void *address, std::size_t size) noexcept;
 
 /**
@@ -86,7 +83,7 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> prefetch(
  * manager.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> offer(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> offer(
     const void *address, std::size_t size) noexcept;
 
 /**
@@ -96,7 +93,7 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> offer(
  * to serialize them to disk; it does not alter the data in RAM.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> flush(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> flush(
     const void *address, std::size_t size) noexcept;
 
 /**
@@ -107,14 +104,14 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> flush(
  * where immutable semantics are logically bypassed.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> lock_pages(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> lock_pages(
     void *address, std::size_t size) noexcept;
 
 /**
  * @brief Unlocks a previously locked virtual address range.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> unlock_pages(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> unlock_pages(
     void *address, std::size_t size) noexcept;
 
 /**
@@ -124,7 +121,7 @@ USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> unlock_pages(
  * physical pages, requiring full mutation rights.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> zero_pages(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> zero_pages(
     void *address, std::size_t size) noexcept;
 
 /**
@@ -145,13 +142,13 @@ USAGI_PLATFORM_DEPENDENT runtime::storage::NativeFileHandle
  * @brief Copies physical memory between two non-overlapping regions.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> copy_memory(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> copy_memory(
     void *dst, const void *src, std::size_t size) noexcept;
 
 /**
  * @brief Moves physical memory between potentially overlapping regions.
  */
 [[nodiscard]]
-USAGI_PLATFORM_DEPENDENT ExpectedSyscallValue<void> move_memory(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> move_memory(
     void *dst, const void *src, std::size_t size) noexcept;
 } // namespace usagi::platforms::memory

@@ -44,14 +44,21 @@ static_assert(sizeof(PageBitmapNode) == 512);
  *
  * It is neutral to all storage backends and allocators.
  */
-class VirtualPageManager
+class VirtualPageManager : Noncopyable
 {
     // The backing buffer for bookkeeping data (typically a linearly growing
     // pagefile mapping)
     MemoryView mBookkeeping;
 
 public:
+    VirtualPageManager() = default;
     explicit VirtualPageManager(MemoryView bookkeeping_view) noexcept;
+
+    [[nodiscard]]
+    bool is_initialized() const noexcept
+    {
+        return mBookkeeping.is_valid();
+    }
 
     /**
      * @brief Ensures that the specified logical range is backed by physical

@@ -19,7 +19,7 @@ namespace usagi::runtime::storage
  * map or access the underlying data.
  */
 template <typename T>
-concept StorageBackend = requires(const T &a) {
+concept StorageBackend = requires(T &a) {
     /**
      * @brief Queries the hardware and logical traits of the backend.
      * Used by the Task Graph to schedule migrations and verify constraints.
@@ -46,12 +46,13 @@ concept StorageBackend = requires(const T &a) {
      * Virtualization.
      */
     {
-        a.create_view(std::uint64_t { },
+        a.create_view(
+            std::uint64_t { },
             std::uint64_t { },
             std::uint64_t { },
             static_cast<void *>(nullptr),
             FileOpenMode::Identical)
-    } -> std::same_as<ExpectedSyscallValue<MemoryView>>;
+    } -> std::same_as<ExpectedRuntimeValue<MemoryView>>;
 } && meta::NotCopyable<T>;
 
 /**
@@ -71,12 +72,11 @@ struct StorageBackendInterface : Noncopyable
     virtual NativeFileHandle native_handle() const noexcept = 0;
 
     [[nodiscard]]
-    virtual ExpectedSyscallValue<MemoryView> create_view(
-        std::uint64_t offset            = 0,
-        std::uint64_t size              = MemoryView::USE_BACKEND_CAPACITY,
-        std::uint64_t commit_size       = 0,
-        void         *base_address_hint = nullptr,
-        FileOpenMode  mode              = FileOpenMode::Identical) const = 0;
+    virtual ExpectedRuntimeValue<MemoryView> create_view(
+        std::uint64_t offset      = 0,
+        std::uint64_t size        = MemoryView::USE_BACKEND_CAPACITY,
+        std::uint64_t commit_size = 0, void *base_address_hint = nullptr,
+        FileOpenMode mode = FileOpenMode::Identical) = 0;
 };
 
 static_assert(StorageBackend<StorageBackendInterface>);
