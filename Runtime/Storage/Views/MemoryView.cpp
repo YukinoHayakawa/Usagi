@@ -1,4 +1,4 @@
-#include "MemoryView.hpp"
+﻿#include "MemoryView.hpp"
 
 #include <Usagi/Library/Utilities/Span.hpp>
 #include <Usagi/Runtime/Errors/Errors.hpp>
@@ -20,10 +20,12 @@ void MemoryView::check_view(
     const std::uint64_t offset, const std::size_t size) const
 {
     // todo: debug only
-    USAGI_CHECK_THROW(OutOfBoundException,
+    USAGI_CHECK_THROW(
+        OutOfBoundException,
         offset <= max_size(),
         "MemoryView offset out of bounds");
-    USAGI_CHECK_THROW(OutOfBoundException,
+    USAGI_CHECK_THROW(
+        OutOfBoundException,
         offset + size <= max_size(),
         "MemoryView size out of bounds");
 }
@@ -33,32 +35,33 @@ void MemoryView::check_page_aligned(
 {
     const auto granularity = platforms::memory::allocation_granularity();
     // Shio: Ensure the absolute virtual address is page-aligned
-    USAGI_CHECK_THROW(LogicException,
+    USAGI_CHECK_THROW(
+        LogicException,
         reinterpret_cast<std::uintptr_t>(mVirtualBase + offset) % granularity ==
             0,
-        errors::SystemErrorCodes::AlignmentError,
+        errors::RuntimeErrorCodes::AlignmentError,
         "Virtual address is not page-aligned");
     // Note: The size check is commented out in legacy, but the operation size
     // should technically be > 0.
-    USAGI_CHECK_THROW(InvalidParameterException,
+    USAGI_CHECK_THROW(
+        InvalidParameterException,
         size > 0,
         "Operation size must be greater than 0");
 }
 
 void MemoryView::check_write_access() const
 {
-    USAGI_CHECK_THROW(LogicException,
+    USAGI_CHECK_THROW(
+        LogicException,
         has_any_of(mode(), FileOpenMode::Write),
         "MemoryView does not have write access");
 }
 
-MemoryView::MemoryView(const MemoryFunctionTable *vtable,
-    const NativeFileHandle                        handle,
-    const FileOpenMode                            mode,
-    const std::size_t                             reserved_size,
-    void                                         *virtual_base,
-    const StorageTraits                          &traits,
-    VirtualPageManager                           *page_manager) noexcept
+MemoryView::MemoryView(
+    const MemoryFunctionTable *vtable, const NativeFileHandle handle,
+    const FileOpenMode mode, const std::size_t reserved_size,
+    void *virtual_base, const StorageTraits &traits,
+    VirtualPageManager *page_manager) noexcept
     : mBackendHandle(handle)
     , mVirtualBase(static_cast<std::byte *>(virtual_base))
     , mMaxSizeAndMode(reserved_size, mode)
@@ -68,24 +71,22 @@ MemoryView::MemoryView(const MemoryFunctionTable *vtable,
 {
 }
 
-ExpectedSyscallValue<MemoryView> MemoryView::create(
-    const MemoryFunctionTable *vtable,
-    const NativeFileHandle     handle,
-    const FileOpenMode         mode,
-    const StorageTraits       &traits,
-    VirtualPageManager        *page_manager,
-    const std::uint64_t        offset,
-    const std::uint64_t        size,
-    const std::uint64_t        commit,
-    void                      *base_address_hint) noexcept
+ExpectedRuntimeValue<MemoryView> MemoryView::create(
+    const MemoryFunctionTable *vtable, const NativeFileHandle handle,
+    const FileOpenMode mode, const StorageTraits &traits,
+    VirtualPageManager *page_manager, const std::uint64_t offset,
+    const std::uint64_t size, const std::uint64_t commit,
+    void *base_address_hint) noexcept
 {
     // Shio: If size is 0 and we are backed by the pagefile, this is invalid.
     // Real physical backends will substitute USE_BACKEND_CAPACITY before
     // passing size here.
-    USAGI_CHECK_THROW(InvalidParameterException,
+    USAGI_CHECK_THROW(
+        InvalidParameterException,
         size != USE_BACKEND_CAPACITY,
         "Size must be specified for MemoryView.");
-    USAGI_CHECK_THROW(InvalidParameterException,
+    USAGI_CHECK_THROW(
+        InvalidParameterException,
         vtable != nullptr,
         "MemoryFunctionTable must be provided.");
 
@@ -151,7 +152,7 @@ MemoryView &MemoryView::operator=(MemoryView &&other) noexcept
 }
 
 // todo: proper error handling
-ExpectedSyscallValue<void> MemoryView::remap(const std::uint64_t new_size)
+ExpectedRuntimeValue<void> MemoryView::remap(const std::uint64_t new_size)
 {
     const auto remap_result =
         mFuncTable->remap_view(mVirtualBase, max_size(), new_size);
@@ -165,16 +166,17 @@ ExpectedSyscallValue<void> MemoryView::remap(const std::uint64_t new_size)
     return std::unexpected(remap_result.error());
 }
 
-void MemoryView::commit(const std::uint64_t offset,
-    const std::size_t                       size,
-    const CommitStrategy                    strategy)
+void MemoryView::commit(
+    const std::uint64_t offset, const std::size_t size,
+    const CommitStrategy strategy)
 {
     check_view(offset, size);
     if(strategy == CommitStrategy::Bypass || !mPageManager)
     {
         const auto result =
             mFuncTable->commit_pages(mVirtualBase + offset, size);
-        USAGI_CHECK_THROW(OutOfMemoryException,
+        USAGI_CHECK_THROW(
+            OutOfMemoryException,
             result.has_value(),
             "commit_pages failed during Bypass: OOM or system limitation");
     }
@@ -184,9 +186,9 @@ void MemoryView::commit(const std::uint64_t offset,
     }
 }
 
-void MemoryView::decommit(const std::uint64_t offset,
-    const std::size_t                         size,
-    const CommitStrategy                      strategy)
+void MemoryView::decommit(
+    const std::uint64_t offset, const std::size_t size,
+    const CommitStrategy strategy)
 {
     check_view(offset, size);
     if(strategy == CommitStrategy::Bypass || !mPageManager)
@@ -194,10 +196,11 @@ void MemoryView::decommit(const std::uint64_t offset,
         check_page_aligned(offset, size);
         const auto result =
             mFuncTable->decommit_pages(mVirtualBase + offset, size);
-        USAGI_CHECK_THROW(OperatingSystemException,
+        USAGI_CHECK_THROW(
+            OperatingSystemException,
             result.has_value(),
             // todo: get the actual error
-            errors::SystemErrorCodes::UnknownError,
+            errors::RuntimeErrorCodes::UnknownError,
             "decommit_pages failed during Bypass: OS rejected valid decommit "
             "request");
     }
@@ -211,10 +214,11 @@ void MemoryView::lock(const std::uint64_t offset, const std::size_t size)
 {
     check_view(offset, size);
     const auto result = mFuncTable->lock_pages(mVirtualBase + offset, size);
-    USAGI_CHECK_THROW(ResourceExhaustedException,
+    USAGI_CHECK_THROW(
+        ResourceExhaustedException,
         result.has_value(),
         // todo: get the actual error
-        errors::SystemErrorCodes::UnknownError,
+        errors::RuntimeErrorCodes::UnknownError,
         "lock_pages failed: OS physical memory quota reached");
 }
 
@@ -222,10 +226,11 @@ void MemoryView::unlock(const std::uint64_t offset, const std::size_t size)
 {
     check_view(offset, size);
     const auto result = mFuncTable->unlock_pages(mVirtualBase + offset, size);
-    USAGI_CHECK_THROW(OperatingSystemException,
+    USAGI_CHECK_THROW(
+        OperatingSystemException,
         result.has_value(),
         // todo: get the actual error
-        errors::SystemErrorCodes::UnknownError,
+        errors::RuntimeErrorCodes::UnknownError,
         "unlock_pages failed: OS rejected unlock request");
 }
 
@@ -235,10 +240,11 @@ void MemoryView::zero_pages(const std::uint64_t offset, const std::size_t size)
     check_page_aligned(offset, size);
     check_write_access();
     const auto result = mFuncTable->zero_pages(mVirtualBase + offset, size);
-    USAGI_CHECK_THROW(OperatingSystemException,
+    USAGI_CHECK_THROW(
+        OperatingSystemException,
         result.has_value(),
         // todo: get the actual error
-        errors::SystemErrorCodes::UnknownError,
+        errors::RuntimeErrorCodes::UnknownError,
         "zero_pages failed: OS physical layer error");
 }
 
@@ -276,10 +282,11 @@ void MemoryView::flush(const std::uint64_t offset, std::uint64_t size)
     check_view(offset, size);
     check_write_access();
     const auto result = mFuncTable->flush(mVirtualBase + offset, size);
-    USAGI_CHECK_THROW(OperatingSystemException,
+    USAGI_CHECK_THROW(
+        OperatingSystemException,
         result.has_value(),
         // todo: get the actual error
-        errors::SystemErrorCodes::UnknownError,
+        errors::RuntimeErrorCodes::UnknownError,
         "flush failed: underlying device I/O error");
 }
 
@@ -290,15 +297,16 @@ void MemoryView::copy_memory(
     const ByteSpan dst_span(dst, size);
     const ByteSpan src_span(src, size);
 
-    errors::check_fatal(
+    USAGI_CHECK_FATAL(
         view_span.contains(dst_span), "copy_memory destination out of bounds");
-    errors::check_fatal(
+    USAGI_CHECK_FATAL(
         view_span.contains(src_span), "copy_memory source out of bounds");
-    errors::check_fatal(!dst_span.overlaps_with(src_span),
+    USAGI_CHECK_FATAL(
+        !dst_span.overlaps_with(src_span),
         "copy_memory regions overlap, use move_memory instead");
 
     const auto result = mFuncTable->copy_memory(dst, src, size);
-    errors::check_fatal(result.has_value(), "copy_memory failed");
+    USAGI_CHECK_FATAL(result.has_value(), "copy_memory failed");
 }
 
 void MemoryView::move_memory(
@@ -308,12 +316,12 @@ void MemoryView::move_memory(
     const ByteSpan dst_span(dst, size);
     const ByteSpan src_span(src, size);
 
-    errors::check_fatal(
+    USAGI_CHECK_FATAL(
         view_span.contains(dst_span), "move_memory destination out of bounds");
-    errors::check_fatal(
+    USAGI_CHECK_FATAL(
         view_span.contains(src_span), "move_memory source out of bounds");
 
     const auto result = mFuncTable->move_memory(dst, src, size);
-    errors::check_fatal(result.has_value(), "move_memory failed");
+    USAGI_CHECK_FATAL(result.has_value(), "move_memory failed");
 }
 } // namespace usagi::runtime::storage

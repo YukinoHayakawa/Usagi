@@ -4,7 +4,7 @@
 
 #include <Usagi/Library/Containers/PackedIntEnumPair.hpp>
 #include <Usagi/Library/Objects/Noncopyable.hpp>
-#include <Usagi/Runtime/Errors/SystemErrorCodes.hpp>
+#include <Usagi/Runtime/Errors/RuntimeErrorCodes.hpp>
 #include <Usagi/Runtime/Storage/Backends/Files.hpp>
 #include <Usagi/Runtime/Storage/Traits/StorageTraits.hpp>
 #include <Usagi/Runtime/Storage/Views/CommitStrategy.hpp>
@@ -48,13 +48,10 @@ class MemoryView final : Noncopyable
     void check_write_access() const;
 
     // Private constructor. Use create() factory method.
-    MemoryView(const MemoryFunctionTable *vtable,
-        NativeFileHandle                  handle,
-        FileOpenMode                      mode,
-        std::size_t                       reserved_size,
-        void                             *virtual_base,
-        const StorageTraits              &traits,
-        VirtualPageManager               *page_manager) noexcept;
+    MemoryView(
+        const MemoryFunctionTable *vtable, NativeFileHandle handle,
+        FileOpenMode mode, std::size_t reserved_size, void *virtual_base,
+        const StorageTraits &traits, VirtualPageManager *page_manager) noexcept;
 
 public:
     constexpr static std::uint64_t USE_BACKEND_CAPACITY = 0;
@@ -77,16 +74,12 @@ public:
      * memory.
      */
     [[nodiscard]]
-    static ExpectedSyscallValue<MemoryView> create(
-        const MemoryFunctionTable *vtable,
-        NativeFileHandle           handle,
-        FileOpenMode               mode,
-        const StorageTraits       &traits,
-        VirtualPageManager        *page_manager      = nullptr,
-        std::uint64_t              offset            = 0,
-        std::uint64_t              size              = USE_BACKEND_CAPACITY,
-        std::uint64_t              commit            = 0,
-        void                      *base_address_hint = nullptr) noexcept;
+    static ExpectedRuntimeValue<MemoryView> create(
+        const MemoryFunctionTable *vtable, NativeFileHandle handle,
+        FileOpenMode mode, const StorageTraits &traits,
+        VirtualPageManager *page_manager = nullptr, std::uint64_t offset = 0,
+        std::uint64_t size = USE_BACKEND_CAPACITY, std::uint64_t commit = 0,
+        void *base_address_hint = nullptr) noexcept;
 
     ~MemoryView();
 
@@ -144,19 +137,19 @@ public:
     }
 
     [[nodiscard]]
-    ExpectedSyscallValue<void> remap(std::uint64_t new_size);
+    ExpectedRuntimeValue<void> remap(std::uint64_t new_size);
 
     // Allocate physical pages for specified virtual address range using the
     // specified strategy.
-    void commit(std::uint64_t offset,
-        std::size_t           size,
-        CommitStrategy        strategy = CommitStrategy::Exact);
+    void commit(
+        std::uint64_t offset, std::size_t size,
+        CommitStrategy strategy = CommitStrategy::Exact);
 
     // Free physical pages for specified virtual address range using the
     // specified strategy.
-    void decommit(std::uint64_t offset,
-        std::size_t             size,
-        CommitStrategy          strategy = CommitStrategy::Exact);
+    void decommit(
+        std::uint64_t offset, std::size_t size,
+        CommitStrategy strategy = CommitStrategy::Exact);
 
     // Lock the specified range into physical RAM.
     void lock(std::uint64_t offset, std::size_t size);
