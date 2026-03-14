@@ -10,10 +10,9 @@ namespace usagi::runtime::allocators
  * block.
  */
 template <typename T>
-concept ReallocatableAllocator = allocators::VariableSizeAllocator<T> &&
-    requires(T                   &a,
-        MemoryHandle              handle,
-        std::uint64_t             new_size,
+concept ReallocatableAllocator = VariableSizeAllocator<T> &&
+    requires(
+        T &a, MemoryHandle handle, std::uint64_t new_size,
         storage::StorageAlignment alignment) {
         {
             a.reallocate(handle, new_size, alignment)

@@ -1,10 +1,16 @@
 #pragma once
 
+#include <Usagi/Platforms/Instructions/BitManipulations.hpp>
 #include <Usagi/Runtime/Allocators/Concepts/ReallocatableAllocator.hpp>
 #include <Usagi/Runtime/Storage/Views/MemoryView.hpp>
 
 namespace usagi::runtime::allocators
 {
+namespace details
+{
+using BitOps = platforms::instructions::
+    DefaultBitManipulationInstructions<OperandBitWidth::_32>;
+
 constexpr std::uint32_t TLSF_FLI_COUNT = 32;
 constexpr std::uint32_t TLSF_SLI_LOG2  = 4; // 16 subdivisions per FLI
 constexpr std::uint32_t TLSF_SLI_COUNT = 1 << TLSF_SLI_LOG2;
@@ -36,7 +42,8 @@ struct TLSFBlockHeader
     [[nodiscard]]
     bool is_free() const
     {
-        return (size_and_flags & 1) != 0;
+        // Extract bit 0, length 1
+        return BitOps::bit_field_extract(size_and_flags, 0 | (1 << 8)) != 0;
     }
 
     void set_free(const bool free)
@@ -47,7 +54,8 @@ struct TLSFBlockHeader
     [[nodiscard]]
     bool is_prev_free() const
     {
-        return (size_and_flags & 2) != 0;
+        // Extract bit 1, length 1
+        return BitOps::bit_field_extract(size_and_flags, 1 | (1 << 8)) != 0;
     }
 
     void set_prev_free(const bool free)
@@ -58,7 +66,7 @@ struct TLSFBlockHeader
     [[nodiscard]]
     std::uint32_t size() const
     {
-        return size_and_flags & ~3u;
+        return BitOps::align_down_pow2(size_and_flags, 4);
     }
 
     void set_size(const std::uint32_t new_size)
@@ -89,6 +97,7 @@ struct TLSFHeapHeader
     // Offsets to the head of the free list for a given [FLI][SLI]
     std::uint32_t free_lists[TLSF_FLI_COUNT][TLSF_SLI_COUNT];
 };
+} // namespace details
 
 /**
  * \brief A position-independent, backend-agnostic Two-Level Segregated Fit
@@ -112,15 +121,15 @@ struct TLSFHeapHeader
  */
 class TLSFAllocator
 {
-    MemoryView mMemory;
+    storage::MemoryView mMemory;
 
     [[nodiscard]]
-    TLSFHeapHeader *header() const noexcept
+    details::TLSFHeapHeader *header() noexcept
     {
-        return reinterpret_cast<TLSFHeapHeader *>(mMemory.base_view());
+        return mMemory.cast_view<details::TLSFHeapHeader>();
     }
 
-    TLSFBlockHeader *get_block(std::uint32_t offset) const;
+    details::TLSFBlockHeader *get_block(std::uint32_t offset);
     void mapping_insert(
         std::uint32_t size, std::uint32_t &fli, std::uint32_t &sli) const;
     void list_insert(std::uint32_t offset);
@@ -130,22 +139,23 @@ public:
     static constexpr std::uint8_t SIGNATURE = 3;
 
     TLSFAllocator(
-        MemoryView memory, std::uint32_t total_size, bool force_format = false);
+        storage::MemoryView memory, std::uint32_t total_size,
+        bool force_format = false);
 
     [[nodiscard]]
     MemoryHandle allocate(
         std::uint64_t size, storage::StorageAlignment alignment);
     void deallocate(MemoryHandle handle);
     [[nodiscard]]
-    MemoryHandle reallocate(MemoryHandle handle,
-        std::uint64_t                    new_size,
-        storage::StorageAlignment        alignment);
+    MemoryHandle reallocate(
+        MemoryHandle handle, std::uint64_t new_size,
+        storage::StorageAlignment alignment);
 
     [[nodiscard]]
-    void *resolve(MemoryHandle handle) const noexcept;
+    void *resolve(MemoryHandle handle) noexcept;
 
     [[nodiscard]]
-    const MemoryView &view() const noexcept
+    const storage::MemoryView &view() const noexcept
     {
         return mMemory;
     }

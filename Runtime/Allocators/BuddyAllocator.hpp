@@ -64,26 +64,26 @@ struct BuddyHeapHeader
  */
 class BuddyAllocator
 {
-    MemoryView mMemory;
+    storage::MemoryView mMemory;
 
     [[nodiscard]]
-    BuddyHeapHeader *header() const noexcept
+    BuddyHeapHeader *header() noexcept
     {
-        return reinterpret_cast<BuddyHeapHeader *>(mMemory.base_view());
+        return mMemory.cast_view<BuddyHeapHeader>();
     }
 
     [[nodiscard]]
-    BuddyBlockHeader *get_block(std::uint32_t offset) const;
+    BuddyBlockHeader *get_block(std::uint32_t offset);
+
     void list_remove(std::uint32_t offset);
     void list_insert(std::uint32_t offset);
 
 public:
     static constexpr std::uint8_t SIGNATURE = 2;
 
-    BuddyAllocator(MemoryView memory,
-        std::uint32_t         min_alloc_size,
-        std::uint32_t         total_size,
-        bool                  force_format = false);
+    BuddyAllocator(
+        storage::MemoryView memory, std::uint32_t min_alloc_size,
+        std::uint32_t total_size, bool force_format = false);
 
     [[nodiscard]]
     MemoryHandle allocate(
@@ -92,15 +92,15 @@ public:
     void deallocate(MemoryHandle handle);
 
     [[nodiscard]]
-    MemoryHandle reallocate(MemoryHandle handle,
-        std::uint64_t                    new_size,
-        storage::StorageAlignment        alignment);
+    MemoryHandle reallocate(
+        MemoryHandle handle, std::uint64_t new_size,
+        storage::StorageAlignment alignment);
 
     [[nodiscard]]
-    void *resolve(MemoryHandle handle) const noexcept;
+    void *resolve(MemoryHandle handle) noexcept;
 
     [[nodiscard]]
-    const MemoryView &view() const noexcept
+    const storage::MemoryView &view() const noexcept
     {
         return mMemory;
     }

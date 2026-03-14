@@ -17,7 +17,7 @@ namespace usagi::runtime::allocators
  * raw pointers dynamically.
  */
 template <typename T>
-concept HandleAllocator = requires(const T &a) {
+concept HandleAllocator = requires(T &a) {
     { T::SIGNATURE } -> std::convertible_to<std::uint8_t>;
     { a.resolve(MemoryHandle { }) } -> std::same_as<void *>;
 } && meta::NotCopyable<T>;

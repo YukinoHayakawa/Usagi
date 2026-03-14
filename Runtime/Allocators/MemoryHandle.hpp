@@ -38,17 +38,20 @@ struct MemoryHandle
      */
     template <typename T = void>
     [[nodiscard]]
-    T *resolve(const MemoryView &view) const noexcept
+    T *resolve(storage::MemoryView &view) const noexcept
     {
         if(!is_valid()) return nullptr;
-        return reinterpret_cast<T *>(view.base_byte_view() + offset);
+        // todo validate allocator signature
+        return view.cast_view<T>(offset);
     }
 
     constexpr bool operator==(const MemoryHandle &) const noexcept = default;
 };
 
-static_assert(sizeof(MemoryHandle) == sizeof(std::uint64_t),
+static_assert(
+    sizeof(MemoryHandle) == sizeof(std::uint64_t),
     "MemoryHandle must be exactly 64 bits to fit tightly in component data.");
-static_assert(std::is_trivially_copyable_v<MemoryHandle>,
+static_assert(
+    std::is_trivially_copyable_v<MemoryHandle>,
     "MemoryHandle must be trivially copyable for SIMD/GPU DMA.");
 } // namespace usagi::runtime

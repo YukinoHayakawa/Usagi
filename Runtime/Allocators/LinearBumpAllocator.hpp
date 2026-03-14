@@ -2,11 +2,14 @@
 
 #include <atomic>
 
+#include <Usagi/Platforms/PlatformTraits.hpp>
 #include <Usagi/Runtime/Allocators/Concepts/VariableSizeAllocator.hpp>
 #include <Usagi/Runtime/Allocators/Concepts/WaitFreeAllocator.hpp>
 #include <Usagi/Runtime/Storage/Views/MemoryView.hpp>
 
 namespace usagi::runtime::allocators
+{
+namespace details
 {
 /**
  * \brief The header mapped at the base of the linear bump allocator's memory
@@ -21,12 +24,15 @@ struct LinearBumpHeapHeader
 
     // Ensure the atomic counter sits on its own cache line to prevent false
     // sharing
-    alignas(64) std::atomic<std::uint64_t> current_offset;
+    alignas(platforms::PlatformTraits::cpu_cache_line_size())
+        std::atomic<std::uint64_t> current_offset;
 
     // Tracks how much of the virtual reservation is currently backed by
     // physical memory
-    alignas(64) std::atomic<std::uint64_t> committed_offset;
+    alignas(platforms::PlatformTraits::cpu_cache_line_size())
+        std::atomic<std::uint64_t> committed_offset;
 };
+} // namespace details
 
 /**
  * \brief A wait-free, thread-safe linear bump allocator backed by MemoryView.
@@ -49,19 +55,20 @@ struct LinearBumpHeapHeader
  */
 class LinearBumpAllocator
 {
-    MemoryView mMemory;
+    storage::MemoryView mMemory;
 
     [[nodiscard]]
-    LinearBumpHeapHeader *header() const noexcept
+    details::LinearBumpHeapHeader *header() noexcept
     {
-        return reinterpret_cast<LinearBumpHeapHeader *>(mMemory.base_view());
+        return mMemory.cast_view<details::LinearBumpHeapHeader>();
     }
 
 public:
     static constexpr std::uint8_t SIGNATURE    = 4;
     static constexpr bool         IS_WAIT_FREE = true;
 
-    explicit LinearBumpAllocator(MemoryView memory, bool force_format = false);
+    explicit LinearBumpAllocator(
+        storage::MemoryView memory, bool force_format = false);
 
     [[nodiscard]]
     MemoryHandle allocate(
@@ -83,10 +90,10 @@ public:
     std::uint64_t active_bytes() const noexcept;
 
     [[nodiscard]]
-    void *resolve(MemoryHandle handle) const noexcept;
+    void *resolve(MemoryHandle handle) noexcept;
 
     [[nodiscard]]
-    const MemoryView &view() const noexcept
+    const storage::MemoryView &view() const noexcept
     {
         return mMemory;
     }
