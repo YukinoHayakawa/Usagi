@@ -118,7 +118,7 @@ ExpectedRuntimeValue<MemoryView> RegularFileBackend::create_view(
             // recursion
             nullptr,
             0,
-            to_bytes(StoragePageSize::Page_1MB),
+            to_bytes(StoragePageSize::_1MiB),
             0,
             nullptr);
 

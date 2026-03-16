@@ -20,8 +20,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::CpuL1Cache)] = {
             .device_flags  = StorageDeviceFlags::CpuInternal,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_64,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_64Byte,
             .latency_flags = StorageLatencyFlags::HardwareThread,
             .access_flags  = StorageAccessFlags::UniversalRandom,
             .numa_node     = 0,
@@ -34,8 +34,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::CpuL2Cache)] = {
             .device_flags  = StorageDeviceFlags::CpuInternal,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_64,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_64Byte,
             .latency_flags = StorageLatencyFlags::HardwareThread,
             .access_flags  = StorageAccessFlags::UniversalRandom,
             .numa_node     = 0,
@@ -48,8 +48,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::CpuL3Cache)] = {
             .device_flags  = StorageDeviceFlags::CpuInternal,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_64,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_64Byte,
             .latency_flags = StorageLatencyFlags::HardwareThread,
             .access_flags  = StorageAccessFlags::UniversalRandom,
             .numa_node     = 0,
@@ -63,8 +63,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::MainMemory)] = {
             .device_flags  = StorageDeviceFlags::SystemRam,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_16,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_16Byte,
             .latency_flags = StorageLatencyFlags::SystemFabric,
             .access_flags  = StorageAccessFlags::UniversalRandom,
             .numa_node     = 0,
@@ -78,8 +78,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::MainMemoryLocked)] = {
             .device_flags  = StorageDeviceFlags::SystemRamLocked,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_16,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_16Byte,
             .latency_flags = StorageLatencyFlags::SystemFabric,
             .access_flags  = StorageAccessFlags::UniversalRandom,
             .numa_node     = 0,
@@ -93,8 +93,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::PersistentMemory)] = {
             .device_flags  = StorageDeviceFlags::PersistentRam,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_256,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_256Byte,
             .latency_flags = StorageLatencyFlags::SystemFabric,
             .access_flags  = StorageAccessFlags::UniversalRandom |
                 StorageAccessFlags::BlockAddressing,
@@ -109,8 +109,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::GpuVRamLocal)] = {
             .device_flags  = StorageDeviceFlags::GpuVRam,
-            .min_page_size = StoragePageSize::Page_64KB,
-            .min_alignment = StorageAlignment::Align_256,
+            .min_page_size = StoragePageSize::_64KiB,
+            .min_alignment = StorageAlignment::_256Byte,
             .latency_flags = StorageLatencyFlags::ExpressInterconnect,
             .access_flags  = StorageAccessFlags::UniversalRandom |
                 StorageAccessFlags::BlockAddressing,
@@ -125,8 +125,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
         result[std::to_underlying(CommonStorage::GpuVRamHostVisible)] = {
             .device_flags =
                 StorageDeviceFlags::GpuVRam | StorageDeviceFlags::Coherent,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_256,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_256Byte,
             .latency_flags = StorageLatencyFlags::ExpressInterconnect,
             .access_flags  = StorageAccessFlags::UniversalRandom |
                 StorageAccessFlags::BlockAddressing,
@@ -141,8 +141,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::RamDisk)] = {
             .device_flags  = StorageDeviceFlags::SystemRam,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_512,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_512Byte,
             .latency_flags = StorageLatencyFlags::SystemFabric,
             .access_flags  = StorageAccessFlags::BidirectionalBlock,
             .numa_node     = 0,
@@ -155,8 +155,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::NvmeSsd)] = {
             .device_flags  = StorageDeviceFlags::NvmeStorage,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_512,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_512Byte,
             .latency_flags = StorageLatencyFlags::ExpressInterconnect,
             .access_flags  = StorageAccessFlags::BidirectionalBlock,
             .numa_node     = 0,
@@ -169,8 +169,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::SataSsd)] = {
             .device_flags  = StorageDeviceFlags::SataStorage,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_512,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_512Byte,
             .latency_flags = StorageLatencyFlags::PeripheralBus,
             .access_flags  = StorageAccessFlags::BidirectionalBlock,
             .numa_node     = 0,
@@ -184,8 +184,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::SataHdd)] = {
             .device_flags  = StorageDeviceFlags::MagneticDisk,
-            .min_page_size = StoragePageSize::Page_64KB,
-            .min_alignment = StorageAlignment::Align_512,
+            .min_page_size = StoragePageSize::_64KiB,
+            .min_alignment = StorageAlignment::_512Byte,
             .latency_flags = StorageLatencyFlags::PeripheralBus,
             .access_flags  = StorageAccessFlags::BidirectionalBlock,
             .numa_node     = 0,
@@ -199,8 +199,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::TapeDrive)] = {
             .device_flags  = StorageDeviceFlags::TapeArchival,
-            .min_page_size = StoragePageSize::Page_1MB,
-            .min_alignment = StorageAlignment::Align_1024,
+            .min_page_size = StoragePageSize::_1MiB,
+            .min_alignment = StorageAlignment::_1KiB,
             .latency_flags = StorageLatencyFlags::PeripheralBus,
             .access_flags  = StorageAccessFlags::BidirectionalBlock,
             .numa_node     = 0,
@@ -214,10 +214,11 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::InfinibandRdma)] = {
             .device_flags = StorageDeviceFlags::NetworkNode |
-                StorageDeviceFlags::Silicon | StorageDeviceFlags::Coherent |
+                StorageDeviceFlags::Silicon |
+                StorageDeviceFlags::Coherent |
                 StorageDeviceFlags::Atomic,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_64,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_64Byte,
             .latency_flags = StorageLatencyFlags::LocalNetworkRDMA,
             .access_flags  = StorageAccessFlags::UniversalRandom |
                 StorageAccessFlags::StreamingConsumer,
@@ -230,8 +231,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
          */
         result[std::to_underlying(CommonStorage::StandardNetwork)] = {
             .device_flags  = StorageDeviceFlags::NetworkNode,
-            .min_page_size = StoragePageSize::Page_4KB,
-            .min_alignment = StorageAlignment::Align_1,
+            .min_page_size = StoragePageSize::_4KiB,
+            .min_alignment = StorageAlignment::_1Byte,
             .latency_flags = StorageLatencyFlags::LocalNetwork,
             .access_flags  = StorageAccessFlags::StreamingConsumer,
             .numa_node     = 0,
@@ -245,8 +246,8 @@ const StorageTraits &common_storage_traits(const CommonStorage storage) noexcept
         result[std::to_underlying(CommonStorage::InternetCloud)] = {
             .device_flags = StorageDeviceFlags::NetworkNode |
                 StorageDeviceFlags::Persistent,
-            .min_page_size = StoragePageSize::Page_64KB,
-            .min_alignment = StorageAlignment::Align_1,
+            .min_page_size = StoragePageSize::_64KiB,
+            .min_alignment = StorageAlignment::_1Byte,
             .latency_flags = StorageLatencyFlags::WideNetwork,
             .access_flags  = StorageAccessFlags::StreamingConsumer,
             .numa_node     = 0,

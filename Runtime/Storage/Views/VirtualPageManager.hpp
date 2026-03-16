@@ -18,7 +18,7 @@ struct PageManagerHeader
 struct PageBitmapNode
 {
     using BitOps = platforms::instructions::
-        DefaultBitManipulationInstructions<OperandBitWidth::_64>;
+        DefaultBitManipulationInstructions<OperandBitWidth::_64Bit>;
     using MaskType = BitOps::ValueType;
 
     static constexpr std::uint64_t BITS_PER_MASK =

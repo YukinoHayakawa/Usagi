@@ -1,7 +1,6 @@
 #pragma once
 
-#include <concepts>
-
+#include <Usagi/Library/Constants/BitWidth.hpp>
 #include <Usagi/Library/Enums/Bitwise.hpp>
 
 namespace usagi::runtime::storage
@@ -14,25 +13,41 @@ namespace usagi::runtime::storage
  */
 enum class StorageAlignment : std::uint8_t
 {
-    Align_1     = 0,  // Standard byte-aligned data (strings, chars)
-    Align_2     = 1,  // 16-bit values (short, half-float)
-    Align_4     = 2,  // 32-bit values (int, float)
-    Align_8     = 3,  // 64-bit values (double, long, raw pointers)
-    Align_16    = 4,  // SSE/SIMD vectors (float4, mat4)
-    Align_32    = 5,  // AVX-256 vectors
-    Align_64    = 6,  // CPU Cache Line size (Prevents False Sharing)
-    Align_128   = 7,  // AVX-512 / Advanced DMA alignment
-    Align_256   = 8,  // GPU Texture/Buffer pitch requirements
-    Align_512   = 9,  // Sector-level alignment
-    Align_1024  = 10, // Common for large block-based structures
-    Align_4096  = 12, // Standard OS Virtual Page alignment
-    Align_65536 = 16, // Win32 VirtualAlloc reservation granularity
-    Align_256KB = 18, // LTO-7+ optimized block alignment
-    Align_1MB   = 20, // Large archival block
-    Align_8MB   = 23, // Enterprise tape / high-throughput streaming
+    // Standard byte-aligned data (strings, chars)
+    _1Byte   = std::to_underlying(BitWidth::_1Byte),
+    // 16-bit values (short, half-float)
+    _2Byte   = std::to_underlying(BitWidth::_2Byte),
+    // 32-bit values (int, float)
+    _4Byte   = std::to_underlying(BitWidth::_4Byte),
+    // 64-bit values (double, long, raw pointers)
+    _8Byte   = std::to_underlying(BitWidth::_8Byte),
+    // SSE/SIMD vectors (float4, mat4)
+    _16Byte  = std::to_underlying(BitWidth::_16Byte),
+    // AVX-256 vectors
+    _32Byte  = std::to_underlying(BitWidth::_32Byte),
+    // CPU Cache Line size (Prevents False Sharing)
+    _64Byte  = std::to_underlying(BitWidth::_64Byte),
+    // AVX-512 / Advanced DMA alignment
+    _128Byte = std::to_underlying(BitWidth::_128Byte),
+    // GPU Texture/Buffer pitch requirements
+    _256Byte = std::to_underlying(BitWidth::_256Byte),
+    // Sector-level alignment
+    _512Byte = std::to_underlying(BitWidth::_512Byte),
+    // Common for large block-based structures
+    _1KiB    = std::to_underlying(BitWidth::_1KiB),
+    // Standard OS Virtual Page alignment
+    _4KiB    = std::to_underlying(BitWidth::_4KiB),
+    // Win32 VirtualAlloc reservation granularity
+    _64KiB   = std::to_underlying(BitWidth::_64KiB),
+    // LTO-7+ optimized block alignment
+    _256KiB  = std::to_underlying(BitWidth::_256KiB),
+    // Large archival block
+    _1MiB    = std::to_underlying(BitWidth::_1MiB),
+    // Enterprise tape / high-throughput streaming
+    _8MiB    = std::to_underlying(BitWidth::_8MiB),
 
-    // Special non-power-of-two values (64+)
-    Align_480KB = 64, // LTO specialized transfer alignment
+    // LTO specialized transfer alignment
+    _480KiB = std::to_underlying(BitWidth::_480KiB),
 };
 
 /**
@@ -44,49 +59,45 @@ enum class StorageAlignment : std::uint8_t
  */
 enum class StoragePageSize : std::uint8_t
 {
-    Page_4KB  = 12, // Standard x86/ARM page size
-    Page_16KB = 14, // Common on Apple Silicon / Advanced OS configurations
-    Page_64KB = 16, // Efficient for large file mapping (NTFS cluster default)
-    Page_1MB  = 20, // Medium "Huge Page"
-    Page_2MB  = 21, // Standard x86 Large Page (High TLB efficiency)
-    Page_4MB  = 22, // Large page variant
-    Page_8MB  = 23, // Large LTO streaming page
-    Page_16MB = 24, // Very large pages for specialized hardware
-    Page_1GB  = 30, // x86 Gigapage (Zero TLB overhead for massive heaps)
+    // Standard x86/ARM page size
+    _4KiB  = std::to_underlying(BitWidth::_4KiB),
+    // Common on Apple Silicon / Advanced OS configurations
+    _16KiB = std::to_underlying(BitWidth::_16KiB),
+    // Efficient for large file mapping (NTFS cluster default)
+    _64KiB = std::to_underlying(BitWidth::_64KiB),
+    // Medium "Huge Page"
+    _1MiB  = std::to_underlying(BitWidth::_1MiB),
+    // Standard x86 Large Page (High TLB efficiency)
+    _2MiB  = std::to_underlying(BitWidth::_2MiB),
+    // Large page variant
+    _4MiB  = std::to_underlying(BitWidth::_4MiB),
+    // Large LTO streaming page
+    _8MiB  = std::to_underlying(BitWidth::_8MiB),
+    // Very large pages for specialized hardware
+    _16MiB = std::to_underlying(BitWidth::_16MiB),
+    // x86 Gigapage (Zero TLB overhead for massive heaps)
+    _1GiB  = std::to_underlying(BitWidth::_1GiB),
 
-    // Special non-power-of-two values (64+)
-    Page_480KB = 64, // LTO specialized transfer page size
+    // LTO specialized transfer page size
+    _480KiB = std::to_underlying(BitWidth::_480KiB),
+};
+} // namespace usagi::runtime::storage
+
+namespace usagi
+{
+template <>
+struct IsBitWidthEnum<runtime::storage::StorageAlignment> : std::true_type
+{
 };
 
-/**
- * Shio:
- * Concept ensuring type safety for storage metric translations.
- */
-template <typename T>
-concept StorageMetric =
-    std::same_as<T, StorageAlignment> || std::same_as<T, StoragePageSize>;
-
-/**
- * @brief Translates a storage-related enum to its literal byte size.
- * Shio: Compact logic handles log2(N) for values < 64 and literals for 64+.
- */
-constexpr std::size_t to_bytes(StorageMetric auto e) noexcept
+template <>
+struct IsBitWidthEnum<runtime::storage::StoragePageSize> : std::true_type
 {
-    const auto v = static_cast<std::uint8_t>(e);
-    return v < 64 ? static_cast<std::size_t>(1) << v
-                  : (v == 64 ? 480 * 1'024 : 0);
-}
+};
+} // namespace usagi
 
-namespace details::static_tests
+namespace usagi::runtime::storage
 {
-static_assert(to_bytes(StorageAlignment::Align_1) == 1);
-static_assert(to_bytes(StorageAlignment::Align_16) == 16);
-static_assert(to_bytes(StorageAlignment::Align_65536) == 65'536);
-static_assert(to_bytes(StorageAlignment::Align_480KB) == 480 * 1'024);
-static_assert(to_bytes(StoragePageSize::Page_4KB) == 4'096);
-static_assert(to_bytes(StoragePageSize::Page_1GB) == 1'024 * 1'024 * 1'024);
-} // namespace details::static_tests
-
 /**
  * Shio:
  * Represents the physical and logical layers through which data must travel.
@@ -160,6 +171,13 @@ enum class StorageAccessFlags : std::uint8_t
     StreamingProducer   = SeekForward | AppendOnly,
     OpaqueStream        = ConsumeOnly,
 };
+
+namespace details::static_tests
+{
+/* Shio: Verifying specialized alignment and operands */
+static_assert(to_bytes(StorageAlignment::_480KiB) == 491'520);
+static_assert(to_bytes(StoragePageSize::_4KiB) == 4'096);
+} // namespace details::static_tests
 } // namespace usagi::runtime::storage
 
 namespace usagi

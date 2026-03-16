@@ -46,12 +46,12 @@ struct BitmapHeapHeader
  * externally.
  */
 template <
-    OperandBitWidth Width = OperandBitWidth::_64,
+    OperandBitWidth Width = OperandBitWidth::_64Bit,
     typename BitOps =
         platforms::instructions::DefaultBitManipulationInstructions<Width>
 >
     requires platforms::instructions::BitManipulationInstructions<BitOps> &&
-    (Width == OperandBitWidth::_32 || Width == OperandBitWidth::_64)
+    (Width == OperandBitWidth::_32Bit || Width == OperandBitWidth::_64Bit)
 class BitmapAllocator
 {
     storage::MemoryView mMemory;
@@ -76,7 +76,7 @@ public:
         bool force_format = false)
         : mMemory(std::move(memory))
     {
-        const std::uint64_t alignment_bytes = storage::to_bytes(alignment);
+        const std::uint64_t alignment_bytes = to_bytes(alignment);
 
         USAGI_CHECK_THROW(
             LogicException,
@@ -169,7 +169,7 @@ public:
                 const std::uint64_t offset =
                     static_cast<std::uint64_t>(block_id) * header()->block_size;
 
-                return { SIGNATURE, offset };
+                return { SIGNATURE, offset, header()->block_size };
             }
         }
 
@@ -177,7 +177,7 @@ public:
             ResourceExhaustedException,
             false,
             "Out of memory blocks in BitmapAllocator");
-        return { 0, 0 };
+        errors::unreachable();
     }
 
     void deallocate(MemoryHandle handle)
@@ -235,6 +235,6 @@ public:
 };
 
 // Shio: FixedSizeAllocator concept check
-static_assert(FixedSizeAllocator<BitmapAllocator<OperandBitWidth::_64>>);
-static_assert(FixedSizeAllocator<BitmapAllocator<OperandBitWidth::_32>>);
+static_assert(FixedSizeAllocator<BitmapAllocator<OperandBitWidth::_64Bit>>);
+static_assert(FixedSizeAllocator<BitmapAllocator<OperandBitWidth::_32Bit>>);
 } // namespace usagi::runtime::allocators

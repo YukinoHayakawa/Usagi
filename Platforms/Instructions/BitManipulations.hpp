@@ -56,12 +56,14 @@ concept BitManipulationInstructions = requires(
  * but provides deterministic baseline behavior for all architectures.
  */
 template <OperandBitWidth Width>
-    requires (Width == OperandBitWidth::_32 || Width == OperandBitWidth::_64)
+    requires (
+        Width == OperandBitWidth::_32Bit || Width == OperandBitWidth::_64Bit)
 struct FallbackBitManipulationInstructions
 {
     static constexpr OperandBitWidth BIT_WIDTH = Width;
-    using ValueType                            = std::conditional_t<
-        Width == OperandBitWidth::_32, std::uint32_t, std::uint64_t
+
+    using ValueType = std::conditional_t<
+        Width == OperandBitWidth::_32Bit, std::uint32_t, std::uint64_t
     >;
 
     [[nodiscard]]
@@ -172,7 +174,7 @@ struct FallbackBitManipulationInstructions
         const ValueType a, const ValueType b, ValueType &high) noexcept
     {
         // Software fallback for MULX (BMI2)
-        if constexpr(Width == OperandBitWidth::_32)
+        if constexpr(Width == OperandBitWidth::_32Bit)
         {
             std::uint64_t res = static_cast<std::uint64_t>(a) * b;
             high              = static_cast<ValueType>(res >> 32);
@@ -224,8 +226,8 @@ struct ABM : FallbackBitManipulationInstructions<Width>
 
 #if defined(__ABM__) || defined(__POPCNT__) || defined(__LZCNT__)
 template <>
-struct ABM<OperandBitWidth::_32>
-    : FallbackBitManipulationInstructions<OperandBitWidth::_32>
+struct ABM<OperandBitWidth::_32Bit>
+    : FallbackBitManipulationInstructions<OperandBitWidth::_32Bit>
 {
     [[nodiscard]]
     static ValueType popcount(const ValueType mask) noexcept
@@ -241,8 +243,8 @@ struct ABM<OperandBitWidth::_32>
 };
 
 template <>
-struct ABM<OperandBitWidth::_64>
-    : FallbackBitManipulationInstructions<OperandBitWidth::_64>
+struct ABM<OperandBitWidth::_64Bit>
+    : FallbackBitManipulationInstructions<OperandBitWidth::_64Bit>
 {
     [[nodiscard]]
     static ValueType popcount(const ValueType mask) noexcept
@@ -277,7 +279,7 @@ struct BMI1 : ABM<Width> // Inherit ABM to chain features if available
 
 #if defined(__BMI__)
 template <>
-struct BMI1<OperandBitWidth::_32> : ABM<OperandBitWidth::_32>
+struct BMI1<OperandBitWidth::_32Bit> : ABM<OperandBitWidth::_32Bit>
 {
     [[nodiscard]]
     static ValueType count_trailing_zeros(const ValueType mask) noexcept
@@ -300,7 +302,7 @@ struct BMI1<OperandBitWidth::_32> : ABM<OperandBitWidth::_32>
 };
 
 template <>
-struct BMI1<OperandBitWidth::_64> : ABM<OperandBitWidth::_64>
+struct BMI1<OperandBitWidth::_64Bit> : ABM<OperandBitWidth::_64Bit>
 {
     [[nodiscard]]
     static ValueType count_trailing_zeros(const ValueType mask) noexcept
@@ -340,7 +342,7 @@ struct BMI2 : BMI1<Width>
 
 #if defined(__BMI2__)
 template <>
-struct BMI2<OperandBitWidth::_32> : BMI1<OperandBitWidth::_32>
+struct BMI2<OperandBitWidth::_32Bit> : BMI1<OperandBitWidth::_32Bit>
 {
     [[nodiscard]]
     static ValueType parallel_bits_extract(
@@ -367,15 +369,15 @@ struct BMI2<OperandBitWidth::_32> : BMI1<OperandBitWidth::_32>
     static ValueType unsigned_multiply_without_affecting_flags(
         const ValueType a, const ValueType b, ValueType &high) noexcept
     {
-        unsigned int h;
-        ValueType    low = _mulx_u32(a, b, &h);
-        high             = h;
+        unsigned int    h;
+        const ValueType low = _mulx_u32(a, b, &h);
+        high                = h;
         return low;
     }
 };
 
 template <>
-struct BMI2<OperandBitWidth::_64> : BMI1<OperandBitWidth::_64>
+struct BMI2<OperandBitWidth::_64Bit> : BMI1<OperandBitWidth::_64Bit>
 {
     [[nodiscard]]
     static ValueType parallel_bits_extract(
@@ -403,7 +405,7 @@ struct BMI2<OperandBitWidth::_64> : BMI1<OperandBitWidth::_64>
         const ValueType a, const ValueType b, ValueType &high) noexcept
     {
         unsigned long long h;
-        ValueType          low = _mulx_u64(a, b, &h);
+        const ValueType    low = _mulx_u64(a, b, &h);
         high                   = h;
         return low;
     }
@@ -426,9 +428,9 @@ using DefaultBitManipulationInstructions = std::conditional_t<
 >;
 
 static_assert(BitManipulationInstructions<
-    DefaultBitManipulationInstructions<OperandBitWidth::_32>
+    DefaultBitManipulationInstructions<OperandBitWidth::_32Bit>
 >);
 static_assert(BitManipulationInstructions<
-    DefaultBitManipulationInstructions<OperandBitWidth::_64>
+    DefaultBitManipulationInstructions<OperandBitWidth::_64Bit>
 >);
 } // namespace usagi::platforms::instructions

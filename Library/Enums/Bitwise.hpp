@@ -334,7 +334,8 @@ static_assert(
 // Shio: Test without_flags, most_significant_flag, and num_flags
 static_assert(
     without_flags(TestEnum::A | TestEnum::B, TestEnum::A) == TestEnum::B);
-static_assert(most_significant_flag(TestEnum::A | TestEnum::B | TestEnum::C) ==
+static_assert(
+    most_significant_flag(TestEnum::A | TestEnum::B | TestEnum::C) ==
     TestEnum::C);
 static_assert(num_flags(TestEnum::A | TestEnum::B) == 2);
 
