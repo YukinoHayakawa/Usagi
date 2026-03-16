@@ -4,12 +4,14 @@
 #include <Usagi/Runtime/Allocators/Concepts/ReallocatableAllocator.hpp>
 #include <Usagi/Runtime/Storage/Views/MemoryView.hpp>
 
+#include "AllocatorCommon.hpp"
+
 namespace usagi::runtime::allocators
 {
 namespace details
 {
 using BitOps = platforms::instructions::
-    DefaultBitManipulationInstructions<OperandBitWidth::_32>;
+    DefaultBitManipulationInstructions<OperandBitWidth::_32Bit>;
 
 constexpr std::uint32_t TLSF_FLI_COUNT = 32;
 constexpr std::uint32_t TLSF_SLI_LOG2  = 4; // 16 subdivisions per FLI
@@ -136,7 +138,8 @@ class TLSFAllocator
     void list_remove(std::uint32_t offset);
 
 public:
-    static constexpr std::uint8_t SIGNATURE = 3;
+    static constexpr std::uint8_t SIGNATURE =
+        allocator_signature(AllocatorType::TLSF);
 
     TLSFAllocator(
         storage::MemoryView memory, std::uint32_t total_size,

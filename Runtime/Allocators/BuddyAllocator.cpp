@@ -2,8 +2,6 @@
 
 #include <algorithm>
 
-#include <Usagi/Runtime/Errors/Errors.hpp>
-
 namespace usagi::runtime::allocators
 {
 BuddyBlockHeader *BuddyAllocator::get_block(const std::uint32_t offset)
@@ -120,7 +118,7 @@ BuddyAllocator::BuddyAllocator(
 MemoryHandle BuddyAllocator::allocate(
     const std::uint64_t size, const storage::StorageAlignment alignment)
 {
-    std::uint64_t alignment_bytes = storage::to_bytes(alignment);
+    std::uint64_t alignment_bytes = to_bytes(alignment);
     // Ensure we have enough alignment for our uint32_t back-pointer
     alignment_bytes               = std::max<uint64_t>(alignment_bytes, 4);
 
@@ -148,10 +146,13 @@ MemoryHandle BuddyAllocator::allocate(
     }
 
     if(current_order > header()->max_order)
+    {
         USAGI_CHECK_THROW(
             OutOfMemoryException,
             false,
             "Out of memory blocks in BuddyAllocator"); // OOM
+        errors::unreachable();
+    }
 
     const std::uint32_t offset =
         header()->free_lists[current_order - header()->min_order];
@@ -187,7 +188,7 @@ MemoryHandle BuddyAllocator::allocate(
     *mMemory.cast_view<std::uint32_t>(
         aligned_payload_offset - sizeof(std::uint32_t)) = offset;
 
-    return { SIGNATURE, aligned_payload_offset };
+    return { SIGNATURE, aligned_payload_offset, size };
 }
 
 void BuddyAllocator::deallocate(const MemoryHandle handle)
@@ -244,44 +245,44 @@ MemoryHandle BuddyAllocator::reallocate(
 {
     const MemoryHandle new_handle = allocate(new_size, alignment);
 
-    if(handle.is_valid())
+    if(!handle.is_valid())
     {
-        // To copy memory, we need to know the old size. We can derive this from
-        // the old block's order.
-        const std::uint32_t payload_offset =
-            static_cast<std::uint32_t>(handle.offset);
-        const std::uint32_t old_block_offset =
-            *mMemory.cast_view<const std::uint32_t>(
-                payload_offset - sizeof(std::uint32_t));
-
-        const BuddyBlockHeader *old_block      = get_block(old_block_offset);
-        // todo: warning
-        const std::uint32_t     old_block_size = 1ull << old_block->size_order;
-
-        // Approximate payload size. Note: A proper realloc would preserve
-        // exactly what was used, but since we only track block capacity, we
-        // copy the usable portion of the old block.
-        const std::uint32_t old_payload_size =
-            old_block_size - (payload_offset - old_block_offset);
-
-        const std::uint64_t copy_size =
-            std::min(new_size, static_cast<std::uint64_t>(old_payload_size));
-
-        void       *dst = resolve(new_handle);
-        const void *src = resolve(handle);
-        mMemory.copy_memory(dst, src, copy_size);
-
-        deallocate(handle);
+        return new_handle;
     }
+
+    // To copy memory, we need to know the old size. We can derive this from
+    // the old block's order.
+    const std::uint32_t payload_offset =
+        static_cast<std::uint32_t>(handle.offset);
+    const std::uint32_t old_block_offset =
+        *mMemory.cast_view<const std::uint32_t>(
+            payload_offset - sizeof(std::uint32_t));
+
+    const BuddyBlockHeader *old_block      = get_block(old_block_offset);
+    // todo: warning implicit conversion
+    const std::uint32_t     old_block_size = 1ull << old_block->size_order;
+
+    // Approximate payload size. Note: A proper realloc would preserve
+    // exactly what was used, but since we only track block capacity, we
+    // copy the usable portion of the old block.
+    const std::uint32_t old_payload_size =
+        old_block_size - (payload_offset - old_block_offset);
+
+    const std::uint64_t copy_size =
+        std::min(new_size, static_cast<std::uint64_t>(old_payload_size));
+
+    void       *dst = resolve(new_handle);
+    const void *src = resolve(handle);
+    mMemory.copy_memory(dst, src, copy_size);
+
+    deallocate(handle);
 
     return new_handle;
 }
 
 void *BuddyAllocator::resolve(const MemoryHandle handle) noexcept
 {
-    USAGI_CHECK_FATAL(
-        !handle.is_valid() || handle.signature == SIGNATURE,
-        "Invalid MemoryHandle signature in BuddyAllocator");
+    validate_before_resolve(this, handle);
     return handle.resolve(mMemory);
 }
 } // namespace usagi::runtime::allocators

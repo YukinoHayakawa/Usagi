@@ -2,9 +2,6 @@
 
 #include <algorithm>
 
-#include <Usagi/Platforms/Instructions/BitManipulations.hpp>
-#include <Usagi/Runtime/Errors/Errors.hpp>
-
 namespace usagi::runtime::allocators
 {
 using namespace details;
@@ -126,7 +123,7 @@ TLSFAllocator::TLSFAllocator(
 MemoryHandle TLSFAllocator::allocate(
     const std::uint64_t size, const storage::StorageAlignment alignment)
 {
-    std::uint64_t alignment_bytes = storage::to_bytes(alignment);
+    std::uint64_t alignment_bytes = to_bytes(alignment);
     alignment_bytes               = std::max<uint64_t>(alignment_bytes, 4);
 
     const std::uint32_t max_padding =
@@ -152,7 +149,8 @@ MemoryHandle TLSFAllocator::allocate(
             USAGI_CHECK_THROW(
                 OutOfMemoryException,
                 false,
-                "Out of memory blocks in TLSFAllocator"); // OOM}
+                "Out of memory blocks in TLSFAllocator"); // OOM
+            errors::unreachable();
         }
         fli    = BitOps::count_trailing_zeros(fl_map);
         sl_map = header()->sl_bitmap[fli];
@@ -210,7 +208,7 @@ MemoryHandle TLSFAllocator::allocate(
     mMemory.commit(
         offset, block->size(), storage::CommitStrategy::Aggressive64);
 
-    return { SIGNATURE, aligned_payload_offset };
+    return { SIGNATURE, aligned_payload_offset, size };
 }
 
 void TLSFAllocator::deallocate(const MemoryHandle handle)
@@ -278,38 +276,36 @@ MemoryHandle TLSFAllocator::reallocate(
 {
     const MemoryHandle new_handle = allocate(new_size, alignment);
 
-    if(handle.is_valid())
+    if(!handle.is_valid())
     {
-        const std::uint32_t payload_offset =
-            static_cast<std::uint32_t>(handle.offset);
-        const std::uint32_t old_block_offset =
-            *mMemory.cast_view<const std::uint32_t>(
-                payload_offset - sizeof(std::uint32_t));
-
-        const TLSFBlockHeader *old_block = get_block(old_block_offset);
-        const std::uint32_t    old_payload_size =
-            old_block->size() - (payload_offset - old_block_offset);
-
-        const std::uint64_t copy_size =
-            std::min(new_size, static_cast<std::uint64_t>(old_payload_size));
-
-        void       *dst = resolve(new_handle);
-        const void *src = resolve(handle);
-        mMemory.copy_memory(dst, src, copy_size);
-
-        deallocate(handle);
+        return new_handle;
     }
+
+    const std::uint32_t payload_offset =
+        static_cast<std::uint32_t>(handle.offset);
+    const std::uint32_t old_block_offset =
+        *mMemory.cast_view<const std::uint32_t>(
+            payload_offset - sizeof(std::uint32_t));
+
+    const TLSFBlockHeader *old_block = get_block(old_block_offset);
+    const std::uint32_t    old_payload_size =
+        old_block->size() - (payload_offset - old_block_offset);
+
+    const std::uint64_t copy_size =
+        std::min(new_size, static_cast<std::uint64_t>(old_payload_size));
+
+    void       *dst = resolve(new_handle);
+    const void *src = resolve(handle);
+    mMemory.copy_memory(dst, src, copy_size);
+
+    deallocate(handle);
 
     return new_handle;
 }
 
 void *TLSFAllocator::resolve(const MemoryHandle handle) noexcept
 {
-    // todo: duplicated code
-    USAGI_CHECK_THROW(
-        LogicException,
-        !handle.is_valid() || handle.signature == SIGNATURE,
-        "memory handle not allocator by this kind of allocator");
+    validate_before_resolve(this, handle);
     return handle.resolve(mMemory);
 }
 } // namespace usagi::runtime::allocators

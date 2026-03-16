@@ -7,6 +7,8 @@
 #include <Usagi/Runtime/Allocators/Concepts/WaitFreeAllocator.hpp>
 #include <Usagi/Runtime/Storage/Views/MemoryView.hpp>
 
+#include "AllocatorCommon.hpp"
+
 namespace usagi::runtime::allocators
 {
 namespace details
@@ -64,8 +66,9 @@ class LinearBumpAllocator
     }
 
 public:
-    static constexpr std::uint8_t SIGNATURE    = 4;
-    static constexpr bool         IS_WAIT_FREE = true;
+    static constexpr std::uint8_t SIGNATURE =
+        allocator_signature(AllocatorType::Linear);
+    static constexpr bool IS_WAIT_FREE = true;
 
     explicit LinearBumpAllocator(
         storage::MemoryView memory, bool force_format = false);

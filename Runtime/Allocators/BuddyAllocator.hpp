@@ -3,6 +3,8 @@
 #include <Usagi/Runtime/Allocators/Concepts/ReallocatableAllocator.hpp>
 #include <Usagi/Runtime/Storage/Views/MemoryView.hpp>
 
+#include "AllocatorCommon.hpp"
+
 namespace usagi::runtime::allocators
 {
 /**
@@ -79,7 +81,8 @@ class BuddyAllocator
     void list_insert(std::uint32_t offset);
 
 public:
-    static constexpr std::uint8_t SIGNATURE = 2;
+    static constexpr std::uint8_t SIGNATURE =
+        allocator_signature(AllocatorType::Buddy);
 
     BuddyAllocator(
         storage::MemoryView memory, std::uint32_t min_alloc_size,

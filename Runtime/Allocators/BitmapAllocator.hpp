@@ -5,7 +5,8 @@
 
 #include <Usagi/Platforms/Instructions/BitManipulations.hpp>
 #include <Usagi/Runtime/Allocators/Concepts/FixedSizeAllocator.hpp>
-#include <Usagi/Runtime/Errors/Errors.hpp>
+
+#include "AllocatorCommon.hpp"
 
 namespace usagi::runtime::allocators
 {
@@ -58,8 +59,8 @@ class BitmapAllocator
 
     using HeaderType = BitmapHeapHeader<Width>;
     using MaskType   = BitOps::ValueType;
-    static constexpr std::uint32_t BITS_PER_ELEMENT =
-        static_cast<std::uint32_t>(Width);
+
+    static constexpr std::uint32_t BITS_PER_ELEMENT = to_bits(Width);
 
     [[nodiscard]]
     HeaderType *header() noexcept
@@ -68,7 +69,8 @@ class BitmapAllocator
     }
 
 public:
-    static constexpr std::uint8_t SIGNATURE = 0b0001u;
+    static constexpr std::uint8_t SIGNATURE = allocator_signature(
+        AllocatorType::Bitmap, Width == OperandBitWidth::_64Bit);
 
     BitmapAllocator(
         storage::MemoryView memory, std::uint32_t block_size,
@@ -208,9 +210,7 @@ public:
     [[nodiscard]]
     void *resolve(const MemoryHandle handle) noexcept
     {
-        USAGI_CHECK_FATAL(
-            !handle.is_valid() || handle.signature == SIGNATURE,
-            "Invalid MemoryHandle signature");
+        validate_before_resolve(this, handle);
         return handle.resolve(mMemory);
     }
 

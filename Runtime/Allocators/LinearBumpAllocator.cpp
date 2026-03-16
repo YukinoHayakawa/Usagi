@@ -1,14 +1,13 @@
 #include "LinearBumpAllocator.hpp"
 
 #include <Usagi/Platforms/Instructions/BitManipulations.hpp>
-#include <Usagi/Runtime/Errors/Errors.hpp>
 
 namespace usagi::runtime::allocators
 {
 using namespace details;
 
 using BitOps = platforms::instructions::
-    DefaultBitManipulationInstructions<OperandBitWidth::_64>;
+    DefaultBitManipulationInstructions<OperandBitWidth::_64Bit>;
 
 LinearBumpAllocator::LinearBumpAllocator(
     storage::MemoryView memory, const bool force_format)
@@ -42,7 +41,7 @@ MemoryHandle LinearBumpAllocator::allocate(
     // increment isn't constant.
     std::uint64_t current =
         header()->current_offset.load(std::memory_order_relaxed);
-    const std::uint64_t alignment_bytes = storage::to_bytes(alignment);
+    const std::uint64_t alignment_bytes = to_bytes(alignment);
     std::uint64_t       aligned_offset;
     std::uint64_t       new_offset;
 
@@ -72,7 +71,7 @@ MemoryHandle LinearBumpAllocator::allocate(
         // MemoryView's sys implementation will handle actual OS allocation
         // granularity.
         constexpr std::uint64_t page_size =
-            storage::to_bytes(storage::StoragePageSize::Page_4KB);
+            to_bytes(storage::StoragePageSize::_4KiB);
 
         if(const std::uint64_t desired_commit =
                 BitOps::align_up_pow2(new_offset, page_size);
@@ -96,7 +95,7 @@ MemoryHandle LinearBumpAllocator::allocate(
         // and check again.
     }
 
-    return { SIGNATURE, aligned_offset };
+    return { SIGNATURE, aligned_offset, size };
 }
 
 void LinearBumpAllocator::deallocate([[maybe_unused]] MemoryHandle handle)
@@ -114,7 +113,7 @@ void LinearBumpAllocator::reset()
     // frequent OS faults, but shrink anything beyond that to prevent memory
     // bloat after spike frames.
     constexpr std::uint64_t warm_size =
-        storage::to_bytes(storage::StoragePageSize::Page_16MB);
+        to_bytes(storage::StoragePageSize::_16MiB);
     const std::uint64_t current_committed =
         header()->committed_offset.load(std::memory_order_acquire);
 
@@ -146,11 +145,7 @@ std::uint64_t LinearBumpAllocator::active_bytes() const noexcept
 
 void *LinearBumpAllocator::resolve(const MemoryHandle handle) noexcept
 {
-    // todo: duplicated code
-    USAGI_CHECK_THROW(
-        LogicException,
-        !handle.is_valid() || handle.signature == SIGNATURE,
-        "memory handle not allocator by this kind of allocator");
+    validate_before_resolve(this, handle);
     return handle.resolve(mMemory);
 }
 } // namespace usagi::runtime::allocators
