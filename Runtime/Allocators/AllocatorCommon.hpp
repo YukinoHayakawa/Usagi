@@ -34,7 +34,7 @@ struct usagi::EnableBitMaskOperators<usagi::runtime::allocators::AllocatorType>
 
 namespace usagi::runtime::allocators
 {
-consteval std::uint8_t allocator_signature(
+constexpr std::uint8_t allocator_signature(
     const AllocatorType base_type, const bool is_64_bit = false)
 {
     if(is_64_bit)

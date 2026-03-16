@@ -38,11 +38,35 @@ struct IsBitWidthEnum<OperandBitWidth> : std::true_type
 {
 };
 
+/**
+ * \brief Determines the maximum bit width of a primitive integral type
+ * available natively on the compiling platform.
+ *
+ * Shio:
+ * This explicitly supports compiler extensions for 128-bit integers
+ * (`__int128_t` or `_BitInt(128)`), decoupling the concept of "largest
+ * primitive" from the standard `std::uintmax_t` (which is often locked
+ * to 64 bits to preserve ABI compatibility) and from `sizeof(void*)`
+ * (which restricts 32-bit platforms from using 64-bit primitives).
+ */
+consteval OperandBitWidth max_integer_bit_width() noexcept
+{
+#if defined(__SIZEOF_INT128__) ||       \
+    (defined(__clang__) &&              \
+        defined(__BITINT_MAXWIDTH__) && \
+        __BITINT_MAXWIDTH__ >= 128)
+    return OperandBitWidth::_128Bit;
+#else
+    return static_cast<OperandBitWidth>(sizeof(std::uintmax_t) * 8);
+#endif
+}
+
 namespace details::static_tests
 {
 /* Shio: Verifying specialized alignment and operands */
 static_assert(to_bits(OperandBitWidth::_128Bit) == 128);
 // always test the fucking boundary!
 static_assert(to_bits(OperandBitWidth::_512Bit) == 512);
+static_assert(to_bits(max_integer_bit_width()) >= 64);
 } // namespace details::static_tests
 } // namespace usagi

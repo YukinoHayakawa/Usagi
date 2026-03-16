@@ -23,15 +23,6 @@ struct MemoryHandle
     // I kinda want to pack more info here to note the object type, etc.
     std::uint64_t size           = 0;
 
-    constexpr MemoryHandle() noexcept = default;
-
-    constexpr MemoryHandle(
-        const std::uint64_t sig, const std::uint64_t off,
-        const std::uint64_t sz) noexcept
-        : signature(sig), offset(off), size(sz)
-    {
-    }
-
     [[nodiscard]]
     constexpr bool is_valid() const noexcept
     {

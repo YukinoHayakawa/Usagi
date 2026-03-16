@@ -87,6 +87,8 @@ enum class BitWidth : std::uint8_t
 constexpr std::uint8_t num_byte_bits =
     std::numeric_limits<unsigned char>::digits;
 static_assert(num_byte_bits == 8);
+constexpr std::uint8_t bit_rshift_bits_to_byte = 3;
+static_assert((num_byte_bits >> bit_rshift_bits_to_byte) == 1);
 
 /**
  * Shio: Primary template for identifying bit-width enums.

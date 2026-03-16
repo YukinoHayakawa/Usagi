@@ -195,7 +195,8 @@ struct PlatformTraits
     [[nodiscard]]
     static consteval bool is_static_analysis() noexcept
     {
-#if defined(__RESHARPER__) || defined(__INTELLISENSE__) || \
+#if defined(__RESHARPER__) ||    \
+    defined(__INTELLISENSE__) || \
     defined(__clang_analyzer__)
         return true;
 #else
@@ -286,7 +287,8 @@ struct PlatformTraits
     [[nodiscard]]
     static consteval bool has_sse() noexcept
     {
-#if defined(__SSE__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 1) || \
+#if defined(__SSE__) ||                         \
+    (defined(_M_IX86_FP) && _M_IX86_FP >= 1) || \
     defined(_M_X64)
         return true;
 #else
@@ -302,7 +304,8 @@ struct PlatformTraits
     [[nodiscard]]
     static consteval bool has_sse2() noexcept
     {
-#if defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || \
+#if defined(__SSE2__) ||                        \
+    (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || \
     defined(_M_X64)
         return true;
 #else
@@ -525,8 +528,8 @@ namespace details::static_tests
 // architectures.
 consteval bool check_cache_line_size()
 {
-    if constexpr(has_any_of(
-                     PlatformTraits::architecture(), Architecture::Bit64))
+    if constexpr(
+        has_any_of(PlatformTraits::architecture(), Architecture::Bit64))
     {
         // 64 bytes is the standard L1 cache line size for typical x86_64 and
         // ARM64 CPUs. Some specialized server chips (like Intel Xeon/PowerPC)
@@ -540,7 +543,8 @@ consteval bool check_cache_line_size()
     }
 }
 
-static_assert(check_cache_line_size(),
+static_assert(
+    check_cache_line_size(),
     "Cache line size unexpectedly small for target architecture.");
 } // namespace details::static_tests
 

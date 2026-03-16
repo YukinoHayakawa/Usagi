@@ -1,165 +1,172 @@
 #include "BitmapAllocator.hpp"
 
-#include <utility>
-
-#include <Usagi/Runtime/Errors/Exceptions.hpp>
-
-// Include BMI1 intrinsics
-#ifdef _MSC_VER
-    #include <intrin.h>
-#else
-    #include <x86intrin.h>
-#endif
+#include <Usagi/Library/Utilities/Bits.hpp>
 
 namespace usagi::runtime::allocators
 {
-BitmapAllocator::BitmapAllocator(MemoryView memory,
-    const std::uint32_t                     block_size,
-    const storage::StorageAlignment         alignment,
-    const std::uint32_t                     max_blocks,
-    const bool                              force_format)
-    : mMemory(std::move(memory))
+using namespace details;
+
+BitmapAllocatorBase::BitmapAllocatorBase(
+    storage::MemoryView memory, const std::uint32_t bits_per_element) noexcept
+    : mMemory(std::move(memory)), mBitsPerElement(bits_per_element)
 {
-    const std::uint64_t alignment_bytes = storage::to_bytes(alignment);
-    USAGI_ASSERT_THROW(block_size > 0 && block_size % alignment_bytes == 0,
-        std::invalid_argument("block_size must be a multiple of alignment"));
+}
 
-    // Calculate the exact size needed for the bitmask
-    const std::uint32_t mask_elements = (max_blocks + 63) / 64;
-    const std::size_t   header_bytes =
-        sizeof(BitmapHeapHeader) + (mask_elements * sizeof(std::uint64_t));
+void BitmapAllocatorBase::initialize(
+    const std::uint32_t block_size, const storage::StorageAlignment alignment,
+    const std::uint32_t max_blocks, const bool force_format)
+{
+    const std::uint64_t alignment_bytes = to_bytes(alignment);
 
-    // The header itself consumes some number of blocks at the start of the
-    // memory
-    const std::uint32_t header_blocks = static_cast<std::uint32_t>(
-        (header_bytes + block_size - 1) / block_size);
+    USAGI_CHECK_THROW(
+        LogicException,
+        block_size > 0 && block_size % alignment_bytes == 0,
+        "block_size must be a multiple of alignment");
+
+    BitmapHeapHeaderBase dummy_header;
+
+    dummy_header.bit_width  = mBitsPerElement;
+    dummy_header.max_blocks = max_blocks;
+
+    const std::uint32_t mask_elements = dummy_header.num_mask_elements();
+    const std::size_t   header_bytes  = dummy_header.num_header_bytes();
+
+    const std::size_t header_blocks =
+        (header_bytes + block_size - 1) / block_size;
     const std::size_t total_bytes =
         static_cast<std::size_t>(max_blocks) * block_size;
 
-    // We must ensure the view has enough space reserved
-    USAGI_ASSERT_THROW(mMemory.max_size() >= total_bytes,
-        std::invalid_argument(
-            "MemoryView is too small for requested capacity."));
+    USAGI_CHECK_THROW(
+        LogicException,
+        mMemory.max_size() >= total_bytes,
+        "MemoryView is too small for requested capacity.");
 
-    // Commit enough pages for the header immediately
-    mMemory.commit(0, header_blocks * block_size);
+    mMemory.commit(
+        0, header_blocks * block_size, storage::CommitStrategy::Bypass);
 
-    // If formatting is forced (e.g. fresh volatile RAM) or the magic number
-    // doesn't match (e.g. newly created memory-mapped file), we initialize the
-    // header.
-    if(force_format || header()->magic != BitmapHeapHeader::EXPECTED_MAGIC)
+    auto *h = mMemory.cast_view<BitmapHeapHeaderBase>();
+
+    const std::uint64_t expected_magic_val =
+        BitmapHeapHeaderBase::EXPECTED_MAGIC ^ mBitsPerElement;
+
+    if(force_format || h->magic != expected_magic_val)
     {
-        header()->magic            = BitmapHeapHeader::EXPECTED_MAGIC;
-        header()->block_size       = block_size;
-        header()->block_alignment  = std::to_underlying(alignment);
-        header()->max_blocks       = max_blocks;
-        header()->first_data_block = header_blocks;
-        header()->active_blocks    = 0;
+        h->magic            = expected_magic_val;
+        h->bit_width        = mBitsPerElement;
+        h->block_size       = block_size;
+        h->block_alignment  = std::to_underlying(alignment);
+        h->max_blocks       = max_blocks;
+        h->first_data_block = static_cast<std::uint32_t>(header_blocks);
+        h->active_blocks    = 0;
 
-        // Initialize all bits to 1 (Free)
-        std::memset(
-            header()->free_mask, 0xFF, mask_elements * sizeof(std::uint64_t));
+        h->act([](auto *h_typed) {
+            std::memset(
+                h_typed->free_masks, 0xFF, h_typed->num_free_mask_bytes());
+        });
 
-        // Mark the blocks consumed by the header itself as Used (0)
         for(std::uint32_t i = 0; i < header_blocks; ++i)
         {
-            const std::uint32_t elem_idx = i / 64;
-            const std::uint32_t bit_idx  = i % 64;
-            header()->free_mask[elem_idx] &= ~(1ULL << bit_idx);
+            const std::uint32_t elem_idx = i / mBitsPerElement;
+            const std::uint32_t bit_idx  = i % mBitsPerElement;
+            // todo: profile whether it's better to enclose the whole for loop
+            h->act([=](auto *h_typed) {
+                bits::clear_bit(h_typed->free_masks[elem_idx], bit_idx);
+            });
         }
 
-        // Mask out the excess bits in the very last uint64_t element to
-        // prevent out-of-bounds allocation
-        if(const std::uint32_t excess_bits = (mask_elements * 64) - max_blocks;
+        if(const std::uint32_t excess_bits =
+                (mask_elements * mBitsPerElement) - max_blocks;
             excess_bits > 0)
         {
-            const std::uint64_t valid_mask = (1ULL << (64 - excess_bits)) - 1;
-            header()->free_mask[mask_elements - 1] &= valid_mask;
+            // todo: profile whether it's better to enclose the whole for loop
+            h->act([&](auto *h_typed) {
+                using MaskType =
+                    std::remove_reference_t<decltype(h_typed->free_masks[0])>;
+                const auto valid_mask = bits::create_mask_with_excess<MaskType>(
+                    h->bit_width, excess_bits);
+                bits::bit_and(
+                    h_typed->free_masks[mask_elements - 1], valid_mask);
+            });
         }
     }
     else
     {
-        // We loaded an existing valid header. Verify it matches our code's
-        // expectations.
-        USAGI_ASSERT_THROW(header()->block_size == block_size,
-            std::runtime_error(
-                "Block size mismatch in persistent/mapped memory"));
-        USAGI_ASSERT_THROW(
-            header()->block_alignment == std::to_underlying(alignment),
-            std::runtime_error(
-                "Block alignment mismatch in persistent/mapped memory"));
-        USAGI_ASSERT_THROW(header()->max_blocks <= max_blocks,
-            std::runtime_error("Mapped memory has more blocks than requested"));
+        USAGI_CHECK_THROW(
+            BrokenInvariantException,
+            h->bit_width == mBitsPerElement,
+            "Bit width mismatch in persistent/mapped memory");
+        USAGI_CHECK_THROW(
+            BrokenInvariantException,
+            h->block_size == block_size,
+            "Block size mismatch in persistent/mapped memory");
+        USAGI_CHECK_THROW(
+            BrokenInvariantException,
+            h->block_alignment == std::to_underlying(alignment),
+            "Block alignment mismatch in persistent/mapped memory");
+        USAGI_CHECK_THROW(
+            BrokenInvariantException,
+            h->max_blocks <= max_blocks,
+            "Mapped memory has more blocks than requested");
     }
 }
 
-MemoryHandle BitmapAllocator::allocate()
+MemoryHandle BitmapAllocatorBase::allocate_impl(const std::uint8_t signature)
 {
-    const std::uint32_t mask_elements = (header()->max_blocks + 63) / 64;
+    auto *h = mMemory.cast_view<BitmapHeapHeaderBase>();
 
-    // Fast SIMD scan for the first free block
-    for(std::uint32_t i = 0; i < mask_elements; ++i)
-    {
-        if(const std::uint64_t mask = header()->free_mask[i]; mask != 0)
+    const std::uint32_t mask_elements = h->num_mask_elements();
+    const std::uint32_t block_id = h->act([&](auto *h_typed) -> std::uint32_t {
+        for(std::uint32_t i = 0; i < mask_elements; ++i)
         {
-            // Find index of lowest set bit (first free block) using BMI1
-            // instruction
-            const std::uint32_t bit_idx =
-                static_cast<std::uint32_t>(_tzcnt_u64(mask));
-
-            // Clear the bit (mark as used) using BMI1 blsr instruction.
-            // This is mathematically equivalent to `mask & (mask - 1)` but
-            // executes in 1 cycle.
-            header()->free_mask[i] = _blsr_u64(mask);
-            header()->active_blocks++;
-
-            const std::uint32_t block_id = (i * 64) + bit_idx;
-            const std::uint64_t offset =
-                static_cast<std::uint64_t>(block_id) * header()->block_size;
-
-            return { SIGNATURE, offset };
+            if(h_typed->free_masks[i] != 0)
+            {
+                const std::uint32_t bit_idx =
+                    bits::pop_lowest_set_bit(h_typed->free_masks[i]);
+                return (i * mBitsPerElement) + bit_idx;
+            }
         }
-    }
+        return static_cast<std::uint32_t>(-1);
+    });
 
-    USAGI_ASSERT_THROW(false, std::bad_alloc()); // Out of memory blocks
+    USAGI_CHECK_THROW(
+        OutOfMemoryException,
+        block_id != static_cast<std::uint32_t>(-1),
+        "Out of memory blocks in BitmapAllocator");
+
+    ++h->active_blocks;
+
+    const std::uint64_t offset =
+        static_cast<std::uint64_t>(block_id) * h->block_size;
+
+    return { signature, offset, h->block_size };
 }
 
-void BitmapAllocator::deallocate(const MemoryHandle handle)
+void BitmapAllocatorBase::deallocate_impl(
+    const MemoryHandle handle, const std::uint8_t signature)
 {
     if(!handle.is_valid()) return;
 
-    USAGI_ASSERT_THROW(handle.signature == SIGNATURE,
-        std::invalid_argument(
-            "Invalid MemoryHandle signature for BitmapAllocator"));
+    USAGI_CHECK_THROW(
+        LogicException,
+        handle.signature == signature,
+        "Invalid MemoryHandle signature for BitmapAllocator");
+
+    auto *h = mMemory.cast_view<BitmapHeapHeaderBase>();
 
     const std::uint32_t block_id =
-        static_cast<std::uint32_t>(handle.offset / header()->block_size);
+        h->block_id_from_offset(static_cast<std::uint32_t>(handle.offset));
 
-    USAGI_ASSERT_THROW(block_id >= header()->first_data_block &&
-            block_id < header()->max_blocks,
-        std::out_of_range("Invalid block ID (Handle offset out of bounds)"));
+    USAGI_CHECK_THROW(
+        LogicException,
+        block_id >= h->first_data_block && block_id < h->max_blocks,
+        "Invalid block ID (Handle offset out of bounds)");
 
-    const std::uint32_t i       = block_id / 64;
-    const std::uint32_t bit_idx = block_id % 64;
+    const std::uint32_t i       = block_id / mBitsPerElement;
+    const std::uint32_t bit_idx = block_id % mBitsPerElement;
 
-    // Mark the bit as 1 (Free)
-    header()->free_mask[i] |= (1ULL << bit_idx);
-    header()->active_blocks--;
-}
+    h->act(
+        [&](auto *h_typed) { bits::set_bit(h_typed->free_masks[i], bit_idx); });
 
-void *BitmapAllocator::resolve(const MemoryHandle handle) const noexcept
-{
-    assert(!handle.is_valid() || handle.signature == SIGNATURE);
-    return handle.resolve(mMemory);
-}
-
-std::uint64_t BitmapAllocator::block_size() const noexcept
-{
-    return header()->block_size;
-}
-
-storage::StorageAlignment BitmapAllocator::alignment() const noexcept
-{
-    return static_cast<storage::StorageAlignment>(header()->block_alignment);
+    --h->active_blocks;
 }
 } // namespace usagi::runtime::allocators
