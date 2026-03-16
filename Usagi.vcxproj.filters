@@ -15,475 +15,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Library\Memory\PoolAllocator.hpp">
+    <ClInclude Include=".legacy\Library\Memory\Alignment.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\TypeContainers\TypeTag.hpp">
+    <ClInclude Include=".legacy\Library\Memory\Noncopyable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\ErrorHandling.hpp">
+    <ClInclude Include=".legacy\Library\Memory\Nonmovable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Memory\Alignment.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Service\Service.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Platform\Memory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Files\RegularFile.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Platform\File.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\View.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\CompileTimeError.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\Archetype.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Database\Component.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\System.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Executor\TaskGraph.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Containers\Queue.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Containers\Stack.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\TopologicalSort.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\ComponentAccess.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\ComponentAccessAllowAll.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\ComponentAccessReadOnly.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\ComponentAccessSystemAttribute.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\ComponentFilter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\EntityDatabaseAccessExternal.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\EntityDatabaseAccessInternal.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\EntityDatabaseViewFiltered.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\EntityDatabaseViewUnfiltered.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\EntityId.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\EntityIterator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\EntityIteratorFiltered.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\EntityPage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\EntityPageIterator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\EntityPageViewFiltered.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\EntityView.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Tuple.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Executor\detail\CpgValidation.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Executor\detail\SystemAccessTraits.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Concepts\Container\Stack.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Concepts\Allocator\ReallocatableAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Concepts\Type\Rebindable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\AdjacencyList.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\IsCyclic.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\TransitiveReduce.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\AdjacencyMatrixFixed.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\ExtractPath.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\FindPath.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Algorithm\Max.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\Degree.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Concepts\Type\Range.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\Level.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\TopologicalSortLexical.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\Graph.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\detail\GraphTraitDynamicSize.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\detail\GraphTraitFixedSize.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\detail\GraphTrait.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\detail\GraphTraitConnectivity.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Container\BinaryHeap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Op.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\Traversal.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Algorithm\Pairwise.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\ComponentReflection.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Files\MappedFileView.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\IO\Unicode.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\TypedAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\VmAllocatorFileBacked.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\VmAllocatorPagefileBacked.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Concepts\Memory\PoolableComponent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Container\DynamicArray.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\PagedStorage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\ParameterPack\Concatenate.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\TypeContainers\TypeSet.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\ParameterPack\Deduplicate.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Template.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\EntityDatabase.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Sampling\ReservoirSampler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Sampling\NBestSampler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Exceptions\ExceptionHeaderCorruption.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Math\Quadratic.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Container\FixedCapacityString.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Memory\Noncopyable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\EnumTranslation.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\String.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\BitMask.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\Pointer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Algorithm\Container.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Service\SimplePlatformService.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Service\LazyInitService.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Service\SimpleCacheService.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Memory\Nonmovable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Task\Task.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Task\TaskExecutor.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Service\SimpleService.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\Variant.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\RefCount.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Files\FilesystemWatcher.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Graph\HeterogeneousGraph.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Memory\MemoryArena.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Memory\Size.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Encoding\Unicode.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\ReturnValue.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Concepts\Type\Types.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\ByteView.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\ArgumentStorage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\Functional.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\TransparentlyComparable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\NamedArgument.hpp">
+    <ClInclude Include=".legacy\Library\Memory\Size.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\StringLiteral.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Service\ServiceAccess.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Allocators\BitmapAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Allocators\CircularAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Memory\Arithmetic.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\MaybeOwnedString.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\StructuredStorage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\ComponentQueryFilter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\ParameterPack\CollectInnerLists.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\TypeContainers\TypeList.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\Utilities.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\detail\Declarations.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include=".stash\ComponentAccess.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\Systems\SystemComponentAccessDeduction.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Database\Components\ComponentAccessLevel.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Database\Components\ComponentAccessDeduction.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Database\Components\ComponentQueryArgument.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Database\Components\ComponentPresence.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\Tuple.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Database\Components\ComponentMemoryAccessType.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include=".stash\ComponentList.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\Entities\Queries\EntityQuery.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Utilities\Types.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\ParameterPack\Deduplicate2.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Types\Deduplicate.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Types\List\TypeList.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Types\List\Concatenate.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Types\Functional.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Strings\Misc.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\Components\ComponentList.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Concepts\Functional.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Functional.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Types\TypeTag.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="v2\Database\Entities\EntityInsertionPolicies.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="v2\Database\Entities\EntityId.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="v2\Database\Entities\PagedAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Allocators\AbstractAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Files\concepts.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Std\spanstream.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Values\MaybeError.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Exceptions\Exceptions.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Backends\MemoryMappedStorage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Backends\MemoryMappingResult.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Backends\PersistableStorage.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Memory\Backends\PersistableStorageType.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Backends\PersistableStorageTypes.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Objects\WeakSingleton.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Platform\FileError.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Platform\FileErrorCodes.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Platform\MemoryError.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Platform\MemoryErrorCodes.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Platform\PermissionErrorCodes.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\Platform\SecurityError.hpp">
@@ -492,166 +45,10 @@
     <ClInclude Include="Runtime\Platform\SecurityErrorCodes.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\RAII\RawHandleResource.hpp">
+    <ClInclude Include="Library\Meta\Reflection.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\RAII\ScopeExitGuard.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\RAII\UnmanagedResource.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Services\ServiceProvider.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Services\ServiceProviderErrorCodes.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Enums.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Values.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Values\Optional.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\RAII\Exceptions.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\StaticReflection.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Functional\Callables.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Templates\Currying.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Classes\Transform.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Callables.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Classes_.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Functions\Closures.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Flags.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Members.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Traits_.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Self.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Types\Traits.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Values\Constness.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\RAII\ResourceErrorCodes.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Services\Exceptions.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Services\SimpleServiceProvider.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\details\UnaryPredicates.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\details\PredicateEvaluation.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\details\Predicates.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Serialization\ErrorCodes.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Safety\MemorySafety.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Safety\MemoryAccessErrorCodes.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Strings\VariadicFormat.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Classes.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Safety\MagicNumberMixin.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Services\Services.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Utilities\MakeStatics.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Memory\Construction.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Values\References.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Values\Nothing.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Traits.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Functions\Operators.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Functions\Overloads.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Templates\SFINAE.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\ReflectionLists.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Memory\Casting.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Container\BinaryHeap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Services\ServiceRequirementCollector.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Injection\ServiceProviderCallingTable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Types\Polymorphism\ProxyCallTable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manifold\Components\Component.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Packs\Expansion.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Functions\Functions.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Splicing.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Containers\FixedString.hpp">
+    <ClInclude Include="Library\Types\Casting.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\Reflection\Types\Fundamental.hpp">
@@ -660,13 +57,7 @@
     <ClInclude Include="Library\Meta\Reflection\Types\TypeLists.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Algorithms\Ranges.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Constexpr\IntegralConstant.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Values\Constexpr.hpp">
+    <ClInclude Include="Library\Meta\Values\IntegralConstant.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Library\Meta\Reflection\Types\Types.hpp">
@@ -675,138 +66,240 @@
     <ClInclude Include="Library\Meta\Reflection\Concepts.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Functions\Invoke.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Functions\Templates.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\Reflection\Functions\Parameters.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Invocations\CallTable_.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Invocations\OpaqueCallTable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\ThunkGen\ThunkGen.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Meta\ThunkGen\ThunkGenTraits.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Allocators\MemoryHandle.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Allocators\OffsetBuddyAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Allocators\OffsetPageAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Allocators\OffsetTLSFAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Memory\Allocators\StagingBumpAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manifold\EntityDatabase.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manifold\Scheduler\DependencyGraphAnalyzer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manifold\Scheduler\PipelinedExecutionHost.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manifold\Staging\CommandMerger.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manifold\Staging\EntityCommandList.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manifold\Systems\SystemTraits.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manifold\ComponentGroup.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manifold\ComponentGroupLayout.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manifold\Systems\System.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Manifold\Entities\EntityId.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Memory\Containers\VirtualArray.hpp">
+    <ClInclude Include="Runtime\Storage\Views\MemoryView.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\Meta\Platforms\TypeTraits.hpp">
+    <ClInclude Include="Runtime\Storage\Backends\StorageBackend.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Storage\Traits\StorageEnums.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Storage\Traits\StorageTraits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Storage\Backends\Files.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Storage\Backends\RegularFileBackend.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Storage\Backends\PagefileBackend.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platforms\Traits\StorageTraitsProvider.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Enums\Bitwise.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Storage\Traits\CommonStorages.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Objects\Noncopyable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Objects\Nonmovable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\TypeTraits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platforms\Syscalls\VirtualMemory.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platforms\Syscalls\Files.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Containers\PackedIntEnumPair.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Storage\Backends\MemoryFunctionTable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\BitmapAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\BuddyAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\LinearBumpAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\MemoryHandle.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\TLSFAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\Concepts\HandleAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\Concepts\FixedSizeAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\Concepts\ReallocatableAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\Concepts\VariableSizeAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\Concepts\WaitFreeAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Errors\Errors.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Storage\Views\CommitStrategy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Storage\Views\VirtualPageManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platforms\Syscalls\VirtualMemoryError.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Utilities\Span.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Errors\RuntimeErrorCodes.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Errors\RuntimeErrorHandler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Storage\Views\PageCommitStrategies.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Functional\InplaceFunction.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Reflection\Templates.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Utilities\Size.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Functional\FunctionTraits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Errors\Exceptions.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platforms\Instructions\BitManipulations.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Execution\ProtectedExecution.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Values\Operands.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Orchestrator\EngineOrchestrator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platforms\PlatformTraits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Errors\ErrorContext.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Types\Fundamentals.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platforms\Platforms.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platforms\Runtime\Execution.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Types\Integrals.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Meta\Types\TypeList.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\HiveAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Manifold\Components\ComponentGroup.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Manifold\Database\EntityDatabase.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Manifold\Manifests\DataAccessFlags.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Executive\EntityQueryCompiler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Executive\TaskGraphExecutionHost.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Constants\BitWidth.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Values\Strings.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Allocators\AllocatorCommon.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Utilities\Bits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Values\ValueList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Runtime\Files\RegularFile.cpp">
+    <ClCompile Include="Runtime\Storage\Traits\CommonStorages.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Files\MappedFileView.cpp">
+    <ClCompile Include="Runtime\Storage\Backends\RegularFileBackend.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Encoding\Unicode.cpp">
+    <ClCompile Include="Runtime\Storage\Backends\PagefileBackend.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Task\TaskExecutor.cpp">
+    <ClCompile Include="Runtime\Storage\Views\MemoryView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Memory\Allocators\BitmapAllocator.cpp">
+    <ClCompile Include="Runtime\Storage\Backends\MemoryFunctionTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Memory\Allocators\CircularAllocator.cpp">
+    <ClCompile Include="Runtime\Allocators\BuddyAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Library\Utilities\MaybeOwnedString.cpp">
+    <ClCompile Include="Runtime\Allocators\LinearBumpAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Library\test.cpp">
+    <ClCompile Include="Runtime\Allocators\TLSFAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Services\SimpleServiceProvider.cpp">
+    <ClCompile Include="Runtime\Storage\Views\VirtualPageManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Memory\Safety\MemorySafety.cpp">
+    <ClCompile Include="Runtime\Errors\RuntimeErrorHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Strings\VariadicFormat.cpp">
+    <ClCompile Include="Runtime\Orchestrator\EngineOrchestrator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Library\Meta\Reflection\StaticTests.cpp">
+    <ClCompile Include="Runtime\Errors\Exceptions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Services\ServiceRequirementCollector.cpp">
+    <ClCompile Include="Runtime\Storage\Views\PageCommitStrategies.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Injection\ServiceProviderCallingTable.cpp">
+    <ClCompile Include="Runtime\Allocators\HiveAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Library\Types\Polymorphism\ProxyCallTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\Invocations\CallTable_.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\Invocations\OpaqueCallTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\Memory\VmAllocatorFileBacked.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\Memory\VmAllocatorPagefileBacked.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Library\Memory\tests.cpp">
+    <ClCompile Include="Runtime\Allocators\BitmapAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
