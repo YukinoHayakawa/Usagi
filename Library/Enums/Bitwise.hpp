@@ -258,11 +258,11 @@ namespace details::static_tests
 {
 // Shio: Test enum used to validate bitwise operations in compile-time tests.
 /**
- * TestEnum:
+ * Bitwise_TestEnum:
  * - None: no flags set.
  * - A/B/C: individual bit flags.
  */
-enum class TestEnum : std::uint8_t
+enum class Bitwise_TestEnum : std::uint8_t
 {
     None = 0,
     A    = 1 << 0,
@@ -272,10 +272,10 @@ enum class TestEnum : std::uint8_t
 
 // Shio: Non-mask enum used to verify the BitMaskEnum concept rejects it.
 /**
- * NonMaskEnum:
+ * Bitwise_NonMaskEnum:
  * Simple enumerators that are not intended to be used as bitmasks.
  */
-enum class NonMaskEnum : std::uint8_t
+enum class Bitwise_NonMaskEnum : std::uint8_t
 {
     A = 1,
     B = 2,
@@ -283,61 +283,79 @@ enum class NonMaskEnum : std::uint8_t
 } // namespace details::static_tests
 } // namespace usagi
 
-// Shio: Enable bitmask operators for TestEnum for static tests.
+// Shio: Enable bitmask operators for Bitwise_TestEnum for static tests.
 /**
- * Specialization enabling bitwise operators for TestEnum. This mirrors how a
- * user would opt-in for their own enum types.
+ * Specialization enabling bitwise operators for Bitwise_TestEnum. This mirrors
+ * how a user would opt-in for their own enum types.
  */
 template <>
-struct usagi::EnableBitMaskOperators<usagi::details::static_tests::TestEnum>
+struct usagi::
+    EnableBitMaskOperators<usagi::details::static_tests::Bitwise_TestEnum>
     : std::true_type
 {
 };
 
 namespace usagi::details::static_tests
 {
-// Shio: Verify that TestEnum satisfies BitMaskEnum.
-static_assert(BitMaskEnum<TestEnum>);
+// Shio: Verify that Bitwise_TestEnum satisfies BitMaskEnum.
+static_assert(BitMaskEnum<Bitwise_TestEnum>);
 
-// Shio: Verify that NonMaskEnum is not a BitMaskEnum.
-static_assert(!BitMaskEnum<NonMaskEnum>);
+// Shio: Verify that Bitwise_NonMaskEnum is not a BitMaskEnum.
+static_assert(!BitMaskEnum<Bitwise_NonMaskEnum>);
 
 // Shio: Verify basic OR behavior: A | B == 3 (bits 0 and 1 set).
-static_assert((TestEnum::A | TestEnum::B) == static_cast<TestEnum>(3));
+static_assert(
+    (Bitwise_TestEnum::A | Bitwise_TestEnum::B) ==
+    static_cast<Bitwise_TestEnum>(3));
 
 // Shio: Verify AND of disjoint flags yields None.
-static_assert((TestEnum::A & TestEnum::B) == TestEnum::None);
+static_assert(
+    (Bitwise_TestEnum::A & Bitwise_TestEnum::B) == Bitwise_TestEnum::None);
 
 // Shio: Verify masking after OR recovers the original flag.
-static_assert(((TestEnum::A | TestEnum::B) & TestEnum::B) == TestEnum::B);
+static_assert(
+    ((Bitwise_TestEnum::A | Bitwise_TestEnum::B) & Bitwise_TestEnum::B) ==
+    Bitwise_TestEnum::B);
 
 // Shio: Verify XOR sets combined bits.
-static_assert((TestEnum::A ^ TestEnum::B) == static_cast<TestEnum>(3));
+static_assert(
+    (Bitwise_TestEnum::A ^ Bitwise_TestEnum::B) ==
+    static_cast<Bitwise_TestEnum>(3));
 
 // Shio: Verify XOR of identical flags yields None.
-static_assert((TestEnum::A ^ TestEnum::A) == TestEnum::None);
+static_assert(
+    (Bitwise_TestEnum::A ^ Bitwise_TestEnum::A) == Bitwise_TestEnum::None);
 
 // Shio: Test operator~ correctness: ~None should produce all-bits-set for the
 // underlying width.
-static_assert((~TestEnum::None) == static_cast<TestEnum>(~0u));
+static_assert((~Bitwise_TestEnum::None) == static_cast<Bitwise_TestEnum>(~0u));
 
 // Shio: Verify that masking with inverted flag clears that flag.
-static_assert((TestEnum::A & ~TestEnum::A) == TestEnum::None);
+static_assert(
+    (Bitwise_TestEnum::A & ~Bitwise_TestEnum::A) == Bitwise_TestEnum::None);
 
 // Shio: Test has_any_of and has_all_of utilities for present and absent flags.
-static_assert(has_any_of(TestEnum::A | TestEnum::B, TestEnum::A));
-static_assert(!has_any_of(TestEnum::A | TestEnum::B, TestEnum::C));
-static_assert(has_all_of(TestEnum::A | TestEnum::B, TestEnum::A | TestEnum::B));
 static_assert(
-    !has_all_of(TestEnum::A | TestEnum::B, TestEnum::A | TestEnum::C));
+    has_any_of(Bitwise_TestEnum::A | Bitwise_TestEnum::B, Bitwise_TestEnum::A));
+static_assert(!has_any_of(
+    Bitwise_TestEnum::A | Bitwise_TestEnum::B, Bitwise_TestEnum::C));
+static_assert(has_all_of(
+    Bitwise_TestEnum::A | Bitwise_TestEnum::B,
+    Bitwise_TestEnum::A | Bitwise_TestEnum::B));
+static_assert(!has_all_of(
+    Bitwise_TestEnum::A | Bitwise_TestEnum::B,
+    Bitwise_TestEnum::A | Bitwise_TestEnum::C));
 
 // Shio: Test without_flags, most_significant_flag, and num_flags
 static_assert(
-    without_flags(TestEnum::A | TestEnum::B, TestEnum::A) == TestEnum::B);
+    without_flags(
+        Bitwise_TestEnum::A | Bitwise_TestEnum::B, Bitwise_TestEnum::A) ==
+    Bitwise_TestEnum::B);
 static_assert(
-    most_significant_flag(TestEnum::A | TestEnum::B | TestEnum::C) ==
-    TestEnum::C);
-static_assert(num_flags(TestEnum::A | TestEnum::B) == 2);
+    most_significant_flag(
+        Bitwise_TestEnum::A | Bitwise_TestEnum::B | Bitwise_TestEnum::C) ==
+    Bitwise_TestEnum::C);
+static_assert(num_flags(Bitwise_TestEnum::A | Bitwise_TestEnum::B) == 2);
 
 // Shio: Validate compound assignment operators in a consteval function so the
 // checks run at compile-time.
@@ -348,15 +366,15 @@ static_assert(num_flags(TestEnum::A | TestEnum::B) == 2);
  */
 consteval bool test_compound_assignments()
 {
-    TestEnum val = TestEnum::A;
-    val |= TestEnum::B;
-    if(val != (TestEnum::A | TestEnum::B)) return false;
+    Bitwise_TestEnum val = Bitwise_TestEnum::A;
+    val |= Bitwise_TestEnum::B;
+    if(val != (Bitwise_TestEnum::A | Bitwise_TestEnum::B)) return false;
 
-    val &= TestEnum::B;
-    if(val != TestEnum::B) return false;
+    val &= Bitwise_TestEnum::B;
+    if(val != Bitwise_TestEnum::B) return false;
 
-    val ^= (TestEnum::B | TestEnum::C);
-    if(val != TestEnum::C) return false;
+    val ^= (Bitwise_TestEnum::B | Bitwise_TestEnum::C);
+    if(val != Bitwise_TestEnum::C) return false;
 
     return true;
 }
