@@ -2,8 +2,13 @@
 
 #include <algorithm>
 
+#include <Usagi/Platforms/Instructions/BitManipulations.hpp>
+
 namespace usagi::runtime::allocators
 {
+using Bmi32 = platforms::instructions::
+    DefaultBitManipulationInstructions<OperandBitWidth::_32Bit>;
+
 BuddyBlockHeader *BuddyAllocator::get_block(const std::uint32_t offset)
 {
     if(offset == 0) return nullptr;
@@ -77,12 +82,13 @@ BuddyAllocator::BuddyAllocator(
     if(force_format || header()->magic != BuddyHeapHeader::EXPECTED_MAGIC)
     {
         header()->magic      = BuddyHeapHeader::EXPECTED_MAGIC;
-        header()->min_order  = std::countr_zero(min_alloc_size);
-        header()->max_order  = std::countr_zero(total_size);
+        header()->min_order  = Bmi32::count_trailing_zeros(min_alloc_size);
+        header()->max_order  = Bmi32::count_trailing_zeros(total_size);
         header()->total_size = total_size;
 
         constexpr std::uint32_t header_size = sizeof(BuddyHeapHeader);
-        header()->payload_base_offset       = std::bit_ceil(header_size);
+        header()->payload_base_offset =
+            Bmi32::align_up_pow2(header_size, header_size);
 
         for(int i = 0; i < 32; ++i)
         {
@@ -94,9 +100,10 @@ BuddyAllocator::BuddyAllocator(
 
         while(remaining_size >= min_alloc_size)
         {
-            std::uint32_t max_align_order = std::countr_zero(current_offset);
+            std::uint32_t max_align_order =
+                Bmi32::count_trailing_zeros(current_offset);
             std::uint32_t max_size_order =
-                31 - std::countl_zero(remaining_size);
+                31 - Bmi32::count_leading_zeros(remaining_size);
 
             std::uint32_t order = std::min(max_align_order, max_size_order);
             order               = std::max(order, header()->min_order);
@@ -132,7 +139,7 @@ MemoryHandle BuddyAllocator::allocate(
 
     const std::uint32_t order = std::max(
         header()->min_order,
-        static_cast<std::uint32_t>(std::bit_width(required_size - 1)));
+        32 - Bmi32::count_leading_zeros(required_size - 1));
 
     if(order > header()->max_order)
         USAGI_CHECK_THROW(
@@ -181,8 +188,9 @@ MemoryHandle BuddyAllocator::allocate(
     // Calculate aligned payload
     const std::uint32_t base_payload_offset =
         offset + sizeof(BuddyBlockHeader) + sizeof(std::uint32_t);
-    std::uint32_t aligned_payload_offset =
-        (base_payload_offset + max_padding) & ~max_padding;
+
+    std::uint32_t aligned_payload_offset = Bmi32::align_up_pow2(
+        base_payload_offset, static_cast<std::uint32_t>(alignment_bytes));
 
     // Store the block offset immediately before the aligned payload
     *mMemory.cast_view<std::uint32_t>(

@@ -17,11 +17,22 @@ void TLSFAllocator::mapping_insert(
 {
     if(size < (1 << TLSF_SLI_LOG2))
     {
+        // Shio: Very small allocations fall into the 0th First-Level Index
+        // (FLI). The Second-Level Index (SLI) is simply mapped to the exact
+        // size bucket directly.
         fli = 0;
         sli = size;
     }
     else
     {
+        // Shio:
+        // 1. FLI conceptually matches the most significant set bit (MSB).
+        //    LZCNT finds the MSB position instantly.
+        // 2. SLI breaks down the remaining space between 2^(FLI) and 2^(FLI+1)
+        //    into a linear sequence of buckets defined by TLSF_SLI_LOG2.
+        //    We shift the size down so the logical subdivisions align to the
+        //    SLI scale, and strip off the implicit MSB using XOR to isolate the
+        //    fractional segment index.
         fli = 31 - BitOps::count_leading_zeros(size);
         sli = (size >> (fli - TLSF_SLI_LOG2)) ^ (1 << TLSF_SLI_LOG2);
     }
@@ -43,8 +54,8 @@ void TLSFAllocator::list_insert(const std::uint32_t offset)
     }
 
     header()->free_lists[fli][sli] = offset;
-    header()->fl_bitmap |= (1 << fli);
-    header()->sl_bitmap[fli] |= (1 << sli);
+    header()->set_fl_bit(fli);
+    header()->set_sl_bit(fli, sli);
 }
 
 void TLSFAllocator::list_remove(const std::uint32_t offset)
@@ -62,10 +73,10 @@ void TLSFAllocator::list_remove(const std::uint32_t offset)
         header()->free_lists[fli][sli] = block->next_free;
         if(header()->free_lists[fli][sli] == 0)
         {
-            header()->sl_bitmap[fli] &= ~(1 << sli);
+            header()->clear_sl_bit(fli, sli);
             if(header()->sl_bitmap[fli] == 0)
             {
-                header()->fl_bitmap &= ~(1 << fli);
+                header()->clear_fl_bit(fli);
             }
         }
     }
@@ -139,9 +150,12 @@ MemoryHandle TLSFAllocator::allocate(
     mapping_insert(required_size, fli, sli);
 
     // Filter SL bitmap to only consider slots >= sli
+    // We isolate the bits starting from our target `sli` to find a valid free
+    // bucket.
     std::uint32_t sl_map = header()->sl_bitmap[fli] & (~0u << sli);
     if(!sl_map)
     {
+        // No bucket available in the current FLI. Move to the next FLI class.
         // Filter FL bitmap to only consider classes > fli
         const std::uint32_t fl_map = header()->fl_bitmap & (~0u << (fli + 1));
         if(!fl_map)
@@ -156,6 +170,7 @@ MemoryHandle TLSFAllocator::allocate(
         sl_map = header()->sl_bitmap[fli];
     }
 
+    // Now that we found a valid FLI class, find the exact SLI bucket via TZCNT.
     sli = BitOps::count_trailing_zeros(sl_map);
 
     const std::uint32_t offset = header()->free_lists[fli][sli];

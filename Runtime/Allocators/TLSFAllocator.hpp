@@ -44,7 +44,8 @@ struct TLSFBlockHeader
     [[nodiscard]]
     bool is_free() const
     {
-        // Extract bit 0, length 1
+        // Shio: BEXTR expects (start | (length << 8)). We extract bit 0,
+        // length 1.
         return BitOps::bit_field_extract(size_and_flags, 0 | (1 << 8)) != 0;
     }
 
@@ -56,7 +57,8 @@ struct TLSFBlockHeader
     [[nodiscard]]
     bool is_prev_free() const
     {
-        // Extract bit 1, length 1
+        // Shio: BEXTR expects (start | (length << 8)). We extract bit 1,
+        // length 1.
         return BitOps::bit_field_extract(size_and_flags, 1 | (1 << 8)) != 0;
     }
 
@@ -68,12 +70,16 @@ struct TLSFBlockHeader
     [[nodiscard]]
     std::uint32_t size() const
     {
+        // Shio: Size is aligned to 4 bytes, so bits 0 and 1 are exactly our
+        // flags. align_down_pow2(..., 4) simply clears the bottom 2 bits.
         return BitOps::align_down_pow2(size_and_flags, 4);
     }
 
     void set_size(const std::uint32_t new_size)
     {
-        size_and_flags = new_size | (size_and_flags & 3);
+        // Shio: Preserve the flags (lowest 2 bits) while updating the size.
+        // bit_zone_clear(size_and_flags, 2) isolates the flags via BZHI.
+        size_and_flags = new_size | BitOps::bit_zone_clear(size_and_flags, 2);
     }
 };
 
@@ -98,6 +104,24 @@ struct TLSFHeapHeader
 
     // Offsets to the head of the free list for a given [FLI][SLI]
     std::uint32_t free_lists[TLSF_FLI_COUNT][TLSF_SLI_COUNT];
+
+    void set_fl_bit(const std::uint32_t fli) { fl_bitmap |= (1u << fli); }
+
+    void clear_fl_bit(const std::uint32_t fli)
+    {
+        // Shio: Clear specific bit using BZHI inversion or simple bitwise AND
+        fl_bitmap &= ~(1u << fli);
+    }
+
+    void set_sl_bit(const std::uint32_t fli, const std::uint32_t sli)
+    {
+        sl_bitmap[fli] |= (1u << sli);
+    }
+
+    void clear_sl_bit(const std::uint32_t fli, const std::uint32_t sli)
+    {
+        sl_bitmap[fli] &= ~(1u << sli);
+    }
 };
 } // namespace details
 
