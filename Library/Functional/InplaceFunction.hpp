@@ -35,9 +35,10 @@ template <
 class InplaceFunction<Ret(Args...), Alignment, Capacity> : Noncopyable
 {
 public:
-    static constexpr std::size_t BUFFER_CAPACITY = platforms::instructions::
-        DefaultBitManipulationInstructions<OperandBitWidth::_64>::align_up_pow2(
-            Capacity, Alignment);
+    static constexpr std::size_t BUFFER_CAPACITY =
+        platforms::instructions::DefaultBitManipulationInstructions<
+            OperandBitWidth::_64Bit
+        >::align_up_pow2(Capacity, Alignment);
 
 private:
     struct CallTable
