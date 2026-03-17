@@ -107,6 +107,7 @@ namespace usagi::runtime::storage
 enum class StorageLatencyFlags : std::uint8_t
 {
     None                = 0,
+    Unknown             = 0,
     HardwareThread      = 1 << 0, // Registers / L1 / L2 / L3 (~1-40ns)
     SystemFabric        = 1 << 1, // Main DDR RAM / CXL (~100ns)
     ExpressInterconnect = 1 << 2, // PCIe / NVLink / VRAM (~1-10us)
@@ -123,6 +124,7 @@ enum class StorageLatencyFlags : std::uint8_t
 enum class StorageDeviceFlags : std::uint16_t
 {
     None       = 0,
+    Unknown    = 0,
     Silicon    = 1 << 0,  // Solid-state (RAM / Optane / NAND)
     Magnetic   = 1 << 1,  // Spinning or Tape media (HDD / LTO)
     Optical    = 1 << 2,  // Laser-read media (CD / DVD / Blu-ray)
@@ -156,6 +158,7 @@ enum class StorageDeviceFlags : std::uint16_t
 enum class StorageAccessFlags : std::uint8_t
 {
     None            = 0,
+    Unknown         = 0,
     RandomAccess    = 1 << 0, // O(1) addressing (RAM/VRAM)
     SeekForward     = 1 << 1, // Can advance cursor (WebStream / Tape)
     SeekBackward    = 1 << 2, // Can reverse cursor (Tape / File)
