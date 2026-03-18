@@ -81,9 +81,13 @@ enum class RuntimeErrorCodes : std::uint32_t
     NotSupported       = StateError | _NEXT_OF(NoOp),
     UnreachableCode    = StateError | _NEXT_OF(NotSupported),
     UnexpectedCodePath = StateError | _NEXT_OF(UnreachableCode),
+    // Queued async action.
+    PendingAsyncAction = StateError | _NEXT_OF(UnexpectedCodePath),
+    // Async action being processed.
+    ActiveAsyncAction  = StateError | _NEXT_OF(PendingAsyncAction),
 
     // Memory & Resource
-    OutOfMemory           = ResourceError | _NEXT_OF(UnexpectedCodePath),
+    OutOfMemory           = ResourceError | _NEXT_OF(ActiveAsyncAction),
     AddressSpaceExhausted = ResourceError | _NEXT_OF(OutOfMemory),
     QuotaExceeded         = ResourceError | _NEXT_OF(AddressSpaceExhausted),
 
@@ -104,6 +108,8 @@ enum class RuntimeErrorCodes : std::uint32_t
     PathTooLong    = DeviceIOError | ParameterError | _NEXT_OF(FileNotFound),
     DiskFull       = DeviceIOError | ResourceError | _NEXT_OF(PathTooLong),
     DataCorruption = DataIntegrityError | DeviceIOError | _NEXT_OF(DiskFull),
+
+    NUM_ERROR_CODES = _NEXT_OF(DataCorruption),
 };
 // todo: bug -  it's weird that if I put `_NEXT_OF` inside RuntimeErrorCodes
 //   clang-format will add a trailing comma for it??
