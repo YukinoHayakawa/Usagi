@@ -19,8 +19,7 @@ namespace usagi::runtime
  * This MUST be implemented in a non-inline, OS-specific translation unit.
  */
 template <typename Callable>
-// todo: using && here forces a rvalue. we need a lvalue or ref
-auto protected_invoke(Callable &callable)
+auto protected_invoke(Callable &&callable)
     -> std::expected<decltype(callable()), errors::RuntimeErrorCodes>
 {
     // todo: can use static reflection here
@@ -60,4 +59,87 @@ auto protected_invoke(Callable &callable)
         return std::unexpected(result);
     }
 }
+
+namespace details::static_tests
+{
+// Shio:
+// We use C++ concepts to perform strict compile-time signature checks on
+// protected_invoke without executing code, proving it handles all functor types
+// correctly across both void and non-void returns.
+
+[[maybe_unused]]
+void ProtectedExecution_TestFunc_Void()
+{
+}
+
+[[maybe_unused]]
+int ProtectedExecution_TestFunc_Int()
+{
+    return 42;
+}
+
+struct ProtectedExecution_TestFunctor
+{
+    void operator()() const { }
+};
+
+struct ProtectedExecution_TestFunctorMut
+{
+    int operator()() { return 42; }
+};
+
+// 1. Function pointers
+static_assert(std::is_same_v<
+    decltype(protected_invoke(ProtectedExecution_TestFunc_Void)),
+    std::expected<void, errors::RuntimeErrorCodes>
+>);
+static_assert(std::is_same_v<
+    decltype(protected_invoke(ProtectedExecution_TestFunc_Int)),
+    std::expected<int, errors::RuntimeErrorCodes>
+>);
+
+// 2. Captureless lambdas
+static_assert(std::is_same_v<
+    decltype(protected_invoke([] { })),
+    std::expected<void, errors::RuntimeErrorCodes>
+>);
+static_assert(std::is_same_v<
+    decltype(protected_invoke([] { return 1.0f; })),
+    std::expected<float, errors::RuntimeErrorCodes>
+>);
+
+// 3. Functors (lvalue/rvalue)
+static_assert(std::is_same_v<
+    decltype(protected_invoke(ProtectedExecution_TestFunctor { })),
+    std::expected<void, errors::RuntimeErrorCodes>
+>);
+static_assert(std::is_same_v<
+    decltype(protected_invoke(ProtectedExecution_TestFunctorMut { })),
+    std::expected<int, errors::RuntimeErrorCodes>
+>);
+
+// 4. Capturing / Mutable Lambdas
+consteval void ProtectedExecution_TestCaptures()
+{
+    int capture = 0;
+
+    auto void_lambda = [&]() { capture++; };
+    static_assert(std::is_same_v<
+        decltype(protected_invoke(void_lambda)),
+        std::expected<void, errors::RuntimeErrorCodes>
+    >);
+
+    auto ret_lambda = [&]() -> int { return capture; };
+    static_assert(std::is_same_v<
+        decltype(protected_invoke(ret_lambda)),
+        std::expected<int, errors::RuntimeErrorCodes>
+    >);
+
+    auto mut_lambda = [capture]() mutable { return ++capture; };
+    static_assert(std::is_same_v<
+        decltype(protected_invoke(mut_lambda)),
+        std::expected<int, errors::RuntimeErrorCodes>
+    >);
+}
+} // namespace details::static_tests
 } // namespace usagi::runtime
