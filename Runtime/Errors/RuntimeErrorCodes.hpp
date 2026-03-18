@@ -35,6 +35,8 @@ enum class RuntimeErrorCodes : std::uint32_t
     DeviceIOError      = 1 << (4 + DomainShift),
     // Corruption or validation failures
     DataIntegrityError = 1 << (5 + DomainShift),
+    // Hardware exceptions
+    HardwareException  = 1 << (6 + DomainShift),
 
     // --- Severity & Threat Flags (Bits 24-31) ---
     // Represents *how dangerous* the error is. These flags are combinable.
