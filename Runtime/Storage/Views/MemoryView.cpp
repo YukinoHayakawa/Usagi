@@ -9,11 +9,8 @@ namespace usagi::runtime::storage
 {
 void MemoryView::reset() noexcept
 {
-    mBackendHandle = INVALID_FILE_HANDLE;
-    mMaxSizeAndMode.set_int(0);
-    mMaxSizeAndMode.set_enum(FileOpenMode::None);
-    mVirtualBase = nullptr;
-    mFuncTable   = nullptr;
+    // Overwrite all members.
+    new (this) MemoryView();
 }
 
 void MemoryView::check_view(
@@ -102,17 +99,30 @@ ExpectedRuntimeValue<MemoryView> MemoryView::create(
         vtable, handle, mode, size, map_result.value(), traits, page_manager);
 }
 
+void MemoryView::maybe_flush_unmap()
+{
+    if(!is_valid()) return;
+
+    // Shio:
+    // We never blindly flush the whole range of the view upon object
+    // destruction under any circumstance. Depending on the OS, flushing
+    // uncommitted pages can result in an error (e.g.
+    // STATUS_NOT_MAPPED_DATA). It is the responsibility of the
+    // VirtualPageManager (or higher-level logic) to selectively flush only
+    // committed pages if required.
+    if(has_any_of(mode(), FileOpenMode::Write))
+    {
+        // todo: let page manager handle flushing dirty pages?
+        flush(0, max_size());
+    }
+    // todo: maybe this should be done via page manager
+    mFuncTable->unmap_view(mVirtualBase, max_size());
+}
+
 MemoryView::~MemoryView()
 {
-    if(mVirtualBase)
-    {
-        if(has_any_of(mode(), FileOpenMode::Write))
-        {
-            flush(0, max_size());
-        }
-        mFuncTable->unmap_view(mVirtualBase, max_size());
-        reset();
-    }
+    maybe_flush_unmap();
+    reset();
 }
 
 MemoryView::MemoryView(MemoryView &&other) noexcept
@@ -130,19 +140,11 @@ MemoryView &MemoryView::operator=(MemoryView &&other) noexcept
 {
     if(this == &other) return *this;
 
-    // todo: what's the perf implication of flushing the whole view?
-    if(mVirtualBase)
-    {
-        if(has_any_of(mode(), FileOpenMode::Write))
-        {
-            flush(0, max_size());
-        }
-        mFuncTable->unmap_view(mVirtualBase, max_size());
-    }
+    maybe_flush_unmap();
 
     mBackendHandle  = other.mBackendHandle;
-    mMaxSizeAndMode = other.mMaxSizeAndMode;
     mVirtualBase    = other.mVirtualBase;
+    mMaxSizeAndMode = other.mMaxSizeAndMode;
     mFuncTable      = other.mFuncTable;
     mTraits         = other.mTraits;
     mPageManager    = other.mPageManager;
@@ -213,6 +215,7 @@ void MemoryView::decommit(
 void MemoryView::lock(const std::uint64_t offset, const std::size_t size)
 {
     check_view(offset, size);
+    // todo: notify page manager
     const auto result = mFuncTable->lock_pages(mVirtualBase + offset, size);
     USAGI_CHECK_THROW(
         ResourceExhaustedException,
@@ -225,6 +228,7 @@ void MemoryView::lock(const std::uint64_t offset, const std::size_t size)
 void MemoryView::unlock(const std::uint64_t offset, const std::size_t size)
 {
     check_view(offset, size);
+    // todo: notify page manager
     const auto result = mFuncTable->unlock_pages(mVirtualBase + offset, size);
     USAGI_CHECK_THROW(
         OperatingSystemException,
@@ -281,6 +285,9 @@ void MemoryView::flush(const std::uint64_t offset, std::uint64_t size)
     size = size ? size : max_size() - offset;
     check_view(offset, size);
     check_write_access();
+    // todo: properly handle attempts to flush to pagefile
+    if(native_handle() == platforms::memory::pagefile_handle()) return;
+    // todo: notify page manager
     const auto result = mFuncTable->flush(mVirtualBase + offset, size);
     USAGI_CHECK_THROW(
         OperatingSystemException,

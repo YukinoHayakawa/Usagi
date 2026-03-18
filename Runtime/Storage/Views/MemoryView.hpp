@@ -53,6 +53,8 @@ class MemoryView final : Noncopyable
         FileOpenMode mode, std::size_t reserved_size, void *virtual_base,
         const StorageTraits &traits, VirtualPageManager *page_manager) noexcept;
 
+    void maybe_flush_unmap();
+
 public:
     constexpr static std::uint64_t USE_BACKEND_CAPACITY = 0;
 
@@ -85,6 +87,12 @@ public:
 
     MemoryView(MemoryView &&other) noexcept;
     MemoryView &operator=(MemoryView &&other) noexcept;
+
+    [[nodiscard]]
+    NativeFileHandle native_handle() const noexcept
+    {
+        return mBackendHandle;
+    }
 
     [[nodiscard]]
     bool is_valid() const noexcept
