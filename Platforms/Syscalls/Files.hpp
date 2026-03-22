@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <filesystem>
+#include <optional>
 
 #include <Usagi/Platforms/Platforms.hpp>
 #include <Usagi/Runtime/Errors/RuntimeErrorCodes.hpp>
@@ -49,7 +50,7 @@ USAGI_PLATFORM_DEPENDENT
  * @brief Closes the provided file handle, releasing the OS resource.
  * @param file The opaque handle previously returned by open_file.
  */
-USAGI_PLATFORM_DEPENDENT void close_file(
+USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> close_file(
     runtime::storage::NativeFileHandle file) noexcept;
 
 /**
@@ -110,7 +111,7 @@ USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<std::uint64_t>
  */
 [[nodiscard]]
 USAGI_PLATFORM_DEPENDENT ExpectedRuntimeValue<void> replace_file(
-    const std::filesystem::path &replaced_file,
-    const std::filesystem::path &replacement_file, bool backup,
-    const std::filesystem::path &backup_name) noexcept;
+    const std::filesystem::path         &replaced_file,
+    const std::filesystem::path         &replacement_file,
+    std::optional<std::filesystem::path> backup_name) noexcept;
 } // namespace usagi::platforms::storage

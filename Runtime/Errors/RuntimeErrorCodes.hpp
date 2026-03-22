@@ -94,12 +94,14 @@ enum class RuntimeErrorCodes : std::uint32_t
     QuotaExceeded         = ResourceError | _NEXT_OF(AddressSpaceExhausted),
 
     // Security & Access
-    AccessDenied = SecurityError | _NEXT_OF(QuotaExceeded),
-    FileInUse    = SecurityError | StateError | _NEXT_OF(AccessDenied),
+    AccessDenied      = SecurityError | _NEXT_OF(QuotaExceeded),
+    FileInUse         = SecurityError | StateError | _NEXT_OF(AccessDenied),
+    ProtectedResource = SecurityError | _NEXT_OF(FileInUse),
 
     // Parameters & Bounds
-    InvalidParameter = ParameterError | _NEXT_OF(FileInUse),
-    AlignmentError   = ParameterError | _NEXT_OF(InvalidParameter),
+    InvalidParameter = ParameterError | _NEXT_OF(ProtectedResource),
+    InvalidHandle    = ParameterError | _NEXT_OF(InvalidParameter),
+    AlignmentError   = ParameterError | _NEXT_OF(InvalidHandle),
     OutOfBounds      = ParameterError | _NEXT_OF(AlignmentError),
     RegionOverlap    = ParameterError | _NEXT_OF(OutOfBounds),
 
