@@ -95,7 +95,11 @@ MemoryHandle LinearBumpAllocator::allocate(
         // and check again.
     }
 
-    return { SIGNATURE, aligned_offset, size };
+    return {
+        .signature = SIGNATURE,
+        .offset    = aligned_offset,
+        .size      = size,
+    };
 }
 
 void LinearBumpAllocator::deallocate([[maybe_unused]] MemoryHandle handle)

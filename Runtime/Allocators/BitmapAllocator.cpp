@@ -138,7 +138,11 @@ MemoryHandle BitmapAllocatorBase::allocate_impl(const std::uint8_t signature)
     const std::uint64_t offset =
         static_cast<std::uint64_t>(block_id) * h->block_size;
 
-    return { signature, offset, h->block_size };
+    return {
+        .signature = signature,
+        .offset    = offset,
+        .size      = h->block_size,
+    };
 }
 
 void BitmapAllocatorBase::deallocate_impl(

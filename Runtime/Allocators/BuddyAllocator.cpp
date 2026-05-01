@@ -111,8 +111,13 @@ BuddyAllocator::BuddyAllocator(
             const std::uint32_t block_size = 1 << order;
 
             BuddyBlockHeader *block = get_block(current_offset);
-            block->size_order       = order;
-            block->is_free          = 1;
+            // todo: properly commit all blocks to be initialized
+            mMemory.commit(
+                current_offset,
+                sizeof(BuddyBlockHeader),
+                storage::CommitStrategy::Exact);
+            block->size_order = order;
+            block->is_free    = 1;
 
             list_insert(current_offset);
 
@@ -142,8 +147,11 @@ MemoryHandle BuddyAllocator::allocate(
         32 - Bmi32::count_leading_zeros(required_size - 1));
 
     if(order > header()->max_order)
+    {
         USAGI_CHECK_THROW(
             OutOfMemoryException, false, "Requested size exceeds max_order");
+        errors::unreachable();
+    }
 
     std::uint32_t current_order = order;
     while(current_order <= header()->max_order &&
@@ -196,7 +204,11 @@ MemoryHandle BuddyAllocator::allocate(
     *mMemory.cast_view<std::uint32_t>(
         aligned_payload_offset - sizeof(std::uint32_t)) = offset;
 
-    return { SIGNATURE, aligned_payload_offset, size };
+    return {
+        .signature = SIGNATURE,
+        .offset    = aligned_payload_offset,
+        .size      = size,
+    };
 }
 
 void BuddyAllocator::deallocate(const MemoryHandle handle)

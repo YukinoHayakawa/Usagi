@@ -195,8 +195,10 @@ void HiveAllocator::deallocate(const MemoryHandle &handle)
 
     auto *h = header();
 
+    const bool is_64_bit = h->mask_width == OperandBitWidth::_64Bit;
+
     USAGI_CHECK_FATAL(
-        handle.signature == SIGNATURE,
+        handle.signature == allocator_signature(AllocatorType::Hive, is_64_bit),
         "Invalid MemoryHandle signature in HiveAllocator");
 
     const std::uint32_t page_idx =
@@ -209,7 +211,7 @@ void HiveAllocator::deallocate(const MemoryHandle &handle)
 
     const bool was_full = page->is_full();
 
-    if(h->mask_width == OperandBitWidth::_64Bit) [[likely]]
+    if(is_64_bit) [[likely]]
     {
         bits::set_bit(page->free_mask, local_idx);
     }

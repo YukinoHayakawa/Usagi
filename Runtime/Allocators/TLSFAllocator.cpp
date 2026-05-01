@@ -182,6 +182,12 @@ MemoryHandle TLSFAllocator::allocate(
         const std::uint32_t split_offset = offset + required_size;
         TLSFBlockHeader    *split        = get_block(split_offset);
 
+        // todo: commit the block header properly!!
+        mMemory.commit(
+            split_offset,
+            sizeof(TLSFBlockHeader),
+            storage::CommitStrategy::Exact);
+
         split->size_and_flags       = block->size() - required_size;
         split->prev_physical_offset = offset;
         split->set_free(true);
@@ -223,7 +229,11 @@ MemoryHandle TLSFAllocator::allocate(
     mMemory.commit(
         offset, block->size(), storage::CommitStrategy::Aggressive64);
 
-    return { SIGNATURE, aligned_payload_offset, size };
+    return {
+        .signature = SIGNATURE,
+        .offset    = aligned_payload_offset,
+        .size      = size,
+    };
 }
 
 void TLSFAllocator::deallocate(const MemoryHandle handle)

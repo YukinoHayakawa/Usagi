@@ -42,4 +42,9 @@ struct function_traits<ReturnType (&)(Args...)>
 // Convenience alias
 template <typename T>
 using function_signature_t = typename function_traits<T>::signature;
+
+template <auto F0, auto F1>
+concept SameFunctionSignature = std::is_same_v<
+    function_signature_t<decltype(F0)>, function_signature_t<decltype(F1)>
+>;
 } // namespace usagi::functional
