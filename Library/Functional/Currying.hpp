@@ -176,8 +176,16 @@ struct [[nodiscard]] CurryCooker
                >(std::move(next));
     }
 
-    // static constexpr bool OriginalFnInvocable =
-    // std::invocable<OriginalFn, CurriedArgs...>;
+    // prefer using operator()
+    [[nodiscard]]
+    constexpr decltype(auto) operator<<(auto &&curry) &&
+        requires MovableOrCopyableArgPack<decltype(curry)>
+    {
+        return operator()(std::forward<decltype(curry)>(curry));
+    }
+
+    static constexpr bool Invocable =
+        std::invocable<OriginalFn, CurriedArgs...>;
 
     /*
      * 3.1. Evaluate (serve) the result immediately and destroy the chain.
@@ -290,6 +298,13 @@ private:
 
 }; // namespace usagi::functional
 
+template <typename Fn>
+[[nodiscard]]
+constexpr auto cook(Fn &&func)
+{
+    return CurryCooker(std::forward<Fn>(func));
+}
+
 namespace static_tests::curry_cooker
 {
 struct s
@@ -345,10 +360,10 @@ constexpr auto test_curry_cooker()
         return s::add_many(std::forward<decltype(args)>(args)...);
     };
     // explicit cast, function evaluated
-    static_assert((int)CurryCooker(l1) == 0);
+    static_assert((int)cook(l1) == 0);
     // implicit cast, evaluated, with closure containing ref.
     static_assert([&] {
-        constexpr int x = CurryCooker([&](int b) { return l1(b); })(123);
+        constexpr int x = cook([&](int b) { return l1(b); })(123);
         return x;
     }() == 123);
     // static_assert(CurryCooker(l1) == 0); -> ambiguous casting
@@ -357,31 +372,31 @@ constexpr auto test_curry_cooker()
     //   and this needs constexpr params.
 
     // eagerly evaluate by explicit cast
-    static_assert((int)CurryCooker(l1)(1) == 1);
-    static_assert((int)CurryCooker(l1)(1)(2) == 1 + 2);
-    static_assert((int)CurryCooker(l1)(1, 2) == 1 + 2);
-    static_assert((int)CurryCooker(l1)(1, 2)(3) == 1 + 2 + 3);
+    static_assert((int)cook(l1)(1) == 1);
+    static_assert((int)cook(l1)(1)(2) == 1 + 2);
+    static_assert((int)cook(l1)(1, 2) == 1 + 2);
+    static_assert((int)cook(l1)(1, 2)(3) == 1 + 2 + 3);
 
     // eagerly evaluate by cooking
-    static_assert(CurryCooker(l1)(1).cooked() == 1);
-    static_assert(CurryCooker(l1)(1)(2).cooked() == 1 + 2);
-    static_assert(CurryCooker(l1)(1, 2).cooked() == 1 + 2);
-    static_assert(CurryCooker(l1)(1, 2)(3).cooked() == 1 + 2 + 3);
+    static_assert(cook(l1)(1).cooked() == 1);
+    static_assert(cook(l1)(1)(2).cooked() == 1 + 2);
+    static_assert(cook(l1)(1, 2).cooked() == 1 + 2);
+    static_assert(cook(l1)(1, 2)(3).cooked() == 1 + 2 + 3);
 
     // eagerly evaluate by invoking
-    static_assert(CurryCooker(l1)(1)() == 1);
-    static_assert(CurryCooker(l1)(1)(2)() == 1 + 2);
-    static_assert(CurryCooker(l1)(1, 2)() == 1 + 2);
-    static_assert(CurryCooker(l1)(1, 2)(3)() == 1 + 2 + 3);
+    static_assert(cook(l1)(1)() == 1);
+    static_assert(cook(l1)(1)(2)() == 1 + 2);
+    static_assert(cook(l1)(1, 2)() == 1 + 2);
+    static_assert(cook(l1)(1, 2)(3)() == 1 + 2 + 3);
 
     // some random
     constexpr auto l2 = [](std::string_view s, std::size_t c, bool b) {
         return s.size() == c && b;
     };
 
-    static_assert(CurryCooker(l2)("test", 4)(true)() == true);
-    static_assert(CurryCooker(l2)("test", 4, false)() == false);
-    static_assert(CurryCooker(l2)("")(4)(false)() == false);
+    static_assert(cook(l2)("test", 4)(true)() == true);
+    static_assert(cook(l2)("test", 4, false)() == false);
+    static_assert(cook(l2)("")(4)(false)() == false);
 
     /*
      * Lifetime and Contracts
@@ -394,23 +409,49 @@ constexpr auto test_curry_cooker()
     };
 
     // nested Cookers and support for move constructor
-    static_assert(CurryCooker(CurryCooker(l1))(1)(2)() == 1 + 2);
-    CurryCooker { l3 }(CurryCooker(l1))(CurryCooker(l1))();
+    static_assert(cook(cook(l1))(1)(2)() == 1 + 2);
+    cook(l3)(cook(l1))(cook(l1))();
     // todo: this chain is not evaluated but not causing compile error
-    auto x = CurryCooker { l3 }(CurryCooker(l1))(CurryCooker(l1));
+    auto x = cook(l3)(cook(l1))(cook(l1));
 
     /*
      * Lazy Evaluation
      */
 
     static_assert([&] {
-        auto c0     = CurryCooker(l2);
-        auto c1     = std::move(c0)("test");
+        // c0 -> string_view -> size_t -> bool -> bool
+        auto c0 = cook(l2);
+        static_assert(!decltype(c0)::Invocable);
+        static_assert(!std::is_invocable_r_v<bool, decltype(c0)>);
+        static_assert(
+            !std::is_invocable_r_v<bool, decltype(c0), std::string_view>
+        );
+        static_assert(!std::is_invocable_r_v<
+            bool, decltype(c0), std::string_view, std::size_t
+        >);
+        static_assert(std::is_invocable_r_v<
+            bool, decltype(c0), std::string_view, std::size_t, bool
+        >);
+        // c1 -> size_t -> bool -> bool
+        auto c1 = std::move(c0)("test");
+        static_assert(!decltype(c1)::Invocable);
+        static_assert(!std::is_invocable_r_v<bool, decltype(c1)>);
+        static_assert(!std::is_invocable_r_v<bool, decltype(c1), std::size_t>);
+        static_assert(
+            std::is_invocable_r_v<bool, decltype(c1), std::size_t, bool>
+        );
         // currying wrong type is a fucking disaster.
         // need a way to carry the original type and appended types.
-        // auto c2     = std::move(c1)("4");
-        auto c2     = std::move(c1)(4);
-        auto c3     = std::move(c2)(true);
+        // c2 -> bool -> bool
+        // auto c2 = std::move(c1)("4");
+        auto c2 = std::move(c1)(4);
+        static_assert(!decltype(c2)::Invocable);
+        static_assert(!std::is_invocable_r_v<bool, decltype(c2)>);
+        static_assert(std::is_invocable_r_v<bool, decltype(c2), bool>);
+        // c3 -> bool
+        auto c3 = std::move(c2)(true);
+        static_assert(decltype(c3)::Invocable);
+        static_assert(std::is_invocable_r_v<bool, decltype(c3)>);
         auto frozen = std::move(c3).frozen();
         return frozen();
     }() == true);
@@ -438,5 +479,21 @@ int main()
     auto mid_crisis = std::move(current_state)(499).frozen();
     // ... weeks pass ...
     mid_crisis(); // Triggers the calculation / execution!
+}
+*/
+
+/*
+int main()
+{
+    auto print_job_status = [](int apps, int rejections) {
+        std::cout << "Applied to: " << apps << " | Rejected by: " << rejections
+                  << "\n";
+    };
+    // Start cooking the function
+    auto active_chain = cook(print_job_status)(100);
+    // Choice A: Serve it hot immediately
+    std::move(active_chain)(99).cooked();
+    // Choice B: Toss it in the freezer for later
+    auto freeze_frame = cook(print_job_status)(100)(99).frozen();
 }
 */
